@@ -10,11 +10,13 @@ import {
   ExternalLink,
   ToggleLeft,
   ToggleRight,
+  Trash2,
+  MoreVertical,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { QrCodeWithMeta } from './actions';
-import { toggleQrCode } from './actions';
+import { toggleQrCode, deleteQrCode } from './actions';
 import { computeQrStatus } from '@/lib/qr/status';
 import { downloadQrPng, downloadQrSvg } from '@/lib/qr/download';
 import { formatDate, truncateUrl } from '@/lib/format';
@@ -57,6 +59,20 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
         );
       } finally {
         setTogglingId(null);
+      }
+    });
+  }
+
+  function handleDelete(id: string, shortCode: string) {
+    if (!confirm(`QR-Code "${shortCode}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) return;
+    startTransition(async () => {
+      try {
+        await deleteQrCode(id);
+        toast.success('QR-Code gelöscht');
+      } catch (err) {
+        toast.error(
+          err instanceof Error ? err.message : 'Fehler beim Löschen',
+        );
       }
     });
   }
@@ -175,10 +191,10 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
-                  <Button variant="ghost" size="icon-sm" title="Herunterladen" />
+                  <Button variant="ghost" size="icon-sm" title="Aktionen" />
                 }
               >
-                <Download className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
@@ -189,6 +205,7 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
                   }}
                   disabled={!qr.qr_png_url}
                 >
+                  <Download className="mr-2 h-3.5 w-3.5" />
                   PNG herunterladen
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -199,7 +216,15 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
                   }}
                   disabled={!qr.qr_svg_url}
                 >
+                  <Download className="mr-2 h-3.5 w-3.5" />
                   SVG herunterladen
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleDelete(qr.id, qr.short_code)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-3.5 w-3.5" />
+                  Löschen
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
