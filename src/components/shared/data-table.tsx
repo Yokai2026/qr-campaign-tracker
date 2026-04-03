@@ -29,33 +29,25 @@ import { EmptyState } from './empty-state';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
 
-// ── Column helper for sort icon ──────────────────────────────────────────────
-
 export function SortIcon({ column }: { column: { getIsSorted: () => false | 'asc' | 'desc' } }) {
   const sort = column.getIsSorted();
   if (sort === 'asc') return <ArrowUp className="ml-1 h-3 w-3" />;
   if (sort === 'desc') return <ArrowDown className="ml-1 h-3 w-3" />;
-  return <ArrowUpDown className="ml-1 h-3 w-3 opacity-30" />;
+  return <ArrowUpDown className="ml-1 h-3 w-3 opacity-25" />;
 }
-
-// ── DataTable props ──────────────────────────────────────────────────────────
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  /** Global filter column key */
   searchKey?: string;
   searchPlaceholder?: string;
-  /** Show pagination (default: true if > 10 rows) */
   pagination?: boolean;
   pageSize?: number;
-  /** Empty state config */
   emptyIcon?: LucideIcon;
   emptyTitle?: string;
   emptyDescription?: string;
   emptyActionLabel?: string;
   emptyActionHref?: string;
-  /** Extra toolbar content */
   toolbar?: React.ReactNode;
   className?: string;
 };
@@ -113,12 +105,12 @@ export function DataTable<TData, TValue>({
         <div className="flex flex-wrap items-center gap-3">
           {searchKey && (
             <div className="relative w-full sm:max-w-xs">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" />
               <Input
                 placeholder={searchPlaceholder}
                 value={globalFilter}
                 onChange={(e) => setGlobalFilter(e.target.value)}
-                className="pl-9"
+                className="h-8 pl-9 text-[13px]"
               />
             </div>
           )}
@@ -136,8 +128,8 @@ export function DataTable<TData, TValue>({
             actionHref={emptyActionHref}
           />
         ) : (
-          <div className="rounded-xl border-2 border-dashed border-border/60 bg-muted/20 p-12 text-center">
-            <p className="text-sm text-muted-foreground">{emptyDescription}</p>
+          <div className="rounded-lg border border-dashed border-border py-12 text-center">
+            <p className="text-[13px] text-muted-foreground">{emptyDescription}</p>
           </div>
         )
       ) : (
@@ -148,10 +140,10 @@ export function DataTable<TData, TValue>({
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow
                     key={headerGroup.id}
-                    className="bg-muted/30 hover:bg-muted/30"
+                    className="border-b border-border bg-muted/40 hover:bg-muted/40"
                   >
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="font-semibold">
+                      <TableHead key={header.id} className="text-[12px] font-medium text-muted-foreground">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -168,7 +160,7 @@ export function DataTable<TData, TValue>({
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="h-24 text-center text-muted-foreground"
+                      className="h-20 text-center text-[13px] text-muted-foreground"
                     >
                       Keine Ergebnisse gefunden.
                     </TableCell>
@@ -177,10 +169,10 @@ export function DataTable<TData, TValue>({
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
-                      className="group transition-colors hover:bg-muted/50"
+                      className="group border-b border-border/60 transition-colors hover:bg-muted/30"
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell key={cell.id} className="text-[13px]">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),
@@ -196,41 +188,44 @@ export function DataTable<TData, TValue>({
 
           {shouldPaginate && (
             <div className="flex items-center justify-between px-1">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-[12px] text-muted-foreground">
                 {table.getFilteredRowModel().rows.length} Einträge
               </p>
               <div className="flex items-center gap-1">
                 <Button
-                  variant="outline"
-                  size="icon-sm"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
                   onClick={() => table.setPageIndex(0)}
                   disabled={!table.getCanPreviousPage()}
                 >
                   <ChevronsLeft className="h-3.5 w-3.5" />
                 </Button>
                 <Button
-                  variant="outline"
-                  size="icon-sm"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </Button>
-                <span className="px-2 text-sm text-muted-foreground">
-                  Seite {table.getState().pagination.pageIndex + 1} von{' '}
-                  {table.getPageCount()}
+                <span className="px-2 text-[12px] text-muted-foreground">
+                  {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
                 </span>
                 <Button
-                  variant="outline"
-                  size="icon-sm"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
                 </Button>
                 <Button
-                  variant="outline"
-                  size="icon-sm"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
                   onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                   disabled={!table.getCanNextPage()}
                 >

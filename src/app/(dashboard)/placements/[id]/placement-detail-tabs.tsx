@@ -242,7 +242,7 @@ export function PlacementDetailTabs({
               description="Sobald QR-Code-Aktionen stattfinden, erscheint hier der Verlauf."
             />
           ) : (
-            <Card className="border-0 shadow-card">
+            <Card className="border border-border">
               <CardHeader>
                 <CardTitle>QR-Code Verlauf</CardTitle>
               </CardHeader>

@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "Write(src/**)",
+      "Write(supabase/**)",
+      "Write(public/**)",
+      "Edit(src/**)",
+      "Edit(supabase/**)",
+      "Edit(public/**)",
+      "Edit(CLAUDE.md)",
+      "Edit(.claude/**)",
+      "Bash(npm run lint)",
+      "Bash(npm run build)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run dev *)",
+      "Bash(npx shadcn@latest add *)",
+      "Bash(npm install *)",
+      "Bash(npm test *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(ls *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)",
+      "Bash(git reset --hard *)"
+    ]
+  }
+}

@@ -89,19 +89,16 @@ export function CampaignDetailClient({
           label="Platzierungen"
           value={stats.placementCount}
           icon={MapPin}
-          color="blue"
         />
         <KPIStatCard
           label="QR-Codes"
           value={stats.qrCodeCount}
           icon={QrCode}
-          color="orange"
         />
         <KPIStatCard
           label="Scans gesamt"
           value={stats.totalScans}
           icon={BarChart3}
-          color="pink"
         />
       </div>
 

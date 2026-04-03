@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
@@ -195,56 +194,64 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
     <div className="space-y-6 animate-in-card">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Analytik</h1>
-          <p className="mt-1 text-muted-foreground">Auswertung aller QR-Scans und Events</p>
+          <h1 className="text-lg font-semibold tracking-tight">Analytik</h1>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">Auswertung aller QR-Scans und Events</p>
         </div>
-        <Button variant="outline" onClick={handleExport}>
-          <Download className="mr-2 h-4 w-4" />
+        <Button variant="outline" size="sm" onClick={handleExport}>
+          <Download className="mr-1.5 h-3.5 w-3.5" />
           CSV Export
         </Button>
       </div>
 
       {/* Filters */}
-      <Card className="border-0 shadow-card">
-        <CardContent className="pt-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="space-y-2">
-              <Label>Von</Label>
-              <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Bis</Label>
-              <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Kampagne</Label>
-              <Select value={campaignId} onValueChange={(v) => setCampaignId(v ?? 'all')}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Kampagnen</SelectItem>
-                  {campaigns.map((c) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Bezirk</Label>
-              <Select value={district} onValueChange={(v) => setDistrict(v ?? 'all')}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Alle Bezirke</SelectItem>
-                  {districts.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}
-                </SelectContent>
-              </Select>
-            </div>
+      <div className="rounded-lg border border-border bg-card p-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-1.5">
+            <Label className="text-[12px] text-muted-foreground">Von</Label>
+            <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-8 text-[13px]" />
           </div>
-        </CardContent>
-      </Card>
+          <div className="space-y-1.5">
+            <Label className="text-[12px] text-muted-foreground">Bis</Label>
+            <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-8 text-[13px]" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[12px] text-muted-foreground">Kampagne</Label>
+            <Select value={campaignId} onValueChange={(v) => setCampaignId(v ?? 'all')}>
+              <SelectTrigger className="h-8 text-[13px]">
+                <SelectValue placeholder="Alle Kampagnen">
+                  {campaignId === 'all'
+                    ? 'Alle Kampagnen'
+                    : campaigns.find((c) => c.id === campaignId)?.name ?? 'Alle Kampagnen'}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Kampagnen</SelectItem>
+                {campaigns.map((c) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[12px] text-muted-foreground">Bezirk</Label>
+            <Select value={district} onValueChange={(v) => setDistrict(v ?? 'all')}>
+              <SelectTrigger className="h-8 text-[13px]">
+                <SelectValue placeholder="Alle Bezirke">
+                  {district === 'all' ? 'Alle Bezirke' : district}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Bezirke</SelectItem>
+                {districts.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
 
       {loading ? (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <KPISkeleton count={4} />
           <ChartSkeleton />
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             <ChartSkeleton />
             <ChartSkeleton />
           </div>
@@ -253,51 +260,72 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       ) : (
         <>
           {/* KPI Cards */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
-            <KPIStatCard label="QR-Scans" value={kpis.totalOpens} icon={TrendingUp} color="pink" subtext={`${kpis.uniqueQrCodes} verschiedene QR-Codes`} />
-            <KPIStatCard label="CTA-Klicks" value={kpis.ctaClicks} icon={MousePointerClick} color="indigo" subtext={`${conversionRate}% Conversion`} />
-            <KPIStatCard label="Formulare" value={kpis.formSubmits} icon={FileText} color="emerald" subtext={`${formRate}% Abschlussrate`} />
-            <KPIStatCard label="Aktive Codes" value={kpis.uniqueQrCodes} icon={QrCode} color="orange" />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
+            <KPIStatCard label="QR-Scans" value={kpis.totalOpens} icon={TrendingUp} subtext={`${kpis.uniqueQrCodes} verschiedene QR-Codes`} />
+            <KPIStatCard label="CTA-Klicks" value={kpis.ctaClicks} icon={MousePointerClick} subtext={`${conversionRate}% Conversion`} />
+            <KPIStatCard label="Formulare" value={kpis.formSubmits} icon={FileText} subtext={`${formRate}% Abschlussrate`} />
+            <KPIStatCard label="Aktive Codes" value={kpis.uniqueQrCodes} icon={QrCode} />
           </div>
 
           {/* Charts */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard title="Scans & Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={timeSeriesData}>
                   <CartesianGrid {...GRID_STYLE} />
                   <XAxis dataKey="date" {...AXIS_STYLE} />
                   <YAxis {...AXIS_STYLE} />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="opens" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="clicks" name="CTA-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={2} dot={false} />
+                  <Tooltip
+                    contentStyle={{
+                      fontSize: 12,
+                      borderRadius: 6,
+                      border: '1px solid oklch(0.92 0 0)',
+                      boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Line type="monotone" dataKey="opens" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} />
+                  <Line type="monotone" dataKey="clicks" name="CTA-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={1.5} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
 
             <ChartCard title="Scans pro Kampagne" empty={campaignData.length === 0}>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={campaignData} layout="vertical">
                   <CartesianGrid {...GRID_STYLE} />
                   <XAxis type="number" {...AXIS_STYLE} />
                   <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={120} />
-                  <Tooltip />
-                  <Bar dataKey="opens" name="Scans" fill={SERIES_COLORS.scans} radius={[0, 4, 4, 0]} />
+                  <Tooltip
+                    contentStyle={{
+                      fontSize: 12,
+                      borderRadius: 6,
+                      border: '1px solid oklch(0.92 0 0)',
+                      boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
+                    }}
+                  />
+                  <Bar dataKey="opens" name="Scans" fill={SERIES_COLORS.scans} radius={[0, 3, 3, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
 
             <ChartCard title="Gerätetypen" empty={deviceData.length === 0}>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={deviceData} cx="50%" cy="50%" outerRadius={100} dataKey="value" nameKey="name" label>
+                  <Pie data={deviceData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={{ fontSize: 11 }} strokeWidth={1}>
                     {deviceData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
-                  <Legend />
+                  <Tooltip
+                    contentStyle={{
+                      fontSize: 12,
+                      borderRadius: 6,
+                      border: '1px solid oklch(0.92 0 0)',
+                      boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -308,20 +336,20 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <DataTableShell>
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/30 hover:bg-muted/30">
-                    <TableHead className="font-semibold">#</TableHead>
-                    <TableHead className="font-semibold">Platzierung</TableHead>
-                    <TableHead className="font-semibold">Standort</TableHead>
-                    <TableHead className="text-right font-semibold">Scans</TableHead>
+                  <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
+                    <TableHead className="text-[12px] font-medium text-muted-foreground">#</TableHead>
+                    <TableHead className="text-[12px] font-medium text-muted-foreground">Platzierung</TableHead>
+                    <TableHead className="text-[12px] font-medium text-muted-foreground">Standort</TableHead>
+                    <TableHead className="text-right text-[12px] font-medium text-muted-foreground">Scans</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {placementData.map((p, i) => (
-                    <TableRow key={i} className="group transition-colors">
-                      <TableCell className="text-muted-foreground">{i + 1}</TableCell>
-                      <TableCell className="font-medium">{p.name}</TableCell>
-                      <TableCell className="text-muted-foreground">{p.location}</TableCell>
-                      <TableCell className="text-right font-semibold">{p.opens}</TableCell>
+                    <TableRow key={i} className="border-b border-border/60 transition-colors">
+                      <TableCell className="text-[13px] text-muted-foreground">{i + 1}</TableCell>
+                      <TableCell className="text-[13px] font-medium">{p.name}</TableCell>
+                      <TableCell className="text-[13px] text-muted-foreground">{p.location}</TableCell>
+                      <TableCell className="text-right text-[13px] font-semibold tabular-nums">{p.opens}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

@@ -1,7 +1,6 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CAMPAIGN_STATUS_LABELS } from '@/lib/constants';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { KPIStatCard } from '@/components/shared/kpi-stat-card';
@@ -70,116 +69,142 @@ export default async function DashboardPage() {
     : '0';
 
   return (
-    <div className="space-y-8 animate-in-card">
+    <div className="space-y-6 animate-in-card">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
+        <h1 className="text-lg font-semibold tracking-tight">
           Willkommen, {profile.display_name || profile.email}
         </h1>
-        <p className="mt-1 text-[13px] text-muted-foreground">
-          Hier ist eine Übersicht Ihrer QR-Kampagnen.
+        <p className="mt-0.5 text-[13px] text-muted-foreground">
+          Übersicht Ihrer QR-Kampagnen
         </p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
         <Link href="/campaigns" className="group">
-          <KPIStatCard label="Kampagnen" value={campaignCount || 0} icon={Megaphone} color="violet" className="transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-0.5" />
+          <KPIStatCard
+            label="Kampagnen"
+            value={campaignCount || 0}
+            icon={Megaphone}
+            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+          />
         </Link>
         <Link href="/locations" className="group">
-          <KPIStatCard label="Standorte" value={locationCount || 0} icon={MapPin} color="blue" className="transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-0.5" />
+          <KPIStatCard
+            label="Standorte"
+            value={locationCount || 0}
+            icon={MapPin}
+            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+          />
         </Link>
         <Link href="/placements" className="group">
-          <KPIStatCard label="Platzierungen" value={placementCount || 0} icon={ClipboardList} color="emerald" className="transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-0.5" />
+          <KPIStatCard
+            label="Platzierungen"
+            value={placementCount || 0}
+            icon={ClipboardList}
+            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+          />
         </Link>
         <Link href="/qr-codes" className="group">
-          <KPIStatCard label="QR-Codes" value={qrCodeCount || 0} icon={QrCode} color="orange" className="transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-0.5" />
+          <KPIStatCard
+            label="QR-Codes"
+            value={qrCodeCount || 0}
+            icon={QrCode}
+            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+          />
         </Link>
         <Link href="/analytics" className="group">
-          <KPIStatCard label="QR-Scans" value={totalOpens || 0} icon={TrendingUp} color="pink" className="transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-0.5" />
+          <KPIStatCard
+            label="QR-Scans"
+            value={totalOpens || 0}
+            icon={TrendingUp}
+            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+          />
         </Link>
         <Link href="/analytics" className="group">
-          <KPIStatCard label="Conversion" value={`${conversionRate}%`} icon={MousePointerClick} color="indigo" className="transition-all duration-300 group-hover:shadow-card-hover group-hover:-translate-y-0.5" />
+          <KPIStatCard
+            label="Conversion"
+            value={`${conversionRate}%`}
+            icon={MousePointerClick}
+            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+          />
         </Link>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         {/* Recent Campaigns */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Aktuelle Kampagnen</CardTitle>
-            <Link href="/campaigns" className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+        <div className="rounded-lg border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <h3 className="text-[13px] font-medium">Aktuelle Kampagnen</h3>
+            <Link href="/campaigns" className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors">
               Alle anzeigen <ArrowRight className="h-3 w-3" />
             </Link>
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="divide-y divide-border/60">
             {recentCampaigns && recentCampaigns.length > 0 ? (
-              <div className="space-y-2">
-                {recentCampaigns.map((c: Record<string, unknown>) => (
-                  <Link
-                    key={c.id as string}
-                    href={`/campaigns/${c.id}`}
-                    className="group flex items-center justify-between rounded-xl border border-border/40 p-3.5 transition-all duration-150 hover:bg-muted/30 hover:border-border/70"
-                  >
-                    <div>
-                      <div className="font-semibold group-hover:text-primary transition-colors">{c.name as string}</div>
-                      <div className="mt-0.5 text-xs text-muted-foreground font-mono">{c.slug as string}</div>
-                    </div>
-                    <StatusBadge
-                      status={c.status as string}
-                      label={CAMPAIGN_STATUS_LABELS[c.status as string] || (c.status as string)}
-                    />
-                  </Link>
-                ))}
-              </div>
+              recentCampaigns.map((c: Record<string, unknown>) => (
+                <Link
+                  key={c.id as string}
+                  href={`/campaigns/${c.id}`}
+                  className="group flex items-center justify-between px-4 py-3 transition-colors hover:bg-muted/30"
+                >
+                  <div className="min-w-0">
+                    <div className="text-[13px] font-medium group-hover:text-primary transition-colors truncate">{c.name as string}</div>
+                    <div className="mt-0.5 text-[12px] text-muted-foreground font-mono">{c.slug as string}</div>
+                  </div>
+                  <StatusBadge
+                    status={c.status as string}
+                    label={CAMPAIGN_STATUS_LABELS[c.status as string] || (c.status as string)}
+                  />
+                </Link>
+              ))
             ) : (
-              <p className="py-8 text-center text-sm text-muted-foreground">
+              <p className="px-4 py-8 text-center text-[13px] text-muted-foreground">
                 Noch keine Kampagnen vorhanden.
               </p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Top Placements */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Top-Platzierungen</CardTitle>
-            <Link href="/placements" className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+        <div className="rounded-lg border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <h3 className="text-[13px] font-medium">Top-Platzierungen</h3>
+            <Link href="/placements" className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors">
               Alle anzeigen <ArrowRight className="h-3 w-3" />
             </Link>
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="divide-y divide-border/60">
             {topPlacementList.length > 0 ? (
-              <div className="space-y-2">
-                {topPlacementList.map(([pid, info], index) => (
-                  <Link
-                    key={pid}
-                    href={`/placements/${pid}`}
-                    className="group flex items-center gap-3.5 rounded-xl border border-border/40 p-3.5 transition-all duration-150 hover:bg-muted/30 hover:border-border/70"
-                  >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-sm font-bold text-muted-foreground">
-                      {index + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold truncate group-hover:text-primary transition-colors">{info.name}</div>
-                      <div className="mt-0.5 text-xs text-muted-foreground truncate">
-                        {info.location} &middot; <span className="font-mono">{info.code}</span>
-                      </div>
+              topPlacementList.map(([pid, info], index) => (
+                <Link
+                  key={pid}
+                  href={`/placements/${pid}`}
+                  className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded text-[12px] font-medium text-muted-foreground bg-muted">
+                    {index + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-medium truncate group-hover:text-primary transition-colors">{info.name}</div>
+                    <div className="mt-0.5 text-[12px] text-muted-foreground truncate">
+                      {info.location} · <span className="font-mono">{info.code}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5">
-                      <TrendingUp className="h-3.5 w-3.5 text-primary" />
-                      <span className="text-sm font-bold text-primary">{info.count}</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-[13px] font-semibold tabular-nums">
+                    {info.count}
+                    <TrendingUp className="h-3 w-3 text-muted-foreground/50" />
+                  </div>
+                </Link>
+              ))
             ) : (
-              <p className="py-8 text-center text-sm text-muted-foreground">
+              <p className="px-4 py-8 text-center text-[13px] text-muted-foreground">
                 Noch keine Scan-Daten vorhanden.
               </p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

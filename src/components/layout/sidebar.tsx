@@ -51,19 +51,35 @@ export function Sidebar() {
         href={item.href}
         onClick={() => setMobileOpen(false)}
         className={cn(
-          'group relative flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-medium transition-all duration-150',
+          'group flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] transition-colors duration-75',
           isActive
-            ? 'bg-sidebar-primary/15 text-white font-semibold'
-            : 'text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground/90'
+            ? 'bg-white/[0.08] text-white font-medium'
+            : 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
         )}
       >
-        {isActive && (
-          <span className="absolute -left-[3px] top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-sidebar-primary" />
-        )}
         <item.icon className={cn(
-          'h-[17px] w-[17px] shrink-0 transition-colors',
-          isActive ? 'text-sidebar-primary' : 'text-sidebar-foreground/35 group-hover:text-sidebar-foreground/60'
+          'h-[15px] w-[15px] shrink-0',
+          isActive ? 'text-white/90' : 'text-white/25'
         )} />
+        <span>{item.name}</span>
+      </Link>
+    );
+  }
+
+  function BottomNavItem({ item }: { item: typeof bottomNav[number] }) {
+    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+    return (
+      <Link
+        href={item.href}
+        onClick={() => setMobileOpen(false)}
+        className={cn(
+          'group flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] transition-colors duration-75',
+          isActive
+            ? 'bg-white/[0.08] text-white font-medium'
+            : 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
+        )}
+      >
+        <item.icon className="h-[15px] w-[15px] shrink-0 text-white/25" />
         {item.name}
       </Link>
     );
@@ -72,35 +88,32 @@ export function Sidebar() {
   const navContent = (
     <>
       {/* Brand */}
-      <div className="flex h-14 items-center gap-2.5 px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary shadow-glow">
-          <QrCode className="h-4 w-4 text-white" />
+      <div className="flex h-12 items-center gap-2 px-3">
+        <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-white/10">
+          <QrCode className="h-3 w-3 text-white/70" />
         </div>
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold tracking-tight text-sidebar-foreground">QR Tracker</span>
-        </div>
+        <span className="text-[13px] font-semibold tracking-tight text-white/90">
+          QR Tracker
+        </span>
       </div>
 
       {/* Main nav */}
-      <nav className="flex-1 space-y-0.5 px-2 pt-2">
-        <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-sidebar-foreground/25">
-          Navigation
-        </p>
+      <nav className="flex-1 space-y-[2px] px-2 pt-1">
         {mainNav.map((item) => (
           <NavItem key={item.href} item={item} />
         ))}
       </nav>
 
       {/* Bottom */}
-      <div className="space-y-0.5 border-t border-sidebar-border/50 px-2 py-2">
+      <div className="space-y-[2px] border-t border-white/[0.06] px-2 py-2">
         {bottomNav.map((item) => (
-          <NavItem key={item.href} item={item} />
+          <BottomNavItem key={item.href} item={item} />
         ))}
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-medium text-sidebar-foreground/40 transition-all duration-150 hover:bg-red-500/8 hover:text-red-400"
+          className="flex w-full items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] text-white/30 transition-colors duration-75 hover:bg-white/[0.04] hover:text-red-400"
         >
-          <LogOut className="h-[17px] w-[17px]" />
+          <LogOut className="h-[15px] w-[15px]" />
           Abmelden
         </button>
       </div>
@@ -110,26 +123,27 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile toggle */}
-      <div className="fixed left-0 top-0 z-40 flex h-13 w-full items-center border-b border-border/50 bg-background/80 glass px-4 lg:hidden">
+      <div className="fixed left-0 top-0 z-40 flex h-12 w-full items-center border-b border-border bg-background px-4 lg:hidden">
         <Button
           variant="ghost"
           size="icon"
+          className="h-8 w-8"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </Button>
         <div className="ml-2 flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg gradient-primary">
-            <QrCode className="h-3.5 w-3.5 text-white" />
+          <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-neutral-900">
+            <QrCode className="h-3 w-3 text-white/70" />
           </div>
-          <span className="text-sm font-semibold">QR Tracker</span>
+          <span className="text-[13px] font-semibold">QR Tracker</span>
         </div>
       </div>
 
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-30 bg-black/60 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -137,7 +151,7 @@ export function Sidebar() {
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-30 flex w-64 flex-col bg-sidebar transition-transform duration-300 ease-out lg:hidden',
+          'fixed inset-y-0 left-0 z-30 flex w-[220px] flex-col bg-[#111] transition-transform duration-200 ease-out lg:hidden',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -145,7 +159,7 @@ export function Sidebar() {
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-60 lg:flex-col lg:bg-sidebar">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-[220px] lg:flex-col lg:bg-[#111] lg:border-r lg:border-white/[0.06]">
         {navContent}
       </aside>
     </>

@@ -173,7 +173,7 @@ export function LocationDetailTabs({
         </TabsList>
 
         <TabsContent value="details">
-          <Card className="border-0 shadow-card">
+          <Card className="border border-border">
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-1.5">

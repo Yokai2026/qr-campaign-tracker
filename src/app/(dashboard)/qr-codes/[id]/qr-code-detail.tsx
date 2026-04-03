@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -103,8 +103,11 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
   const campaign = placement?.campaign;
   const location = placement?.location;
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? (typeof window !== 'undefined' ? window.location.origin : '');
-  const shortLink = `${baseUrl}/r/${qrCode.short_code}`;
+  const [baseUrl, setBaseUrl] = useState('');
+  useEffect(() => {
+    setBaseUrl(process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin);
+  }, []);
+  const shortLink = baseUrl ? `${baseUrl}/r/${qrCode.short_code}` : `/r/${qrCode.short_code}`;
 
   // Edit form state
   const [showEdit, setShowEdit] = useState(false);
@@ -256,7 +259,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
                   <BarChart3 className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{redirectCount}</p>
+                  <p className="text-xl font-semibold">{redirectCount}</p>
                   <p className="text-xs text-muted-foreground">
                     Weiterleitungen gesamt
                   </p>
