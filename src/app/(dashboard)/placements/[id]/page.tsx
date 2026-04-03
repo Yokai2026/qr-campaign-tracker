@@ -1,0 +1,33 @@
+import { unstable_noStore as noStore } from 'next/cache';
+import { notFound } from 'next/navigation';
+import { getPlacement, getCampaignsForSelect, getLocationsForSelect } from '../actions';
+import { PlacementDetailTabs } from './placement-detail-tabs';
+
+export default async function PlacementDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  noStore();
+  const { id } = await params;
+
+  let placement;
+  try {
+    placement = await getPlacement(id);
+  } catch {
+    notFound();
+  }
+
+  const [campaigns, locations] = await Promise.all([
+    getCampaignsForSelect(),
+    getLocationsForSelect(),
+  ]);
+
+  return (
+    <PlacementDetailTabs
+      placement={placement}
+      campaigns={campaigns}
+      locations={locations}
+    />
+  );
+}
