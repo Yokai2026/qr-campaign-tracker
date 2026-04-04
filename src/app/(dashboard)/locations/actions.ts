@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { locationSchema } from '@/lib/validations';
 import type { Location, LocationInput } from '@/types';
@@ -134,7 +134,7 @@ export async function deleteLocation(
   id: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   await requireAuth();
-  const supabase = await createClient();
+  const supabase = await createServiceClient();
 
   // Check for linked placements
   const { count } = await supabase

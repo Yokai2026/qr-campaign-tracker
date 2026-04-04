@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { campaignSchema } from '@/lib/validations';
 import { revalidatePath } from 'next/cache';
@@ -173,7 +173,7 @@ export async function updateCampaign(
 /** Delete a campaign by id. */
 export async function deleteCampaign(id: string): Promise<void> {
   await requireAuth();
-  const supabase = await createClient();
+  const supabase = await createServiceClient();
 
   const { error } = await supabase
     .from('campaigns')

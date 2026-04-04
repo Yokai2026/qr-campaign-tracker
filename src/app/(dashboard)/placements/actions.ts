@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { placementSchema } from '@/lib/validations';
 import type {
@@ -194,7 +194,7 @@ export async function updatePlacement(id: string, input: Partial<PlacementInput>
  */
 export async function deletePlacement(id: string) {
   await requireAuth();
-  const supabase = await createClient();
+  const supabase = await createServiceClient();
 
   const { error } = await supabase
     .from('placements')

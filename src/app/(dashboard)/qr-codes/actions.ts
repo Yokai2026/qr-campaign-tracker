@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { nanoid } from 'nanoid';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { generateQrCode, buildRedirectUrl } from '@/lib/qr/generate';
 import { qrCodeSchema, isUrlSafe } from '@/lib/validations';
@@ -380,12 +380,9 @@ export async function toggleQrCode(
  */
 export async function deleteQrCode(id: string): Promise<void> {
   await requireAuth();
-  const supabase = await createClient();
+  const supabase = await createServiceClient();
 
-  // Delete related records first, then the QR code itself
-  await supabase.from('qr_status_history').delete().eq('qr_code_id', id);
-  await supabase.from('redirect_events').delete().eq('qr_code_id', id);
-
+  // FK cascades handle qr_status_history; redirect_events uses ON DELETE SET NULL
   const { error } = await supabase
     .from('qr_codes')
     .delete()
