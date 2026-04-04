@@ -25,6 +25,7 @@ export default function NewLinkPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [useCustomCode, setUseCustomCode] = useState(false);
   const [origin, setOrigin] = useState('');
 
   // Form state
@@ -120,7 +121,16 @@ export default function NewLinkPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[12px] text-muted-foreground">Kurzcode (optional)</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-[12px] text-muted-foreground">Kurzcode</Label>
+              <button
+                type="button"
+                onClick={() => { setUseCustomCode(!useCustomCode); if (useCustomCode) setShortCode(''); }}
+                className="text-[11px] text-primary hover:underline"
+              >
+                {useCustomCode ? 'Auto-generieren' : 'Eigenen Code verwenden'}
+              </button>
+            </div>
             <div className="flex items-center gap-1.5">
               <span className="text-[13px] text-muted-foreground shrink-0">
                 {origin}/r/
@@ -129,12 +139,10 @@ export default function NewLinkPage() {
                 placeholder="auto-generiert"
                 value={shortCode}
                 onChange={(e) => setShortCode(e.target.value)}
+                disabled={!useCustomCode}
                 className="h-9 text-[13px]"
               />
             </div>
-            <p className="text-[11px] text-muted-foreground">
-              Leer lassen fuer automatischen 7-Zeichen-Code, oder eigenen Slug eingeben.
-            </p>
           </div>
 
           <div className="space-y-1.5">
