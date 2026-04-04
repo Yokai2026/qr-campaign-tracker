@@ -574,6 +574,8 @@ function EditForm({ form, onSave, onCancel, isPending }: EditFormProps) {
   const [showUtm, setShowUtm] = useState(false);
   const [showColors, setShowColors] = useState(false);
   const active = watch('active');
+  const watchFg = watch('qr_fg_color');
+  const watchBg = watch('qr_bg_color');
 
   return (
     <form onSubmit={handleSubmit(onSave)} className="space-y-4">
@@ -708,10 +710,16 @@ function EditForm({ form, onSave, onCancel, isPending }: EditFormProps) {
               <input
                 type="color"
                 id="edit_fg"
-                {...register('qr_fg_color')}
+                value={watchFg}
+                onChange={(e) => setValue('qr_fg_color', e.target.value)}
                 className="h-8 w-10 cursor-pointer rounded border border-border bg-transparent p-0.5"
               />
-              <Input {...register('qr_fg_color')} className="font-mono text-xs uppercase" maxLength={7} />
+              <Input
+                value={watchFg}
+                onChange={(e) => setValue('qr_fg_color', e.target.value)}
+                className="font-mono text-xs uppercase"
+                maxLength={7}
+              />
             </div>
           </div>
           <div className="space-y-1">
@@ -720,10 +728,16 @@ function EditForm({ form, onSave, onCancel, isPending }: EditFormProps) {
               <input
                 type="color"
                 id="edit_bg"
-                {...register('qr_bg_color')}
+                value={watchBg}
+                onChange={(e) => setValue('qr_bg_color', e.target.value)}
                 className="h-8 w-10 cursor-pointer rounded border border-border bg-transparent p-0.5"
               />
-              <Input {...register('qr_bg_color')} className="font-mono text-xs uppercase" maxLength={7} />
+              <Input
+                value={watchBg}
+                onChange={(e) => setValue('qr_bg_color', e.target.value)}
+                className="font-mono text-xs uppercase"
+                maxLength={7}
+              />
             </div>
           </div>
         </div>

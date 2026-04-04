@@ -117,6 +117,8 @@ export default function NewQrCodePage() {
   });
 
   const placementId = watch('placement_id');
+  const watchFg = watch('qr_fg_color');
+  const watchBg = watch('qr_bg_color');
   const selectedPlacement = placements.find((p) => p.id === placementId);
 
   // Load placements on mount
@@ -438,12 +440,13 @@ export default function NewQrCodePage() {
                   <div className="flex items-center gap-3">
                     <input
                       type="color"
-                      id="qr_fg_color"
-                      {...register('qr_fg_color')}
+                      value={watchFg}
+                      onChange={(e) => setValue('qr_fg_color', e.target.value)}
                       className="h-9 w-12 cursor-pointer rounded-lg border border-border bg-transparent p-0.5"
                     />
                     <Input
-                      {...register('qr_fg_color')}
+                      value={watchFg}
+                      onChange={(e) => setValue('qr_fg_color', e.target.value)}
                       className="flex-1 font-mono uppercase"
                       maxLength={7}
                     />
@@ -454,12 +457,13 @@ export default function NewQrCodePage() {
                   <div className="flex items-center gap-3">
                     <input
                       type="color"
-                      id="qr_bg_color"
-                      {...register('qr_bg_color')}
+                      value={watchBg}
+                      onChange={(e) => setValue('qr_bg_color', e.target.value)}
                       className="h-9 w-12 cursor-pointer rounded-lg border border-border bg-transparent p-0.5"
                     />
                     <Input
-                      {...register('qr_bg_color')}
+                      value={watchBg}
+                      onChange={(e) => setValue('qr_bg_color', e.target.value)}
                       className="flex-1 font-mono uppercase"
                       maxLength={7}
                     />
@@ -469,12 +473,12 @@ export default function NewQrCodePage() {
               {/* Live preview */}
               <div className="flex items-center justify-center rounded-lg border bg-muted/30 p-4">
                 <div
-                  className="flex h-24 w-24 items-center justify-center rounded-lg"
-                  style={{ backgroundColor: watch('qr_bg_color') }}
+                  className="flex h-24 w-24 items-center justify-center rounded-lg transition-colors"
+                  style={{ backgroundColor: watchBg }}
                 >
                   <QrCodeIcon
-                    className="h-16 w-16"
-                    style={{ color: watch('qr_fg_color') }}
+                    className="h-16 w-16 transition-colors"
+                    style={{ color: watchFg }}
                   />
                 </div>
               </div>
