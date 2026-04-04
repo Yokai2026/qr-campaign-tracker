@@ -129,7 +129,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
 
   const [baseUrl, setBaseUrl] = useState('');
   useEffect(() => {
-    setBaseUrl(process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin);
+    setBaseUrl(window.location.origin);
   }, []);
   const shortLink = baseUrl ? `${baseUrl}/r/${qrCode.short_code}` : `/r/${qrCode.short_code}`;
 

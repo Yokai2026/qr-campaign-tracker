@@ -173,7 +173,8 @@ create table public.redirect_events (
   campaign_id uuid references public.campaigns(id) on delete set null,
   short_code text not null,
   event_type text not null default 'qr_open' check (event_type in (
-    'qr_open', 'qr_blocked_inactive', 'qr_expired'
+    'qr_open', 'qr_blocked_inactive', 'qr_expired',
+    'link_open', 'link_expired', 'link_blocked_inactive'
   )),
   referrer text,
   user_agent text,

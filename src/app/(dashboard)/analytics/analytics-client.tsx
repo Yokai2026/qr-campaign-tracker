@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -35,7 +35,7 @@ type Props = {
 
 type AnalyticsData = {
   kpis: { totalOpens: number; uniqueScans: number; uniqueQrCodes: number; ctaClicks: number; formSubmits: number; linkClicks: number };
-  timeSeriesData: { date: string; opens: number; clicks: number }[];
+  timeSeriesData: { date: string; qr: number; link: number }[];
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; opens: number; location: string }[];
   deviceData: { name: string; value: number }[];
@@ -47,12 +47,36 @@ type SourceFilter = 'all' | 'qr' | 'link';
 
 export function AnalyticsClient({ campaigns, districts }: Props) {
   const supabase = createClient();
+  const queryClient = useQueryClient();
 
   const [dateFrom, setDateFrom] = useState(format(subDays(new Date(), 30), 'yyyy-MM-dd'));
   const [dateTo, setDateTo] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [campaignId, setCampaignId] = useState<string>('all');
   const [district, setDistrict] = useState<string>('all');
   const [source, setSource] = useState<SourceFilter>('all');
+  const [isLive, setIsLive] = useState(false);
+
+  // Realtime: invalidate analytics on new events
+  const invalidateAnalytics = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['analytics'] });
+  }, [queryClient]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('analytics-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'redirect_events' },
+        invalidateAnalytics,
+      )
+      .subscribe((status) => {
+        setIsLive(status === 'SUBSCRIBED');
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, invalidateAnalytics]);
 
   const { data, isLoading: loading } = useQuery<AnalyticsData>({
     queryKey: ['analytics', dateFrom, dateTo, campaignId, district, source],
@@ -65,7 +89,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
       let redirectQuery = supabase
         .from('redirect_events')
-        .select('id, qr_code_id, short_link_id, campaign_id, placement_id, device_type, created_at, event_type, ip_hash, country, referrer, is_bot, placements(name, placement_code, location:locations(venue_name, district))')
+        .select('id, qr_code_id, short_link_id, campaign_id, placement_id, device_type, created_at, event_type, ip_hash, country, referrer, is_bot, destination_url, placements(name, placement_code, location:locations(venue_name, district))')
         .in('event_type', eventTypes)
         .eq('is_bot', false)
         .gte('created_at', from)
@@ -96,31 +120,25 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
       const uniqueQrs = new Set(qrEvents.map((e: Record<string, unknown>) => e.qr_code_id));
       const uniqueIps = new Set(filteredEvents.map((e: Record<string, unknown>) => e.ip_hash).filter(Boolean));
-      const ctaClicks = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'cta_click').length;
+      const targetClicks = filteredEvents.filter((e: Record<string, unknown>) => e.destination_url).length;
       const formSubmits = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'form_submit').length;
 
       const kpis = {
         totalOpens: filteredEvents.length,
         uniqueScans: uniqueIps.size,
         uniqueQrCodes: uniqueQrs.size,
-        ctaClicks,
+        ctaClicks: targetClicks,
         formSubmits,
         linkClicks: linkEvents.length,
       };
 
-      // Time series
-      const dayMap: Record<string, { opens: number; clicks: number }> = {};
-      filteredEvents.forEach((e: { created_at: string }) => {
-        const day = e.created_at.slice(0, 10);
-        if (!dayMap[day]) dayMap[day] = { opens: 0, clicks: 0 };
-        dayMap[day].opens++;
-      });
-      (pageEvents || []).forEach((e: { event_type: string; created_at: string }) => {
-        if (e.event_type === 'cta_click') {
-          const day = e.created_at.slice(0, 10);
-          if (!dayMap[day]) dayMap[day] = { opens: 0, clicks: 0 };
-          dayMap[day].clicks++;
-        }
+      // Time series — QR vs Link per day
+      const dayMap: Record<string, { qr: number; link: number }> = {};
+      filteredEvents.forEach((e: Record<string, unknown>) => {
+        const day = (e.created_at as string).slice(0, 10);
+        if (!dayMap[day]) dayMap[day] = { qr: 0, link: 0 };
+        if (e.event_type === 'qr_open') dayMap[day].qr++;
+        else if (e.event_type === 'link_open') dayMap[day].link++;
       });
       const timeSeriesData = Object.entries(dayMap)
         .sort(([a], [b]) => a.localeCompare(b))
@@ -196,8 +214,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const countryData = data?.countryData ?? [];
   const referrerData = data?.referrerData ?? [];
 
-  const conversionRate = kpis.totalOpens > 0 ? ((kpis.ctaClicks / kpis.totalOpens) * 100).toFixed(1) : '0';
-  const formRate = kpis.totalOpens > 0 ? ((kpis.formSubmits / kpis.totalOpens) * 100).toFixed(1) : '0';
+  const conversionRate = kpis.totalOpens > 0 ? ((kpis.ctaClicks / kpis.totalOpens) * 100).toFixed(1) : '0.0';
+  const formRate = kpis.totalOpens > 0 ? ((kpis.formSubmits / kpis.totalOpens) * 100).toFixed(1) : '0.0';
 
   async function handleExport() {
     const from = `${dateFrom}T00:00:00`;
@@ -246,8 +264,16 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
     <div className="space-y-6 animate-in-card">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight">Analytik</h1>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">Auswertung aller QR-Scans und Events</p>
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg font-semibold tracking-tight">Analytik</h1>
+            {isLive && (
+              <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live
+              </span>
+            )}
+          </div>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">Auswertung aller QR-Scans und Link-Klicks</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" render={<a href="/analytics/compare" />}>
@@ -349,21 +375,21 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <KPIStatCard label="Aufrufe gesamt" value={kpis.totalOpens} icon={TrendingUp} subtext={`${kpis.uniqueQrCodes} QR-Codes + ${kpis.linkClicks} Link-Klicks`} />
             <KPIStatCard label="Einzelne Besucher" value={kpis.uniqueScans} icon={Users} subtext={kpis.totalOpens ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% einzigartige Nutzer` : 'Keine Daten'} />
             <KPIStatCard label="Link-Klicks" value={kpis.linkClicks} icon={Link2} subtext="Klicks ueber Kurzlinks" />
-            <KPIStatCard label="Klicks auf Zielseite" value={kpis.ctaClicks} icon={MousePointerClick} subtext={`${conversionRate}% Klickrate`} />
+            <KPIStatCard label="Zielseite erreicht" value={kpis.ctaClicks} icon={MousePointerClick} subtext={`${conversionRate}% Weiterleitungsrate`} />
             <KPIStatCard label="Formulare abgeschickt" value={kpis.formSubmits} icon={FileText} subtext={kpis.totalOpens ? `${formRate}% der Besucher` : 'Keine Daten'} />
             <KPIStatCard label="QR-Codes aktiv" value={kpis.uniqueQrCodes} icon={QrCode} subtext="Codes mit mindestens 1 Scan" />
             <KPIStatCard label="Top-Referrer" value={referrerData.length > 0 ? referrerData[0].name : '–'} icon={ArrowUpRight} subtext={referrerData.length > 0 ? `${referrerData[0].value} Klicks` : 'Keine Referrer-Daten'} />
-            <KPIStatCard label="Abschlussrate" value={`${conversionRate}%`} icon={MousePointerClick} subtext="Aufruf → Klick auf Zielseite" />
+            <KPIStatCard label="Abschlussrate" value={`${conversionRate}%`} icon={MousePointerClick} subtext="Aufruf → Zielseite erreicht" />
           </div>
 
           {/* Charts */}
           <div className="grid gap-4 lg:grid-cols-2">
-            <ChartCard title="Scans & Klicks auf Zielseite über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
+            <ChartCard title="QR-Scans & Link-Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={timeSeriesData}>
                   <CartesianGrid {...GRID_STYLE} />
                   <XAxis dataKey="date" {...AXIS_STYLE} />
-                  <YAxis {...AXIS_STYLE} />
+                  <YAxis {...AXIS_STYLE} allowDecimals={false} />
                   <Tooltip
                     contentStyle={{
                       fontSize: 12,
@@ -373,8 +399,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Line type="monotone" dataKey="opens" name="Scans" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} />
-                  <Line type="monotone" dataKey="clicks" name="Klicks auf Zielseite" stroke={SERIES_COLORS.clicks} strokeWidth={1.5} dot={false} />
+                  <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} />
+                  <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={1.5} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>

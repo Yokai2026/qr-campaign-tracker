@@ -6,6 +6,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { generateQrCode, buildRedirectUrl } from '@/lib/qr/generate';
 import { qrCodeSchema, isUrlSafe } from '@/lib/validations';
+import { getAppUrl } from '@/lib/constants';
 import type { QrCode, QrCodeInput, QrStatusHistory, QrAction } from '@/types';
 
 // ---------------------------------------------------------------------------
@@ -203,7 +204,7 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
 
   // Generate short code and URLs
   const shortCode = nanoid(8);
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getAppUrl();
   const redirectUrl = buildRedirectUrl(baseUrl, shortCode);
 
   // Generate QR code images with optional colors
@@ -350,7 +351,7 @@ export async function updateQrCode(
 
   // Regenerate QR image if target URL or colors changed
   if (targetChanged || colorChanged) {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+    const baseUrl = getAppUrl();
     const redirectUrl = buildRedirectUrl(baseUrl, existing.short_code);
     const fgColor = (updates.qr_fg_color as string) ?? existing.qr_fg_color ?? '#000000';
     const bgColor = (updates.qr_bg_color as string) ?? existing.qr_bg_color ?? '#FFFFFF';
@@ -450,7 +451,7 @@ export async function bulkCreateQrCodes(
   }
 
   const campaign = placement.campaign as { id: string; name: string; slug: string } | null;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const baseUrl = getAppUrl();
   const errors: string[] = [];
   let created = 0;
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Radio, Smartphone, Monitor, Tablet } from 'lucide-react';
+import { Radio, Smartphone, Monitor, Tablet, QrCode, Link2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 
@@ -10,6 +10,7 @@ type ScanEvent = {
   id: string;
   short_code: string;
   device_type: string | null;
+  event_type: string;
   created_at: string;
 };
 
@@ -26,18 +27,19 @@ export function LiveScanFeed() {
   useEffect(() => {
     const supabase = createClient();
 
-    // Load recent 5 events
+    // Load recent 5 events (QR + Link)
     supabase
       .from('redirect_events')
-      .select('id, short_code, device_type, created_at')
-      .eq('event_type', 'qr_open')
+      .select('id, short_code, device_type, event_type, created_at')
+      .in('event_type', ['qr_open', 'link_open'])
+      .eq('is_bot', false)
       .order('created_at', { ascending: false })
       .limit(5)
       .then(({ data }) => {
         if (data) setEvents(data);
       });
 
-    // Subscribe to new events
+    // Subscribe to new events (QR + Link)
     const channel = supabase
       .channel('live-scans')
       .on(
@@ -46,11 +48,12 @@ export function LiveScanFeed() {
           event: 'INSERT',
           schema: 'public',
           table: 'redirect_events',
-          filter: 'event_type=eq.qr_open',
         },
         (payload) => {
           const newEvent = payload.new as ScanEvent;
-          setEvents((prev) => [newEvent, ...prev].slice(0, 8));
+          if (newEvent.event_type === 'qr_open' || newEvent.event_type === 'link_open') {
+            setEvents((prev) => [newEvent, ...prev].slice(0, 8));
+          }
         },
       )
       .subscribe((status) => {
@@ -79,15 +82,18 @@ export function LiveScanFeed() {
         {events.length > 0 ? (
           events.map((event) => {
             const DeviceIcon = DEVICE_ICONS[event.device_type || ''] || Radio;
+            const isLink = event.event_type === 'link_open';
+            const SourceIcon = isLink ? Link2 : QrCode;
             return (
               <div
                 key={event.id}
                 className="flex items-center gap-3 px-4 py-2.5 animate-in fade-in slide-in-from-top-1 duration-300"
               >
-                <DeviceIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+                <SourceIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
                 <code className="text-[12px] font-mono font-medium">
                   {event.short_code}
                 </code>
+                <DeviceIcon className="h-3 w-3 shrink-0 text-muted-foreground/30" />
                 <span className="ml-auto text-[11px] text-muted-foreground tabular-nums">
                   {formatDistanceToNow(new Date(event.created_at), {
                     addSuffix: true,

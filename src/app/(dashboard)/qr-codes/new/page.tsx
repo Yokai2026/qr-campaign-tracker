@@ -149,7 +149,7 @@ export default function NewQrCodePage() {
   // Preview URL — initialize empty to avoid hydration mismatch
   const [baseUrl, setBaseUrl] = useState('');
   useEffect(() => {
-    setBaseUrl(process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin);
+    setBaseUrl(window.location.origin);
   }, []);
   const previewShortUrl = baseUrl ? `${baseUrl}/r/<short-code>` : '';
 

@@ -168,28 +168,33 @@ export default function NewLinkPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label className="text-[12px] text-muted-foreground">Kampagne</Label>
-              <Select value={campaignId} onValueChange={(v) => setCampaignId(v ?? '')}>
+              <Label className="text-[12px] text-muted-foreground">Kampagne zuordnen</Label>
+              <Select value={campaignId || 'none'} onValueChange={(v) => setCampaignId(!v || v === 'none' ? '' : v)}>
                 <SelectTrigger className="h-9 text-[13px]">
-                  <SelectValue placeholder="Keine Kampagne" />
+                  <SelectValue>
+                    {campaignId ? campaigns.find((c) => c.id === campaignId)?.name ?? 'Laden...' : 'Keine Kampagne'}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Keine Kampagne</SelectItem>
+                  <SelectItem value="none">Keine Kampagne</SelectItem>
                   {campaigns.map((c) => (
                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <p className="text-[11px] text-muted-foreground">Ordne den Link einer Kampagne zu, um Klicks dort mitzuzaehlen.</p>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-[12px] text-muted-foreground">Gruppe</Label>
-              <Select value={groupId} onValueChange={(v) => setGroupId(v ?? '')}>
+              <Label className="text-[12px] text-muted-foreground">Link-Sammlung</Label>
+              <Select value={groupId || 'none'} onValueChange={(v) => setGroupId(!v || v === 'none' ? '' : v)}>
                 <SelectTrigger className="h-9 text-[13px]">
-                  <SelectValue placeholder="Keine Gruppe" />
+                  <SelectValue>
+                    {groupId ? groups.find((g) => g.id === groupId)?.name ?? 'Laden...' : 'Keine Sammlung'}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Keine Gruppe</SelectItem>
+                  <SelectItem value="none">Keine Sammlung</SelectItem>
                   {groups.map((g) => (
                     <SelectItem key={g.id} value={g.id}>
                       <span className="flex items-center gap-1.5">
@@ -200,6 +205,7 @@ export default function NewLinkPage() {
                   ))}
                 </SelectContent>
               </Select>
+              <p className="text-[11px] text-muted-foreground">Gruppiere Links nach Thema oder Kanal (z.B. &ldquo;Social Media&rdquo;, &ldquo;Newsletter&rdquo;).</p>
             </div>
           </div>
         </CardContent>
@@ -212,71 +218,90 @@ export default function NewLinkPage() {
             onClick={() => setShowAdvanced(!showAdvanced)}
             className="flex w-full items-center justify-between"
           >
-            <CardTitle className="text-[14px]">Erweiterte Einstellungen</CardTitle>
+            <div>
+              <CardTitle className="text-[14px] text-left">Ablauf & Tracking</CardTitle>
+              <CardDescription className="text-[12px] text-left">Ablaufdatum, Weiterleitungen und Herkunfts-Tracking</CardDescription>
+            </div>
             {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
         </CardHeader>
         {showAdvanced && (
-          <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-[12px] text-muted-foreground">Ablaufdatum</Label>
-              <Input
-                type="datetime-local"
-                value={expiresAt}
-                onChange={(e) => setExpiresAt(e.target.value)}
-                className="h-9 text-[13px]"
-              />
+          <CardContent className="space-y-5">
+            {/* Expiry section */}
+            <div>
+              <p className="text-[12px] font-medium mb-3">Zeitliche Begrenzung</p>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] text-muted-foreground">Link gueltig bis</Label>
+                  <Input
+                    type="datetime-local"
+                    value={expiresAt}
+                    onChange={(e) => setExpiresAt(e.target.value)}
+                    className="h-9 text-[13px]"
+                  />
+                  <p className="text-[11px] text-muted-foreground">Nach diesem Zeitpunkt wird der Link deaktiviert.</p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] text-muted-foreground">Wohin nach Ablauf?</Label>
+                  <Input
+                    type="url"
+                    placeholder="https://meine-seite.de/nicht-mehr-verfuegbar"
+                    value={expiredUrl}
+                    onChange={(e) => setExpiredUrl(e.target.value)}
+                    className="h-9 text-[13px]"
+                  />
+                  <p className="text-[11px] text-muted-foreground">Besucher werden nach Ablauf hierhin weitergeleitet. Ohne Angabe sehen sie eine Standard-Hinweisseite.</p>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-[12px] text-muted-foreground">Weiterleitung nach Ablauf</Label>
-              <Input
-                type="url"
-                placeholder="https://example.com/abgelaufen"
-                value={expiredUrl}
-                onChange={(e) => setExpiredUrl(e.target.value)}
-                className="h-9 text-[13px]"
-              />
-            </div>
-
+            {/* UTM section */}
             <div className="border-t border-border pt-4">
-              <p className="text-[12px] font-medium mb-3">UTM-Parameter</p>
+              <p className="text-[12px] font-medium mb-1">Herkunfts-Tracking (UTM)</p>
+              <p className="text-[11px] text-muted-foreground mb-3">
+                Diese Parameter werden an die Ziel-URL angehaengt, damit du in Google Analytics o.ae. siehst, woher die Besucher kommen.
+              </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] text-muted-foreground">utm_source</Label>
+                  <Label className="text-[12px] text-muted-foreground">Quelle</Label>
                   <Input
-                    placeholder="z.B. newsletter, instagram"
+                    placeholder="z.B. newsletter, instagram, flyer"
                     value={utmSource}
                     onChange={(e) => setUtmSource(e.target.value)}
                     className="h-8 text-[13px]"
                   />
+                  <p className="text-[11px] text-muted-foreground">Wo wird der Link geteilt?</p>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] text-muted-foreground">utm_medium</Label>
+                  <Label className="text-[12px] text-muted-foreground">Medium</Label>
                   <Input
                     placeholder="link"
                     value={utmMedium}
                     onChange={(e) => setUtmMedium(e.target.value)}
                     className="h-8 text-[13px]"
                   />
+                  <p className="text-[11px] text-muted-foreground">Art des Kanals (z.B. email, social, print)</p>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] text-muted-foreground">utm_campaign</Label>
+                  <Label className="text-[12px] text-muted-foreground">Kampagnenname</Label>
                   <Input
-                    placeholder="z.B. sommer-2026"
+                    placeholder="z.B. sommer-aktion-2026"
                     value={utmCampaign}
                     onChange={(e) => setUtmCampaign(e.target.value)}
                     className="h-8 text-[13px]"
                   />
+                  <p className="text-[11px] text-muted-foreground">Name der Marketing-Aktion</p>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] text-muted-foreground">utm_content</Label>
+                  <Label className="text-[12px] text-muted-foreground">Inhalt</Label>
                   <Input
-                    placeholder="z.B. header-cta"
+                    placeholder="z.B. header-button, sidebar-banner"
                     value={utmContent}
                     onChange={(e) => setUtmContent(e.target.value)}
                     className="h-8 text-[13px]"
                   />
+                  <p className="text-[11px] text-muted-foreground">Welches Element genau? (bei mehreren Links)</p>
                 </div>
               </div>
             </div>

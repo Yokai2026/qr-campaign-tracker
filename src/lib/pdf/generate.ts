@@ -43,7 +43,7 @@ export function generateAnalyticsPdf(data: PdfReportData) {
       ['Scans gesamt', String(data.kpis.totalOpens)],
       ['Einzelne Besucher', String(data.kpis.uniqueScans)],
       ['Verwendete QR-Codes', String(data.kpis.uniqueQrCodes)],
-      ['Klicks auf Zielseite', String(data.kpis.ctaClicks)],
+      ['Zielseite erreicht', String(data.kpis.ctaClicks)],
       ['Formulare abgeschickt', String(data.kpis.formSubmits)],
       ['Abschlussrate', `${conversionRate}%`],
     ],
