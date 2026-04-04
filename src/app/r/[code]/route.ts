@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
-import { hashIp, parseDevice, getClientIp } from '@/lib/tracking/events';
+import { hashIp, parseDevice, getClientIp, isBot } from '@/lib/tracking/events';
 import { buildTargetUrlWithUtm } from '@/lib/qr/generate';
 import { isUrlSafe } from '@/lib/validations';
 
@@ -23,7 +23,17 @@ export async function GET(
   const { code } = await params;
   const supabase = await createServiceClient();
 
-  // Look up QR code by short_code
+  const userAgent = request.headers.get('user-agent') || '';
+  const referrer = request.headers.get('referer') || null;
+  const ip = getClientIp(request);
+  const ipHash = hashIp(ip);
+  const deviceType = parseDevice(userAgent);
+  const country = request.headers.get('x-vercel-ip-country') || null;
+  const botDetected = isBot(userAgent);
+
+  // =========================================
+  // 1. Try QR code lookup
+  // =========================================
   const { data: qr } = await supabase
     .from('qr_codes')
     .select(`
@@ -36,34 +46,78 @@ export async function GET(
     .eq('short_code', code)
     .single();
 
-  if (!qr) {
-    return new NextResponse('QR code not found', { status: 404 });
+  if (qr) {
+    return handleQrRedirect(supabase, qr, {
+      code, userAgent, referrer, ipHash, deviceType, country, botDetected,
+    });
   }
 
-  const userAgent = request.headers.get('user-agent') || '';
-  const referrer = request.headers.get('referer') || null;
-  const ip = getClientIp(request);
-  const ipHash = hashIp(ip);
-  const deviceType = parseDevice(userAgent);
-  const country = request.headers.get('x-vercel-ip-country') || null;
+  // =========================================
+  // 2. Try short link lookup
+  // =========================================
+  const { data: link } = await supabase
+    .from('short_links')
+    .select('*')
+    .eq('short_code', code)
+    .single();
 
-  const placement = qr.placement as { id: string; campaign_id: string; placement_code: string; campaign: { id: string; slug: string } | null } | null;
+  if (link) {
+    return handleLinkRedirect(supabase, link, {
+      code, userAgent, referrer, ipHash, deviceType, country, botDetected,
+    });
+  }
+
+  // =========================================
+  // 3. Not found
+  // =========================================
+  return new NextResponse(
+    errorHtml('Link nicht gefunden.', 'Dieser Kurzlink existiert nicht.'),
+    { status: 404, headers: { 'Content-Type': 'text/html' } }
+  );
+}
+
+// =============================================
+// QR Code redirect (existing logic)
+// =============================================
+type TrackingContext = {
+  code: string;
+  userAgent: string;
+  referrer: string | null;
+  ipHash: string;
+  deviceType: string;
+  country: string | null;
+  botDetected: boolean;
+};
+
+type SupabaseClient = Awaited<ReturnType<typeof createServiceClient>>;
+
+async function handleQrRedirect(
+  supabase: SupabaseClient,
+  qr: Record<string, unknown>,
+  ctx: TrackingContext
+) {
+  const placement = qr.placement as {
+    id: string; campaign_id: string; placement_code: string;
+    campaign: { id: string; slug: string } | null;
+  } | null;
   const campaignId = placement?.campaign_id || null;
 
-  // Check if QR code is active
+  const baseEvent = {
+    qr_code_id: qr.id as string,
+    placement_id: qr.placement_id as string,
+    campaign_id: campaignId,
+    short_code: ctx.code,
+    referrer: ctx.referrer,
+    user_agent: ctx.userAgent,
+    device_type: ctx.deviceType,
+    ip_hash: ctx.ipHash,
+    country: ctx.country,
+    is_bot: ctx.botDetected,
+  };
+
   if (!qr.active) {
     await supabase.from('redirect_events').insert({
-      qr_code_id: qr.id,
-      placement_id: qr.placement_id,
-      campaign_id: campaignId,
-      short_code: code,
-      event_type: 'qr_blocked_inactive',
-      referrer,
-      user_agent: userAgent,
-      device_type: deviceType,
-      ip_hash: ipHash,
-      destination_url: null,
-      country,
+      ...baseEvent, event_type: 'qr_blocked_inactive', destination_url: null,
     });
     return new NextResponse(
       errorHtml('Dieser QR-Code ist derzeit nicht aktiv.'),
@@ -71,21 +125,10 @@ export async function GET(
     );
   }
 
-  // Check validity dates
   const now = new Date();
-  if (qr.valid_until && new Date(qr.valid_until) < now) {
+  if (qr.valid_until && new Date(qr.valid_until as string) < now) {
     await supabase.from('redirect_events').insert({
-      qr_code_id: qr.id,
-      placement_id: qr.placement_id,
-      campaign_id: campaignId,
-      short_code: code,
-      event_type: 'qr_expired',
-      referrer,
-      user_agent: userAgent,
-      device_type: deviceType,
-      ip_hash: ipHash,
-      destination_url: null,
-      country,
+      ...baseEvent, event_type: 'qr_expired', destination_url: null,
     });
     return new NextResponse(
       errorHtml('Dieser QR-Code ist abgelaufen.'),
@@ -93,39 +136,28 @@ export async function GET(
     );
   }
 
-  if (qr.valid_from && new Date(qr.valid_from) > now) {
+  if (qr.valid_from && new Date(qr.valid_from as string) > now) {
     return new NextResponse(
       errorHtml('Dieser QR-Code ist noch nicht aktiv.'),
       { status: 425, headers: { 'Content-Type': 'text/html' } }
     );
   }
 
-  // Check scan limit
   if (qr.max_scans) {
     const { count } = await supabase
       .from('redirect_events')
       .select('id', { count: 'exact', head: true })
-      .eq('qr_code_id', qr.id)
+      .eq('qr_code_id', qr.id as string)
       .eq('event_type', 'qr_open');
 
-    if (count !== null && count >= qr.max_scans) {
-      // Log the event
+    if (count !== null && count >= (qr.max_scans as number)) {
       await supabase.from('redirect_events').insert({
-        qr_code_id: qr.id,
-        placement_id: qr.placement_id,
-        campaign_id: campaignId,
-        short_code: code,
-        event_type: 'qr_blocked_inactive',
-        referrer,
-        user_agent: userAgent,
-        device_type: deviceType,
-        ip_hash: ipHash,
-        destination_url: null,
+        ...baseEvent, event_type: 'qr_blocked_inactive', destination_url: null,
       });
 
-      // Redirect to limit URL or show message
-      if (qr.limit_redirect_url && isUrlSafe(qr.limit_redirect_url)) {
-        return NextResponse.redirect(qr.limit_redirect_url, 302);
+      const limitUrl = qr.limit_redirect_url as string | null;
+      if (limitUrl && isUrlSafe(limitUrl)) {
+        return NextResponse.redirect(limitUrl, 302);
       }
       return new NextResponse(
         errorHtml('Dieses Angebot ist leider nicht mehr verfuegbar.', 'Das Scan-Limit wurde erreicht.'),
@@ -134,42 +166,98 @@ export async function GET(
     }
   }
 
-  // Build target URL with UTM params
-  let targetUrl = qr.target_url;
-
-  // Safety check
+  let targetUrl = qr.target_url as string;
   if (!isUrlSafe(targetUrl)) {
     return new NextResponse('Invalid redirect target', { status: 400 });
   }
 
   targetUrl = buildTargetUrlWithUtm(targetUrl, {
-    utm_source: qr.utm_source || undefined,
-    utm_medium: qr.utm_medium || undefined,
-    utm_campaign: qr.utm_campaign || undefined,
-    utm_content: qr.utm_content || undefined,
-    utm_id: qr.utm_id || undefined,
+    utm_source: (qr.utm_source as string) || undefined,
+    utm_medium: (qr.utm_medium as string) || undefined,
+    utm_campaign: (qr.utm_campaign as string) || undefined,
+    utm_content: (qr.utm_content as string) || undefined,
+    utm_id: (qr.utm_id as string) || undefined,
   });
 
-  // Append QR attribution params for landing page tracking
   const url = new URL(targetUrl);
-  url.searchParams.set('qr', code);
-  if (qr.placement_id) url.searchParams.set('pid', qr.placement_id);
+  url.searchParams.set('qr', ctx.code);
+  if (qr.placement_id) url.searchParams.set('pid', qr.placement_id as string);
   if (campaignId) url.searchParams.set('cid', campaignId);
   targetUrl = url.toString();
 
-  // Record redirect event (non-blocking)
   await supabase.from('redirect_events').insert({
-    qr_code_id: qr.id,
-    placement_id: qr.placement_id,
-    campaign_id: campaignId,
-    short_code: code,
-    event_type: 'qr_open',
-    referrer,
-    user_agent: userAgent,
-    device_type: deviceType,
-    ip_hash: ipHash,
-    destination_url: targetUrl,
-    country,
+    ...baseEvent, event_type: 'qr_open', destination_url: targetUrl,
+  });
+
+  return NextResponse.redirect(targetUrl, 302);
+}
+
+// =============================================
+// Short Link redirect
+// =============================================
+async function handleLinkRedirect(
+  supabase: SupabaseClient,
+  link: Record<string, unknown>,
+  ctx: TrackingContext
+) {
+  const baseEvent = {
+    short_link_id: link.id as string,
+    campaign_id: link.campaign_id as string | null,
+    short_code: ctx.code,
+    referrer: ctx.referrer,
+    user_agent: ctx.userAgent,
+    device_type: ctx.deviceType,
+    ip_hash: ctx.ipHash,
+    country: ctx.country,
+    is_bot: ctx.botDetected,
+  };
+
+  if (!link.active || link.archived) {
+    await supabase.from('redirect_events').insert({
+      ...baseEvent, event_type: 'link_blocked_inactive', destination_url: null,
+    });
+    return new NextResponse(
+      errorHtml('Dieser Link ist derzeit nicht aktiv.'),
+      { status: 410, headers: { 'Content-Type': 'text/html' } }
+    );
+  }
+
+  const now = new Date();
+  if (link.expires_at && new Date(link.expires_at as string) < now) {
+    await supabase.from('redirect_events').insert({
+      ...baseEvent, event_type: 'link_expired', destination_url: null,
+    });
+    const expiredUrl = link.expired_url as string | null;
+    if (expiredUrl && isUrlSafe(expiredUrl)) {
+      return NextResponse.redirect(expiredUrl, 302);
+    }
+    return new NextResponse(
+      errorHtml('Dieser Link ist abgelaufen.'),
+      { status: 410, headers: { 'Content-Type': 'text/html' } }
+    );
+  }
+
+  let targetUrl = link.target_url as string;
+  if (!isUrlSafe(targetUrl)) {
+    return new NextResponse('Invalid redirect target', { status: 400 });
+  }
+
+  targetUrl = buildTargetUrlWithUtm(targetUrl, {
+    utm_source: (link.utm_source as string) || undefined,
+    utm_medium: (link.utm_medium as string) || 'link',
+    utm_campaign: (link.utm_campaign as string) || undefined,
+    utm_content: (link.utm_content as string) || undefined,
+    utm_id: (link.utm_id as string) || undefined,
+  });
+
+  // Append link attribution params
+  const url = new URL(targetUrl);
+  url.searchParams.set('sl', ctx.code);
+  if (link.campaign_id) url.searchParams.set('cid', link.campaign_id as string);
+  targetUrl = url.toString();
+
+  await supabase.from('redirect_events').insert({
+    ...baseEvent, event_type: 'link_open', destination_url: targetUrl,
   });
 
   return NextResponse.redirect(targetUrl, 302);

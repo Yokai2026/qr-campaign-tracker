@@ -166,6 +166,49 @@ export interface PageEvent {
   created_at: string;
 }
 
+// ============================================
+// Short Links
+// ============================================
+
+export interface LinkGroup {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  color: string;
+  campaign_id: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  campaign?: Campaign;
+}
+
+export interface ShortLink {
+  id: string;
+  short_code: string;
+  target_url: string;
+  title: string | null;
+  description: string | null;
+  campaign_id: string | null;
+  link_group_id: string | null;
+  active: boolean;
+  archived: boolean;
+  expires_at: string | null;
+  expired_url: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  utm_id: string | null;
+  click_count: number;
+  last_clicked_at: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  campaign?: Campaign;
+  link_group?: LinkGroup;
+}
+
 export type ReportFrequency = 'daily' | 'weekly' | 'monthly';
 
 export interface ReportSchedule {

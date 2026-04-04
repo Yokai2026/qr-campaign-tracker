@@ -10,6 +10,7 @@ import {
   MapPin,
   ClipboardList,
   QrCode,
+  Link2,
   BarChart3,
   Settings,
   LogOut,
@@ -26,6 +27,7 @@ const mainNav = [
   { name: 'Standorte', href: '/locations', icon: MapPin },
   { name: 'Platzierungen', href: '/placements', icon: ClipboardList },
   { name: 'QR-Codes', href: '/qr-codes', icon: QrCode },
+  { name: 'Kurzlinks', href: '/links', icon: Link2 },
   { name: 'Analytik', href: '/analytics', icon: BarChart3 },
 ];
 

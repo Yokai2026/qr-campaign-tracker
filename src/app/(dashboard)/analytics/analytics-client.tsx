@@ -20,6 +20,7 @@ import {
 } from 'recharts';
 import {
   TrendingUp, MousePointerClick, FileText, QrCode, Download, Users, FileDown, Globe,
+  Link2, ArrowUpRight,
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
@@ -33,13 +34,16 @@ type Props = {
 };
 
 type AnalyticsData = {
-  kpis: { totalOpens: number; uniqueScans: number; uniqueQrCodes: number; ctaClicks: number; formSubmits: number };
+  kpis: { totalOpens: number; uniqueScans: number; uniqueQrCodes: number; ctaClicks: number; formSubmits: number; linkClicks: number };
   timeSeriesData: { date: string; opens: number; clicks: number }[];
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; opens: number; location: string }[];
   deviceData: { name: string; value: number }[];
   countryData: { name: string; value: number }[];
+  referrerData: { name: string; value: number }[];
 };
+
+type SourceFilter = 'all' | 'qr' | 'link';
 
 export function AnalyticsClient({ campaigns, districts }: Props) {
   const supabase = createClient();
@@ -48,17 +52,22 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const [dateTo, setDateTo] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [campaignId, setCampaignId] = useState<string>('all');
   const [district, setDistrict] = useState<string>('all');
+  const [source, setSource] = useState<SourceFilter>('all');
 
   const { data, isLoading: loading } = useQuery<AnalyticsData>({
-    queryKey: ['analytics', dateFrom, dateTo, campaignId, district],
+    queryKey: ['analytics', dateFrom, dateTo, campaignId, district, source],
     queryFn: async () => {
       const from = `${dateFrom}T00:00:00`;
       const to = `${dateTo}T23:59:59`;
 
+      // Determine which event types to query based on source filter
+      const eventTypes = source === 'qr' ? ['qr_open'] : source === 'link' ? ['link_open'] : ['qr_open', 'link_open'];
+
       let redirectQuery = supabase
         .from('redirect_events')
-        .select('id, qr_code_id, campaign_id, placement_id, device_type, created_at, event_type, ip_hash, country, placements(name, placement_code, location:locations(venue_name, district))')
-        .eq('event_type', 'qr_open')
+        .select('id, qr_code_id, short_link_id, campaign_id, placement_id, device_type, created_at, event_type, ip_hash, country, referrer, is_bot, placements(name, placement_code, location:locations(venue_name, district))')
+        .in('event_type', eventTypes)
+        .eq('is_bot', false)
         .gte('created_at', from)
         .lte('created_at', to);
 
@@ -82,12 +91,22 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       if (campaignId !== 'all') pageQuery = pageQuery.eq('campaign_id', campaignId);
       const { data: pageEvents } = await pageQuery;
 
-      const uniqueQrs = new Set(filteredEvents.map((e: Record<string, unknown>) => e.qr_code_id));
+      const qrEvents = filteredEvents.filter((e: Record<string, unknown>) => e.event_type === 'qr_open');
+      const linkEvents = filteredEvents.filter((e: Record<string, unknown>) => e.event_type === 'link_open');
+
+      const uniqueQrs = new Set(qrEvents.map((e: Record<string, unknown>) => e.qr_code_id));
       const uniqueIps = new Set(filteredEvents.map((e: Record<string, unknown>) => e.ip_hash).filter(Boolean));
       const ctaClicks = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'cta_click').length;
       const formSubmits = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'form_submit').length;
 
-      const kpis = { totalOpens: filteredEvents.length, uniqueScans: uniqueIps.size, uniqueQrCodes: uniqueQrs.size, ctaClicks, formSubmits };
+      const kpis = {
+        totalOpens: filteredEvents.length,
+        uniqueScans: uniqueIps.size,
+        uniqueQrCodes: uniqueQrs.size,
+        ctaClicks,
+        formSubmits,
+        linkClicks: linkEvents.length,
+      };
 
       // Time series
       const dayMap: Record<string, { opens: number; clicks: number }> = {};
@@ -117,9 +136,9 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         .map(([cid, opens]) => ({ name: campaigns.find((c) => c.id === cid)?.name || 'Unbekannt', opens }))
         .sort((a, b) => b.opens - a.opens);
 
-      // Top placements
+      // Top placements (only for QR events)
       const placeMap: Record<string, { name: string; location: string; opens: number }> = {};
-      filteredEvents.forEach((e: Record<string, unknown>) => {
+      qrEvents.forEach((e: Record<string, unknown>) => {
         const pid = e.placement_id as string;
         if (!pid) return;
         if (!placeMap[pid]) {
@@ -148,16 +167,34 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         .map(([name, value]) => ({ name, value }))
         .sort((a, b) => b.value - a.value);
 
-      return { kpis, timeSeriesData, campaignData, placementData, deviceData, countryData };
+      // Referrer breakdown
+      const refMap: Record<string, number> = {};
+      filteredEvents.forEach((e: Record<string, unknown>) => {
+        const ref = e.referrer as string | null;
+        if (!ref) return;
+        try {
+          const host = new URL(ref).hostname.replace('www.', '');
+          refMap[host] = (refMap[host] || 0) + 1;
+        } catch {
+          refMap[ref] = (refMap[ref] || 0) + 1;
+        }
+      });
+      const referrerData = Object.entries(refMap)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 10);
+
+      return { kpis, timeSeriesData, campaignData, placementData, deviceData, countryData, referrerData };
     },
   });
 
-  const kpis = data?.kpis ?? { totalOpens: 0, uniqueScans: 0, uniqueQrCodes: 0, ctaClicks: 0, formSubmits: 0 };
+  const kpis = data?.kpis ?? { totalOpens: 0, uniqueScans: 0, uniqueQrCodes: 0, ctaClicks: 0, formSubmits: 0, linkClicks: 0 };
   const timeSeriesData = data?.timeSeriesData ?? [];
   const campaignData = data?.campaignData ?? [];
   const placementData = data?.placementData ?? [];
   const deviceData = data?.deviceData ?? [];
   const countryData = data?.countryData ?? [];
+  const referrerData = data?.referrerData ?? [];
 
   const conversionRate = kpis.totalOpens > 0 ? ((kpis.ctaClicks / kpis.totalOpens) * 100).toFixed(1) : '0';
   const formRate = kpis.totalOpens > 0 ? ((kpis.formSubmits / kpis.totalOpens) * 100).toFixed(1) : '0';
@@ -238,7 +275,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
       {/* Filters */}
       <div className="rounded-lg border border-border bg-card p-4">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Von</Label>
             <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-8 text-[13px]" />
@@ -246,6 +283,21 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Bis</Label>
             <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-8 text-[13px]" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[12px] text-muted-foreground">Quelle</Label>
+            <Select value={source} onValueChange={(v) => setSource((v ?? 'all') as SourceFilter)}>
+              <SelectTrigger className="h-8 text-[13px]">
+                <SelectValue>
+                  {source === 'all' ? 'Alle Quellen' : source === 'qr' ? 'QR-Codes' : 'Kurzlinks'}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Quellen</SelectItem>
+                <SelectItem value="qr">QR-Codes</SelectItem>
+                <SelectItem value="link">Kurzlinks</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Kampagne</Label>
@@ -293,13 +345,15 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       ) : (
         <>
           {/* KPI Cards */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
-            <KPIStatCard label="Scans gesamt" value={kpis.totalOpens} icon={TrendingUp} subtext={`${kpis.uniqueQrCodes} verschiedene QR-Codes gescannt`} />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
+            <KPIStatCard label="Aufrufe gesamt" value={kpis.totalOpens} icon={TrendingUp} subtext={`${kpis.uniqueQrCodes} QR-Codes + ${kpis.linkClicks} Link-Klicks`} />
             <KPIStatCard label="Einzelne Besucher" value={kpis.uniqueScans} icon={Users} subtext={kpis.totalOpens ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% einzigartige Nutzer` : 'Keine Daten'} />
+            <KPIStatCard label="Link-Klicks" value={kpis.linkClicks} icon={Link2} subtext="Klicks ueber Kurzlinks" />
             <KPIStatCard label="Klicks auf Zielseite" value={kpis.ctaClicks} icon={MousePointerClick} subtext={`${conversionRate}% Klickrate`} />
             <KPIStatCard label="Formulare abgeschickt" value={kpis.formSubmits} icon={FileText} subtext={kpis.totalOpens ? `${formRate}% der Besucher` : 'Keine Daten'} />
-            <KPIStatCard label="Verwendete QR-Codes" value={kpis.uniqueQrCodes} icon={QrCode} subtext="Codes mit mindestens 1 Scan" />
-            <KPIStatCard label="Abschlussrate" value={`${conversionRate}%`} icon={MousePointerClick} subtext="Scan → Klick auf Zielseite" />
+            <KPIStatCard label="QR-Codes aktiv" value={kpis.uniqueQrCodes} icon={QrCode} subtext="Codes mit mindestens 1 Scan" />
+            <KPIStatCard label="Top-Referrer" value={referrerData.length > 0 ? referrerData[0].name : '–'} icon={ArrowUpRight} subtext={referrerData.length > 0 ? `${referrerData[0].value} Klicks` : 'Keine Referrer-Daten'} />
+            <KPIStatCard label="Abschlussrate" value={`${conversionRate}%`} icon={MousePointerClick} subtext="Aufruf → Klick auf Zielseite" />
           </div>
 
           {/* Charts */}
@@ -380,6 +434,32 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 <CountryChart data={countryData} />
               </ChartCard>
             </div>
+          )}
+
+          {/* Referrer Chart */}
+          {referrerData.length > 0 && (
+            <ChartCard title="Top-Referrer" className="lg:col-span-1">
+              <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+                <ArrowUpRight className="h-3.5 w-3.5" />
+                Woher die Besucher kommen
+              </div>
+              <ResponsiveContainer width="100%" height={Math.max(200, referrerData.length * 36)}>
+                <BarChart data={referrerData} layout="vertical">
+                  <CartesianGrid {...GRID_STYLE} />
+                  <XAxis type="number" {...AXIS_STYLE} />
+                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={140} />
+                  <Tooltip
+                    contentStyle={{
+                      fontSize: 12,
+                      borderRadius: 6,
+                      border: '1px solid oklch(0.92 0 0)',
+                      boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
+                    }}
+                  />
+                  <Bar dataKey="value" name="Klicks" fill={SERIES_COLORS.clicks} radius={[0, 3, 3, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
           )}
 
           {/* Top Placements Table */}

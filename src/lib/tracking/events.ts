@@ -14,6 +14,18 @@ export function parseDevice(userAgent: string): string {
   return 'desktop';
 }
 
+const BOT_PATTERNS = [
+  'bot', 'crawl', 'spider', 'slurp', 'facebookexternalhit', 'facebot',
+  'twitterbot', 'linkedinbot', 'whatsapp', 'telegrambot', 'discordbot',
+  'slackbot', 'applebot', 'googlebot', 'bingbot', 'yandexbot',
+  'pinterestbot', 'preview', 'fetch', 'curl', 'wget', 'headless',
+];
+
+export function isBot(userAgent: string): boolean {
+  const ua = userAgent.toLowerCase();
+  return BOT_PATTERNS.some((pattern) => ua.includes(pattern));
+}
+
 export function getClientIp(request: Request): string {
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) return forwarded.split(',')[0].trim();
