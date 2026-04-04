@@ -102,6 +102,7 @@ export function LocationsTable({ data }: LocationsTableProps) {
       emptyDescription="Erstellen Sie Ihren ersten Standort, um loszulegen."
       emptyActionLabel="Standort erstellen"
       emptyActionHref="/locations/new"
+      enableColumnVisibility
     />
   );
 }

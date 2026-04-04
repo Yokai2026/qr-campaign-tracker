@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -28,11 +29,12 @@ type Props = {
   districts: string[];
 };
 
-type KPIs = {
-  totalOpens: number;
-  uniqueQrCodes: number;
-  ctaClicks: number;
-  formSubmits: number;
+type AnalyticsData = {
+  kpis: { totalOpens: number; uniqueQrCodes: number; ctaClicks: number; formSubmits: number };
+  timeSeriesData: { date: string; opens: number; clicks: number }[];
+  campaignData: { name: string; opens: number }[];
+  placementData: { name: string; opens: number; location: string }[];
+  deviceData: { name: string; value: number }[];
 };
 
 export function AnalyticsClient({ campaigns, districts }: Props) {
@@ -43,106 +45,103 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const [campaignId, setCampaignId] = useState<string>('all');
   const [district, setDistrict] = useState<string>('all');
 
-  const [kpis, setKpis] = useState<KPIs>({ totalOpens: 0, uniqueQrCodes: 0, ctaClicks: 0, formSubmits: 0 });
-  const [timeSeriesData, setTimeSeriesData] = useState<{ date: string; opens: number; clicks: number }[]>([]);
-  const [campaignData, setCampaignData] = useState<{ name: string; opens: number }[]>([]);
-  const [placementData, setPlacementData] = useState<{ name: string; opens: number; location: string }[]>([]);
-  const [deviceData, setDeviceData] = useState<{ name: string; value: number }[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading: loading } = useQuery<AnalyticsData>({
+    queryKey: ['analytics', dateFrom, dateTo, campaignId, district],
+    queryFn: async () => {
+      const from = `${dateFrom}T00:00:00`;
+      const to = `${dateTo}T23:59:59`;
 
-  const fetchAnalytics = useCallback(async () => {
-    setLoading(true);
-    const from = `${dateFrom}T00:00:00`;
-    const to = `${dateTo}T23:59:59`;
+      let redirectQuery = supabase
+        .from('redirect_events')
+        .select('id, qr_code_id, campaign_id, placement_id, device_type, created_at, event_type, placements(name, placement_code, location:locations(venue_name, district))')
+        .eq('event_type', 'qr_open')
+        .gte('created_at', from)
+        .lte('created_at', to);
 
-    let redirectQuery = supabase
-      .from('redirect_events')
-      .select('id, qr_code_id, campaign_id, placement_id, device_type, created_at, event_type, placements(name, placement_code, location:locations(venue_name, district))')
-      .eq('event_type', 'qr_open')
-      .gte('created_at', from)
-      .lte('created_at', to);
+      if (campaignId !== 'all') redirectQuery = redirectQuery.eq('campaign_id', campaignId);
+      const { data: redirectEvents } = await redirectQuery;
 
-    if (campaignId !== 'all') redirectQuery = redirectQuery.eq('campaign_id', campaignId);
-    const { data: redirectEvents } = await redirectQuery;
+      let filteredEvents = redirectEvents || [];
+      if (district !== 'all') {
+        filteredEvents = filteredEvents.filter((e: Record<string, unknown>) => {
+          const p = e.placements as { location: { district: string | null } | null } | null;
+          return p?.location?.district === district;
+        });
+      }
 
-    let filteredEvents = redirectEvents || [];
-    if (district !== 'all') {
-      filteredEvents = filteredEvents.filter((e: Record<string, unknown>) => {
-        const p = e.placements as { location: { district: string | null } | null } | null;
-        return p?.location?.district === district;
-      });
-    }
+      let pageQuery = supabase
+        .from('page_events')
+        .select('id, event_type, campaign_id, created_at')
+        .gte('created_at', from)
+        .lte('created_at', to);
 
-    let pageQuery = supabase
-      .from('page_events')
-      .select('id, event_type, campaign_id, created_at')
-      .gte('created_at', from)
-      .lte('created_at', to);
+      if (campaignId !== 'all') pageQuery = pageQuery.eq('campaign_id', campaignId);
+      const { data: pageEvents } = await pageQuery;
 
-    if (campaignId !== 'all') pageQuery = pageQuery.eq('campaign_id', campaignId);
-    const { data: pageEvents } = await pageQuery;
+      const uniqueQrs = new Set(filteredEvents.map((e: Record<string, unknown>) => e.qr_code_id));
+      const ctaClicks = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'cta_click').length;
+      const formSubmits = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'form_submit').length;
 
-    const uniqueQrs = new Set(filteredEvents.map((e: Record<string, unknown>) => e.qr_code_id));
-    const ctaClicks = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'cta_click').length;
-    const formSubmits = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'form_submit').length;
+      const kpis = { totalOpens: filteredEvents.length, uniqueQrCodes: uniqueQrs.size, ctaClicks, formSubmits };
 
-    setKpis({ totalOpens: filteredEvents.length, uniqueQrCodes: uniqueQrs.size, ctaClicks, formSubmits });
-
-    // Time series
-    const dayMap: Record<string, { opens: number; clicks: number }> = {};
-    filteredEvents.forEach((e: { created_at: string }) => {
-      const day = e.created_at.slice(0, 10);
-      if (!dayMap[day]) dayMap[day] = { opens: 0, clicks: 0 };
-      dayMap[day].opens++;
-    });
-    (pageEvents || []).forEach((e: { event_type: string; created_at: string }) => {
-      if (e.event_type === 'cta_click') {
+      // Time series
+      const dayMap: Record<string, { opens: number; clicks: number }> = {};
+      filteredEvents.forEach((e: { created_at: string }) => {
         const day = e.created_at.slice(0, 10);
         if (!dayMap[day]) dayMap[day] = { opens: 0, clicks: 0 };
-        dayMap[day].clicks++;
-      }
-    });
-    setTimeSeriesData(
-      Object.entries(dayMap).sort(([a], [b]) => a.localeCompare(b)).map(([date, val]) => ({ date, ...val })),
-    );
+        dayMap[day].opens++;
+      });
+      (pageEvents || []).forEach((e: { event_type: string; created_at: string }) => {
+        if (e.event_type === 'cta_click') {
+          const day = e.created_at.slice(0, 10);
+          if (!dayMap[day]) dayMap[day] = { opens: 0, clicks: 0 };
+          dayMap[day].clicks++;
+        }
+      });
+      const timeSeriesData = Object.entries(dayMap)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, val]) => ({ date, ...val }));
 
-    // Campaign breakdown
-    const campMap: Record<string, number> = {};
-    filteredEvents.forEach((e: { campaign_id: string | null }) => {
-      const cid = e.campaign_id || 'unknown';
-      campMap[cid] = (campMap[cid] || 0) + 1;
-    });
-    setCampaignData(
-      Object.entries(campMap)
+      // Campaign breakdown
+      const campMap: Record<string, number> = {};
+      filteredEvents.forEach((e: { campaign_id: string | null }) => {
+        const cid = e.campaign_id || 'unknown';
+        campMap[cid] = (campMap[cid] || 0) + 1;
+      });
+      const campaignData = Object.entries(campMap)
         .map(([cid, opens]) => ({ name: campaigns.find((c) => c.id === cid)?.name || 'Unbekannt', opens }))
-        .sort((a, b) => b.opens - a.opens),
-    );
+        .sort((a, b) => b.opens - a.opens);
 
-    // Top placements
-    const placeMap: Record<string, { name: string; location: string; opens: number }> = {};
-    filteredEvents.forEach((e: Record<string, unknown>) => {
-      const pid = e.placement_id as string;
-      if (!pid) return;
-      if (!placeMap[pid]) {
-        const p = e.placements as { name: string; location: { venue_name: string } | null } | null;
-        placeMap[pid] = { name: p?.name || 'Unbekannt', location: p?.location?.venue_name || '', opens: 0 };
-      }
-      placeMap[pid].opens++;
-    });
-    setPlacementData(Object.values(placeMap).sort((a, b) => b.opens - a.opens).slice(0, 10));
+      // Top placements
+      const placeMap: Record<string, { name: string; location: string; opens: number }> = {};
+      filteredEvents.forEach((e: Record<string, unknown>) => {
+        const pid = e.placement_id as string;
+        if (!pid) return;
+        if (!placeMap[pid]) {
+          const p = e.placements as { name: string; location: { venue_name: string } | null } | null;
+          placeMap[pid] = { name: p?.name || 'Unbekannt', location: p?.location?.venue_name || '', opens: 0 };
+        }
+        placeMap[pid].opens++;
+      });
+      const placementData = Object.values(placeMap).sort((a, b) => b.opens - a.opens).slice(0, 10);
 
-    // Device breakdown
-    const devMap: Record<string, number> = {};
-    filteredEvents.forEach((e: { device_type: string | null }) => {
-      const dev = e.device_type || 'unbekannt';
-      devMap[dev] = (devMap[dev] || 0) + 1;
-    });
-    setDeviceData(Object.entries(devMap).map(([name, value]) => ({ name, value })));
-    setLoading(false);
-  }, [supabase, dateFrom, dateTo, campaignId, district, campaigns]);
+      // Device breakdown
+      const devMap: Record<string, number> = {};
+      filteredEvents.forEach((e: { device_type: string | null }) => {
+        const dev = e.device_type || 'unbekannt';
+        devMap[dev] = (devMap[dev] || 0) + 1;
+      });
+      const deviceData = Object.entries(devMap).map(([name, value]) => ({ name, value }));
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { fetchAnalytics(); }, [fetchAnalytics]);
+      return { kpis, timeSeriesData, campaignData, placementData, deviceData };
+    },
+  });
+
+  const kpis = data?.kpis ?? { totalOpens: 0, uniqueQrCodes: 0, ctaClicks: 0, formSubmits: 0 };
+  const timeSeriesData = data?.timeSeriesData ?? [];
+  const campaignData = data?.campaignData ?? [];
+  const placementData = data?.placementData ?? [];
+  const deviceData = data?.deviceData ?? [];
 
   const conversionRate = kpis.totalOpens > 0 ? ((kpis.ctaClicks / kpis.totalOpens) * 100).toFixed(1) : '0';
   const formRate = kpis.totalOpens > 0 ? ((kpis.formSubmits / kpis.totalOpens) * 100).toFixed(1) : '0';

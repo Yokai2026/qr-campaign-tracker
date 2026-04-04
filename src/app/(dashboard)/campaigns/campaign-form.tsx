@@ -2,8 +2,10 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { toast } from 'sonner';
-import { campaignSchema } from '@/lib/validations';
 import { CAMPAIGN_STATUS_LABELS } from '@/lib/constants';
 import type { CampaignStatus, CampaignInput } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -25,6 +27,23 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { createCampaign, updateCampaign } from './actions';
+
+// ---------------------------------------------------------------------------
+// Schema (tags as comma-separated string for the form)
+// ---------------------------------------------------------------------------
+
+const formSchema = z.object({
+  name: z.string().min(1, 'Name ist erforderlich').max(200),
+  slug: z.string().min(1, 'Slug ist erforderlich').max(100)
+    .regex(/^[a-z0-9-]+$/, 'Nur Kleinbuchstaben, Zahlen und Bindestriche'),
+  description: z.string().max(2000),
+  status: z.enum(['draft', 'active', 'paused', 'completed', 'archived']),
+  start_date: z.string(),
+  end_date: z.string(),
+  tags: z.string(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 // ---------------------------------------------------------------------------
 // Slug helper
@@ -64,85 +83,50 @@ interface CampaignFormProps {
 export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
   const router = useRouter();
   const isEditing = Boolean(campaignId);
-
-  // Form state
-  const [name, setName] = useState(defaultValues?.name ?? '');
-  const [slug, setSlug] = useState(defaultValues?.slug ?? '');
-  const [description, setDescription] = useState(
-    defaultValues?.description ?? '',
-  );
-  const [status, setStatus] = useState<CampaignStatus>(
-    defaultValues?.status ?? 'draft',
-  );
-  const [startDate, setStartDate] = useState(
-    defaultValues?.start_date ?? '',
-  );
-  const [endDate, setEndDate] = useState(defaultValues?.end_date ?? '');
-  const [tagsInput, setTagsInput] = useState(
-    defaultValues?.tags?.join(', ') ?? '',
-  );
-
-  // Whether the slug has been manually edited
   const [slugTouched, setSlugTouched] = useState(isEditing);
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
 
-  // Derive tags array from comma-separated input
-  function parseTags(raw: string): string[] {
-    return raw
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean);
-  }
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: defaultValues?.name ?? '',
+      slug: defaultValues?.slug ?? '',
+      description: defaultValues?.description ?? '',
+      status: defaultValues?.status ?? 'draft',
+      start_date: defaultValues?.start_date ?? '',
+      end_date: defaultValues?.end_date ?? '',
+      tags: defaultValues?.tags?.join(', ') ?? '',
+    },
+  });
 
-  function handleNameChange(value: string) {
-    setName(value);
-    if (!slugTouched) {
-      setSlug(generateSlug(value));
-    }
-  }
+  const nameReg = register('name');
 
-  function handleSlugChange(value: string) {
-    setSlugTouched(true);
-    setSlug(value);
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setErrors({});
-
-    const data: CampaignInput = {
-      name,
-      slug,
-      description: description || undefined,
-      status,
-      start_date: startDate || undefined,
-      end_date: endDate || undefined,
-      tags: parseTags(tagsInput),
+  function onSubmit(data: FormValues) {
+    const input: CampaignInput = {
+      name: data.name,
+      slug: data.slug,
+      description: data.description || undefined,
+      status: data.status,
+      start_date: data.start_date || undefined,
+      end_date: data.end_date || undefined,
+      tags: data.tags
+        ? data.tags.split(',').map((t) => t.trim()).filter(Boolean)
+        : [],
     };
-
-    // Client-side validation
-    const result = campaignSchema.safeParse(data);
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const key = issue.path[0];
-        if (key && !fieldErrors[String(key)]) {
-          fieldErrors[String(key)] = issue.message;
-        }
-      }
-      setErrors(fieldErrors);
-      return;
-    }
 
     startTransition(async () => {
       try {
         if (isEditing && campaignId) {
-          await updateCampaign(campaignId, data);
+          await updateCampaign(campaignId, input);
           toast.success('Kampagne wurde aktualisiert.');
         } else {
-          await createCampaign(data);
+          await createCampaign(input);
           toast.success('Kampagne wurde erstellt.');
         }
         router.push('/campaigns');
@@ -162,7 +146,7 @@ export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
   ][];
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         <CardHeader>
           <CardTitle>
@@ -176,12 +160,18 @@ export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              value={name}
-              onChange={(e) => handleNameChange(e.target.value)}
+              {...nameReg}
+              onChange={(e) => {
+                nameReg.onChange(e);
+                if (!slugTouched) {
+                  setValue('slug', generateSlug(e.target.value));
+                }
+              }}
               placeholder="z.B. Sommer-Leseaktion 2026"
+              aria-invalid={!!errors.name}
             />
             {errors.name && (
-              <p className="text-sm text-destructive">{errors.name}</p>
+              <p className="text-sm text-destructive">{errors.name.message}</p>
             )}
           </div>
 
@@ -190,13 +180,15 @@ export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
             <Label htmlFor="slug">Slug</Label>
             <Input
               id="slug"
-              value={slug}
-              onChange={(e) => handleSlugChange(e.target.value)}
+              {...register('slug', {
+                onChange: () => setSlugTouched(true),
+              })}
               placeholder="sommer-leseaktion-2026"
               className="font-mono"
+              aria-invalid={!!errors.slug}
             />
             {errors.slug && (
-              <p className="text-sm text-destructive">{errors.slug}</p>
+              <p className="text-sm text-destructive">{errors.slug.message}</p>
             )}
             <p className="text-xs text-muted-foreground">
               Wird automatisch aus dem Namen generiert. Nur Kleinbuchstaben,
@@ -209,38 +201,43 @@ export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
             <Label htmlFor="description">Beschreibung</Label>
             <Textarea
               id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              {...register('description')}
               placeholder="Optionale Beschreibung der Kampagne..."
               rows={3}
             />
             {errors.description && (
-              <p className="text-sm text-destructive">{errors.description}</p>
+              <p className="text-sm text-destructive">{errors.description.message}</p>
             )}
           </div>
 
           {/* Status */}
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
-            <Select
-              value={status}
-              onValueChange={(value) => {
-                if (value) setStatus(value as CampaignStatus);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Status waehlen" />
-              </SelectTrigger>
-              <SelectContent>
-                {statusEntries.map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    if (value) field.onChange(value);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Status wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusEntries.map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
             {errors.status && (
-              <p className="text-sm text-destructive">{errors.status}</p>
+              <p className="text-sm text-destructive">{errors.status.message}</p>
             )}
           </div>
 
@@ -251,11 +248,10 @@ export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
               <Input
                 id="start_date"
                 type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                {...register('start_date')}
               />
               {errors.start_date && (
-                <p className="text-sm text-destructive">{errors.start_date}</p>
+                <p className="text-sm text-destructive">{errors.start_date.message}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -263,11 +259,10 @@ export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
               <Input
                 id="end_date"
                 type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                {...register('end_date')}
               />
               {errors.end_date && (
-                <p className="text-sm text-destructive">{errors.end_date}</p>
+                <p className="text-sm text-destructive">{errors.end_date.message}</p>
               )}
             </div>
           </div>
@@ -277,8 +272,7 @@ export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
             <Label htmlFor="tags">Tags</Label>
             <Input
               id="tags"
-              value={tagsInput}
-              onChange={(e) => setTagsInput(e.target.value)}
+              {...register('tags')}
               placeholder="z.B. sommer, lesen, kinder"
             />
             <p className="text-xs text-muted-foreground">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,12 +11,19 @@ import { toast } from 'sonner';
 import { User, Shield, Code, Loader2 } from 'lucide-react';
 import type { Profile } from '@/types';
 
+type ProfileFormValues = {
+  display_name: string;
+};
+
 export default function SettingsPage() {
   const supabase = createClient();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [origin, setOrigin] = useState('');
+
+  const { register, handleSubmit, reset } = useForm<ProfileFormValues>({
+    defaultValues: { display_name: '' },
+  });
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -25,18 +33,18 @@ export default function SettingsPage() {
       const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       if (data) {
         setProfile(data as Profile);
-        setDisplayName(data.display_name || '');
+        reset({ display_name: data.display_name || '' });
       }
     }
     load();
-  }, [supabase]);
+  }, [supabase, reset]);
 
-  async function handleSave() {
+  async function onSubmit(data: ProfileFormValues) {
     if (!profile) return;
     setLoading(true);
     const { error } = await supabase
       .from('profiles')
-      .update({ display_name: displayName })
+      .update({ display_name: data.display_name })
       .eq('id', profile.id);
 
     if (error) {
@@ -83,32 +91,34 @@ export default function SettingsPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-[12px] text-muted-foreground">E-Mail</Label>
-              <Input value={profile.email} disabled className="h-8 text-[13px] bg-muted/30" />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-[12px] text-muted-foreground">Anzeigename</Label>
-              <Input
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Ihr Name"
-                className="h-8 text-[13px]"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-[12px] text-muted-foreground">Rolle</Label>
-              <Input value={profile.role === 'admin' ? 'Administrator' : 'Editor'} disabled className="h-8 text-[13px] bg-muted/30" />
-            </div>
-            <Button size="sm" onClick={handleSave} disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                  Wird gespeichert...
-                </>
-              ) : 'Speichern'}
-            </Button>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="settings-email" className="text-[12px] text-muted-foreground">E-Mail</Label>
+                <Input id="settings-email" value={profile.email} disabled className="h-8 text-[13px] bg-muted/30" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="display_name" className="text-[12px] text-muted-foreground">Anzeigename</Label>
+                <Input
+                  id="display_name"
+                  {...register('display_name')}
+                  placeholder="Ihr Name"
+                  className="h-8 text-[13px]"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="settings-role" className="text-[12px] text-muted-foreground">Rolle</Label>
+                <Input id="settings-role" value={profile.role === 'admin' ? 'Administrator' : 'Editor'} disabled className="h-8 text-[13px] bg-muted/30" />
+              </div>
+              <Button type="submit" size="sm" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    Wird gespeichert...
+                  </>
+                ) : 'Speichern'}
+              </Button>
+            </form>
           </CardContent>
         </Card>
 

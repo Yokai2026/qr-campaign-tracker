@@ -160,6 +160,7 @@ export function PlacementsTable({ data }: PlacementsTableProps) {
       emptyDescription="Erstellen Sie Ihre erste Platzierung, um QR-Codes zuzuordnen."
       emptyActionLabel="Neue Platzierung"
       emptyActionHref="/placements/new"
+      enableColumnVisibility
     />
   );
 }

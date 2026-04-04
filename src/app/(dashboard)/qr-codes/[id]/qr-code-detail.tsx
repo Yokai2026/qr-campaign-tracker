@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -90,6 +91,23 @@ interface QrCodeDetailProps {
 }
 
 // ---------------------------------------------------------------------------
+// Edit form values
+// ---------------------------------------------------------------------------
+
+type EditFormValues = {
+  target_url: string;
+  note: string;
+  active: boolean;
+  valid_from: string;
+  valid_until: string;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_content: string;
+  utm_id: string;
+};
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -111,31 +129,36 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
 
   // Edit form state
   const [showEdit, setShowEdit] = useState(false);
-  const [editTargetUrl, setEditTargetUrl] = useState(qrCode.target_url);
-  const [editNote, setEditNote] = useState(qrCode.note ?? '');
-  const [editActive, setEditActive] = useState(qrCode.active);
-  const [editValidFrom, setEditValidFrom] = useState(qrCode.valid_from ?? '');
-  const [editValidUntil, setEditValidUntil] = useState(qrCode.valid_until ?? '');
-  const [editUtmSource, setEditUtmSource] = useState(qrCode.utm_source ?? '');
-  const [editUtmMedium, setEditUtmMedium] = useState(qrCode.utm_medium ?? '');
-  const [editUtmCampaign, setEditUtmCampaign] = useState(qrCode.utm_campaign ?? '');
-  const [editUtmContent, setEditUtmContent] = useState(qrCode.utm_content ?? '');
-  const [editUtmId, setEditUtmId] = useState(qrCode.utm_id ?? '');
 
-  function handleSave() {
+  const editForm = useForm<EditFormValues>({
+    defaultValues: {
+      target_url: qrCode.target_url,
+      note: qrCode.note ?? '',
+      active: qrCode.active,
+      valid_from: qrCode.valid_from ?? '',
+      valid_until: qrCode.valid_until ?? '',
+      utm_source: qrCode.utm_source ?? '',
+      utm_medium: qrCode.utm_medium ?? '',
+      utm_campaign: qrCode.utm_campaign ?? '',
+      utm_content: qrCode.utm_content ?? '',
+      utm_id: qrCode.utm_id ?? '',
+    },
+  });
+
+  function handleSave(data: EditFormValues) {
     startTransition(async () => {
       try {
         await updateQrCode(qrCode.id, {
-          target_url: editTargetUrl,
-          note: editNote || undefined,
-          active: editActive,
-          valid_from: editValidFrom || undefined,
-          valid_until: editValidUntil || undefined,
-          utm_source: editUtmSource || undefined,
-          utm_medium: editUtmMedium || undefined,
-          utm_campaign: editUtmCampaign || undefined,
-          utm_content: editUtmContent || undefined,
-          utm_id: editUtmId || undefined,
+          target_url: data.target_url,
+          note: data.note || undefined,
+          active: data.active,
+          valid_from: data.valid_from || undefined,
+          valid_until: data.valid_until || undefined,
+          utm_source: data.utm_source || undefined,
+          utm_medium: data.utm_medium || undefined,
+          utm_campaign: data.utm_campaign || undefined,
+          utm_content: data.utm_content || undefined,
+          utm_id: data.utm_id || undefined,
         });
         toast.success('QR-Code aktualisiert!');
         setShowEdit(false);
@@ -149,16 +172,16 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
   }
 
   function handleDelete() {
-    if (!confirm('Moechten Sie diesen QR-Code wirklich archivieren?')) return;
+    if (!confirm('Moechten Sie diesen QR-Code wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
     setIsDeleting(true);
     startTransition(async () => {
       try {
         await deleteQrCode(qrCode.id);
-        toast.success('QR-Code archiviert.');
+        toast.success('QR-Code gelöscht.');
         router.push('/qr-codes');
       } catch (err) {
         toast.error(
-          err instanceof Error ? err.message : 'Fehler beim Archivieren.',
+          err instanceof Error ? err.message : 'Fehler beim Löschen.',
         );
         setIsDeleting(false);
       }
@@ -216,7 +239,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
                     variant="ghost"
                     size="icon-sm"
                     onClick={() => copyToClipboard(shortLink)}
-                    title="Kopieren"
+                    aria-label="Kurzlink kopieren"
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -296,26 +319,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
             <CardContent>
               {showEdit ? (
                 <EditForm
-                  targetUrl={editTargetUrl}
-                  onTargetUrlChange={setEditTargetUrl}
-                  note={editNote}
-                  onNoteChange={setEditNote}
-                  active={editActive}
-                  onActiveChange={setEditActive}
-                  validFrom={editValidFrom}
-                  onValidFromChange={setEditValidFrom}
-                  validUntil={editValidUntil}
-                  onValidUntilChange={setEditValidUntil}
-                  utmSource={editUtmSource}
-                  onUtmSourceChange={setEditUtmSource}
-                  utmMedium={editUtmMedium}
-                  onUtmMediumChange={setEditUtmMedium}
-                  utmCampaign={editUtmCampaign}
-                  onUtmCampaignChange={setEditUtmCampaign}
-                  utmContent={editUtmContent}
-                  onUtmContentChange={setEditUtmContent}
-                  utmId={editUtmId}
-                  onUtmIdChange={setEditUtmId}
+                  form={editForm}
                   onSave={handleSave}
                   onCancel={() => setShowEdit(false)}
                   isPending={isPending}
@@ -345,9 +349,9 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
                   Keine Eintraege vorhanden.
                 </p>
               ) : (
-                <div className="space-y-3">
+                <ol className="space-y-3" aria-label="Änderungsverlauf">
                   {history.map((entry) => (
-                    <div
+                    <li
                       key={entry.id}
                       className="flex items-start gap-3 rounded-lg border p-3"
                     >
@@ -383,9 +387,9 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
                           </p>
                         )}
                       </div>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ol>
               )}
             </CardContent>
           </Card>
@@ -398,9 +402,9 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
             <CardContent>
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-medium">QR-Code archivieren</p>
+                  <p className="text-sm font-medium">QR-Code löschen</p>
                   <p className="text-sm text-muted-foreground">
-                    Der QR-Code wird deaktiviert und aus der aktiven Liste entfernt.
+                    Der QR-Code wird unwiderruflich gelöscht.
                   </p>
                 </div>
                 <Button
@@ -411,7 +415,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
                 >
                   {isDeleting && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
                   <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                  Archivieren
+                  Löschen
                 </Button>
               </div>
             </CardContent>
@@ -546,48 +550,33 @@ function UtmField({ label, value }: { label: string; value: string | null }) {
 }
 
 // ---------------------------------------------------------------------------
-// Edit Form
+// Edit Form (using React Hook Form)
 // ---------------------------------------------------------------------------
 
+import type { UseFormReturn } from 'react-hook-form';
+
 interface EditFormProps {
-  targetUrl: string;
-  onTargetUrlChange: (v: string) => void;
-  note: string;
-  onNoteChange: (v: string) => void;
-  active: boolean;
-  onActiveChange: (v: boolean) => void;
-  validFrom: string;
-  onValidFromChange: (v: string) => void;
-  validUntil: string;
-  onValidUntilChange: (v: string) => void;
-  utmSource: string;
-  onUtmSourceChange: (v: string) => void;
-  utmMedium: string;
-  onUtmMediumChange: (v: string) => void;
-  utmCampaign: string;
-  onUtmCampaignChange: (v: string) => void;
-  utmContent: string;
-  onUtmContentChange: (v: string) => void;
-  utmId: string;
-  onUtmIdChange: (v: string) => void;
-  onSave: () => void;
+  form: UseFormReturn<EditFormValues>;
+  onSave: (data: EditFormValues) => void;
   onCancel: () => void;
   isPending: boolean;
 }
 
-function EditForm(props: EditFormProps) {
+function EditForm({ form, onSave, onCancel, isPending }: EditFormProps) {
+  const { register, handleSubmit, watch, setValue } = form;
   const [showUtm, setShowUtm] = useState(false);
+  const active = watch('active');
 
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit(onSave)} className="space-y-4">
       {/* Target URL */}
       <div className="space-y-2">
         <Label htmlFor="edit_target_url">Ziel-URL</Label>
         <Input
           id="edit_target_url"
           type="url"
-          value={props.targetUrl}
-          onChange={(e) => props.onTargetUrlChange(e.target.value)}
+          {...register('target_url')}
+          aria-invalid={!!form.formState.errors.target_url}
         />
       </div>
 
@@ -596,8 +585,7 @@ function EditForm(props: EditFormProps) {
         <Label htmlFor="edit_note">Notiz</Label>
         <Textarea
           id="edit_note"
-          value={props.note}
-          onChange={(e) => props.onNoteChange(e.target.value)}
+          {...register('note')}
           rows={2}
         />
       </div>
@@ -607,11 +595,12 @@ function EditForm(props: EditFormProps) {
         <Label htmlFor="edit_active">Status</Label>
         <Button
           type="button"
-          variant={props.active ? 'default' : 'outline'}
+          variant={active ? 'default' : 'outline'}
           size="sm"
-          onClick={() => props.onActiveChange(!props.active)}
+          onClick={() => setValue('active', !active)}
+          aria-pressed={active}
         >
-          {props.active ? 'Aktiv' : 'Inaktiv'}
+          {active ? 'Aktiv' : 'Inaktiv'}
         </Button>
       </div>
 
@@ -622,8 +611,7 @@ function EditForm(props: EditFormProps) {
           <Input
             id="edit_valid_from"
             type="date"
-            value={props.validFrom}
-            onChange={(e) => props.onValidFromChange(e.target.value)}
+            {...register('valid_from')}
           />
         </div>
         <div className="space-y-2">
@@ -631,8 +619,7 @@ function EditForm(props: EditFormProps) {
           <Input
             id="edit_valid_until"
             type="date"
-            value={props.validUntil}
-            onChange={(e) => props.onValidUntilChange(e.target.value)}
+            {...register('valid_until')}
           />
         </div>
       </div>
@@ -642,6 +629,7 @@ function EditForm(props: EditFormProps) {
         type="button"
         className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
         onClick={() => setShowUtm(!showUtm)}
+        aria-expanded={showUtm}
       >
         UTM-Parameter
         {showUtm ? (
@@ -658,52 +646,32 @@ function EditForm(props: EditFormProps) {
               <Label htmlFor="edit_utm_source" className="text-xs">
                 utm_source
               </Label>
-              <Input
-                id="edit_utm_source"
-                value={props.utmSource}
-                onChange={(e) => props.onUtmSourceChange(e.target.value)}
-              />
+              <Input id="edit_utm_source" {...register('utm_source')} />
             </div>
             <div className="space-y-1">
               <Label htmlFor="edit_utm_medium" className="text-xs">
                 utm_medium
               </Label>
-              <Input
-                id="edit_utm_medium"
-                value={props.utmMedium}
-                onChange={(e) => props.onUtmMediumChange(e.target.value)}
-              />
+              <Input id="edit_utm_medium" {...register('utm_medium')} />
             </div>
           </div>
           <div className="space-y-1">
             <Label htmlFor="edit_utm_campaign" className="text-xs">
               utm_campaign
             </Label>
-            <Input
-              id="edit_utm_campaign"
-              value={props.utmCampaign}
-              onChange={(e) => props.onUtmCampaignChange(e.target.value)}
-            />
+            <Input id="edit_utm_campaign" {...register('utm_campaign')} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="edit_utm_content" className="text-xs">
               utm_content
             </Label>
-            <Input
-              id="edit_utm_content"
-              value={props.utmContent}
-              onChange={(e) => props.onUtmContentChange(e.target.value)}
-            />
+            <Input id="edit_utm_content" {...register('utm_content')} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="edit_utm_id" className="text-xs">
               utm_id
             </Label>
-            <Input
-              id="edit_utm_id"
-              value={props.utmId}
-              onChange={(e) => props.onUtmIdChange(e.target.value)}
-            />
+            <Input id="edit_utm_id" {...register('utm_id')} />
           </div>
         </div>
       )}
@@ -712,16 +680,16 @@ function EditForm(props: EditFormProps) {
 
       {/* Actions */}
       <div className="flex items-center gap-3">
-        <Button onClick={props.onSave} disabled={props.isPending}>
-          {props.isPending && (
+        <Button type="submit" disabled={isPending}>
+          {isPending && (
             <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
           )}
           Speichern
         </Button>
-        <Button variant="outline" onClick={props.onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel}>
           Abbrechen
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

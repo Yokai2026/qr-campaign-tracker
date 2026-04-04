@@ -2,6 +2,8 @@
 
 import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -50,29 +52,57 @@ function parseTypes(typeStr: string): string[] {
   return typeStr.split(',').map((t) => t.trim()).filter(Boolean);
 }
 
+// Form schema (placement_type as comma-joined string is validated separately)
+const formSchema = placementSchema;
+
+type FormValues = {
+  campaign_id: string;
+  location_id: string;
+  name: string;
+  placement_code: string;
+  poster_version: string;
+  flyer_version: string;
+  notes: string;
+  status: PlacementStatus;
+};
+
 export function PlacementForm({ campaigns, locations, placement }: PlacementFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
   const isEditing = !!placement;
 
-  // Form state
-  const [name, setName] = useState(placement?.name ?? '');
-  const [placementCode, setPlacementCode] = useState(placement?.placement_code ?? '');
-  const [campaignId, setCampaignId] = useState(placement?.campaign_id ?? '');
-  const [locationId, setLocationId] = useState(placement?.location_id ?? '');
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    setError,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      campaign_id: placement?.campaign_id ?? '',
+      location_id: placement?.location_id ?? '',
+      name: placement?.name ?? '',
+      placement_code: placement?.placement_code ?? '',
+      poster_version: placement?.poster_version ?? '',
+      flyer_version: placement?.flyer_version ?? '',
+      notes: placement?.notes ?? '',
+      status: placement?.status ?? 'planned',
+    },
+  });
+
+  // Multi-select types (managed separately — complex chip UI)
   const [selectedTypes, setSelectedTypes] = useState<string[]>(() =>
     parseTypes(placement?.placement_type ?? 'poster')
   );
   const [typePopoverOpen, setTypePopoverOpen] = useState(false);
   const [customTypeInput, setCustomTypeInput] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
-  const [posterVersion, setPosterVersion] = useState(placement?.poster_version ?? '');
-  const [flyerVersion, setFlyerVersion] = useState(placement?.flyer_version ?? '');
-  const [notes, setNotes] = useState(placement?.notes ?? '');
-  const [status, setStatus] = useState<PlacementStatus>(placement?.status ?? 'planned');
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+
+  const campaignId = watch('campaign_id');
+  const locationId = watch('location_id');
 
   // Auto-generate placement code when campaign and location change (only for new)
   useEffect(() => {
@@ -82,23 +112,20 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
     const location = locations.find((l) => l.id === locationId);
     if (!campaign || !location) return;
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsGeneratingCode(true);
     let cancelled = false;
     generatePlacementCode(campaign.slug, location.venue_name)
       .then((code) => {
-        if (!cancelled) setPlacementCode(code);
+        if (!cancelled) setValue('placement_code', code);
       })
-      .catch(() => {
-        // Fallback: manual entry
-      })
+      .catch(() => {})
       .finally(() => {
         if (!cancelled) setIsGeneratingCode(false);
       });
     return () => { cancelled = true; };
-  }, [campaignId, locationId, campaigns, locations, isEditing]);
+  }, [campaignId, locationId, campaigns, locations, isEditing, setValue]);
 
-  // Types not yet selected (available to pick)
+  // Types not yet selected
   const availableTypes = Object.entries(PLACEMENT_TYPE_LABELS).filter(
     ([key]) => !selectedTypes.includes(key)
   );
@@ -130,40 +157,31 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
   const selectedCampaign = campaigns.find((c) => c.id === campaignId);
   const selectedLocation = locations.find((l) => l.id === locationId);
 
-  // Joined type string for DB
   const placementTypeValue = selectedTypes.join(',');
-
-  // Show version fields based on selected types
   const hasPosterType = selectedTypes.some((t) => t === 'poster' || t === 'banner');
   const hasFlyerType = selectedTypes.some((t) => t === 'flyer' || t === 'handout');
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setErrors({});
-
+  function onSubmit(data: FormValues) {
     const input: PlacementInput = {
-      name,
-      placement_code: placementCode,
-      campaign_id: campaignId,
-      location_id: locationId,
+      name: data.name,
+      placement_code: data.placement_code,
+      campaign_id: data.campaign_id,
+      location_id: data.location_id,
       placement_type: placementTypeValue,
-      poster_version: posterVersion || undefined,
-      flyer_version: flyerVersion || undefined,
-      notes: notes || undefined,
-      status,
+      poster_version: data.poster_version || undefined,
+      flyer_version: data.flyer_version || undefined,
+      notes: data.notes || undefined,
+      status: data.status,
     };
 
-    // Client-side validation
-    const result = placementSchema.safeParse(input);
+    const result = formSchema.safeParse(input);
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
       for (const issue of result.error.issues) {
-        const key = issue.path[0]?.toString();
-        if (key && !fieldErrors[key]) {
-          fieldErrors[key] = issue.message;
+        const key = issue.path[0]?.toString() as keyof FormValues | undefined;
+        if (key && key in data) {
+          setError(key, { message: issue.message });
         }
       }
-      setErrors(fieldErrors);
       return;
     }
 
@@ -187,61 +205,73 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         <CardContent className="space-y-5">
           {/* Campaign */}
           <div className="space-y-1.5">
             <Label htmlFor="campaign_id">Kampagne *</Label>
-            <Select value={campaignId} onValueChange={(val: string | null) => setCampaignId(val ?? '')}>
-              <SelectTrigger className="w-full" id="campaign_id">
-                <SelectValue placeholder="Kampagne wählen...">
-                  {campaignId
-                    ? selectedCampaign?.name ?? 'Kampagne wählen...'
-                    : 'Kampagne wählen...'}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {campaigns.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="campaign_id"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={(val: string | null) => field.onChange(val ?? '')}>
+                  <SelectTrigger className="w-full" id="campaign_id" aria-invalid={!!errors.campaign_id}>
+                    <SelectValue placeholder="Kampagne wählen...">
+                      {field.value
+                        ? selectedCampaign?.name ?? 'Kampagne wählen...'
+                        : 'Kampagne wählen...'}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {campaigns.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
             {errors.campaign_id && (
-              <p className="text-xs text-destructive">{errors.campaign_id}</p>
+              <p className="text-xs text-destructive">{errors.campaign_id.message}</p>
             )}
           </div>
 
           {/* Location */}
           <div className="space-y-1.5">
             <Label htmlFor="location_id">Standort *</Label>
-            <Select value={locationId} onValueChange={(val: string | null) => setLocationId(val ?? '')}>
-              <SelectTrigger className="w-full" id="location_id">
-                <SelectValue placeholder="Standort wählen...">
-                  {locationId
-                    ? selectedLocation
-                      ? `${selectedLocation.venue_name}${selectedLocation.district ? ` (${selectedLocation.district})` : ''}`
-                      : 'Standort wählen...'
-                    : 'Standort wählen...'}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {locations.map((l) => (
-                  <SelectItem key={l.id} value={l.id}>
-                    {l.venue_name}
-                    {l.district && (
-                      <span className="ml-1 text-muted-foreground">
-                        ({l.district})
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="location_id"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={(val: string | null) => field.onChange(val ?? '')}>
+                  <SelectTrigger className="w-full" id="location_id" aria-invalid={!!errors.location_id}>
+                    <SelectValue placeholder="Standort wählen...">
+                      {field.value
+                        ? selectedLocation
+                          ? `${selectedLocation.venue_name}${selectedLocation.district ? ` (${selectedLocation.district})` : ''}`
+                          : 'Standort wählen...'
+                        : 'Standort wählen...'}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations.map((l) => (
+                      <SelectItem key={l.id} value={l.id}>
+                        {l.venue_name}
+                        {l.district && (
+                          <span className="ml-1 text-muted-foreground">
+                            ({l.district})
+                          </span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
             {errors.location_id && (
-              <p className="text-xs text-destructive">{errors.location_id}</p>
+              <p className="text-xs text-destructive">{errors.location_id.message}</p>
             )}
           </div>
 
@@ -250,12 +280,12 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
             <Label htmlFor="name">Name *</Label>
             <Input
               id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register('name')}
               placeholder="z.B. Poster Haupteingang"
+              aria-invalid={!!errors.name}
             />
             {errors.name && (
-              <p className="text-xs text-destructive">{errors.name}</p>
+              <p className="text-xs text-destructive">{errors.name.message}</p>
             )}
           </div>
 
@@ -265,10 +295,10 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
             <div className="flex items-center gap-2">
               <Input
                 id="placement_code"
-                value={placementCode}
-                onChange={(e) => setPlacementCode(e.target.value)}
+                {...register('placement_code')}
                 placeholder="wird automatisch generiert"
                 disabled={isGeneratingCode}
+                aria-invalid={!!errors.placement_code}
               />
               {isGeneratingCode && (
                 <span className="text-xs text-muted-foreground whitespace-nowrap">
@@ -280,7 +310,7 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
               Nur Kleinbuchstaben, Zahlen und Bindestriche.
             </p>
             {errors.placement_code && (
-              <p className="text-xs text-destructive">{errors.placement_code}</p>
+              <p className="text-xs text-destructive">{errors.placement_code.message}</p>
             )}
           </div>
 
@@ -298,6 +328,7 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
                     type="button"
                     onClick={() => removeType(type)}
                     className="ml-0.5 rounded-sm p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={`${getTypeLabel(type)} entfernen`}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -311,7 +342,7 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
                       variant="outline"
                       size="icon"
                       className="h-8 w-8 shrink-0"
-                      title="Typ hinzufügen"
+                      aria-label="Typ hinzufügen"
                     />
                   }
                 >
@@ -350,6 +381,7 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
                           variant="ghost"
                           className="h-7 w-7 shrink-0"
                           onClick={addCustomType}
+                          aria-label="Eigenen Typ hinzufügen"
                         >
                           <Plus className="h-3.5 w-3.5" />
                         </Button>
@@ -373,9 +405,6 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
                 Mindestens einen Typ auswählen.
               </p>
             )}
-            {errors.placement_type && (
-              <p className="text-xs text-destructive">{errors.placement_type}</p>
-            )}
           </div>
 
           {/* Poster / Flyer version (conditional) */}
@@ -384,8 +413,7 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
               <Label htmlFor="poster_version">Poster-Version</Label>
               <Input
                 id="poster_version"
-                value={posterVersion}
-                onChange={(e) => setPosterVersion(e.target.value)}
+                {...register('poster_version')}
                 placeholder="z.B. v2-sommer"
               />
             </div>
@@ -396,8 +424,7 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
               <Label htmlFor="flyer_version">Flyer-Version</Label>
               <Input
                 id="flyer_version"
-                value={flyerVersion}
-                onChange={(e) => setFlyerVersion(e.target.value)}
+                {...register('flyer_version')}
                 placeholder="z.B. v1-herbst"
               />
             </div>
@@ -406,25 +433,33 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
           {/* Status */}
           <div className="space-y-1.5">
             <Label htmlFor="status">Status *</Label>
-            <Select
-              value={status}
-              onValueChange={(val: string | null) => val && setStatus(val as PlacementStatus)}
-            >
-              <SelectTrigger className="w-full" id="status">
-                <SelectValue>
-                  {PLACEMENT_STATUS_LABELS[status] ?? status}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(PLACEMENT_STATUS_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(val: string | null) => {
+                    if (val) field.onChange(val);
+                  }}
+                >
+                  <SelectTrigger className="w-full" id="status">
+                    <SelectValue>
+                      {PLACEMENT_STATUS_LABELS[field.value] ?? field.value}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(PLACEMENT_STATUS_LABELS).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
             {errors.status && (
-              <p className="text-xs text-destructive">{errors.status}</p>
+              <p className="text-xs text-destructive">{errors.status.message}</p>
             )}
           </div>
 
@@ -433,8 +468,7 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
             <Label htmlFor="notes">Notizen</Label>
             <Textarea
               id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              {...register('notes')}
               placeholder="Optionale Hinweise zu dieser Platzierung..."
               rows={3}
             />

@@ -127,6 +127,7 @@ export function CampaignsTable({ data }: CampaignsTableProps) {
       emptyDescription="Erstellen Sie Ihre erste Kampagne, um loszulegen."
       emptyActionLabel="Neue Kampagne"
       emptyActionHref="/campaigns/new"
+      enableColumnVisibility
     />
   );
 }

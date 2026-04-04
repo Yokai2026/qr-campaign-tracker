@@ -379,23 +379,19 @@ export async function toggleQrCode(
  * Soft-delete (archive) a QR code by deactivating it and adding an archived history entry.
  */
 export async function deleteQrCode(id: string): Promise<void> {
-  const profile = await requireAuth();
+  await requireAuth();
   const supabase = await createClient();
+
+  // Delete related records first, then the QR code itself
+  await supabase.from('qr_status_history').delete().eq('qr_code_id', id);
+  await supabase.from('redirect_events').delete().eq('qr_code_id', id);
 
   const { error } = await supabase
     .from('qr_codes')
-    .update({ active: false })
+    .delete()
     .eq('id', id);
 
   if (error) throw new Error(error.message);
 
-  await addHistory(supabase, {
-    qr_code_id: id,
-    action: 'archived',
-    changed_by: profile.id,
-    note: 'QR-Code archiviert',
-  });
-
   revalidatePath('/qr-codes');
-  revalidatePath(`/qr-codes/${id}`);
 }

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import {
   ChevronDown,
@@ -52,6 +54,24 @@ type PlacementOption = {
 };
 
 // ---------------------------------------------------------------------------
+// Form schema
+// ---------------------------------------------------------------------------
+
+const formSchema = qrCodeSchema;
+type FormValues = {
+  placement_id: string;
+  target_url: string;
+  note: string;
+  valid_from: string;
+  valid_until: string;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_content: string;
+  utm_id: string;
+};
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -59,30 +79,38 @@ export default function NewQrCodePage() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // Placement data
+  // Placement data (loaded on mount)
   const [placements, setPlacements] = useState<PlacementOption[]>([]);
   const [loadingPlacements, setLoadingPlacements] = useState(true);
-
-  // Form state
-  const [placementId, setPlacementId] = useState('');
-  const [targetUrl, setTargetUrl] = useState('');
-  const [note, setNote] = useState('');
-  const [validFrom, setValidFrom] = useState('');
-  const [validUntil, setValidUntil] = useState('');
-
-  // UTM fields
   const [showUtm, setShowUtm] = useState(false);
-  const [utmSource, setUtmSource] = useState('qr');
-  const [utmMedium, setUtmMedium] = useState('offline');
-  const [utmCampaign, setUtmCampaign] = useState('');
-  const [utmContent, setUtmContent] = useState('');
-  const [utmId, setUtmId] = useState('');
-
-  // Placement combobox
   const [comboOpen, setComboOpen] = useState(false);
 
-  // Validation errors
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    getValues,
+    setError,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      placement_id: '',
+      target_url: '',
+      note: '',
+      valid_from: '',
+      valid_until: '',
+      utm_source: 'qr',
+      utm_medium: 'offline',
+      utm_campaign: '',
+      utm_content: '',
+      utm_id: '',
+    },
+  });
+
+  const placementId = watch('placement_id');
+  const selectedPlacement = placements.find((p) => p.id === placementId);
 
   // Load placements on mount
   useEffect(() => {
@@ -96,18 +124,11 @@ export default function NewQrCodePage() {
   useEffect(() => {
     const placement = placements.find((p) => p.id === placementId);
     if (placement) {
-      if (!utmCampaign || utmCampaign === '') {
-        setUtmCampaign(placement.campaign?.slug ?? '');
-      }
-      if (!utmContent || utmContent === '') {
-        setUtmContent(placement.placement_code ?? '');
-      }
+      if (!getValues('utm_campaign')) setValue('utm_campaign', placement.campaign?.slug || '');
+      if (!getValues('utm_content')) setValue('utm_content', placement.placement_code || '');
     }
-    // Only run when placementId changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [placementId]);
-
-  const selectedPlacement = placements.find((p) => p.id === placementId);
 
   // Preview URL — initialize empty to avoid hydration mismatch
   const [baseUrl, setBaseUrl] = useState('');
@@ -116,32 +137,26 @@ export default function NewQrCodePage() {
   }, []);
   const previewShortUrl = baseUrl ? `${baseUrl}/r/<short-code>` : '';
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setErrors({});
-
+  function onSubmit(data: FormValues) {
     const input: QrCodeInput = {
-      placement_id: placementId,
-      target_url: targetUrl,
-      note: note || undefined,
-      valid_from: validFrom || undefined,
-      valid_until: validUntil || undefined,
-      utm_source: utmSource || undefined,
-      utm_medium: utmMedium || undefined,
-      utm_campaign: utmCampaign || undefined,
-      utm_content: utmContent || undefined,
-      utm_id: utmId || undefined,
+      placement_id: data.placement_id,
+      target_url: data.target_url,
+      note: data.note || undefined,
+      valid_from: data.valid_from || undefined,
+      valid_until: data.valid_until || undefined,
+      utm_source: data.utm_source || undefined,
+      utm_medium: data.utm_medium || undefined,
+      utm_campaign: data.utm_campaign || undefined,
+      utm_content: data.utm_content || undefined,
+      utm_id: data.utm_id || undefined,
     };
 
-    // Client-side validation
-    const result = qrCodeSchema.safeParse(input);
+    const result = formSchema.safeParse(input);
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
       for (const err of result.error.issues) {
-        const key = err.path[0]?.toString() ?? 'form';
-        fieldErrors[key] = err.message;
+        const key = err.path[0]?.toString() as keyof FormValues | undefined;
+        if (key) setError(key, { message: err.message });
       }
-      setErrors(fieldErrors);
       return;
     }
 
@@ -165,7 +180,7 @@ export default function NewQrCodePage() {
         description="Erstellen Sie einen neuen QR-Code mit Weiterleitung."
       />
 
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
         {/* Placement select */}
         <Card>
           <CardHeader>
@@ -178,54 +193,61 @@ export default function NewQrCodePage() {
             {/* Placement combobox */}
             <div className="space-y-2">
               <Label htmlFor="placement_id">Platzierung</Label>
-              <Popover open={comboOpen} onOpenChange={setComboOpen}>
-                <PopoverTrigger
-                  render={
-                    <Button
-                      variant="outline"
-                      className="w-full justify-between font-normal"
-                      disabled={loadingPlacements}
-                    />
-                  }
-                >
-                  {loadingPlacements
-                    ? 'Laden...'
-                    : selectedPlacement
-                      ? `${selectedPlacement.name} (${selectedPlacement.campaign?.name ?? '-'})`
-                      : 'Platzierung waehlen...'}
-                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
-                  <Command>
-                    <CommandInput placeholder="Platzierung suchen..." />
-                    <CommandList>
-                      <CommandEmpty>Keine Platzierung gefunden.</CommandEmpty>
-                      <CommandGroup>
-                        {placements.map((p) => (
-                          <CommandItem
-                            key={p.id}
-                            value={`${p.name} ${p.campaign?.name ?? ''}`}
-                            onSelect={() => {
-                              setPlacementId(p.id);
-                              setComboOpen(false);
-                            }}
-                            data-checked={placementId === p.id}
-                          >
-                            <div className="flex flex-col">
-                              <span className="font-medium">{p.name}</span>
-                              <span className="text-xs text-muted-foreground">
-                                {p.campaign?.name ?? 'Keine Kampagne'} &middot; {p.placement_code}
-                              </span>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <Controller
+                name="placement_id"
+                control={control}
+                render={({ field }) => (
+                  <Popover open={comboOpen} onOpenChange={setComboOpen}>
+                    <PopoverTrigger
+                      render={
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between font-normal"
+                          disabled={loadingPlacements}
+                          aria-label="Platzierung auswählen"
+                        />
+                      }
+                    >
+                      {loadingPlacements
+                        ? 'Laden...'
+                        : selectedPlacement
+                          ? `${selectedPlacement.name} (${selectedPlacement.campaign?.name ?? '-'})`
+                          : 'Platzierung waehlen...'}
+                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Platzierung suchen..." />
+                        <CommandList>
+                          <CommandEmpty>Keine Platzierung gefunden.</CommandEmpty>
+                          <CommandGroup>
+                            {placements.map((p) => (
+                              <CommandItem
+                                key={p.id}
+                                value={`${p.name} ${p.campaign?.name ?? ''}`}
+                                onSelect={() => {
+                                  field.onChange(p.id);
+                                  setComboOpen(false);
+                                }}
+                                data-checked={field.value === p.id}
+                              >
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{p.name}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {p.campaign?.name ?? 'Keine Kampagne'} &middot; {p.placement_code}
+                                  </span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
               {errors.placement_id && (
-                <p className="text-sm text-destructive">{errors.placement_id}</p>
+                <p className="text-sm text-destructive">{errors.placement_id.message}</p>
               )}
             </div>
 
@@ -236,12 +258,11 @@ export default function NewQrCodePage() {
                 id="target_url"
                 type="url"
                 placeholder="https://beispiel.de/seite"
-                value={targetUrl}
-                onChange={(e) => setTargetUrl(e.target.value)}
+                {...register('target_url')}
                 aria-invalid={!!errors.target_url}
               />
               {errors.target_url && (
-                <p className="text-sm text-destructive">{errors.target_url}</p>
+                <p className="text-sm text-destructive">{errors.target_url.message}</p>
               )}
             </div>
 
@@ -251,8 +272,7 @@ export default function NewQrCodePage() {
               <Textarea
                 id="note"
                 placeholder="Interne Notiz zum QR-Code..."
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
+                {...register('note')}
                 rows={2}
               />
             </div>
@@ -264,8 +284,7 @@ export default function NewQrCodePage() {
                 <Input
                   id="valid_from"
                   type="date"
-                  value={validFrom}
-                  onChange={(e) => setValidFrom(e.target.value)}
+                  {...register('valid_from')}
                 />
               </div>
               <div className="space-y-2">
@@ -273,8 +292,7 @@ export default function NewQrCodePage() {
                 <Input
                   id="valid_until"
                   type="date"
-                  value={validUntil}
-                  onChange={(e) => setValidUntil(e.target.value)}
+                  {...register('valid_until')}
                 />
               </div>
             </div>
@@ -301,6 +319,7 @@ export default function NewQrCodePage() {
               type="button"
               className="flex w-full items-center justify-between text-left"
               onClick={() => setShowUtm(!showUtm)}
+              aria-expanded={showUtm}
             >
               <div>
                 <CardTitle>Tracking-Einstellungen</CardTitle>
@@ -323,8 +342,7 @@ export default function NewQrCodePage() {
                   <Input
                     id="utm_source"
                     placeholder="qr"
-                    value={utmSource}
-                    onChange={(e) => setUtmSource(e.target.value)}
+                    {...register('utm_source')}
                   />
                   <p className="text-xs text-muted-foreground">
                     Woher kommt der Besucher? (z.B. qr, instagram, flyer)
@@ -335,8 +353,7 @@ export default function NewQrCodePage() {
                   <Input
                     id="utm_medium"
                     placeholder="offline"
-                    value={utmMedium}
-                    onChange={(e) => setUtmMedium(e.target.value)}
+                    {...register('utm_medium')}
                   />
                   <p className="text-xs text-muted-foreground">
                     Welche Art von Werbung? (z.B. offline, social, email)
@@ -348,8 +365,7 @@ export default function NewQrCodePage() {
                 <Input
                   id="utm_campaign"
                   placeholder="Kampagnen-Slug"
-                  value={utmCampaign}
-                  onChange={(e) => setUtmCampaign(e.target.value)}
+                  {...register('utm_campaign')}
                 />
                 <p className="text-xs text-muted-foreground">
                   Wird automatisch von der Kampagne uebernommen.
@@ -360,8 +376,7 @@ export default function NewQrCodePage() {
                 <Input
                   id="utm_content"
                   placeholder="Platzierungscode"
-                  value={utmContent}
-                  onChange={(e) => setUtmContent(e.target.value)}
+                  {...register('utm_content')}
                 />
                 <p className="text-xs text-muted-foreground">
                   Wird automatisch vom Platzierungscode uebernommen. Hilft zu erkennen, welcher QR-Code gescannt wurde.
@@ -372,8 +387,7 @@ export default function NewQrCodePage() {
                 <Input
                   id="utm_id"
                   placeholder="z.B. interne Referenznummer"
-                  value={utmId}
-                  onChange={(e) => setUtmId(e.target.value)}
+                  {...register('utm_id')}
                 />
               </div>
             </CardContent>

@@ -196,7 +196,7 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
               >
                 <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="min-w-[200px]">
                 <DropdownMenuItem
                   onClick={() => {
                     if (qr.qr_png_url) {
@@ -245,6 +245,43 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
       emptyDescription="Erstellen Sie Ihren ersten QR-Code, um Weiterleitungen zu tracken."
       emptyActionLabel="Neuer QR-Code"
       emptyActionHref="/qr-codes/new"
+      enableColumnVisibility
+      enableRowSelection
+      bulkActions={(selectedRows, clearSelection) => (
+        <>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-[12px]"
+            onClick={() => {
+              selectedRows.forEach((qr) => {
+                if (qr.qr_png_url) downloadQrPng(qr.qr_png_url, qr.short_code);
+              });
+            }}
+          >
+            <Download className="mr-1.5 h-3 w-3" />
+            PNGs herunterladen
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-[12px] text-destructive hover:text-destructive"
+            onClick={() => {
+              if (!confirm(`${selectedRows.length} QR-Code(s) wirklich löschen?`)) return;
+              startTransition(async () => {
+                for (const qr of selectedRows) {
+                  await deleteQrCode(qr.id).catch(() => {});
+                }
+                toast.success(`${selectedRows.length} QR-Code(s) gelöscht`);
+                clearSelection();
+              });
+            }}
+          >
+            <Trash2 className="mr-1.5 h-3 w-3" />
+            Löschen
+          </Button>
+        </>
+      )}
     />
   );
 }

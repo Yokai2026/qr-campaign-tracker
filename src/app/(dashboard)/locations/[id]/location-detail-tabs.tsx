@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { MapPin, Trash2 } from 'lucide-react';
@@ -52,55 +53,66 @@ type LocationDetailTabsProps = {
   placementCount: number;
 };
 
+type FormValues = {
+  venue_name: string;
+  district: string;
+  address: string;
+  location_type: LocationType;
+  notes: string;
+  active: boolean;
+};
+
 export function LocationDetailTabs({
   location,
   placements,
   placementCount,
 }: LocationDetailTabsProps) {
   const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [isDeleting, setIsDeleting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setErrors({});
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      venue_name: location.venue_name,
+      district: location.district ?? '',
+      address: location.address ?? '',
+      location_type: location.location_type,
+      notes: location.notes ?? '',
+      active: location.active,
+    },
+  });
 
-    const formData = new FormData(e.currentTarget);
-    const data: LocationInput = {
-      venue_name: formData.get('venue_name') as string,
-      district: (formData.get('district') as string) || undefined,
-      address: (formData.get('address') as string) || undefined,
-      location_type: formData.get('location_type') as LocationType,
-      notes: (formData.get('notes') as string) || undefined,
-      active: formData.get('active') === 'on',
+  function onSubmit(data: FormValues) {
+    const input: LocationInput = {
+      venue_name: data.venue_name,
+      district: data.district || undefined,
+      address: data.address || undefined,
+      location_type: data.location_type,
+      notes: data.notes || undefined,
+      active: data.active,
     };
 
-    const parsed = locationSchema.safeParse(data);
-    if (!parsed.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of parsed.error.issues) {
-        const key = String(issue.path[0]);
-        if (!fieldErrors[key]) fieldErrors[key] = issue.message;
-      }
-      setErrors(fieldErrors);
-      return;
-    }
+    const parsed = locationSchema.safeParse(input);
+    if (!parsed.success) return;
 
-    setIsPending(true);
-    try {
-      const result = await updateLocation(location.id, data);
-      if (result.success) {
-        toast.success('Standort erfolgreich aktualisiert.');
-        router.refresh();
-      } else {
-        toast.error(result.error);
+    startTransition(async () => {
+      try {
+        const result = await updateLocation(location.id, input);
+        if (result.success) {
+          toast.success('Standort erfolgreich aktualisiert.');
+          router.refresh();
+        } else {
+          toast.error(result.error);
+        }
+      } catch {
+        toast.error('Ein unerwarteter Fehler ist aufgetreten.');
       }
-    } catch {
-      toast.error('Ein unerwarteter Fehler ist aufgetreten.');
-    } finally {
-      setIsPending(false);
-    }
+    });
   }
 
   async function handleDelete() {
@@ -175,62 +187,58 @@ export function LocationDetailTabs({
         <TabsContent value="details">
           <Card className="border border-border">
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <div className="space-y-1.5">
                   <Label htmlFor="venue_name">Ortsname *</Label>
                   <Input
                     id="venue_name"
-                    name="venue_name"
-                    defaultValue={location.venue_name}
-                    required
+                    {...register('venue_name')}
                     aria-invalid={!!errors.venue_name}
                   />
                   {errors.venue_name && (
-                    <p className="text-xs text-destructive">{errors.venue_name}</p>
+                    <p className="text-xs text-destructive">{errors.venue_name.message}</p>
                   )}
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-1.5">
                     <Label htmlFor="district">Bezirk</Label>
-                    <Input
-                      id="district"
-                      name="district"
-                      defaultValue={location.district ?? ''}
-                    />
+                    <Input id="district" {...register('district')} />
                     {errors.district && (
-                      <p className="text-xs text-destructive">{errors.district}</p>
+                      <p className="text-xs text-destructive">{errors.district.message}</p>
                     )}
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="address">Adresse</Label>
-                    <Input
-                      id="address"
-                      name="address"
-                      defaultValue={location.address ?? ''}
-                    />
+                    <Input id="address" {...register('address')} />
                     {errors.address && (
-                      <p className="text-xs text-destructive">{errors.address}</p>
+                      <p className="text-xs text-destructive">{errors.address.message}</p>
                     )}
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <Label htmlFor="location_type">Typ *</Label>
-                  <Select name="location_type" defaultValue={location.location_type} required>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Typ auswählen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {LOCATION_TYPES.map((t) => (
-                        <SelectItem key={t} value={t}>
-                          {LOCATION_TYPE_LABELS[t]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="location_type"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={(val) => { if (val) field.onChange(val); }}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Typ auswählen" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LOCATION_TYPES.map((t) => (
+                            <SelectItem key={t} value={t}>
+                              {LOCATION_TYPE_LABELS[t]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                   {errors.location_type && (
-                    <p className="text-xs text-destructive">{errors.location_type}</p>
+                    <p className="text-xs text-destructive">{errors.location_type.message}</p>
                   )}
                 </div>
 
@@ -238,16 +246,25 @@ export function LocationDetailTabs({
                   <Label htmlFor="notes">Notizen</Label>
                   <Textarea
                     id="notes"
-                    name="notes"
-                    defaultValue={location.notes ?? ''}
+                    {...register('notes')}
                     rows={3}
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Checkbox id="active" name="active" defaultChecked={location.active} />
-                  <Label htmlFor="active" className="cursor-pointer">Aktiv</Label>
-                </div>
+                <Controller
+                  name="active"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="active"
+                        checked={field.value}
+                        onCheckedChange={(checked) => field.onChange(!!checked)}
+                      />
+                      <Label htmlFor="active" className="cursor-pointer">Aktiv</Label>
+                    </div>
+                  )}
+                />
 
                 <div className="flex items-center gap-3 border-t pt-4">
                   <Button type="submit" disabled={isPending}>
@@ -307,7 +324,7 @@ export function LocationDetailTabs({
                             {p.campaign.name}
                           </Link>
                         ) : (
-                          <span className="text-muted-foreground">\u2014</span>
+                          <span className="text-muted-foreground">{'\u2014'}</span>
                         )}
                       </TableCell>
                       <TableCell>
