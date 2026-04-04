@@ -10,6 +10,8 @@ import {
   ChevronUp,
   Loader2,
   Link as LinkIcon,
+  Palette,
+  QrCode as QrCodeIcon,
 } from 'lucide-react';
 
 import { createQrCode, getPlacements } from '../actions';
@@ -69,6 +71,8 @@ type FormValues = {
   utm_campaign: string;
   utm_content: string;
   utm_id: string;
+  qr_fg_color: string;
+  qr_bg_color: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -83,6 +87,7 @@ export default function NewQrCodePage() {
   const [placements, setPlacements] = useState<PlacementOption[]>([]);
   const [loadingPlacements, setLoadingPlacements] = useState(true);
   const [showUtm, setShowUtm] = useState(false);
+  const [showDesign, setShowDesign] = useState(false);
   const [comboOpen, setComboOpen] = useState(false);
 
   const {
@@ -106,6 +111,8 @@ export default function NewQrCodePage() {
       utm_campaign: '',
       utm_content: '',
       utm_id: '',
+      qr_fg_color: '#000000',
+      qr_bg_color: '#FFFFFF',
     },
   });
 
@@ -149,6 +156,8 @@ export default function NewQrCodePage() {
       utm_campaign: data.utm_campaign || undefined,
       utm_content: data.utm_content || undefined,
       utm_id: data.utm_id || undefined,
+      qr_fg_color: data.qr_fg_color || undefined,
+      qr_bg_color: data.qr_bg_color || undefined,
     };
 
     const result = formSchema.safeParse(input);
@@ -389,6 +398,85 @@ export default function NewQrCodePage() {
                   placeholder="z.B. interne Referenznummer"
                   {...register('utm_id')}
                 />
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* QR Design */}
+        <Card>
+          <CardHeader>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between text-left"
+              onClick={() => setShowDesign(!showDesign)}
+              aria-expanded={showDesign}
+            >
+              <div>
+                <CardTitle>
+                  <span className="flex items-center gap-2">
+                    <Palette className="h-4 w-4" />
+                    QR-Design
+                  </span>
+                </CardTitle>
+                <CardDescription>
+                  Farben des QR-Codes anpassen.
+                </CardDescription>
+              </div>
+              {showDesign ? (
+                <ChevronUp className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+              )}
+            </button>
+          </CardHeader>
+          {showDesign && (
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="qr_fg_color">Vordergrund</Label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      id="qr_fg_color"
+                      {...register('qr_fg_color')}
+                      className="h-9 w-12 cursor-pointer rounded-lg border border-border bg-transparent p-0.5"
+                    />
+                    <Input
+                      {...register('qr_fg_color')}
+                      className="flex-1 font-mono uppercase"
+                      maxLength={7}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="qr_bg_color">Hintergrund</Label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      id="qr_bg_color"
+                      {...register('qr_bg_color')}
+                      className="h-9 w-12 cursor-pointer rounded-lg border border-border bg-transparent p-0.5"
+                    />
+                    <Input
+                      {...register('qr_bg_color')}
+                      className="flex-1 font-mono uppercase"
+                      maxLength={7}
+                    />
+                  </div>
+                </div>
+              </div>
+              {/* Live preview */}
+              <div className="flex items-center justify-center rounded-lg border bg-muted/30 p-4">
+                <div
+                  className="flex h-24 w-24 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: watch('qr_bg_color') }}
+                >
+                  <QrCodeIcon
+                    className="h-16 w-16"
+                    style={{ color: watch('qr_fg_color') }}
+                  />
+                </div>
               </div>
             </CardContent>
           )}

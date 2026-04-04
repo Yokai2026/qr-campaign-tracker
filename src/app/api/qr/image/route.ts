@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing url parameter' }, { status: 400 });
   }
 
-  const { pngDataUrl, svgString } = await generateQrCode(url);
+  const fg = request.nextUrl.searchParams.get('fg') || undefined;
+  const bg = request.nextUrl.searchParams.get('bg') || undefined;
+  const { pngDataUrl, svgString } = await generateQrCode(url, { fgColor: fg, bgColor: bg });
 
   if (format === 'svg') {
     return new NextResponse(svgString, {

@@ -19,7 +19,7 @@ import {
   ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import {
-  TrendingUp, MousePointerClick, FileText, QrCode, Download,
+  TrendingUp, MousePointerClick, FileText, QrCode, Download, Users,
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
@@ -30,7 +30,7 @@ type Props = {
 };
 
 type AnalyticsData = {
-  kpis: { totalOpens: number; uniqueQrCodes: number; ctaClicks: number; formSubmits: number };
+  kpis: { totalOpens: number; uniqueScans: number; uniqueQrCodes: number; ctaClicks: number; formSubmits: number };
   timeSeriesData: { date: string; opens: number; clicks: number }[];
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; opens: number; location: string }[];
@@ -53,7 +53,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
       let redirectQuery = supabase
         .from('redirect_events')
-        .select('id, qr_code_id, campaign_id, placement_id, device_type, created_at, event_type, placements(name, placement_code, location:locations(venue_name, district))')
+        .select('id, qr_code_id, campaign_id, placement_id, device_type, created_at, event_type, ip_hash, placements(name, placement_code, location:locations(venue_name, district))')
         .eq('event_type', 'qr_open')
         .gte('created_at', from)
         .lte('created_at', to);
@@ -79,10 +79,11 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       const { data: pageEvents } = await pageQuery;
 
       const uniqueQrs = new Set(filteredEvents.map((e: Record<string, unknown>) => e.qr_code_id));
+      const uniqueIps = new Set(filteredEvents.map((e: Record<string, unknown>) => e.ip_hash).filter(Boolean));
       const ctaClicks = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'cta_click').length;
       const formSubmits = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'form_submit').length;
 
-      const kpis = { totalOpens: filteredEvents.length, uniqueQrCodes: uniqueQrs.size, ctaClicks, formSubmits };
+      const kpis = { totalOpens: filteredEvents.length, uniqueScans: uniqueIps.size, uniqueQrCodes: uniqueQrs.size, ctaClicks, formSubmits };
 
       // Time series
       const dayMap: Record<string, { opens: number; clicks: number }> = {};
@@ -137,7 +138,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
     },
   });
 
-  const kpis = data?.kpis ?? { totalOpens: 0, uniqueQrCodes: 0, ctaClicks: 0, formSubmits: 0 };
+  const kpis = data?.kpis ?? { totalOpens: 0, uniqueScans: 0, uniqueQrCodes: 0, ctaClicks: 0, formSubmits: 0 };
   const timeSeriesData = data?.timeSeriesData ?? [];
   const campaignData = data?.campaignData ?? [];
   const placementData = data?.placementData ?? [];
@@ -259,11 +260,13 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       ) : (
         <>
           {/* KPI Cards */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
             <KPIStatCard label="QR-Scans" value={kpis.totalOpens} icon={TrendingUp} subtext={`${kpis.uniqueQrCodes} verschiedene QR-Codes`} />
+            <KPIStatCard label="Unique Scans" value={kpis.uniqueScans} icon={Users} subtext={kpis.totalOpens ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% der Gesamt-Scans` : undefined} />
             <KPIStatCard label="CTA-Klicks" value={kpis.ctaClicks} icon={MousePointerClick} subtext={`${conversionRate}% Conversion`} />
             <KPIStatCard label="Formulare" value={kpis.formSubmits} icon={FileText} subtext={`${formRate}% Abschlussrate`} />
             <KPIStatCard label="Aktive Codes" value={kpis.uniqueQrCodes} icon={QrCode} />
+            <KPIStatCard label="Formular-Rate" value={`${formRate}%`} icon={FileText} subtext={`${kpis.formSubmits} Abschlüsse`} />
           </div>
 
           {/* Charts */}

@@ -49,6 +49,8 @@ export const qrCodeSchema = z.object({
   utm_campaign: z.string().max(200).optional().or(z.literal('')),
   utm_content: z.string().max(200).optional().or(z.literal('')),
   utm_id: z.string().max(200).optional().or(z.literal('')),
+  qr_fg_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Ungültiger Farbcode').optional().or(z.literal('')),
+  qr_bg_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Ungültiger Farbcode').optional().or(z.literal('')),
 });
 
 export const trackEventSchema = z.object({

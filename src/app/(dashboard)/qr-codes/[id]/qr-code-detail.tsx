@@ -21,6 +21,7 @@ import {
   ChevronDown,
   ChevronUp,
   Trash2,
+  Palette,
 } from 'lucide-react';
 
 import { updateQrCode, deleteQrCode } from '../actions';
@@ -105,6 +106,8 @@ type EditFormValues = {
   utm_campaign: string;
   utm_content: string;
   utm_id: string;
+  qr_fg_color: string;
+  qr_bg_color: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -142,6 +145,8 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
       utm_campaign: qrCode.utm_campaign ?? '',
       utm_content: qrCode.utm_content ?? '',
       utm_id: qrCode.utm_id ?? '',
+      qr_fg_color: qrCode.qr_fg_color ?? '#000000',
+      qr_bg_color: qrCode.qr_bg_color ?? '#FFFFFF',
     },
   });
 
@@ -159,6 +164,8 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
           utm_campaign: data.utm_campaign || undefined,
           utm_content: data.utm_content || undefined,
           utm_id: data.utm_id || undefined,
+          qr_fg_color: data.qr_fg_color || undefined,
+          qr_bg_color: data.qr_bg_color || undefined,
         });
         toast.success('QR-Code aktualisiert!');
         setShowEdit(false);
@@ -565,6 +572,7 @@ interface EditFormProps {
 function EditForm({ form, onSave, onCancel, isPending }: EditFormProps) {
   const { register, handleSubmit, watch, setValue } = form;
   const [showUtm, setShowUtm] = useState(false);
+  const [showColors, setShowColors] = useState(false);
   const active = watch('active');
 
   return (
@@ -672,6 +680,51 @@ function EditForm({ form, onSave, onCancel, isPending }: EditFormProps) {
               utm_id
             </Label>
             <Input id="edit_utm_id" {...register('utm_id')} />
+          </div>
+        </div>
+      )}
+
+      {/* QR Colors */}
+      <button
+        type="button"
+        className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
+        onClick={() => setShowColors(!showColors)}
+        aria-expanded={showColors}
+      >
+        <Palette className="h-3.5 w-3.5 mr-0.5" />
+        QR-Farben
+        {showColors ? (
+          <ChevronUp className="h-4 w-4" />
+        ) : (
+          <ChevronDown className="h-4 w-4" />
+        )}
+      </button>
+
+      {showColors && (
+        <div className="grid grid-cols-2 gap-3 rounded-lg border p-3">
+          <div className="space-y-1">
+            <Label htmlFor="edit_fg" className="text-xs">Vordergrund</Label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                id="edit_fg"
+                {...register('qr_fg_color')}
+                className="h-8 w-10 cursor-pointer rounded border border-border bg-transparent p-0.5"
+              />
+              <Input {...register('qr_fg_color')} className="font-mono text-xs uppercase" maxLength={7} />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="edit_bg" className="text-xs">Hintergrund</Label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                id="edit_bg"
+                {...register('qr_bg_color')}
+                className="h-8 w-10 cursor-pointer rounded border border-border bg-transparent p-0.5"
+              />
+              <Input {...register('qr_bg_color')} className="font-mono text-xs uppercase" maxLength={7} />
+            </div>
           </div>
         </div>
       )}

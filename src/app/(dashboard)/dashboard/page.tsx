@@ -13,7 +13,9 @@ import {
   MousePointerClick,
   TrendingUp,
   ArrowRight,
+  Users,
 } from 'lucide-react';
+import { LiveScanFeed } from '@/components/shared/live-scan-feed';
 
 export default async function DashboardPage() {
   noStore();
@@ -26,6 +28,7 @@ export default async function DashboardPage() {
     { count: placementCount },
     { count: qrCodeCount },
     { count: totalOpens },
+    { data: ipHashData },
     { count: ctaClicks },
     { data: recentCampaigns },
     { data: topPlacements },
@@ -35,6 +38,7 @@ export default async function DashboardPage() {
     supabase.from('placements').select('*', { count: 'exact', head: true }),
     supabase.from('qr_codes').select('*', { count: 'exact', head: true }),
     supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'qr_open'),
+    supabase.from('redirect_events').select('ip_hash').eq('event_type', 'qr_open'),
     supabase.from('page_events').select('*', { count: 'exact', head: true }).eq('event_type', 'cta_click'),
     supabase.from('campaigns').select('id, name, status, slug').order('updated_at', { ascending: false }).limit(5),
     supabase.from('redirect_events')
@@ -63,6 +67,8 @@ export default async function DashboardPage() {
   const topPlacementList = Object.entries(placementCounts)
     .sort(([, a], [, b]) => b.count - a.count)
     .slice(0, 5);
+
+  const uniqueScans = new Set((ipHashData || []).map((e: { ip_hash: string | null }) => e.ip_hash).filter(Boolean)).size;
 
   const conversionRate = totalOpens && ctaClicks
     ? ((ctaClicks / totalOpens) * 100).toFixed(1)
@@ -119,20 +125,25 @@ export default async function DashboardPage() {
             label="QR-Scans"
             value={totalOpens || 0}
             icon={TrendingUp}
+            subtext={`${uniqueScans} unique`}
             className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
           />
         </Link>
         <Link href="/analytics" className="group">
           <KPIStatCard
-            label="Conversion"
-            value={`${conversionRate}%`}
-            icon={MousePointerClick}
+            label="Unique Scans"
+            value={uniqueScans}
+            icon={Users}
+            subtext={totalOpens ? `${((uniqueScans / totalOpens) * 100).toFixed(0)}% der Gesamt-Scans` : undefined}
             className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
           />
         </Link>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-3">
+        {/* Live Scan Feed */}
+        <LiveScanFeed />
+
         {/* Recent Campaigns */}
         <div className="rounded-lg border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">

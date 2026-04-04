@@ -1,18 +1,29 @@
 import QRCode from 'qrcode';
 
+export interface QrGenerateOptions {
+  fgColor?: string;
+  bgColor?: string;
+}
+
 export interface QrGenerateResult {
   pngDataUrl: string;
   svgString: string;
 }
 
-export async function generateQrCode(url: string): Promise<QrGenerateResult> {
+export async function generateQrCode(
+  url: string,
+  opts?: QrGenerateOptions,
+): Promise<QrGenerateResult> {
+  const fgColor = opts?.fgColor || '#000000';
+  const bgColor = opts?.bgColor || '#FFFFFF';
+
   const options = {
     errorCorrectionLevel: 'M' as const,
     margin: 2,
     width: 400,
     color: {
-      dark: '#000000',
-      light: '#FFFFFF',
+      dark: fgColor,
+      light: bgColor,
     },
   };
 

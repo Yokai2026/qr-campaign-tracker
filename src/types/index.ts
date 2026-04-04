@@ -111,6 +111,8 @@ export interface QrCode {
   utm_campaign: string | null;
   utm_content: string | null;
   utm_id: string | null;
+  qr_fg_color: string;
+  qr_bg_color: string;
   created_at: string;
   updated_at: string;
   // Joined
@@ -249,4 +251,6 @@ export interface QrCodeInput {
   utm_campaign?: string;
   utm_content?: string;
   utm_id?: string;
+  qr_fg_color?: string;
+  qr_bg_color?: string;
 }

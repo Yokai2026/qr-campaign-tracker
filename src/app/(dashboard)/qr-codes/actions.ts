@@ -206,8 +206,13 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
   const redirectUrl = buildRedirectUrl(baseUrl, shortCode);
 
-  // Generate QR code images
-  const { pngDataUrl, svgString } = await generateQrCode(redirectUrl);
+  // Generate QR code images with optional colors
+  const fgColor = input.qr_fg_color || '#000000';
+  const bgColor = input.qr_bg_color || '#FFFFFF';
+  const { pngDataUrl, svgString } = await generateQrCode(redirectUrl, {
+    fgColor,
+    bgColor,
+  });
 
   // Build SVG data URL for storage
   const svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`;
@@ -234,6 +239,8 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
       utm_campaign: utmCampaign,
       utm_content: utmContent,
       utm_id: input.utm_id || null,
+      qr_fg_color: fgColor,
+      qr_bg_color: bgColor,
     })
     .select()
     .single();
@@ -271,6 +278,8 @@ export async function updateQrCode(
       | 'utm_campaign'
       | 'utm_content'
       | 'utm_id'
+      | 'qr_fg_color'
+      | 'qr_bg_color'
     >
   >,
 ): Promise<QrCode> {
@@ -316,15 +325,24 @@ export async function updateQrCode(
     }
   }
 
-  // If target URL changed, the QR still points to the same short redirect URL,
-  // so no need to regenerate the QR image itself. The redirect handler resolves
-  // the short_code to the new target_url dynamically.
-  // However if the admin wants to re-encode the redirect URL into the QR for
-  // transparency, we regenerate anyway.
-  if (targetChanged) {
+  // Color changes
+  let colorChanged = false;
+  if (data.qr_fg_color !== undefined && data.qr_fg_color !== existing.qr_fg_color) {
+    updates.qr_fg_color = data.qr_fg_color;
+    colorChanged = true;
+  }
+  if (data.qr_bg_color !== undefined && data.qr_bg_color !== existing.qr_bg_color) {
+    updates.qr_bg_color = data.qr_bg_color;
+    colorChanged = true;
+  }
+
+  // Regenerate QR image if target URL or colors changed
+  if (targetChanged || colorChanged) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const redirectUrl = buildRedirectUrl(baseUrl, existing.short_code);
-    const { pngDataUrl, svgString } = await generateQrCode(redirectUrl);
+    const fgColor = (updates.qr_fg_color as string) ?? existing.qr_fg_color ?? '#000000';
+    const bgColor = (updates.qr_bg_color as string) ?? existing.qr_bg_color ?? '#FFFFFF';
+    const { pngDataUrl, svgString } = await generateQrCode(redirectUrl, { fgColor, bgColor });
     const svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`;
     updates.qr_png_url = pngDataUrl;
     updates.qr_svg_url = svgDataUrl;
