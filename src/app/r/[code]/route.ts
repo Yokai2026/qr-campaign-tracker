@@ -44,7 +44,7 @@ export async function GET(
       )
     `)
     .eq('short_code', code)
-    .single();
+    .maybeSingle();
 
   if (qr) {
     return handleQrRedirect(supabase, qr, {
@@ -59,7 +59,7 @@ export async function GET(
     .from('short_links')
     .select('*')
     .eq('short_code', code)
-    .single();
+    .maybeSingle();
 
   if (link) {
     return handleLinkRedirect(supabase, link, {
