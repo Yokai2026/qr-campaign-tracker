@@ -25,6 +25,7 @@ import { format, subDays } from 'date-fns';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
 import { generateAnalyticsPdf } from '@/lib/pdf/generate';
 import { CountryChart } from '@/components/shared/country-chart';
+import { WorldMap } from '@/components/shared/world-map';
 
 type Props = {
   campaigns: { id: string; name: string }[];
@@ -367,13 +368,18 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
           {/* Geo: Scans by Country */}
           {countryData.length > 0 && (
-            <ChartCard title="Scans nach Land" className="lg:col-span-1">
-              <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
-                <Globe className="h-3.5 w-3.5" />
-                Zeigt, aus welchen Laendern deine QR-Codes gescannt werden
-              </div>
-              <CountryChart data={countryData} />
-            </ChartCard>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <ChartCard title="Weltkarte" className="lg:col-span-1">
+                <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+                  <Globe className="h-3.5 w-3.5" />
+                  Geografische Verteilung der QR-Scans
+                </div>
+                <WorldMap data={countryData} />
+              </ChartCard>
+              <ChartCard title="Scans nach Land" className="lg:col-span-1">
+                <CountryChart data={countryData} />
+              </ChartCard>
+            </div>
           )}
 
           {/* Top Placements Table */}

@@ -166,6 +166,22 @@ export interface PageEvent {
   created_at: string;
 }
 
+export type ReportFrequency = 'daily' | 'weekly' | 'monthly';
+
+export interface ReportSchedule {
+  id: string;
+  user_id: string;
+  email: string;
+  frequency: ReportFrequency;
+  campaign_id: string | null;
+  active: boolean;
+  last_sent_at: string | null;
+  next_run_at: string;
+  created_at: string;
+  updated_at: string;
+  campaign?: Campaign;
+}
+
 // ============================================
 // Analytics / aggregated types
 // ============================================

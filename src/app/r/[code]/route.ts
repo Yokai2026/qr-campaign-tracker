@@ -6,6 +6,16 @@ import { isUrlSafe } from '@/lib/validations';
 
 export const dynamic = 'force-dynamic';
 
+function errorHtml(title: string, message?: string) {
+  return `<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fafafa;color:#111}
+.c{text-align:center;max-width:400px;padding:2rem}.c h1{font-size:1.25rem;font-weight:600;margin-bottom:.5rem}.c p{font-size:.875rem;color:#666;margin-bottom:.25rem}
+.c a{display:inline-block;margin-top:1.5rem;font-size:.75rem;color:#999;text-decoration:underline;text-underline-offset:2px}</style></head>
+<body><div class="c"><h1>${title}</h1>${message ? `<p>${message}</p>` : ''}<a href="/datenschutz">Datenschutzerklaerung</a></div></body></html>`;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
@@ -56,7 +66,7 @@ export async function GET(
       country,
     });
     return new NextResponse(
-      '<html><body><h1>Dieser QR-Code ist derzeit nicht aktiv.</h1></body></html>',
+      errorHtml('Dieser QR-Code ist derzeit nicht aktiv.'),
       { status: 410, headers: { 'Content-Type': 'text/html' } }
     );
   }
@@ -78,14 +88,14 @@ export async function GET(
       country,
     });
     return new NextResponse(
-      '<html><body><h1>Dieser QR-Code ist abgelaufen.</h1></body></html>',
+      errorHtml('Dieser QR-Code ist abgelaufen.'),
       { status: 410, headers: { 'Content-Type': 'text/html' } }
     );
   }
 
   if (qr.valid_from && new Date(qr.valid_from) > now) {
     return new NextResponse(
-      '<html><body><h1>Dieser QR-Code ist noch nicht aktiv.</h1></body></html>',
+      errorHtml('Dieser QR-Code ist noch nicht aktiv.'),
       { status: 425, headers: { 'Content-Type': 'text/html' } }
     );
   }
@@ -118,7 +128,7 @@ export async function GET(
         return NextResponse.redirect(qr.limit_redirect_url, 302);
       }
       return new NextResponse(
-        '<html><body><h1>Dieses Angebot ist leider nicht mehr verfügbar.</h1><p>Das Scan-Limit wurde erreicht.</p></body></html>',
+        errorHtml('Dieses Angebot ist leider nicht mehr verfuegbar.', 'Das Scan-Limit wurde erreicht.'),
         { status: 410, headers: { 'Content-Type': 'text/html' } }
       );
     }

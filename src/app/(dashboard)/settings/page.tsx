@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { User, Shield, Code, Loader2 } from 'lucide-react';
+import { ReportSchedules } from '@/components/settings/report-schedules';
 import type { Profile } from '@/types';
 
 type ProfileFormValues = {
@@ -163,6 +164,8 @@ export default function SettingsPage() {
           </Card>
         </div>
       </div>
+      {/* Report Schedules */}
+      <ReportSchedules />
     </div>
   );
 }
