@@ -206,7 +206,7 @@ export default function NewQrCodePage() {
           <CardHeader>
             <CardTitle>Platzierung & Ziel</CardTitle>
             <CardDescription>
-              Waehlen Sie die Platzierung und geben Sie die Ziel-URL an.
+              Wählen Sie die Platzierung und geben Sie die Ziel-URL an.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -232,7 +232,7 @@ export default function NewQrCodePage() {
                         ? 'Laden...'
                         : selectedPlacement
                           ? `${selectedPlacement.name} (${selectedPlacement.campaign?.name ?? '-'})`
-                          : 'Platzierung waehlen...'}
+                          : 'Platzierung wählen...'}
                       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
@@ -300,7 +300,7 @@ export default function NewQrCodePage() {
             {/* Validity dates */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="valid_from">Gueltig ab (optional)</Label>
+                <Label htmlFor="valid_from">Gültig ab (optional)</Label>
                 <Input
                   id="valid_from"
                   type="date"
@@ -308,7 +308,7 @@ export default function NewQrCodePage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="valid_until">Gueltig bis (optional)</Label>
+                <Label htmlFor="valid_until">Gültig bis (optional)</Label>
                 <Input
                   id="valid_until"
                   type="date"
@@ -344,7 +344,7 @@ export default function NewQrCodePage() {
               <div>
                 <CardTitle>Tracking-Einstellungen</CardTitle>
                 <CardDescription>
-                  Hiermit erkennst du in Analytics, woher ein Besucher kam. Wird automatisch befuellt — nur anpassen, wenn noetig.
+                  Hiermit erkennst du in Analytics, woher ein Besucher kam. Wird automatisch befüllt — nur anpassen, wenn nötig.
                 </CardDescription>
               </div>
               {showUtm ? (
@@ -388,7 +388,7 @@ export default function NewQrCodePage() {
                   {...register('utm_campaign')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Wird automatisch von der Kampagne uebernommen.
+                  Wird automatisch von der Kampagne übernommen.
                 </p>
               </div>
               <div className="space-y-2">
@@ -399,7 +399,7 @@ export default function NewQrCodePage() {
                   {...register('utm_content')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Wird automatisch vom Platzierungscode uebernommen. Hilft zu erkennen, welcher QR-Code gescannt wurde.
+                  Wird automatisch vom Platzierungscode übernommen. Hilft zu erkennen, welcher QR-Code gescannt wurde.
                 </p>
               </div>
               <div className="space-y-2">
@@ -534,7 +534,7 @@ export default function NewQrCodePage() {
                   {...register('max_scans')}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Nach dieser Anzahl wird der QR-Code gesperrt. Leer lassen fuer unbegrenzt.
+                  Nach dieser Anzahl wird der QR-Code gesperrt. Leer lassen für unbegrenzt.
                 </p>
               </div>
               {watchMaxScans && (

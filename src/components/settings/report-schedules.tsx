@@ -104,7 +104,7 @@ export function ReportSchedules() {
     if (error) {
       toast.error('Fehler: ' + error.message);
     } else {
-      toast.success('Zeitplan geloescht');
+      toast.success('Zeitplan gelöscht');
       setSchedules((prev) => prev.filter((s) => s.id !== id));
     }
   }

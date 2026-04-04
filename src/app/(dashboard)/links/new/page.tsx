@@ -182,7 +182,7 @@ export default function NewLinkPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-[11px] text-muted-foreground">Ordne den Link einer Kampagne zu, um Klicks dort mitzuzaehlen.</p>
+              <p className="text-[11px] text-muted-foreground">Ordne den Link einer Kampagne zu, um Klicks dort mitzuzählen.</p>
             </div>
 
             <div className="space-y-1.5">
@@ -232,7 +232,7 @@ export default function NewLinkPage() {
               <p className="text-[12px] font-medium mb-3">Zeitliche Begrenzung</p>
               <div className="space-y-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] text-muted-foreground">Link gueltig bis</Label>
+                  <Label className="text-[12px] text-muted-foreground">Link gültig bis</Label>
                   <Input
                     type="datetime-local"
                     value={expiresAt}
@@ -246,7 +246,7 @@ export default function NewLinkPage() {
                   <Label className="text-[12px] text-muted-foreground">Wohin nach Ablauf?</Label>
                   <Input
                     type="url"
-                    placeholder="https://meine-seite.de/nicht-mehr-verfuegbar"
+                    placeholder="https://meine-seite.de/nicht-mehr-verfügbar"
                     value={expiredUrl}
                     onChange={(e) => setExpiredUrl(e.target.value)}
                     className="h-9 text-[13px]"
@@ -260,7 +260,7 @@ export default function NewLinkPage() {
             <div className="border-t border-border pt-4">
               <p className="text-[12px] font-medium mb-1">Herkunfts-Tracking (UTM)</p>
               <p className="text-[11px] text-muted-foreground mb-3">
-                Diese Parameter werden an die Ziel-URL angehaengt, damit du in Google Analytics o.ae. siehst, woher die Besucher kommen.
+                Diese Parameter werden an die Ziel-URL angehängt, damit du in Google Analytics o.ä. siehst, woher die Besucher kommen.
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">

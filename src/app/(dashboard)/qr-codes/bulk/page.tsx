@@ -104,7 +104,7 @@ export default function BulkQrCodePage() {
           try {
             new URL(url);
           } catch {
-            errors.push(`Zeile ${i + 2}: Ungueltige URL "${url}"`);
+            errors.push(`Zeile ${i + 2}: Ungültige URL "${url}"`);
             return;
           }
           parsed.push({
@@ -153,7 +153,7 @@ export default function BulkQrCodePage() {
 
   function handleSubmit() {
     if (!placementId) {
-      toast.error('Bitte zuerst eine Platzierung waehlen.');
+      toast.error('Bitte zuerst eine Platzierung wählen.');
       return;
     }
     if (rows.length === 0) {
@@ -192,7 +192,7 @@ export default function BulkQrCodePage() {
         {/* Step 1: Placement */}
         <Card>
           <CardHeader>
-            <CardTitle>1. Platzierung waehlen</CardTitle>
+            <CardTitle>1. Platzierung wählen</CardTitle>
             <CardDescription>
               Alle importierten QR-Codes werden dieser Platzierung zugeordnet.
             </CardDescription>
@@ -205,7 +205,7 @@ export default function BulkQrCodePage() {
                     variant="outline"
                     className="w-full justify-between font-normal"
                     disabled={loadingPlacements}
-                    aria-label="Platzierung auswaehlen"
+                    aria-label="Platzierung auswählen"
                   />
                 }
               >
@@ -213,7 +213,7 @@ export default function BulkQrCodePage() {
                   ? 'Laden...'
                   : selectedPlacement
                     ? `${selectedPlacement.name} (${selectedPlacement.campaign?.name ?? '-'})`
-                    : 'Platzierung waehlen...'}
+                    : 'Platzierung wählen...'}
                 <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
@@ -254,7 +254,7 @@ export default function BulkQrCodePage() {
             <CardTitle>2. CSV-Datei hochladen</CardTitle>
             <CardDescription>
               Die CSV braucht eine Spalte <code className="text-xs bg-muted px-1 py-0.5 rounded">target_url</code>.
-              Optional: <code className="text-xs bg-muted px-1 py-0.5 rounded">note</code> fuer interne Notizen.
+              Optional: <code className="text-xs bg-muted px-1 py-0.5 rounded">note</code> für interne Notizen.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -306,7 +306,7 @@ export default function BulkQrCodePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>3. Vorschau ({rows.length} Eintraege)</CardTitle>
-                  <CardDescription>Pruefen Sie die Daten vor dem Import.</CardDescription>
+                  <CardDescription>Prüfen Sie die Daten vor dem Import.</CardDescription>
                 </div>
                 <Button
                   variant="ghost"
@@ -382,7 +382,7 @@ export default function BulkQrCodePage() {
             </Button>
           ) : (
             <Button onClick={() => router.push('/qr-codes')}>
-              Zur Uebersicht
+              Zur Übersicht
             </Button>
           )}
           <Button variant="outline" onClick={() => router.push('/qr-codes')}>

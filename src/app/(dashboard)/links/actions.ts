@@ -59,7 +59,7 @@ export async function createShortLink(input: Record<string, unknown>): Promise<{
 
   const parsed = shortLinkSchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? 'Ungueltige Eingabe' };
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Ungültige Eingabe' };
   }
 
   const data = parsed.data;
@@ -116,7 +116,7 @@ export async function updateShortLink(
 
   const parsed = shortLinkSchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? 'Ungueltige Eingabe' };
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Ungültige Eingabe' };
   }
 
   const data = parsed.data;
@@ -192,7 +192,7 @@ export async function createLinkGroup(input: Record<string, unknown>): Promise<{
 
   const parsed = linkGroupSchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, error: parsed.error.issues[0]?.message ?? 'Ungueltige Eingabe' };
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Ungültige Eingabe' };
   }
 
   const data = parsed.data;

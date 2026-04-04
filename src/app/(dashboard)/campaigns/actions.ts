@@ -183,7 +183,7 @@ export async function deleteCampaign(id: string): Promise<void> {
     .eq('id', id);
 
   if (error) {
-    throw new Error(`Kampagne konnte nicht geloescht werden: ${error.message}`);
+    throw new Error(`Kampagne konnte nicht gelöscht werden: ${error.message}`);
   }
 
   revalidatePath('/campaigns');

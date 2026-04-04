@@ -160,7 +160,7 @@ async function handleQrRedirect(
         return NextResponse.redirect(limitUrl, 302);
       }
       return new NextResponse(
-        errorHtml('Dieses Angebot ist leider nicht mehr verfuegbar.', 'Das Scan-Limit wurde erreicht.'),
+        errorHtml('Dieses Angebot ist leider nicht mehr verfügbar.', 'Das Scan-Limit wurde erreicht.'),
         { status: 410, headers: { 'Content-Type': 'text/html' } }
       );
     }

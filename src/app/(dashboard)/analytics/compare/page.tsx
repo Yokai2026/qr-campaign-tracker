@@ -70,11 +70,11 @@ export default function ComparePage() {
 
   async function handleCompare() {
     if (!campaignA || !campaignB) {
-      toast.error('Bitte zwei Kampagnen auswaehlen.');
+      toast.error('Bitte zwei Kampagnen auswählen.');
       return;
     }
     if (campaignA === campaignB) {
-      toast.error('Bitte zwei verschiedene Kampagnen waehlen.');
+      toast.error('Bitte zwei verschiedene Kampagnen wählen.');
       return;
     }
 
@@ -127,7 +127,7 @@ export default function ComparePage() {
       {/* Campaign selectors */}
       <Card>
         <CardHeader>
-          <CardTitle>Kampagnen auswaehlen</CardTitle>
+          <CardTitle>Kampagnen auswählen</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
@@ -135,7 +135,7 @@ export default function ComparePage() {
               <Label className="text-xs text-muted-foreground">Kampagne A</Label>
               <Select value={campaignA} onValueChange={(v) => setCampaignA(v ?? '')}>
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Waehlen..." />
+                  <SelectValue placeholder="Wählen..." />
                 </SelectTrigger>
                 <SelectContent>
                   {campaigns.map((c) => (
@@ -153,7 +153,7 @@ export default function ComparePage() {
               <Label className="text-xs text-muted-foreground">Kampagne B</Label>
               <Select value={campaignB} onValueChange={(v) => setCampaignB(v ?? '')}>
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Waehlen..." />
+                  <SelectValue placeholder="Wählen..." />
                 </SelectTrigger>
                 <SelectContent>
                   {campaigns.map((c) => (
@@ -239,7 +239,7 @@ export default function ComparePage() {
           {/* Comparison Bar Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Vergleichs-Uebersicht</CardTitle>
+              <CardTitle>Vergleichs-Übersicht</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={240}>

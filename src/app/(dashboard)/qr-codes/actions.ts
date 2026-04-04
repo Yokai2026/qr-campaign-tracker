@@ -256,7 +256,7 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
     action: 'created',
     changed_by: profile.id,
     new_value: redirectUrl,
-    note: `QR-Code erstellt fuer ${input.target_url}`,
+    note: `QR-Code erstellt für ${input.target_url}`,
   });
 
   revalidatePath('/qr-codes');

@@ -186,7 +186,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
   }
 
   function handleDelete() {
-    if (!confirm('Moechten Sie diesen QR-Code wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
+    if (!confirm('Möchten Sie diesen QR-Code wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
     setIsDeleting(true);
     startTransition(async () => {
       try {
@@ -323,7 +323,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
                 {showEdit ? (
                   <>
                     <ChevronUp className="mr-1.5 h-3.5 w-3.5" />
-                    Schliessen
+                    Schließen
                   </>
                 ) : (
                   'Bearbeiten'
@@ -498,11 +498,11 @@ function DetailsView({ qrCode, campaign, location, placement }: DetailsViewProps
 
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
-          <p className="text-muted-foreground">Gueltig ab</p>
+          <p className="text-muted-foreground">Gültig ab</p>
           <p className="font-medium">{formatDate(qrCode.valid_from)}</p>
         </div>
         <div>
-          <p className="text-muted-foreground">Gueltig bis</p>
+          <p className="text-muted-foreground">Gültig bis</p>
           <p className="font-medium">{formatDate(qrCode.valid_until)}</p>
         </div>
         <div>

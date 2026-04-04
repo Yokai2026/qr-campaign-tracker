@@ -31,13 +31,13 @@ export function DeleteCampaignButton({
     startTransition(async () => {
       try {
         await deleteCampaign(campaignId);
-        toast.success('Kampagne wurde geloescht.');
+        toast.success('Kampagne wurde gelöscht.');
         setOpen(false);
       } catch (err) {
         toast.error(
           err instanceof Error
             ? err.message
-            : 'Kampagne konnte nicht geloescht werden.',
+            : 'Kampagne konnte nicht gelöscht werden.',
         );
       }
     });
@@ -47,14 +47,14 @@ export function DeleteCampaignButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button variant="ghost" size="icon" />}>
         <Trash2 className="h-4 w-4" />
-        <span className="sr-only">Loeschen</span>
+        <span className="sr-only">Löschen</span>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Kampagne loeschen</DialogTitle>
+          <DialogTitle>Kampagne löschen</DialogTitle>
           <DialogDescription>
             Sind Sie sicher, dass Sie die Kampagne &ldquo;{campaignName}&rdquo;
-            loeschen moechten? Diese Aktion kann nicht rueckgaengig gemacht
+            löschen möchten? Diese Aktion kann nicht rückgängig gemacht
             werden.
           </DialogDescription>
         </DialogHeader>
@@ -67,7 +67,7 @@ export function DeleteCampaignButton({
             onClick={handleDelete}
             disabled={isPending}
           >
-            {isPending ? 'Wird geloescht...' : 'Loeschen'}
+            {isPending ? 'Wird gelöscht...' : 'Löschen'}
           </Button>
         </DialogFooter>
       </DialogContent>

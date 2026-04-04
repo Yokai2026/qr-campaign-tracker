@@ -56,7 +56,7 @@ export const qrCodeSchema = z.object({
 });
 
 export const shortLinkSchema = z.object({
-  target_url: z.string().url('Gueltige URL erforderlich').max(2000),
+  target_url: z.string().url('Gültige URL erforderlich').max(2000),
   short_code: z.string().min(3, 'Mindestens 3 Zeichen').max(50)
     .regex(/^[a-zA-Z0-9_-]+$/, 'Nur Buchstaben, Zahlen, Bindestrich und Unterstrich')
     .optional()
@@ -66,7 +66,7 @@ export const shortLinkSchema = z.object({
   campaign_id: z.string().uuid().optional().or(z.literal('')),
   link_group_id: z.string().uuid().optional().or(z.literal('')),
   expires_at: z.string().optional().or(z.literal('')),
-  expired_url: z.string().url('Gueltige URL erforderlich').max(2000).optional().or(z.literal('')),
+  expired_url: z.string().url('Gültige URL erforderlich').max(2000).optional().or(z.literal('')),
   utm_source: z.string().max(200).optional().or(z.literal('')),
   utm_medium: z.string().max(200).optional().or(z.literal('')),
   utm_campaign: z.string().max(200).optional().or(z.literal('')),

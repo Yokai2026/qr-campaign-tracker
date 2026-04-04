@@ -65,7 +65,7 @@ export function LinkDetail({ link }: Props) {
     startTransition(async () => {
       const result = await deleteShortLink(link.id);
       if (result.success) {
-        toast.success('Link geloescht');
+        toast.success('Link gelöscht');
         router.push('/links');
       } else {
         toast.error(result.error || 'Fehler');
@@ -167,7 +167,7 @@ export function LinkDetail({ link }: Props) {
             </Button>
             <Button variant="outline" size="sm" className="text-destructive" onClick={handleDelete} disabled={isPending}>
               <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-              Loeschen
+              Löschen
             </Button>
           </div>
         }
@@ -215,7 +215,7 @@ export function LinkDetail({ link }: Props) {
           </span>
         )}
         <span>Erstellt: {formatDate(link.created_at)}</span>
-        {link.expires_at && <span>Laeuft ab: {formatDateTime(link.expires_at)}</span>}
+        {link.expires_at && <span>Läuft ab: {formatDateTime(link.expires_at)}</span>}
         {link.last_clicked_at && <span>Letzter Klick: {formatDateTime(link.last_clicked_at)}</span>}
       </div>
 
@@ -233,7 +233,7 @@ export function LinkDetail({ link }: Props) {
       </div>
 
       {/* Charts */}
-      <ChartCard title="Klicks ueber Zeit" empty={stats.timeSeriesData.length === 0} emptyText="Keine Klicks im Zeitraum">
+      <ChartCard title="Klicks über Zeit" empty={stats.timeSeriesData.length === 0} emptyText="Keine Klicks im Zeitraum">
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={stats.timeSeriesData}>
             <CartesianGrid {...GRID_STYLE} />
@@ -246,7 +246,7 @@ export function LinkDetail({ link }: Props) {
       </ChartCard>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <ChartCard title="Geraetetypen" empty={stats.deviceData.length === 0}>
+        <ChartCard title="Gerätetypen" empty={stats.deviceData.length === 0}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie data={stats.deviceData} cx="50%" cy="50%" outerRadius={85} innerRadius={48} dataKey="value" nameKey="name" label={{ fontSize: 11 }} strokeWidth={1}>

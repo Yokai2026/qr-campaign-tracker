@@ -61,7 +61,7 @@ export function LinkList({ links, groups }: LinkListProps) {
     startTransition(async () => {
       const result = await deleteShortLink(id);
       if (result.success) {
-        toast.success('Link geloescht');
+        toast.success('Link gelöscht');
       } else {
         toast.error(result.error || 'Fehler');
       }
@@ -192,7 +192,7 @@ export function LinkList({ links, groups }: LinkListProps) {
                 onClick={() => handleDelete(sl.id)}
               >
                 <Trash2 className="mr-2 h-3.5 w-3.5" />
-                Loeschen
+                Löschen
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

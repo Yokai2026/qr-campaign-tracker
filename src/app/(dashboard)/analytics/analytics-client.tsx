@@ -374,7 +374,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
             <KPIStatCard label="Aufrufe gesamt" value={kpis.totalOpens} icon={TrendingUp} subtext={`${kpis.uniqueQrCodes} QR-Codes + ${kpis.linkClicks} Link-Klicks`} />
             <KPIStatCard label="Einzelne Besucher" value={kpis.uniqueScans} icon={Users} subtext={kpis.totalOpens ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% einzigartige Nutzer` : 'Keine Daten'} />
-            <KPIStatCard label="Link-Klicks" value={kpis.linkClicks} icon={Link2} subtext="Klicks ueber Kurzlinks" />
+            <KPIStatCard label="Link-Klicks" value={kpis.linkClicks} icon={Link2} subtext="Klicks über Kurzlinks" />
             <KPIStatCard label="Zielseite erreicht" value={kpis.ctaClicks} icon={MousePointerClick} subtext={`${conversionRate}% Weiterleitungsrate`} />
             <KPIStatCard label="Formulare abgeschickt" value={kpis.formSubmits} icon={FileText} subtext={kpis.totalOpens ? `${formRate}% der Besucher` : 'Keine Daten'} />
             <KPIStatCard label="QR-Codes aktiv" value={kpis.uniqueQrCodes} icon={QrCode} subtext="Codes mit mindestens 1 Scan" />
