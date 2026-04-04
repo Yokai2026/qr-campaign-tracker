@@ -261,17 +261,17 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         <>
           {/* KPI Cards */}
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
-            <KPIStatCard label="QR-Scans" value={kpis.totalOpens} icon={TrendingUp} subtext={`${kpis.uniqueQrCodes} verschiedene QR-Codes`} />
-            <KPIStatCard label="Unique Scans" value={kpis.uniqueScans} icon={Users} subtext={kpis.totalOpens ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% der Gesamt-Scans` : undefined} />
-            <KPIStatCard label="CTA-Klicks" value={kpis.ctaClicks} icon={MousePointerClick} subtext={`${conversionRate}% Conversion`} />
-            <KPIStatCard label="Formulare" value={kpis.formSubmits} icon={FileText} subtext={`${formRate}% Abschlussrate`} />
-            <KPIStatCard label="Aktive Codes" value={kpis.uniqueQrCodes} icon={QrCode} />
-            <KPIStatCard label="Formular-Rate" value={`${formRate}%`} icon={FileText} subtext={`${kpis.formSubmits} Abschlüsse`} />
+            <KPIStatCard label="Scans gesamt" value={kpis.totalOpens} icon={TrendingUp} subtext={`${kpis.uniqueQrCodes} verschiedene QR-Codes gescannt`} />
+            <KPIStatCard label="Einzelne Besucher" value={kpis.uniqueScans} icon={Users} subtext={kpis.totalOpens ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% einzigartige Nutzer` : 'Keine Daten'} />
+            <KPIStatCard label="Klicks auf Zielseite" value={kpis.ctaClicks} icon={MousePointerClick} subtext={`${conversionRate}% Klickrate`} />
+            <KPIStatCard label="Formulare abgeschickt" value={kpis.formSubmits} icon={FileText} subtext={kpis.totalOpens ? `${formRate}% der Besucher` : 'Keine Daten'} />
+            <KPIStatCard label="Verwendete QR-Codes" value={kpis.uniqueQrCodes} icon={QrCode} subtext="Codes mit mindestens 1 Scan" />
+            <KPIStatCard label="Abschlussrate" value={`${conversionRate}%`} icon={MousePointerClick} subtext="Scan → Klick auf Zielseite" />
           </div>
 
           {/* Charts */}
           <div className="grid gap-4 lg:grid-cols-2">
-            <ChartCard title="Scans & Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
+            <ChartCard title="Scans & Klicks auf Zielseite über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={timeSeriesData}>
                   <CartesianGrid {...GRID_STYLE} />
@@ -286,8 +286,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Line type="monotone" dataKey="opens" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} />
-                  <Line type="monotone" dataKey="clicks" name="CTA-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={1.5} dot={false} />
+                  <Line type="monotone" dataKey="opens" name="Scans" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} />
+                  <Line type="monotone" dataKey="clicks" name="Klicks auf Zielseite" stroke={SERIES_COLORS.clicks} strokeWidth={1.5} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
