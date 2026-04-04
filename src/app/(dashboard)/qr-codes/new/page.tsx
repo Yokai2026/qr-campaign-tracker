@@ -12,6 +12,7 @@ import {
   Link as LinkIcon,
   Palette,
   QrCode as QrCodeIcon,
+  ShieldAlert,
 } from 'lucide-react';
 
 import { createQrCode, getPlacements } from '../actions';
@@ -73,6 +74,8 @@ type FormValues = {
   utm_id: string;
   qr_fg_color: string;
   qr_bg_color: string;
+  max_scans: string;
+  limit_redirect_url: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -88,6 +91,7 @@ export default function NewQrCodePage() {
   const [loadingPlacements, setLoadingPlacements] = useState(true);
   const [showUtm, setShowUtm] = useState(false);
   const [showDesign, setShowDesign] = useState(false);
+  const [showLimit, setShowLimit] = useState(false);
   const [comboOpen, setComboOpen] = useState(false);
 
   const {
@@ -113,12 +117,15 @@ export default function NewQrCodePage() {
       utm_id: '',
       qr_fg_color: '#000000',
       qr_bg_color: '#FFFFFF',
+      max_scans: '',
+      limit_redirect_url: '',
     },
   });
 
   const placementId = watch('placement_id');
   const watchFg = watch('qr_fg_color');
   const watchBg = watch('qr_bg_color');
+  const watchMaxScans = watch('max_scans');
   const selectedPlacement = placements.find((p) => p.id === placementId);
 
   // Load placements on mount
@@ -160,6 +167,8 @@ export default function NewQrCodePage() {
       utm_id: data.utm_id || undefined,
       qr_fg_color: data.qr_fg_color || undefined,
       qr_bg_color: data.qr_bg_color || undefined,
+      max_scans: data.max_scans ? parseInt(data.max_scans, 10) : undefined,
+      limit_redirect_url: data.limit_redirect_url || undefined,
     };
 
     const result = formSchema.safeParse(input);
@@ -482,6 +491,66 @@ export default function NewQrCodePage() {
                   />
                 </div>
               </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* Scan-Limit */}
+        <Card>
+          <CardHeader>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between text-left"
+              onClick={() => setShowLimit(!showLimit)}
+              aria-expanded={showLimit}
+            >
+              <div>
+                <CardTitle>
+                  <span className="flex items-center gap-2">
+                    <ShieldAlert className="h-4 w-4" />
+                    Scan-Limit
+                  </span>
+                </CardTitle>
+                <CardDescription>
+                  Begrenze die Anzahl der Scans — z.B. für limitierte Angebote wie &quot;Nur die ersten 100 bekommen Rabatt&quot;.
+                </CardDescription>
+              </div>
+              {showLimit ? (
+                <ChevronUp className="h-5 w-5 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+              )}
+            </button>
+          </CardHeader>
+          {showLimit && (
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="max_scans">Maximale Scans</Label>
+                <Input
+                  id="max_scans"
+                  type="number"
+                  min="1"
+                  placeholder="z.B. 100"
+                  {...register('max_scans')}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Nach dieser Anzahl wird der QR-Code gesperrt. Leer lassen fuer unbegrenzt.
+                </p>
+              </div>
+              {watchMaxScans && (
+                <div className="space-y-2">
+                  <Label htmlFor="limit_redirect_url">Weiterleitungs-URL nach Limit</Label>
+                  <Input
+                    id="limit_redirect_url"
+                    type="url"
+                    placeholder="https://beispiel.de/ausverkauft"
+                    {...register('limit_redirect_url')}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Wohin soll nach Erreichen des Limits weitergeleitet werden? Ohne Angabe wird eine Info-Seite angezeigt.
+                  </p>
+                </div>
+              )}
             </CardContent>
           )}
         </Card>

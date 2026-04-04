@@ -35,6 +35,7 @@ export async function GET(
   const ip = getClientIp(request);
   const ipHash = hashIp(ip);
   const deviceType = parseDevice(userAgent);
+  const country = request.headers.get('x-vercel-ip-country') || null;
 
   const placement = qr.placement as { id: string; campaign_id: string; placement_code: string; campaign: { id: string; slug: string } | null } | null;
   const campaignId = placement?.campaign_id || null;
@@ -52,6 +53,7 @@ export async function GET(
       device_type: deviceType,
       ip_hash: ipHash,
       destination_url: null,
+      country,
     });
     return new NextResponse(
       '<html><body><h1>Dieser QR-Code ist derzeit nicht aktiv.</h1></body></html>',
@@ -73,6 +75,7 @@ export async function GET(
       device_type: deviceType,
       ip_hash: ipHash,
       destination_url: null,
+      country,
     });
     return new NextResponse(
       '<html><body><h1>Dieser QR-Code ist abgelaufen.</h1></body></html>',
@@ -85,6 +88,40 @@ export async function GET(
       '<html><body><h1>Dieser QR-Code ist noch nicht aktiv.</h1></body></html>',
       { status: 425, headers: { 'Content-Type': 'text/html' } }
     );
+  }
+
+  // Check scan limit
+  if (qr.max_scans) {
+    const { count } = await supabase
+      .from('redirect_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('qr_code_id', qr.id)
+      .eq('event_type', 'qr_open');
+
+    if (count !== null && count >= qr.max_scans) {
+      // Log the event
+      await supabase.from('redirect_events').insert({
+        qr_code_id: qr.id,
+        placement_id: qr.placement_id,
+        campaign_id: campaignId,
+        short_code: code,
+        event_type: 'qr_blocked_inactive',
+        referrer,
+        user_agent: userAgent,
+        device_type: deviceType,
+        ip_hash: ipHash,
+        destination_url: null,
+      });
+
+      // Redirect to limit URL or show message
+      if (qr.limit_redirect_url && isUrlSafe(qr.limit_redirect_url)) {
+        return NextResponse.redirect(qr.limit_redirect_url, 302);
+      }
+      return new NextResponse(
+        '<html><body><h1>Dieses Angebot ist leider nicht mehr verfügbar.</h1><p>Das Scan-Limit wurde erreicht.</p></body></html>',
+        { status: 410, headers: { 'Content-Type': 'text/html' } }
+      );
+    }
   }
 
   // Build target URL with UTM params
@@ -122,6 +159,7 @@ export async function GET(
     device_type: deviceType,
     ip_hash: ipHash,
     destination_url: targetUrl,
+    country,
   });
 
   return NextResponse.redirect(targetUrl, 302);

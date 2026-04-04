@@ -19,10 +19,12 @@ import {
   ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import {
-  TrendingUp, MousePointerClick, FileText, QrCode, Download, Users,
+  TrendingUp, MousePointerClick, FileText, QrCode, Download, Users, FileDown, Globe,
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
+import { generateAnalyticsPdf } from '@/lib/pdf/generate';
+import { CountryChart } from '@/components/shared/country-chart';
 
 type Props = {
   campaigns: { id: string; name: string }[];
@@ -35,6 +37,7 @@ type AnalyticsData = {
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; opens: number; location: string }[];
   deviceData: { name: string; value: number }[];
+  countryData: { name: string; value: number }[];
 };
 
 export function AnalyticsClient({ campaigns, districts }: Props) {
@@ -53,7 +56,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
       let redirectQuery = supabase
         .from('redirect_events')
-        .select('id, qr_code_id, campaign_id, placement_id, device_type, created_at, event_type, ip_hash, placements(name, placement_code, location:locations(venue_name, district))')
+        .select('id, qr_code_id, campaign_id, placement_id, device_type, created_at, event_type, ip_hash, country, placements(name, placement_code, location:locations(venue_name, district))')
         .eq('event_type', 'qr_open')
         .gte('created_at', from)
         .lte('created_at', to);
@@ -134,7 +137,17 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       });
       const deviceData = Object.entries(devMap).map(([name, value]) => ({ name, value }));
 
-      return { kpis, timeSeriesData, campaignData, placementData, deviceData };
+      // Country breakdown
+      const countryMap: Record<string, number> = {};
+      filteredEvents.forEach((e: { country: string | null }) => {
+        const c = e.country || 'Unbekannt';
+        countryMap[c] = (countryMap[c] || 0) + 1;
+      });
+      const countryData = Object.entries(countryMap)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+
+      return { kpis, timeSeriesData, campaignData, placementData, deviceData, countryData };
     },
   });
 
@@ -143,6 +156,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const campaignData = data?.campaignData ?? [];
   const placementData = data?.placementData ?? [];
   const deviceData = data?.deviceData ?? [];
+  const countryData = data?.countryData ?? [];
 
   const conversionRate = kpis.totalOpens > 0 ? ((kpis.ctaClicks / kpis.totalOpens) * 100).toFixed(1) : '0';
   const formRate = kpis.totalOpens > 0 ? ((kpis.formSubmits / kpis.totalOpens) * 100).toFixed(1) : '0';
@@ -197,10 +211,28 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           <h1 className="text-lg font-semibold tracking-tight">Analytik</h1>
           <p className="mt-0.5 text-[13px] text-muted-foreground">Auswertung aller QR-Scans und Events</p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleExport}>
-          <Download className="mr-1.5 h-3.5 w-3.5" />
-          CSV Export
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" render={<a href="/analytics/compare" />}>
+            <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
+            A/B Vergleich
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              generateAnalyticsPdf({
+                dateFrom, dateTo, kpis, campaignData, placementData, deviceData, countryData,
+              });
+            }}
+          >
+            <FileDown className="mr-1.5 h-3.5 w-3.5" />
+            PDF Bericht
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleExport}>
+            <Download className="mr-1.5 h-3.5 w-3.5" />
+            CSV Export
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -332,6 +364,17 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               </ResponsiveContainer>
             </ChartCard>
           </div>
+
+          {/* Geo: Scans by Country */}
+          {countryData.length > 0 && (
+            <ChartCard title="Scans nach Land" className="lg:col-span-1">
+              <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+                <Globe className="h-3.5 w-3.5" />
+                Zeigt, aus welchen Laendern deine QR-Codes gescannt werden
+              </div>
+              <CountryChart data={countryData} />
+            </ChartCard>
+          )}
 
           {/* Top Placements Table */}
           <ChartCard title="Top-Platzierungen" empty={placementData.length === 0} emptyText="Noch keine Scan-Daten">

@@ -241,6 +241,8 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
       utm_id: input.utm_id || null,
       qr_fg_color: fgColor,
       qr_bg_color: bgColor,
+      max_scans: input.max_scans || null,
+      limit_redirect_url: input.limit_redirect_url || null,
     })
     .select()
     .single();
@@ -280,6 +282,8 @@ export async function updateQrCode(
       | 'utm_id'
       | 'qr_fg_color'
       | 'qr_bg_color'
+      | 'max_scans'
+      | 'limit_redirect_url'
     >
   >,
 ): Promise<QrCode> {
@@ -323,6 +327,14 @@ export async function updateQrCode(
     if (data[field] !== undefined) {
       updates[field] = data[field] || null;
     }
+  }
+
+  // Scan limit fields
+  if (data.max_scans !== undefined) {
+    updates.max_scans = data.max_scans || null;
+  }
+  if (data.limit_redirect_url !== undefined) {
+    updates.limit_redirect_url = data.limit_redirect_url || null;
   }
 
   // Color changes
@@ -409,4 +421,78 @@ export async function deleteQrCode(id: string): Promise<void> {
   if (error) throw new Error(error.message);
 
   revalidatePath('/qr-codes');
+}
+
+/**
+ * Bulk-create QR codes for a single placement from a list of items.
+ * Max 100 items per call.
+ */
+export async function bulkCreateQrCodes(
+  placementId: string,
+  items: { target_url: string; note?: string }[],
+): Promise<{ created: number; errors: string[] }> {
+  const profile = await requireAuth();
+  const supabase = await createClient();
+
+  if (items.length > 100) {
+    return { created: 0, errors: ['Maximal 100 QR-Codes pro Bulk-Import.'] };
+  }
+
+  // Validate placement
+  const { data: placement } = await supabase
+    .from('placements')
+    .select('*, campaign:campaigns!campaign_id ( id, name, slug )')
+    .eq('id', placementId)
+    .single();
+
+  if (!placement) {
+    return { created: 0, errors: ['Platzierung nicht gefunden.'] };
+  }
+
+  const campaign = placement.campaign as { id: string; name: string; slug: string } | null;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const errors: string[] = [];
+  let created = 0;
+
+  for (const item of items) {
+    try {
+      if (!isUrlSafe(item.target_url)) {
+        errors.push(`Unsichere URL übersprungen: ${item.target_url}`);
+        continue;
+      }
+
+      const shortCode = nanoid(8);
+      const redirectUrl = buildRedirectUrl(baseUrl, shortCode);
+      const { pngDataUrl, svgString } = await generateQrCode(redirectUrl);
+      const svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`;
+
+      const { error } = await supabase.from('qr_codes').insert({
+        placement_id: placementId,
+        short_code: shortCode,
+        target_url: item.target_url,
+        active: true,
+        note: item.note || null,
+        created_by: profile.id,
+        qr_png_url: pngDataUrl,
+        qr_svg_url: svgDataUrl,
+        utm_source: 'qr',
+        utm_medium: 'offline',
+        utm_campaign: campaign?.slug || '',
+        utm_content: placement.placement_code || '',
+        qr_fg_color: '#000000',
+        qr_bg_color: '#FFFFFF',
+      });
+
+      if (error) {
+        errors.push(`Fehler bei ${item.target_url}: ${error.message}`);
+      } else {
+        created++;
+      }
+    } catch (err) {
+      errors.push(`Fehler bei ${item.target_url}: ${err instanceof Error ? err.message : 'Unbekannt'}`);
+    }
+  }
+
+  revalidatePath('/qr-codes');
+  return { created, errors };
 }

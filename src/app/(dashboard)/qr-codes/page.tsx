@@ -1,6 +1,9 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { Suspense } from 'react';
+import Link from 'next/link';
+import { Plus, Upload } from 'lucide-react';
 import { PageHeader } from '@/components/shared/page-header';
+import { Button } from '@/components/ui/button';
 import { getQrCodes } from './actions';
 import { QrCodeList } from './qr-code-list';
 
@@ -10,8 +13,18 @@ export default function QrCodesPage() {
       <PageHeader
         title="QR-Codes"
         description="Verwalten Sie Ihre QR-Codes und deren Weiterleitungen."
-        actionLabel="Neuer QR-Code"
-        actionHref="/qr-codes/new"
+        action={
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" render={<Link href="/qr-codes/bulk" />}>
+              <Upload className="mr-1.5 h-3.5 w-3.5" />
+              Bulk-Import
+            </Button>
+            <Button size="sm" render={<Link href="/qr-codes/new" />}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Neuer QR-Code
+            </Button>
+          </div>
+        }
       />
       <Suspense
         fallback={

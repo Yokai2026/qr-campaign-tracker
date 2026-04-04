@@ -51,6 +51,8 @@ export const qrCodeSchema = z.object({
   utm_id: z.string().max(200).optional().or(z.literal('')),
   qr_fg_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Ungültiger Farbcode').optional().or(z.literal('')),
   qr_bg_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Ungültiger Farbcode').optional().or(z.literal('')),
+  max_scans: z.number().int().min(1, 'Mindestens 1 Scan').optional(),
+  limit_redirect_url: z.string().url('Gültige URL erforderlich').max(2000).optional().or(z.literal('')),
 });
 
 export const trackEventSchema = z.object({

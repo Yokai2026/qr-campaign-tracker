@@ -113,6 +113,8 @@ export interface QrCode {
   utm_id: string | null;
   qr_fg_color: string;
   qr_bg_color: string;
+  max_scans: number | null;
+  limit_redirect_url: string | null;
   created_at: string;
   updated_at: string;
   // Joined
@@ -253,4 +255,6 @@ export interface QrCodeInput {
   utm_id?: string;
   qr_fg_color?: string;
   qr_bg_color?: string;
+  max_scans?: number;
+  limit_redirect_url?: string;
 }
