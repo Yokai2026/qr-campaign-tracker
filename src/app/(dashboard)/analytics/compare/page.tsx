@@ -70,11 +70,11 @@ export default function ComparePage() {
 
   async function handleCompare() {
     if (!campaignA || !campaignB) {
-      toast.error('Bitte zwei Kampagnen auswählen.');
+      toast.error('Bitte zwei Kampagnen auswählen');
       return;
     }
     if (campaignA === campaignB) {
-      toast.error('Bitte zwei verschiedene Kampagnen wählen.');
+      toast.error('Bitte zwei verschiedene Kampagnen wählen');
       return;
     }
 
@@ -89,7 +89,7 @@ export default function ComparePage() {
       setDataA(a);
       setDataB(b);
     } catch {
-      toast.error('Fehler beim Laden der Daten.');
+      toast.error('Fehler beim Laden der Daten');
     } finally {
       setLoading(false);
     }

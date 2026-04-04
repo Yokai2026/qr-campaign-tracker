@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useMemo, useTransition } from 'react';
 import Link from 'next/link';
 import { type ColumnDef } from '@tanstack/react-table';
 import {
@@ -12,6 +12,8 @@ import {
   MoreVertical,
   Copy,
   Check,
+  Filter,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -22,6 +24,13 @@ import { formatDate, truncateUrl } from '@/lib/format';
 import { DataTable } from '@/components/shared/data-table';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -37,6 +46,41 @@ type LinkListProps = {
 export function LinkList({ links, groups }: LinkListProps) {
   const [isPending, startTransition] = useTransition();
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [groupFilter, setGroupFilter] = useState<string>('all');
+  const [campaignFilter, setCampaignFilter] = useState<string>('all');
+
+  // Extract unique campaigns from links
+  const campaigns = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const l of links) {
+      if (l.campaign) map.set(l.campaign.id, l.campaign.name);
+    }
+    return Array.from(map, ([id, name]) => ({ id, name })).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }, [links]);
+
+  // Apply filters
+  const filteredLinks = useMemo(() => {
+    let result = links;
+    if (groupFilter !== 'all') {
+      if (groupFilter === 'none') {
+        result = result.filter((l) => !l.link_group_id);
+      } else {
+        result = result.filter((l) => l.link_group_id === groupFilter);
+      }
+    }
+    if (campaignFilter !== 'all') {
+      if (campaignFilter === 'none') {
+        result = result.filter((l) => !l.campaign_id);
+      } else {
+        result = result.filter((l) => l.campaign_id === campaignFilter);
+      }
+    }
+    return result;
+  }, [links, groupFilter, campaignFilter]);
+
+  const hasActiveFilter = groupFilter !== 'all' || campaignFilter !== 'all';
 
   function handleCopy(shortCode: string, id: string) {
     const url = `${window.location.origin}/r/${shortCode}`;
@@ -58,6 +102,7 @@ export function LinkList({ links, groups }: LinkListProps) {
   }
 
   function handleDelete(id: string) {
+    if (!confirm('Diesen Link wirklich löschen?')) return;
     startTransition(async () => {
       const result = await deleteShortLink(id);
       if (result.success) {
@@ -127,7 +172,7 @@ export function LinkList({ links, groups }: LinkListProps) {
     },
     {
       accessorKey: 'link_group',
-      header: 'Gruppe',
+      header: 'Sammlung',
       cell: ({ row }) => {
         const g = row.original.link_group;
         if (!g) return <span className="text-[13px] text-muted-foreground">–</span>;
@@ -201,12 +246,66 @@ export function LinkList({ links, groups }: LinkListProps) {
     },
   ];
 
+  const filterToolbar = (
+    <div className="flex items-center gap-2">
+      {groups.length > 0 && (
+        <Select value={groupFilter} onValueChange={(v) => setGroupFilter(v ?? 'all')}>
+          <SelectTrigger className="h-8 w-[160px] text-[12px]">
+            <Filter className="mr-1.5 h-3 w-3 text-muted-foreground" />
+            <SelectValue placeholder="Sammlung" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle Sammlungen</SelectItem>
+            <SelectItem value="none">Ohne Sammlung</SelectItem>
+            {groups.map((g) => (
+              <SelectItem key={g.id} value={g.id}>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full shrink-0" style={{ background: g.color }} />
+                  {g.name}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+      {campaigns.length > 0 && (
+        <Select value={campaignFilter} onValueChange={(v) => setCampaignFilter(v ?? 'all')}>
+          <SelectTrigger className="h-8 w-[160px] text-[12px]">
+            <SelectValue placeholder="Kampagne" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle Kampagnen</SelectItem>
+            <SelectItem value="none">Ohne Kampagne</SelectItem>
+            {campaigns.map((c) => (
+              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+      {hasActiveFilter && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 text-[12px] text-muted-foreground"
+          onClick={() => {
+            setGroupFilter('all');
+            setCampaignFilter('all');
+          }}
+        >
+          <X className="mr-1 h-3 w-3" />
+          Filter zurücksetzen
+        </Button>
+      )}
+    </div>
+  );
+
   return (
     <DataTable
       columns={columns}
-      data={links}
+      data={filteredLinks}
       searchKey="short_code"
       searchPlaceholder="Kurzlinks durchsuchen..."
+      toolbar={filterToolbar}
     />
   );
 }

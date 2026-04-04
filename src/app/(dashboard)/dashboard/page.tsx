@@ -82,7 +82,7 @@ export default async function DashboardPage() {
           Willkommen, {profile.display_name || profile.email}
         </h1>
         <p className="mt-0.5 text-[13px] text-muted-foreground">
-          Übersicht Ihrer QR-Kampagnen
+          Übersicht deiner QR-Kampagnen
         </p>
       </div>
 

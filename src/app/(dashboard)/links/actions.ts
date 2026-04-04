@@ -215,6 +215,37 @@ export async function createLinkGroup(input: Record<string, unknown>): Promise<{
   return { success: true, id: created?.id };
 }
 
+export async function updateLinkGroup(
+  id: string,
+  input: Record<string, unknown>
+): Promise<{ success: boolean; error?: string }> {
+  await requireAuth();
+  const supabase = await createClient();
+
+  const parsed = linkGroupSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Ungültige Eingabe' };
+  }
+
+  const data = parsed.data;
+
+  const { error } = await supabase
+    .from('link_groups')
+    .update({
+      name: data.name,
+      slug: data.slug,
+      description: data.description || null,
+      color: data.color || '#6d28d9',
+      campaign_id: data.campaign_id || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+
+  if (error) return { success: false, error: error.message };
+  revalidatePath('/links');
+  return { success: true };
+}
+
 export async function deleteLinkGroup(id: string): Promise<{ success: boolean; error?: string }> {
   await requireAuth();
   const supabase = await createClient();

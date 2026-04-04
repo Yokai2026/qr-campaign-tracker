@@ -8,7 +8,7 @@ export default function NewCampaignPage() {
     <div className="space-y-6">
       <PageHeader
         title="Neue Kampagne erstellen"
-        description="Legen Sie eine neue Kampagne an."
+        description="Neue Kampagne anlegen"
       />
       <CampaignForm />
     </div>

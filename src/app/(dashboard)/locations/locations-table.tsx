@@ -99,7 +99,7 @@ export function LocationsTable({ data }: LocationsTableProps) {
       searchPlaceholder="Standort suchen..."
       emptyIcon={MapPin}
       emptyTitle="Keine Standorte gefunden"
-      emptyDescription="Erstellen Sie Ihren ersten Standort, um loszulegen."
+      emptyDescription="Erstelle deinen ersten Standort, um loszulegen"
       emptyActionLabel="Standort erstellen"
       emptyActionHref="/locations/new"
       enableColumnVisibility

@@ -71,13 +71,13 @@ export default function NewLocationPage() {
       try {
         const result = await createLocation(input);
         if (result.success) {
-          toast.success('Standort erfolgreich erstellt.');
+          toast.success('Standort erstellt');
           router.push(`/locations/${result.id}`);
         } else {
           toast.error(result.error);
         }
       } catch {
-        toast.error('Ein unerwarteter Fehler ist aufgetreten.');
+        toast.error('Unerwarteter Fehler');
       }
     });
   }

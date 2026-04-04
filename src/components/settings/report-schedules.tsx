@@ -26,8 +26,8 @@ type Schedule = {
 type Campaign = { id: string; name: string };
 
 const FREQUENCY_LABELS: Record<ReportFrequency, string> = {
-  daily: 'Taeglich',
-  weekly: 'Woechentlich',
+  daily: 'Täglich',
+  weekly: 'Wöchentlich',
   monthly: 'Monatlich',
 };
 
@@ -96,6 +96,7 @@ export function ReportSchedules() {
   }
 
   async function handleDelete(id: string) {
+    if (!confirm('Zeitplan wirklich löschen?')) return;
     const { error } = await supabase
       .from('report_schedules')
       .delete()
@@ -175,8 +176,8 @@ export function ReportSchedules() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="daily">Taeglich</SelectItem>
-                    <SelectItem value="weekly">Woechentlich</SelectItem>
+                    <SelectItem value="daily">Täglich</SelectItem>
+                    <SelectItem value="weekly">Wöchentlich</SelectItem>
                     <SelectItem value="monthly">Monatlich</SelectItem>
                   </SelectContent>
                 </Select>

@@ -12,7 +12,7 @@ export default function QrCodesPage() {
     <div className="space-y-6 animate-in-card">
       <PageHeader
         title="QR-Codes"
-        description="Verwalten Sie Ihre QR-Codes und deren Weiterleitungen."
+        description="Verwalte deine QR-Codes und deren Weiterleitungen"
         action={
           <div className="flex items-center gap-2">
             <Button size="sm" variant="outline" render={<Link href="/qr-codes/bulk" />}>

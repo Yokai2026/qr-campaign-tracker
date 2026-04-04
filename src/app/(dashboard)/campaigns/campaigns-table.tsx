@@ -124,7 +124,7 @@ export function CampaignsTable({ data }: CampaignsTableProps) {
       searchPlaceholder="Kampagne suchen..."
       emptyIcon={Megaphone}
       emptyTitle="Keine Kampagnen vorhanden"
-      emptyDescription="Erstellen Sie Ihre erste Kampagne, um loszulegen."
+      emptyDescription="Erstelle deine erste Kampagne, um loszulegen"
       emptyActionLabel="Neue Kampagne"
       emptyActionHref="/campaigns/new"
       enableColumnVisibility

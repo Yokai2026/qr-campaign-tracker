@@ -88,7 +88,7 @@ export default function SettingsPage() {
               <User className="h-4 w-4 text-muted-foreground" />
               <div>
                 <CardTitle className="text-[14px]">Profil</CardTitle>
-                <CardDescription className="text-[12px]">Ihre persönlichen Informationen</CardDescription>
+                <CardDescription className="text-[12px]">Deine persönlichen Informationen</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -148,7 +148,7 @@ export default function SettingsPage() {
                 <div>
                   <CardTitle className="text-[14px]">Tracking-Script</CardTitle>
                   <CardDescription className="text-[12px]">
-                    Auf Ihren Landingpages einbinden
+                    Auf deinen Landingpages einbinden
                   </CardDescription>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useMemo, useTransition } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { type ColumnDef } from '@tanstack/react-table';
@@ -12,6 +12,8 @@ import {
   ToggleRight,
   Trash2,
   MoreVertical,
+  Filter,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -24,6 +26,13 @@ import { formatDate, truncateUrl } from '@/lib/format';
 import { DataTable } from '@/components/shared/data-table';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -44,6 +53,49 @@ type QrCodeListProps = {
 export function QrCodeList({ qrCodes }: QrCodeListProps) {
   const [isPending, startTransition] = useTransition();
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [campaignFilter, setCampaignFilter] = useState<string>('all');
+  const [placementFilter, setPlacementFilter] = useState<string>('all');
+
+  // Extract unique campaigns and placements
+  const campaigns = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const qr of qrCodes) {
+      if (qr.campaign_name) {
+        const key = qr.campaign_name;
+        if (!map.has(key)) map.set(key, key);
+      }
+    }
+    return Array.from(map.values()).sort();
+  }, [qrCodes]);
+
+  const placements = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const qr of qrCodes) {
+      if (qr.placement_name) {
+        const key = qr.placement_name;
+        if (!map.has(key)) map.set(key, key);
+      }
+    }
+    return Array.from(map.values()).sort();
+  }, [qrCodes]);
+
+  // Apply filters
+  const filteredQrCodes = useMemo(() => {
+    let result = qrCodes;
+    if (campaignFilter !== 'all') {
+      if (campaignFilter === 'none') {
+        result = result.filter((qr) => !qr.campaign_name);
+      } else {
+        result = result.filter((qr) => qr.campaign_name === campaignFilter);
+      }
+    }
+    if (placementFilter !== 'all') {
+      result = result.filter((qr) => qr.placement_name === placementFilter);
+    }
+    return result;
+  }, [qrCodes, campaignFilter, placementFilter]);
+
+  const hasActiveFilter = campaignFilter !== 'all' || placementFilter !== 'all';
 
   function handleToggle(id: string, currentActive: boolean) {
     setTogglingId(id);
@@ -234,15 +286,63 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
     },
   ];
 
+  const filterToolbar = (
+    <div className="flex items-center gap-2">
+      {campaigns.length > 0 && (
+        <Select value={campaignFilter} onValueChange={(v) => setCampaignFilter(v ?? 'all')}>
+          <SelectTrigger className="h-8 w-[160px] text-[12px]">
+            <Filter className="mr-1.5 h-3 w-3 text-muted-foreground" />
+            <SelectValue placeholder="Kampagne" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle Kampagnen</SelectItem>
+            <SelectItem value="none">Ohne Kampagne</SelectItem>
+            {campaigns.map((c) => (
+              <SelectItem key={c} value={c}>{c}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+      {placements.length > 0 && (
+        <Select value={placementFilter} onValueChange={(v) => setPlacementFilter(v ?? 'all')}>
+          <SelectTrigger className="h-8 w-[160px] text-[12px]">
+            <SelectValue placeholder="Platzierung" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle Platzierungen</SelectItem>
+            {placements.map((p) => (
+              <SelectItem key={p} value={p}>{p}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+      {hasActiveFilter && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 text-[12px] text-muted-foreground"
+          onClick={() => {
+            setCampaignFilter('all');
+            setPlacementFilter('all');
+          }}
+        >
+          <X className="mr-1 h-3 w-3" />
+          Filter zurücksetzen
+        </Button>
+      )}
+    </div>
+  );
+
   return (
     <DataTable
       columns={columns}
-      data={qrCodes}
+      data={filteredQrCodes}
       searchKey="short_code"
       searchPlaceholder="QR-Code suchen..."
+      toolbar={filterToolbar}
       emptyIcon={QrCodeIcon}
       emptyTitle="Keine QR-Codes vorhanden"
-      emptyDescription="Erstellen Sie Ihren ersten QR-Code, um Weiterleitungen zu tracken."
+      emptyDescription="Erstelle deinen ersten QR-Code, um Weiterleitungen zu tracken"
       emptyActionLabel="Neuer QR-Code"
       emptyActionHref="/qr-codes/new"
       enableColumnVisibility

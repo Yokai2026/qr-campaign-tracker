@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
@@ -9,14 +9,15 @@ import { format, subDays } from 'date-fns';
 import {
   Link2, ExternalLink, Copy, Check, Trash2, ToggleLeft, ToggleRight,
   TrendingUp, Users, Globe, Monitor, ArrowUpRight, MousePointerClick,
+  Pencil, Loader2, ChevronDown, ChevronUp,
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 
-import type { ShortLink } from '@/types';
-import { deleteShortLink, toggleShortLink } from '../actions';
+import type { ShortLink, LinkGroup } from '@/types';
+import { deleteShortLink, toggleShortLink, updateShortLink, getLinkGroups } from '../actions';
 import { formatDate, formatDateTime } from '@/lib/format';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
 
@@ -24,7 +25,11 @@ import { PageHeader } from '@/components/shared/page-header';
 import { KPIStatCard } from '@/components/shared/kpi-stat-card';
 import { ChartCard } from '@/components/shared/chart-card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CountryChart } from '@/components/shared/country-chart';
 
 const TOOLTIP_STYLE = {
@@ -36,11 +41,64 @@ const TOOLTIP_STYLE = {
 
 type Props = { link: ShortLink };
 
+type Campaign = { id: string; name: string };
+
+type EditFormData = {
+  target_url: string;
+  title: string;
+  description: string;
+  campaign_id: string;
+  link_group_id: string;
+  expires_at: string;
+  expired_url: string;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_content: string;
+  utm_id: string;
+};
+
+function buildEditForm(link: ShortLink): EditFormData {
+  return {
+    target_url: link.target_url,
+    title: link.title ?? '',
+    description: link.description ?? '',
+    campaign_id: link.campaign_id ?? '',
+    link_group_id: link.link_group_id ?? '',
+    expires_at: link.expires_at ? link.expires_at.slice(0, 16) : '',
+    expired_url: link.expired_url ?? '',
+    utm_source: link.utm_source ?? '',
+    utm_medium: link.utm_medium ?? '',
+    utm_campaign: link.utm_campaign ?? '',
+    utm_content: link.utm_content ?? '',
+    utm_id: link.utm_id ?? '',
+  };
+}
+
 export function LinkDetail({ link }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const [isPending, startTransition] = useTransition();
   const [copied, setCopied] = useState(false);
+
+  // Edit state
+  const [showEdit, setShowEdit] = useState(false);
+  const [editForm, setEditForm] = useState<EditFormData>(buildEditForm(link));
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [groups, setGroups] = useState<LinkGroup[]>([]);
+  const [showUtm, setShowUtm] = useState(false);
+
+  // Load campaigns + groups when edit opens
+  useEffect(() => {
+    if (!showEdit) return;
+    const sb = createClient();
+    sb.from('campaigns')
+      .select('id, name')
+      .in('status', ['draft', 'active', 'paused'])
+      .order('name')
+      .then(({ data }) => setCampaigns((data ?? []) as Campaign[]));
+    getLinkGroups().then(setGroups);
+  }, [showEdit]);
 
   const shortUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/r/${link.short_code}`
@@ -62,6 +120,7 @@ export function LinkDetail({ link }: Props) {
   }
 
   function handleDelete() {
+    if (!confirm('Diesen Link wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
     startTransition(async () => {
       const result = await deleteShortLink(link.id);
       if (result.success) {
@@ -71,6 +130,37 @@ export function LinkDetail({ link }: Props) {
         toast.error(result.error || 'Fehler');
       }
     });
+  }
+
+  function handleSave() {
+    startTransition(async () => {
+      const result = await updateShortLink(link.id, {
+        target_url: editForm.target_url,
+        title: editForm.title || undefined,
+        description: editForm.description || undefined,
+        campaign_id: editForm.campaign_id || undefined,
+        link_group_id: editForm.link_group_id || undefined,
+        expires_at: editForm.expires_at || undefined,
+        expired_url: editForm.expired_url || undefined,
+        utm_source: editForm.utm_source || undefined,
+        utm_medium: editForm.utm_medium || undefined,
+        utm_campaign: editForm.utm_campaign || undefined,
+        utm_content: editForm.utm_content || undefined,
+        utm_id: editForm.utm_id || undefined,
+      });
+      if (result.success) {
+        toast.success('Link aktualisiert');
+        setShowEdit(false);
+        router.refresh();
+      } else {
+        toast.error(result.error || 'Fehler beim Aktualisieren');
+      }
+    });
+  }
+
+  function handleCancelEdit() {
+    setEditForm(buildEditForm(link));
+    setShowEdit(false);
   }
 
   // Analytics data
@@ -156,8 +246,16 @@ export function LinkDetail({ link }: Props) {
       <PageHeader
         title={link.title || link.short_code}
         description={link.target_url}
+        breadcrumbs={[
+          { label: 'Kurzlinks', href: '/links' },
+          { label: link.title || `/r/${link.short_code}` },
+        ]}
         action={
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setShowEdit(!showEdit)} disabled={isPending}>
+              <Pencil className="mr-1.5 h-3.5 w-3.5" />
+              Bearbeiten
+            </Button>
             <Button variant="outline" size="sm" onClick={handleToggle} disabled={isPending}>
               {link.active ? (
                 <><ToggleLeft className="mr-1.5 h-3.5 w-3.5" /> Deaktivieren</>
@@ -218,6 +316,179 @@ export function LinkDetail({ link }: Props) {
         {link.expires_at && <span>Läuft ab: {formatDateTime(link.expires_at)}</span>}
         {link.last_clicked_at && <span>Letzter Klick: {formatDateTime(link.last_clicked_at)}</span>}
       </div>
+
+      {/* Edit form */}
+      {showEdit && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Link bearbeiten</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-title">Titel</Label>
+                <Input
+                  id="edit-title"
+                  value={editForm.title}
+                  onChange={(e) => setEditForm((p) => ({ ...p, title: e.target.value }))}
+                  placeholder="Optionaler Titel"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-target">Ziel-URL</Label>
+                <Input
+                  id="edit-target"
+                  value={editForm.target_url}
+                  onChange={(e) => setEditForm((p) => ({ ...p, target_url: e.target.value }))}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-description">Beschreibung</Label>
+              <Textarea
+                id="edit-description"
+                value={editForm.description}
+                onChange={(e) => setEditForm((p) => ({ ...p, description: e.target.value }))}
+                placeholder="Optionale Beschreibung..."
+                rows={2}
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>Kampagne</Label>
+                <Select
+                  value={editForm.campaign_id || 'none'}
+                  onValueChange={(val) =>
+                    setEditForm((p) => ({ ...p, campaign_id: !val || val === 'none' ? '' : val }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Keine Kampagne" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Keine Kampagne</SelectItem>
+                    {campaigns.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Link-Sammlung</Label>
+                <Select
+                  value={editForm.link_group_id || 'none'}
+                  onValueChange={(val) =>
+                    setEditForm((p) => ({ ...p, link_group_id: !val || val === 'none' ? '' : val }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Keine Sammlung" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Keine Sammlung</SelectItem>
+                    {groups.map((g) => (
+                      <SelectItem key={g.id} value={g.id}>
+                        <span className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full shrink-0" style={{ background: g.color }} />
+                          {g.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-expires">Läuft ab am</Label>
+                <Input
+                  id="edit-expires"
+                  type="datetime-local"
+                  value={editForm.expires_at}
+                  onChange={(e) => setEditForm((p) => ({ ...p, expires_at: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-expired-url">Weiterleitungs-URL nach Ablauf</Label>
+                <Input
+                  id="edit-expired-url"
+                  value={editForm.expired_url}
+                  onChange={(e) => setEditForm((p) => ({ ...p, expired_url: e.target.value }))}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+
+            {/* UTM toggle */}
+            <button
+              type="button"
+              onClick={() => setShowUtm(!showUtm)}
+              className="flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showUtm ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              UTM-Parameter
+            </button>
+
+            {showUtm && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-utm-source">utm_source</Label>
+                  <Input
+                    id="edit-utm-source"
+                    value={editForm.utm_source}
+                    onChange={(e) => setEditForm((p) => ({ ...p, utm_source: e.target.value }))}
+                    placeholder="z.B. newsletter"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-utm-medium">utm_medium</Label>
+                  <Input
+                    id="edit-utm-medium"
+                    value={editForm.utm_medium}
+                    onChange={(e) => setEditForm((p) => ({ ...p, utm_medium: e.target.value }))}
+                    placeholder="z.B. email"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-utm-campaign">utm_campaign</Label>
+                  <Input
+                    id="edit-utm-campaign"
+                    value={editForm.utm_campaign}
+                    onChange={(e) => setEditForm((p) => ({ ...p, utm_campaign: e.target.value }))}
+                    placeholder="z.B. sommer-2026"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-utm-content">utm_content</Label>
+                  <Input
+                    id="edit-utm-content"
+                    value={editForm.utm_content}
+                    onChange={(e) => setEditForm((p) => ({ ...p, utm_content: e.target.value }))}
+                    placeholder="z.B. header-button"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 pt-2">
+              <Button onClick={handleSave} disabled={isPending || !editForm.target_url} size="sm">
+                {isPending ? (
+                  <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Speichern...</>
+                ) : (
+                  'Speichern'
+                )}
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleCancelEdit}>
+                Abbrechen
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* KPIs */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

@@ -80,7 +80,7 @@ export default function BulkQrCodePage() {
   useEffect(() => {
     getPlacements()
       .then(setPlacements)
-      .catch(() => toast.error('Platzierungen konnten nicht geladen werden.'))
+      .catch(() => toast.error('Platzierungen konnten nicht geladen werden'))
       .finally(() => setLoadingPlacements(false));
   }, []);
 
@@ -114,7 +114,7 @@ export default function BulkQrCodePage() {
         });
 
         if (parsed.length > 100) {
-          errors.push('Maximal 100 Eintraege pro Import. Bitte aufteilen.');
+          errors.push('Maximal 100 Einträge pro Import. Bitte aufteilen.');
           setParseErrors(errors);
           return;
         }
@@ -123,7 +123,7 @@ export default function BulkQrCodePage() {
         setParseErrors(errors);
 
         if (parsed.length > 0) {
-          toast.success(`${parsed.length} Eintraege erkannt`);
+          toast.success(`${parsed.length} Einträge erkannt`);
         }
       },
       error(err) {
@@ -138,7 +138,7 @@ export default function BulkQrCodePage() {
     if (file && (file.name.endsWith('.csv') || file.type === 'text/csv')) {
       handleFileUpload(file);
     } else {
-      toast.error('Bitte eine CSV-Datei hochladen.');
+      toast.error('Bitte eine CSV-Datei hochladen');
     }
   }
 
@@ -153,11 +153,11 @@ export default function BulkQrCodePage() {
 
   function handleSubmit() {
     if (!placementId) {
-      toast.error('Bitte zuerst eine Platzierung wählen.');
+      toast.error('Bitte zuerst eine Platzierung wählen');
       return;
     }
     if (rows.length === 0) {
-      toast.error('Keine Eintraege zum Erstellen.');
+      toast.error('Keine Einträge zum Erstellen');
       return;
     }
 
@@ -166,13 +166,13 @@ export default function BulkQrCodePage() {
         const res = await bulkCreateQrCodes(placementId, rows);
         setResult(res);
         if (res.created > 0) {
-          toast.success(`${res.created} QR-Codes erfolgreich erstellt!`);
+          toast.success(`${res.created} QR-Codes erstellt`);
         }
         if (res.errors.length > 0) {
-          toast.error(`${res.errors.length} Fehler aufgetreten.`);
+          toast.error(`${res.errors.length} Fehler aufgetreten`);
         }
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Fehler beim Erstellen.');
+        toast.error(err instanceof Error ? err.message : 'Fehler beim Erstellen');
       }
     });
   }
@@ -267,7 +267,7 @@ export default function BulkQrCodePage() {
               <Upload className="h-8 w-8 text-muted-foreground" />
               <div className="text-center">
                 <p className="text-sm font-medium">CSV hierher ziehen oder klicken</p>
-                <p className="text-xs text-muted-foreground mt-1">Maximal 100 Eintraege</p>
+                <p className="text-xs text-muted-foreground mt-1">Maximal 100 Einträge</p>
               </div>
               <input
                 id="csv-input"
@@ -305,8 +305,8 @@ export default function BulkQrCodePage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>3. Vorschau ({rows.length} Eintraege)</CardTitle>
-                  <CardDescription>Prüfen Sie die Daten vor dem Import.</CardDescription>
+                  <CardTitle>3. Vorschau ({rows.length} Einträge)</CardTitle>
+                  <CardDescription>Prüfe die Daten vor dem Import</CardDescription>
                 </div>
                 <Button
                   variant="ghost"

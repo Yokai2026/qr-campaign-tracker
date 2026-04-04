@@ -104,20 +104,20 @@ export function LocationDetailTabs({
       try {
         const result = await updateLocation(location.id, input);
         if (result.success) {
-          toast.success('Standort erfolgreich aktualisiert.');
+          toast.success('Standort aktualisiert');
           router.refresh();
         } else {
           toast.error(result.error);
         }
       } catch {
-        toast.error('Ein unerwarteter Fehler ist aufgetreten.');
+        toast.error('Unerwarteter Fehler');
       }
     });
   }
 
   async function handleDelete() {
     const confirmed = window.confirm(
-      'Möchten Sie diesen Standort wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+      'Diesen Standort wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
     );
     if (!confirmed) return;
 
@@ -125,13 +125,13 @@ export function LocationDetailTabs({
     try {
       const result = await deleteLocation(location.id);
       if (result.success) {
-        toast.success('Standort wurde gelöscht.');
+        toast.success('Standort gelöscht');
         router.push('/locations');
       } else {
         toast.error(result.error);
       }
     } catch {
-      toast.error('Ein unerwarteter Fehler ist aufgetreten.');
+      toast.error('Unerwarteter Fehler');
     } finally {
       setIsDeleting(false);
     }

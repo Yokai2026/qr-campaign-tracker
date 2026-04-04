@@ -77,8 +77,8 @@ function formatDateTime(iso: string | null): string {
 
 function copyToClipboard(text: string) {
   navigator.clipboard.writeText(text).then(
-    () => toast.success('In Zwischenablage kopiert!'),
-    () => toast.error('Kopieren fehlgeschlagen.'),
+    () => toast.success('In Zwischenablage kopiert'),
+    () => toast.error('Kopieren fehlgeschlagen'),
   );
 }
 
@@ -174,28 +174,28 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
           max_scans: data.max_scans ? parseInt(data.max_scans, 10) : undefined,
           limit_redirect_url: data.limit_redirect_url || undefined,
         });
-        toast.success('QR-Code aktualisiert!');
+        toast.success('QR-Code aktualisiert');
         setShowEdit(false);
         router.refresh();
       } catch (err) {
         toast.error(
-          err instanceof Error ? err.message : 'Fehler beim Aktualisieren.',
+          err instanceof Error ? err.message : 'Fehler beim Aktualisieren',
         );
       }
     });
   }
 
   function handleDelete() {
-    if (!confirm('Möchten Sie diesen QR-Code wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
+    if (!confirm('Diesen QR-Code wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
     setIsDeleting(true);
     startTransition(async () => {
       try {
         await deleteQrCode(qrCode.id);
-        toast.success('QR-Code gelöscht.');
+        toast.success('QR-Code gelöscht');
         router.push('/qr-codes');
       } catch (err) {
         toast.error(
-          err instanceof Error ? err.message : 'Fehler beim Löschen.',
+          err instanceof Error ? err.message : 'Fehler beim Löschen',
         );
         setIsDeleting(false);
       }
@@ -354,13 +354,13 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
             <CardHeader>
               <CardTitle>Verlauf</CardTitle>
               <CardDescription>
-                Aenderungsprotokoll dieses QR-Codes.
+                Änderungsprotokoll dieses QR-Codes.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {history.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  Keine Eintraege vorhanden.
+                  Keine Einträge vorhanden.
                 </p>
               ) : (
                 <ol className="space-y-3" aria-label="Änderungsverlauf">

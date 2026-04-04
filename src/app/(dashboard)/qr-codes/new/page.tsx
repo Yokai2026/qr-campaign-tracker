@@ -132,7 +132,7 @@ export default function NewQrCodePage() {
   useEffect(() => {
     getPlacements()
       .then((data) => setPlacements(data))
-      .catch(() => toast.error('Platzierungen konnten nicht geladen werden.'))
+      .catch(() => toast.error('Platzierungen konnten nicht geladen werden'))
       .finally(() => setLoadingPlacements(false));
   }, []);
 
@@ -183,11 +183,11 @@ export default function NewQrCodePage() {
     startTransition(async () => {
       try {
         const qrCode = await createQrCode(input);
-        toast.success('QR-Code erfolgreich erstellt!');
+        toast.success('QR-Code erstellt');
         router.push(`/qr-codes/${qrCode.id}`);
       } catch (err) {
         toast.error(
-          err instanceof Error ? err.message : 'Fehler beim Erstellen des QR-Codes.',
+          err instanceof Error ? err.message : 'Fehler beim Erstellen des QR-Codes',
         );
       }
     });
@@ -197,7 +197,7 @@ export default function NewQrCodePage() {
     <div className="space-y-6">
       <PageHeader
         title="Neuer QR-Code"
-        description="Erstellen Sie einen neuen QR-Code mit Weiterleitung."
+        description="Neuen QR-Code mit Weiterleitung erstellen"
       />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
@@ -206,7 +206,7 @@ export default function NewQrCodePage() {
           <CardHeader>
             <CardTitle>Platzierung & Ziel</CardTitle>
             <CardDescription>
-              Wählen Sie die Platzierung und geben Sie die Ziel-URL an.
+              Wähle die Platzierung und gib die Ziel-URL an
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

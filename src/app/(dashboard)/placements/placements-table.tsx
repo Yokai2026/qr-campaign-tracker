@@ -157,7 +157,7 @@ export function PlacementsTable({ data }: PlacementsTableProps) {
       searchPlaceholder="Platzierung suchen..."
       emptyIcon={MapPin}
       emptyTitle="Keine Platzierungen vorhanden"
-      emptyDescription="Erstellen Sie Ihre erste Platzierung, um QR-Codes zuzuordnen."
+      emptyDescription="Erstelle deine erste Platzierung, um QR-Codes zuzuordnen"
       emptyActionLabel="Neue Platzierung"
       emptyActionHref="/placements/new"
       enableColumnVisibility

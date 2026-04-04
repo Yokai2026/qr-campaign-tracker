@@ -124,17 +124,17 @@ export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
       try {
         if (isEditing && campaignId) {
           await updateCampaign(campaignId, input);
-          toast.success('Kampagne wurde aktualisiert.');
+          toast.success('Kampagne aktualisiert');
         } else {
           await createCampaign(input);
-          toast.success('Kampagne wurde erstellt.');
+          toast.success('Kampagne erstellt');
         }
         router.push('/campaigns');
       } catch (err) {
         toast.error(
           err instanceof Error
             ? err.message
-            : 'Ein Fehler ist aufgetreten.',
+            : 'Ein Fehler ist aufgetreten',
         );
       }
     });

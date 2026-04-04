@@ -164,7 +164,7 @@ export function PlacementDetailTabs({
             <EmptyState
               icon={QrCodeIcon}
               title="Keine QR-Codes"
-              description="Erstellen Sie einen QR-Code für diese Platzierung."
+              description="Erstelle einen QR-Code für diese Platzierung"
               actionLabel="QR-Code erstellen"
               actionHref={`/qr-codes/new?placement_id=${placement.id}`}
             />

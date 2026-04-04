@@ -29,7 +29,7 @@ export default async function PlacementsPage({
     <div className="space-y-6 animate-in-card">
       <PageHeader
         title="Platzierungen"
-        description="Verwalten Sie alle Platzierungen Ihrer Kampagnen."
+        description="Verwalte alle Platzierungen deiner Kampagnen"
         actionLabel="Neue Platzierung"
         actionHref="/placements/new"
       />

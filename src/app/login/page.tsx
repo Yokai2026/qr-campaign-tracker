@@ -43,7 +43,7 @@ export default function LoginPage() {
             </div>
             <CardTitle className="text-lg font-semibold tracking-tight">QR Campaign Tracker</CardTitle>
             <CardDescription className="text-[13px]">
-              Melden Sie sich an, um Ihre Kampagnen zu verwalten
+              Melde dich an, um deine Kampagnen zu verwalten
             </CardDescription>
           </CardHeader>
           <CardContent>
