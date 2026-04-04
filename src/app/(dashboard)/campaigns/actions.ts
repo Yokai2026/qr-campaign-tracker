@@ -141,8 +141,10 @@ export async function updateCampaign(
     throw new Error(`Kampagne konnte nicht aktualisiert werden: ${error.message}`);
   }
 
-  // Replace tags: delete existing, then insert new ones
-  const { error: deleteError } = await supabase
+  // Replace tags: delete existing (service client to bypass admin-only DELETE policy), then insert new ones
+  const serviceClient = await createServiceClient();
+
+  const { error: deleteError } = await serviceClient
     .from('campaign_tags')
     .delete()
     .eq('campaign_id', id);
@@ -157,7 +159,7 @@ export async function updateCampaign(
       tag: tag.trim(),
     }));
 
-    const { error: tagError } = await supabase
+    const { error: tagError } = await serviceClient
       .from('campaign_tags')
       .insert(tagRows);
 
