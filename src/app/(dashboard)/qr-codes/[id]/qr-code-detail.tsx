@@ -22,6 +22,7 @@ import {
   ChevronUp,
   Trash2,
   Palette,
+  ShieldAlert,
 } from 'lucide-react';
 
 import { updateQrCode, deleteQrCode } from '../actions';
@@ -108,6 +109,8 @@ type EditFormValues = {
   utm_id: string;
   qr_fg_color: string;
   qr_bg_color: string;
+  max_scans: string;
+  limit_redirect_url: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -147,6 +150,8 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
       utm_id: qrCode.utm_id ?? '',
       qr_fg_color: qrCode.qr_fg_color ?? '#000000',
       qr_bg_color: qrCode.qr_bg_color ?? '#FFFFFF',
+      max_scans: qrCode.max_scans ? String(qrCode.max_scans) : '',
+      limit_redirect_url: qrCode.limit_redirect_url ?? '',
     },
   });
 
@@ -166,6 +171,8 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
           utm_id: data.utm_id || undefined,
           qr_fg_color: data.qr_fg_color || undefined,
           qr_bg_color: data.qr_bg_color || undefined,
+          max_scans: data.max_scans ? parseInt(data.max_scans, 10) : undefined,
+          limit_redirect_url: data.limit_redirect_url || undefined,
         });
         toast.success('QR-Code aktualisiert!');
         setShowEdit(false);
@@ -523,6 +530,29 @@ function DetailsView({ qrCode, campaign, location, placement }: DetailsViewProps
           <UtmField label="id" value={qrCode.utm_id} />
         </div>
       </div>
+
+      {/* Scan-Limit */}
+      {qrCode.max_scans && (
+        <>
+          <Separator />
+          <div>
+            <p className="mb-2 text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+              <ShieldAlert className="h-3.5 w-3.5" />
+              Scan-Limit
+            </p>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <p className="text-muted-foreground">Max. Scans</p>
+                <p className="font-medium">{qrCode.max_scans}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Limit-URL</p>
+                <p className="font-mono text-xs break-all">{qrCode.limit_redirect_url || 'Info-Seite'}</p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -573,9 +603,11 @@ function EditForm({ form, onSave, onCancel, isPending }: EditFormProps) {
   const { register, handleSubmit, watch, setValue } = form;
   const [showUtm, setShowUtm] = useState(false);
   const [showColors, setShowColors] = useState(false);
+  const [showLimit, setShowLimit] = useState(false);
   const active = watch('active');
   const watchFg = watch('qr_fg_color');
   const watchBg = watch('qr_bg_color');
+  const watchMaxScans = watch('max_scans');
 
   return (
     <form onSubmit={handleSubmit(onSave)} className="space-y-4">
@@ -740,6 +772,46 @@ function EditForm({ form, onSave, onCancel, isPending }: EditFormProps) {
               />
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Scan-Limit */}
+      <button
+        type="button"
+        className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
+        onClick={() => setShowLimit(!showLimit)}
+        aria-expanded={showLimit}
+      >
+        <ShieldAlert className="h-3.5 w-3.5 mr-0.5" />
+        Scan-Limit
+        {showLimit ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+      </button>
+
+      {showLimit && (
+        <div className="space-y-3 rounded-lg border p-3">
+          <div className="space-y-1">
+            <Label htmlFor="edit_max_scans" className="text-xs">Maximale Scans</Label>
+            <Input
+              id="edit_max_scans"
+              type="number"
+              min="1"
+              placeholder="Leer = unbegrenzt"
+              {...register('max_scans')}
+            />
+            <p className="text-xs text-muted-foreground">Nach dieser Anzahl wird der QR-Code gesperrt.</p>
+          </div>
+          {watchMaxScans && (
+            <div className="space-y-1">
+              <Label htmlFor="edit_limit_url" className="text-xs">Weiterleitungs-URL nach Limit</Label>
+              <Input
+                id="edit_limit_url"
+                type="url"
+                placeholder="https://beispiel.de/ausverkauft"
+                {...register('limit_redirect_url')}
+              />
+              <p className="text-xs text-muted-foreground">Ohne Angabe wird eine Info-Seite angezeigt.</p>
+            </div>
+          )}
         </div>
       )}
 
