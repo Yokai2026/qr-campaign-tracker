@@ -48,13 +48,13 @@ export async function GET(request: NextRequest) {
       });
 
       const subject = campaignName
-        ? `QR Report: ${campaignName} (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`
-        : `QR Report: Alle Kampagnen (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`;
+        ? `Spur Report: ${campaignName} (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`
+        : `Spur Report: Alle Kampagnen (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`;
 
-      const fromEmail = process.env.RESEND_FROM_EMAIL || 'reports@qr-tracker.app';
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'reports@spur.app';
 
       await resend.emails.send({
-        from: `QR Tracker <${fromEmail}>`,
+        from: `Spur <${fromEmail}>`,
         to: schedule.email,
         subject,
         html,

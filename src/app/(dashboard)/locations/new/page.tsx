@@ -84,7 +84,7 @@ export default function NewLocationPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Neuer Standort" description="Einen neuen Standort anlegen." />
+      <PageHeader title="Neuer Standort" description="Einen neuen Standort anlegen" />
 
       <Card>
         <CardContent>

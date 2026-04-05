@@ -44,7 +44,7 @@ export function buildReportHtml(data: ReportData): string {
 <div style="max-width:560px;margin:24px auto;background:#fff;border-radius:8px;border:1px solid #e5e5e5;overflow:hidden">
 
   <div style="padding:24px 24px 16px;border-bottom:1px solid #eee">
-    <h1 style="margin:0;font-size:18px;font-weight:600">QR Tracker Report</h1>
+    <h1 style="margin:0;font-size:18px;font-weight:600">Spur Report</h1>
     <p style="margin:4px 0 0;font-size:13px;color:#666">${scope} &middot; ${data.dateFrom} bis ${data.dateTo}</p>
   </div>
 
@@ -90,7 +90,7 @@ export function buildReportHtml(data: ReportData): string {
   </div>` : ''}
 
   <div style="padding:16px 24px;background:#f8f8f8;font-size:11px;color:#999;text-align:center">
-    Automatisch generiert von QR Campaign Tracker
+    Automatisch generiert von Spur
   </div>
 </div>
 </body></html>`;

@@ -181,7 +181,7 @@ export default function BulkQrCodePage() {
     <div className="space-y-6">
       <PageHeader
         title="Bulk-Import"
-        description="Erstelle viele QR-Codes auf einmal per CSV-Upload."
+        description="Erstelle viele QR-Codes auf einmal per CSV-Upload"
         breadcrumbs={[
           { label: 'QR-Codes', href: '/qr-codes' },
           { label: 'Bulk-Import' },

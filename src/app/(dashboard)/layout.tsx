@@ -1,4 +1,5 @@
 import { Sidebar } from '@/components/layout/sidebar';
+import { CommandPalette } from '@/components/layout/command-palette';
 import { Toaster } from '@/components/ui/sonner';
 import { Providers } from '@/components/providers';
 
@@ -16,6 +17,7 @@ export default function DashboardLayout({
             {children}
           </div>
         </main>
+        <CommandPalette />
         <Toaster />
       </div>
     </Providers>

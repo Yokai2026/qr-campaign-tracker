@@ -71,7 +71,6 @@ export function PlacementDetailTabs({
       <PageHeader
         title={placement.name}
         breadcrumbs={[
-          { label: 'Dashboard', href: '/' },
           { label: 'Platzierungen', href: '/placements' },
           { label: placement.name },
         ]}
@@ -239,7 +238,7 @@ export function PlacementDetailTabs({
             <EmptyState
               icon={History}
               title="Kein Verlauf"
-              description="Sobald QR-Code-Aktionen stattfinden, erscheint hier der Verlauf."
+              description="Sobald QR-Code-Aktionen stattfinden, erscheint hier der Verlauf"
             />
           ) : (
             <Card className="border border-border">

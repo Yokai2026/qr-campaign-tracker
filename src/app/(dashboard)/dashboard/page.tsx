@@ -14,6 +14,7 @@ import {
   TrendingUp,
   ArrowRight,
   Users,
+  Link2,
 } from 'lucide-react';
 import { LiveScanFeed } from '@/components/shared/live-scan-feed';
 
@@ -30,8 +31,10 @@ export default async function DashboardPage() {
     { count: totalOpens },
     { data: ipHashData },
     { count: ctaClicks },
+    { count: linkClicks },
     { data: recentCampaigns },
     { data: topPlacements },
+    { data: topLinks },
   ] = await Promise.all([
     supabase.from('campaigns').select('*', { count: 'exact', head: true }),
     supabase.from('locations').select('*', { count: 'exact', head: true }),
@@ -40,6 +43,7 @@ export default async function DashboardPage() {
     supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'qr_open'),
     supabase.from('redirect_events').select('ip_hash').eq('event_type', 'qr_open'),
     supabase.from('page_events').select('*', { count: 'exact', head: true }).eq('event_type', 'cta_click'),
+    supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'link_open'),
     supabase.from('campaigns').select('id, name, status, slug').order('updated_at', { ascending: false }).limit(5),
     supabase.from('redirect_events')
       .select('placement_id, placements(name, placement_code, location:locations(venue_name))')
@@ -47,6 +51,11 @@ export default async function DashboardPage() {
       .not('placement_id', 'is', null)
       .order('created_at', { ascending: false })
       .limit(100),
+    supabase.from('short_links')
+      .select('id, title, short_code, click_count, campaign:campaigns(name)')
+      .eq('archived', false)
+      .order('click_count', { ascending: false })
+      .limit(5),
   ]);
 
   const placementCounts: Record<string, { name: string; code: string; location: string; count: number }> = {};
@@ -138,9 +147,17 @@ export default async function DashboardPage() {
             className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
           />
         </Link>
+        <Link href="/links" className="group">
+          <KPIStatCard
+            label="Link-Klicks"
+            value={linkClicks || 0}
+            icon={MousePointerClick}
+            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+          />
+        </Link>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         {/* Live Scan Feed */}
         <LiveScanFeed />
 
@@ -212,6 +229,50 @@ export default async function DashboardPage() {
             ) : (
               <p className="px-4 py-8 text-center text-[13px] text-muted-foreground">
                 Noch keine Scan-Daten vorhanden.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Top Links */}
+        <div className="rounded-lg border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <h3 className="text-[13px] font-medium">Top-Links</h3>
+            <Link href="/links" className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Alle anzeigen <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          <div className="divide-y divide-border/60">
+            {topLinks && topLinks.length > 0 ? (
+              topLinks.map((link: Record<string, unknown>, index: number) => (
+                <Link
+                  key={link.id as string}
+                  href={`/links/${link.id}`}
+                  className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded text-[12px] font-medium text-muted-foreground bg-muted">
+                    {index + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-medium truncate group-hover:text-primary transition-colors">
+                      {(link.title as string) || (link.short_code as string)}
+                    </div>
+                    <div className="mt-0.5 text-[12px] text-muted-foreground truncate">
+                      <span className="font-mono">/r/{link.short_code as string}</span>
+                      {(link.campaign as { name: string } | null)?.name && (
+                        <> · {(link.campaign as { name: string }).name}</>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-[13px] font-semibold tabular-nums">
+                    {link.click_count as number}
+                    <Link2 className="h-3 w-3 text-muted-foreground/50" />
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <p className="px-4 py-8 text-center text-[13px] text-muted-foreground">
+                Noch keine Link-Daten vorhanden
               </p>
             )}
           </div>

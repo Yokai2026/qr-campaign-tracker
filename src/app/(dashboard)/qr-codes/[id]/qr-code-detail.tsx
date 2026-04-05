@@ -209,7 +209,6 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
         title={`QR-Code: ${qrCode.short_code}`}
         description={placement?.name ?? 'Kein Platzierungsname'}
         breadcrumbs={[
-          { label: 'Dashboard', href: '/' },
           { label: 'QR-Codes', href: '/qr-codes' },
           { label: qrCode.short_code },
         ]}

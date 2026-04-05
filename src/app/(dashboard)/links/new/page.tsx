@@ -92,7 +92,7 @@ export default function NewLinkPage() {
     <div className="mx-auto max-w-2xl space-y-6 animate-in-card">
       <PageHeader
         title="Neuer Kurzlink"
-        description="Erstelle einen trackbaren Kurzlink."
+        description="Erstelle einen trackbaren Kurzlink"
       />
 
       {/* Main fields */}

@@ -117,7 +117,7 @@ export default function ComparePage() {
     <div className="space-y-6 animate-in-card">
       <PageHeader
         title="A/B Vergleich"
-        description="Vergleiche die Performance von zwei Kampagnen — finde heraus, welche besser ankommt."
+        description="Vergleiche die Performance von zwei Kampagnen — finde heraus, welche besser ankommt"
         breadcrumbs={[
           { label: 'Analytik', href: '/analytics' },
           { label: 'A/B Vergleich' },

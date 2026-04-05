@@ -13,7 +13,7 @@ export default function LinksPage() {
     <div className="space-y-6 animate-in-card">
       <PageHeader
         title="Kurzlinks"
-        description="Erstelle und verwalte trackbare Kurzlinks und Link-Sammlungen."
+        description="Erstelle und verwalte trackbare Kurzlinks und Link-Sammlungen"
         action={
           <Button size="sm" render={<Link href="/links/new" />}>
             <Plus className="mr-1.5 h-3.5 w-3.5" />

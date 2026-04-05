@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { Shield, ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Datenschutzerklärung — QR Campaign Tracker',
-  description: 'Informationen zum Datenschutz beim QR-Code-Tracking',
+  title: 'Datenschutzerklärung — Spur',
+  description: 'Informationen zum Datenschutz beim Kampagnen-Tracking',
 };
 
 export default function DatenschutzPage() {

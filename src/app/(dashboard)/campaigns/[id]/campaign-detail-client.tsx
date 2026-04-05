@@ -61,7 +61,6 @@ export function CampaignDetailClient({
       <PageHeader
         title={campaign.name}
         breadcrumbs={[
-          { label: 'Dashboard', href: '/' },
           { label: 'Kampagnen', href: '/campaigns' },
           { label: campaign.name },
         ]}
@@ -120,7 +119,7 @@ export function CampaignDetailClient({
             <EmptyState
               icon={MapPin}
               title="Keine Platzierungen"
-              description="Dieser Kampagne wurden noch keine Platzierungen zugeordnet."
+              description="Dieser Kampagne wurden noch keine Platzierungen zugeordnet"
             />
           ) : (
             <DataTableShell>

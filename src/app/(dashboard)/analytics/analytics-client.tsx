@@ -27,6 +27,7 @@ import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/char
 import { generateAnalyticsPdf } from '@/lib/pdf/generate';
 import { CountryChart } from '@/components/shared/country-chart';
 import { WorldMap } from '@/components/shared/world-map';
+import { PageHeader } from '@/components/shared/page-header';
 
 type Props = {
   campaigns: { id: string; name: string }[];
@@ -262,42 +263,40 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
   return (
     <div className="space-y-6 animate-in-card">
-      <div className="flex items-start justify-between">
-        <div>
+      <PageHeader
+        title="Analytik"
+        description="Auswertung aller QR-Scans und Link-Klicks"
+        badge={isLive ? (
+          <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Live
+          </span>
+        ) : undefined}
+        action={
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold tracking-tight">Analytik</h1>
-            {isLive && (
-              <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live
-              </span>
-            )}
+            <Button variant="outline" size="sm" render={<a href="/analytics/compare" />}>
+              <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
+              A/B Vergleich
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                generateAnalyticsPdf({
+                  dateFrom, dateTo, kpis, campaignData, placementData, deviceData, countryData,
+                });
+              }}
+            >
+              <FileDown className="mr-1.5 h-3.5 w-3.5" />
+              PDF Bericht
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExport}>
+              <Download className="mr-1.5 h-3.5 w-3.5" />
+              CSV Export
+            </Button>
           </div>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">Auswertung aller QR-Scans und Link-Klicks</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" render={<a href="/analytics/compare" />}>
-            <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
-            A/B Vergleich
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              generateAnalyticsPdf({
-                dateFrom, dateTo, kpis, campaignData, placementData, deviceData, countryData,
-              });
-            }}
-          >
-            <FileDown className="mr-1.5 h-3.5 w-3.5" />
-            PDF Bericht
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleExport}>
-            <Download className="mr-1.5 h-3.5 w-3.5" />
-            CSV Export
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Filters */}
       <div className="rounded-lg border border-border bg-card p-4">

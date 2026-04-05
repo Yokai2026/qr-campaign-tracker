@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   Shield,
+  Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -96,8 +97,23 @@ export function Sidebar() {
           <QrCode className="h-3 w-3 text-white/70" />
         </div>
         <span className="text-[13px] font-semibold tracking-tight text-white/90">
-          QR Tracker
+          Spur
         </span>
+      </div>
+
+      {/* Search trigger */}
+      <div className="px-2 pt-1 pb-1">
+        <button
+          onClick={() => {
+            setMobileOpen(false);
+            window.dispatchEvent(new Event('open-command-palette'));
+          }}
+          className="flex w-full items-center gap-2 rounded-[5px] bg-white/[0.04] px-2 py-[6px] text-[12px] text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white/60"
+        >
+          <Search className="h-[13px] w-[13px]" />
+          <span>Suchen…</span>
+          <kbd className="ml-auto font-mono text-[10px] text-white/30">⌘K</kbd>
+        </button>
       </div>
 
       {/* Main nav */}
@@ -147,7 +163,7 @@ export function Sidebar() {
           <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-neutral-900">
             <QrCode className="h-3 w-3 text-white/70" />
           </div>
-          <span className="text-[13px] font-semibold">QR Tracker</span>
+          <span className="text-[13px] font-semibold">Spur</span>
         </div>
       </div>
 

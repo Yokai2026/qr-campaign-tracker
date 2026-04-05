@@ -143,7 +143,6 @@ export function LocationDetailTabs({
       <PageHeader
         title={location.venue_name}
         breadcrumbs={[
-          { label: 'Dashboard', href: '/' },
           { label: 'Standorte', href: '/locations' },
           { label: location.venue_name },
         ]}
@@ -289,7 +288,7 @@ export function LocationDetailTabs({
             <EmptyState
               icon={MapPin}
               title="Keine Platzierungen"
-              description="Diesem Standort sind noch keine Platzierungen zugeordnet."
+              description="Diesem Standort sind noch keine Platzierungen zugeordnet"
             />
           ) : (
             <DataTableShell>

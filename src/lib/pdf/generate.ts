@@ -25,7 +25,7 @@ export function generateAnalyticsPdf(data: PdfReportData) {
 
   // Title
   doc.setFontSize(18);
-  doc.text('QR Campaign Tracker — Bericht', 14, 20);
+  doc.text('Spur — Bericht', 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(100);
   doc.text(`Zeitraum: ${data.dateFrom} bis ${data.dateTo}`, 14, 28);
@@ -136,7 +136,7 @@ export function generateAnalyticsPdf(data: PdfReportData) {
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150);
-    doc.text(`Seite ${i} von ${pageCount} — QR Campaign Tracker`, 14, 290);
+    doc.text(`Seite ${i} von ${pageCount} — Spur`, 14, 290);
   }
 
   doc.save(`qr-bericht-${data.dateFrom}-${data.dateTo}.pdf`);

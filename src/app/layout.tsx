@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'QR Campaign Tracker',
-  description: 'Offline-Marketing QR-Code Kampagnen verwalten und tracken',
+  title: 'Spur',
+  description: 'Multi-Channel Kampagnen-Tracking für QR-Codes, Kurzlinks und Social Media',
 };
 
 export default function RootLayout({

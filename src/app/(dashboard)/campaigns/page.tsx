@@ -11,7 +11,7 @@ export default async function CampaignsPage() {
     <div className="space-y-6 animate-in-card">
       <PageHeader
         title="Kampagnen"
-        description="Alle Kampagnen verwalten und deren Leistung verfolgen."
+        description="Alle Kampagnen verwalten und deren Leistung verfolgen"
         actionLabel="Neue Kampagne"
         actionHref="/campaigns/new"
       />

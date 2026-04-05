@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { User, Shield, Code, Loader2 } from 'lucide-react';
 import { ReportSchedules } from '@/components/settings/report-schedules';
+import { PageHeader } from '@/components/shared/page-header';
 import type { Profile } from '@/types';
 
 type ProfileFormValues = {
@@ -76,10 +77,10 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6 animate-in-card">
-      <div>
-        <h1 className="text-lg font-semibold tracking-tight">Einstellungen</h1>
-        <p className="mt-0.5 text-[13px] text-muted-foreground">Profil und Kontoeinstellungen verwalten</p>
-      </div>
+      <PageHeader
+        title="Einstellungen"
+        description="Profil und Kontoeinstellungen verwalten"
+      />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="border border-border">
@@ -103,7 +104,7 @@ export default function SettingsPage() {
                 <Input
                   id="display_name"
                   {...register('display_name')}
-                  placeholder="Ihr Name"
+                  placeholder="Dein Name"
                   className="h-8 text-[13px]"
                 />
               </div>

@@ -34,7 +34,7 @@ export default async function LocationsPage({
     <div className="space-y-6 animate-in-card">
       <PageHeader
         title="Standorte"
-        description="Alle Standorte und Orte verwalten."
+        description="Alle Standorte und Orte verwalten"
         actionLabel="Neuer Standort"
         actionHref="/locations/new"
       />

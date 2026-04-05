@@ -1,6 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { getCampaignsForSelect, getLocationsForSelect } from '../actions';
 import { PlacementForm } from '../placement-form';
+import { PageHeader } from '@/components/shared/page-header';
 
 export default async function NewPlacementPage() {
   noStore();
@@ -11,12 +12,14 @@ export default async function NewPlacementPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-lg font-semibold tracking-tight">Neue Platzierung</h1>
-        <p className="mt-0.5 text-[13px] text-muted-foreground">
-          Erstelle eine neue Platzierung für eine Kampagne an einem Standort
-        </p>
-      </div>
+      <PageHeader
+        title="Neue Platzierung"
+        description="Erstelle eine neue Platzierung für eine Kampagne an einem Standort"
+        breadcrumbs={[
+          { label: 'Platzierungen', href: '/placements' },
+          { label: 'Neue Platzierung' },
+        ]}
+      />
 
       <PlacementForm campaigns={campaigns} locations={locations} />
     </div>
