@@ -15,6 +15,8 @@ import {
   ArrowRight,
   Users,
   Link2,
+  Target,
+  Sparkles,
 } from 'lucide-react';
 import { LiveScanFeed } from '@/components/shared/live-scan-feed';
 
@@ -83,6 +85,8 @@ export default async function DashboardPage() {
     ? ((ctaClicks / totalOpens) * 100).toFixed(1)
     : '0';
 
+  const hasAnyData = (campaignCount || 0) > 0 || (totalOpens || 0) > 0;
+
   return (
     <div className="space-y-6 animate-in-card">
       {/* Header */}
@@ -95,67 +99,149 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
-        <Link href="/campaigns" className="group">
-          <KPIStatCard
-            label="Kampagnen"
-            value={campaignCount || 0}
-            icon={Megaphone}
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
-          />
-        </Link>
-        <Link href="/locations" className="group">
-          <KPIStatCard
-            label="Standorte"
-            value={locationCount || 0}
-            icon={MapPin}
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
-          />
-        </Link>
-        <Link href="/placements" className="group">
-          <KPIStatCard
-            label="Platzierungen"
-            value={placementCount || 0}
-            icon={ClipboardList}
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
-          />
-        </Link>
-        <Link href="/qr-codes" className="group">
-          <KPIStatCard
-            label="QR-Codes"
-            value={qrCodeCount || 0}
-            icon={QrCode}
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
-          />
-        </Link>
-        <Link href="/analytics" className="group">
-          <KPIStatCard
-            label="QR-Scans"
-            value={totalOpens || 0}
-            icon={TrendingUp}
-            subtext={`${uniqueScans} unique`}
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
-          />
-        </Link>
-        <Link href="/analytics" className="group">
-          <KPIStatCard
-            label="Unique Scans"
-            value={uniqueScans}
-            icon={Users}
-            subtext={totalOpens ? `${((uniqueScans / totalOpens) * 100).toFixed(0)}% der Gesamt-Scans` : undefined}
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
-          />
-        </Link>
-        <Link href="/links" className="group">
-          <KPIStatCard
-            label="Link-Klicks"
-            value={linkClicks || 0}
-            icon={MousePointerClick}
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
-          />
-        </Link>
-      </div>
+      {/* Onboarding: first-time users only */}
+      {!hasAnyData && (
+        <div className="rounded-lg border border-dashed border-border bg-muted/20 p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-background border border-border">
+              <Sparkles className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-[14px] font-semibold">Willkommen bei Spur</h3>
+              <p className="mt-1 text-[13px] text-muted-foreground">
+                In 3 Schritten bist du startklar: Erstelle eine Kampagne, lege Standorte & Platzierungen an und generiere deine QR-Codes.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link
+                  href="/campaigns/new"
+                  className="inline-flex items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-[12px] font-medium text-background hover:bg-foreground/90 transition-colors"
+                >
+                  <Megaphone className="h-3 w-3" />
+                  Kampagne erstellen
+                </Link>
+                <Link
+                  href="/locations/new"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-[12px] font-medium hover:bg-muted/40 transition-colors"
+                >
+                  <MapPin className="h-3 w-3" />
+                  Standort anlegen
+                </Link>
+                <Link
+                  href="/qr-codes/new"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-[12px] font-medium hover:bg-muted/40 transition-colors"
+                >
+                  <QrCode className="h-3 w-3" />
+                  QR-Code erzeugen
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Performance KPIs — 4 symmetric cards */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-[13px] font-semibold tracking-tight">Leistung</h2>
+            <p className="text-[12px] text-muted-foreground">So performen deine Kampagnen aktuell</p>
+          </div>
+          <Link
+            href="/analytics"
+            className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Zur Analytik <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
+          <Link href="/analytics" className="group">
+            <KPIStatCard
+              label="QR-Scans"
+              value={totalOpens || 0}
+              icon={TrendingUp}
+              subtext={totalOpens ? `${uniqueScans} eindeutig` : 'Noch keine Scans'}
+              hint="Gesamtzahl aller QR-Code-Scans über alle Platzierungen hinweg."
+              className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link href="/analytics" className="group">
+            <KPIStatCard
+              label="Eindeutige Besucher"
+              value={uniqueScans}
+              icon={Users}
+              subtext={totalOpens ? `${((uniqueScans / totalOpens) * 100).toFixed(0)}% der Scans` : 'Noch keine Daten'}
+              hint="Anzahl unterschiedlicher Personen (anonymisiert). Zeigt echte Reichweite statt nur Klicks."
+              className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link href="/links" className="group">
+            <KPIStatCard
+              label="Link-Klicks"
+              value={linkClicks || 0}
+              icon={MousePointerClick}
+              subtext={linkClicks ? 'Gesamt' : 'Noch keine Klicks'}
+              hint="Klicks auf deine Kurzlinks (z. B. für Social Media oder digitale Kanäle)."
+              className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link href="/analytics" className="group">
+            <KPIStatCard
+              label="Conversion-Rate"
+              value={`${conversionRate}%`}
+              icon={Target}
+              subtext={ctaClicks ? `${ctaClicks} Aktionen` : 'Noch keine Aktionen'}
+              hint="Anteil der Besucher, die nach dem Scan eine gewünschte Aktion ausgeführt haben (z. B. Button-Klick, Formular)."
+              className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            />
+          </Link>
+        </div>
+      </section>
+
+      {/* Inventory KPIs — 4 symmetric cards */}
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-[13px] font-semibold tracking-tight">Bestand</h2>
+          <p className="text-[12px] text-muted-foreground">Was du bereits angelegt hast</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
+          <Link href="/campaigns" className="group">
+            <KPIStatCard
+              label="Kampagnen"
+              value={campaignCount || 0}
+              icon={Megaphone}
+              hint="Eine Kampagne bündelt alle Platzierungen und QR-Codes für ein Marketing-Ziel."
+              className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link href="/locations" className="group">
+            <KPIStatCard
+              label="Standorte"
+              value={locationCount || 0}
+              icon={MapPin}
+              hint="Orte an denen deine QR-Codes aushängen (z. B. Bibliothek, Café, Jugendzentrum)."
+              className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link href="/placements" className="group">
+            <KPIStatCard
+              label="Platzierungen"
+              value={placementCount || 0}
+              icon={ClipboardList}
+              hint="Einzelne Anbringungen pro Standort (z. B. Poster am Eingang, Flyer am Tresen)."
+              className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link href="/qr-codes" className="group">
+            <KPIStatCard
+              label="QR-Codes"
+              value={qrCodeCount || 0}
+              icon={QrCode}
+              hint="Jede Platzierung hat einen eigenen QR-Code mit individueller Tracking-URL."
+              className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            />
+          </Link>
+        </div>
+      </section>
 
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Live Scan Feed */}

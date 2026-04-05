@@ -306,6 +306,11 @@ export function LinkList({ links, groups }: LinkListProps) {
       searchKey="short_code"
       searchPlaceholder="Kurzlinks durchsuchen..."
       toolbar={filterToolbar}
+      emptyIcon={Link2}
+      emptyTitle="Keine Kurzlinks vorhanden"
+      emptyDescription="Erstelle deinen ersten trackbaren Kurzlink — perfekt für Social Media, E-Mail oder digitale Kampagnen."
+      emptyActionLabel="Neuer Kurzlink"
+      emptyActionHref="/links/new"
     />
   );
 }

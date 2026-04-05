@@ -35,7 +35,15 @@ type Props = {
 };
 
 type AnalyticsData = {
-  kpis: { totalOpens: number; uniqueScans: number; uniqueQrCodes: number; ctaClicks: number; formSubmits: number; linkClicks: number };
+  kpis: {
+    totalOpens: number;
+    qrScans: number;
+    linkClicks: number;
+    uniqueScans: number;
+    uniqueQrCodes: number;
+    ctaClicks: number;
+    formSubmits: number;
+  };
   timeSeriesData: { date: string; qr: number; link: number }[];
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; opens: number; location: string }[];
@@ -121,16 +129,18 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
       const uniqueQrs = new Set(qrEvents.map((e: Record<string, unknown>) => e.qr_code_id));
       const uniqueIps = new Set(filteredEvents.map((e: Record<string, unknown>) => e.ip_hash).filter(Boolean));
-      const targetClicks = filteredEvents.filter((e: Record<string, unknown>) => e.destination_url).length;
+      // Real CTA clicks come from page_events (tracked on the landing page), not redirect events.
+      const ctaClicks = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'cta_click').length;
       const formSubmits = (pageEvents || []).filter((e: { event_type: string }) => e.event_type === 'form_submit').length;
 
       const kpis = {
         totalOpens: filteredEvents.length,
+        qrScans: qrEvents.length,
+        linkClicks: linkEvents.length,
         uniqueScans: uniqueIps.size,
         uniqueQrCodes: uniqueQrs.size,
-        ctaClicks: targetClicks,
+        ctaClicks,
         formSubmits,
-        linkClicks: linkEvents.length,
       };
 
       // Time series — QR vs Link per day
@@ -207,7 +217,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
     },
   });
 
-  const kpis = data?.kpis ?? { totalOpens: 0, uniqueScans: 0, uniqueQrCodes: 0, ctaClicks: 0, formSubmits: 0, linkClicks: 0 };
+  const kpis = data?.kpis ?? { totalOpens: 0, qrScans: 0, linkClicks: 0, uniqueScans: 0, uniqueQrCodes: 0, ctaClicks: 0, formSubmits: 0 };
   const timeSeriesData = data?.timeSeriesData ?? [];
   const campaignData = data?.campaignData ?? [];
   const placementData = data?.placementData ?? [];
@@ -369,17 +379,81 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         </div>
       ) : (
         <>
-          {/* KPI Cards */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
-            <KPIStatCard label="Aufrufe gesamt" value={kpis.totalOpens} icon={TrendingUp} subtext={`${kpis.uniqueQrCodes} QR-Codes + ${kpis.linkClicks} Link-Klicks`} />
-            <KPIStatCard label="Einzelne Besucher" value={kpis.uniqueScans} icon={Users} subtext={kpis.totalOpens ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% einzigartige Nutzer` : 'Keine Daten'} />
-            <KPIStatCard label="Link-Klicks" value={kpis.linkClicks} icon={Link2} subtext="Klicks über Kurzlinks" />
-            <KPIStatCard label="Zielseite erreicht" value={kpis.ctaClicks} icon={MousePointerClick} subtext={`${conversionRate}% Weiterleitungsrate`} />
-            <KPIStatCard label="Formulare abgeschickt" value={kpis.formSubmits} icon={FileText} subtext={kpis.totalOpens ? `${formRate}% der Besucher` : 'Keine Daten'} />
-            <KPIStatCard label="QR-Codes aktiv" value={kpis.uniqueQrCodes} icon={QrCode} subtext="Codes mit mindestens 1 Scan" />
-            <KPIStatCard label="Top-Referrer" value={referrerData.length > 0 ? referrerData[0].name : '–'} icon={ArrowUpRight} subtext={referrerData.length > 0 ? `${referrerData[0].value} Klicks` : 'Keine Referrer-Daten'} />
-            <KPIStatCard label="Abschlussrate" value={`${conversionRate}%`} icon={MousePointerClick} subtext="Aufruf → Zielseite erreicht" />
-          </div>
+          {/* Reichweite — wie viele Aufrufe, wie viele echte Besucher */}
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-[13px] font-semibold tracking-tight">Reichweite</h2>
+              <p className="text-[12px] text-muted-foreground">Wie oft wurden deine Codes und Links aufgerufen</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
+              <KPIStatCard
+                label="Aufrufe gesamt"
+                value={kpis.totalOpens}
+                icon={TrendingUp}
+                subtext={kpis.totalOpens ? `${kpis.qrScans} QR · ${kpis.linkClicks} Link` : 'Noch keine Aufrufe'}
+                hint="Summe aller QR-Scans und Kurzlink-Klicks im gewählten Zeitraum (ohne Bots)."
+              />
+              <KPIStatCard
+                label="QR-Scans"
+                value={kpis.qrScans}
+                icon={QrCode}
+                subtext={kpis.qrScans ? `${kpis.uniqueQrCodes} aktive Codes` : 'Noch keine Scans'}
+                hint="Wie oft physische QR-Codes gescannt wurden."
+              />
+              <KPIStatCard
+                label="Link-Klicks"
+                value={kpis.linkClicks}
+                icon={Link2}
+                subtext="Aufrufe über Kurzlinks"
+                hint="Klicks auf deine trackbaren Kurzlinks (z. B. für Social Media, E-Mail)."
+              />
+              <KPIStatCard
+                label="Eindeutige Besucher"
+                value={kpis.uniqueScans}
+                icon={Users}
+                subtext={kpis.totalOpens ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% der Aufrufe` : 'Noch keine Daten'}
+                hint="Anzahl unterschiedlicher Personen (anonymisiert über IP-Hash). Echte Reichweite."
+              />
+            </div>
+          </section>
+
+          {/* Engagement — was passiert nach dem Aufruf */}
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-[13px] font-semibold tracking-tight">Engagement</h2>
+              <p className="text-[12px] text-muted-foreground">Was die Besucher nach dem Aufruf tun</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
+              <KPIStatCard
+                label="Aktive QR-Codes"
+                value={kpis.uniqueQrCodes}
+                icon={QrCode}
+                subtext={kpis.uniqueQrCodes ? 'Mit mind. 1 Scan' : 'Noch keine Aktivität'}
+                hint="QR-Codes, die im Zeitraum mindestens einmal gescannt wurden."
+              />
+              <KPIStatCard
+                label="CTA-Klicks"
+                value={kpis.ctaClicks}
+                icon={MousePointerClick}
+                subtext={kpis.ctaClicks ? 'Auf der Zielseite' : 'Noch keine Klicks'}
+                hint="Klicks auf Buttons/Links auf deiner Zielseite (benötigt eingebundenes Tracking-Script)."
+              />
+              <KPIStatCard
+                label="Formular-Abschlüsse"
+                value={kpis.formSubmits}
+                icon={FileText}
+                subtext={kpis.formSubmits ? `${formRate}% der Besucher` : 'Noch keine Abschlüsse'}
+                hint="Gesendete Formulare auf der Zielseite (z. B. Anmeldungen, Kontakte)."
+              />
+              <KPIStatCard
+                label="Conversion-Rate"
+                value={`${conversionRate}%`}
+                icon={ArrowUpRight}
+                subtext={kpis.ctaClicks ? 'CTA-Klicks ÷ Aufrufe' : 'Noch keine Daten'}
+                hint="Anteil der Aufrufe, die zu einer CTA-Aktion geführt haben. Zeigt wie gut deine Landing Page konvertiert."
+              />
+            </div>
+          </section>
 
           {/* Charts */}
           <div className="grid gap-4 lg:grid-cols-2">

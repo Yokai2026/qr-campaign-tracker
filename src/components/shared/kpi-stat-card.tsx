@@ -1,4 +1,4 @@
-import { type LucideIcon } from 'lucide-react';
+import { type LucideIcon, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type KPIStatCardProps = {
@@ -6,6 +6,7 @@ type KPIStatCardProps = {
   value: string | number;
   icon: LucideIcon;
   subtext?: string;
+  hint?: string;
   className?: string;
 };
 
@@ -14,6 +15,7 @@ export function KPIStatCard({
   value,
   icon: Icon,
   subtext,
+  hint,
   className,
 }: KPIStatCardProps) {
   return (
@@ -22,11 +24,22 @@ export function KPIStatCard({
       className,
     )}>
       <div className="flex items-center justify-between">
-        <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
+          {hint && (
+            <span
+              title={hint}
+              className="inline-flex cursor-help text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors"
+              aria-label={hint}
+            >
+              <Info className="h-3 w-3" />
+            </span>
+          )}
+        </div>
         <Icon className="h-4 w-4 text-muted-foreground/50" />
       </div>
       <div className="mt-2">
-        <p className="text-2xl font-semibold tracking-tight">{value}</p>
+        <p className="text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
         {subtext && (
           <p className="mt-1 text-[12px] text-muted-foreground">{subtext}</p>
         )}
