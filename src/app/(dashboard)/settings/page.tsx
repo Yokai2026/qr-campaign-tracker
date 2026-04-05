@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { User, Shield, Code, Loader2 } from 'lucide-react';
 import { ReportSchedules } from '@/components/settings/report-schedules';
+import { CustomDomains } from '@/components/settings/custom-domains';
 import { PageHeader } from '@/components/shared/page-header';
 import type { Profile } from '@/types';
 
@@ -165,6 +166,9 @@ export default function SettingsPage() {
           </Card>
         </div>
       </div>
+      {/* Custom Domains */}
+      <CustomDomains />
+
       {/* Report Schedules */}
       <ReportSchedules />
     </div>

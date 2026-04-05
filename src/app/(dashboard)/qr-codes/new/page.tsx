@@ -344,7 +344,7 @@ export default function NewQrCodePage() {
               <div>
                 <CardTitle>Tracking-Einstellungen</CardTitle>
                 <CardDescription>
-                  Hiermit erkennst du in Analytics, woher ein Besucher kam. Wird automatisch befüllt — nur anpassen, wenn nötig.
+                  Hiermit erkennst du in Analytics, woher ein Besucher kam. Wird automatisch befüllt — nur anpassen, wenn nötig
                 </CardDescription>
               </div>
               {showUtm ? (
@@ -431,7 +431,7 @@ export default function NewQrCodePage() {
                   </span>
                 </CardTitle>
                 <CardDescription>
-                  Farben des QR-Codes anpassen.
+                  Farben des QR-Codes anpassen
                 </CardDescription>
               </div>
               {showDesign ? (
@@ -512,7 +512,7 @@ export default function NewQrCodePage() {
                   </span>
                 </CardTitle>
                 <CardDescription>
-                  Begrenze die Anzahl der Scans — z.B. für limitierte Angebote wie &quot;Nur die ersten 100 bekommen Rabatt&quot;.
+                  Begrenze die Anzahl der Scans — z.B. für limitierte Angebote wie &quot;Nur die ersten 100 bekommen Rabatt&quot;
                 </CardDescription>
               </div>
               {showLimit ? (

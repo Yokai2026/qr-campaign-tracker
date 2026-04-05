@@ -194,7 +194,7 @@ export default function BulkQrCodePage() {
           <CardHeader>
             <CardTitle>1. Platzierung wählen</CardTitle>
             <CardDescription>
-              Alle importierten QR-Codes werden dieser Platzierung zugeordnet.
+              Alle importierten QR-Codes werden dieser Platzierung zugeordnet
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -254,7 +254,7 @@ export default function BulkQrCodePage() {
             <CardTitle>2. CSV-Datei hochladen</CardTitle>
             <CardDescription>
               Die CSV braucht eine Spalte <code className="text-xs bg-muted px-1 py-0.5 rounded">target_url</code>.
-              Optional: <code className="text-xs bg-muted px-1 py-0.5 rounded">note</code> für interne Notizen.
+              Optional: <code className="text-xs bg-muted px-1 py-0.5 rounded">note</code> für interne Notizen
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

@@ -209,6 +209,22 @@ export interface ShortLink {
   link_group?: LinkGroup;
 }
 
+// ============================================
+// Custom Domains
+// ============================================
+
+export interface CustomDomain {
+  id: string;
+  host: string;
+  verification_token: string;
+  verified: boolean;
+  verified_at: string | null;
+  is_primary: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export type ReportFrequency = 'daily' | 'weekly' | 'monthly';
 
 export interface ReportSchedule {

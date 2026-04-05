@@ -312,7 +312,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
             <CardHeader className="flex-row items-center justify-between">
               <div>
                 <CardTitle>Details</CardTitle>
-                <CardDescription>Alle Informationen zum QR-Code.</CardDescription>
+                <CardDescription>Alle Informationen zum QR-Code</CardDescription>
               </div>
               <Button
                 variant="outline"
@@ -353,7 +353,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
             <CardHeader>
               <CardTitle>Verlauf</CardTitle>
               <CardDescription>
-                Änderungsprotokoll dieses QR-Codes.
+                Änderungsprotokoll dieses QR-Codes
               </CardDescription>
             </CardHeader>
             <CardContent>
