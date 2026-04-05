@@ -49,6 +49,7 @@ type AnalyticsData = {
   placementData: { name: string; opens: number; location: string }[];
   deviceData: { name: string; value: number }[];
   countryData: { name: string; value: number }[];
+  unknownCountryCount: number;
   referrerData: { name: string; value: number }[];
 };
 
@@ -186,11 +187,16 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       });
       const deviceData = Object.entries(devMap).map(([name, value]) => ({ name, value }));
 
-      // Country breakdown
+      // Country breakdown — separate real countries (ISO alpha-2) from unknown/local
       const countryMap: Record<string, number> = {};
+      let unknownCountryCount = 0;
       filteredEvents.forEach((e: { country: string | null }) => {
-        const c = e.country || 'Unbekannt';
-        countryMap[c] = (countryMap[c] || 0) + 1;
+        const c = e.country;
+        if (c && c.length === 2) {
+          countryMap[c.toUpperCase()] = (countryMap[c.toUpperCase()] || 0) + 1;
+        } else {
+          unknownCountryCount++;
+        }
       });
       const countryData = Object.entries(countryMap)
         .map(([name, value]) => ({ name, value }))
@@ -213,7 +219,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         .sort((a, b) => b.value - a.value)
         .slice(0, 10);
 
-      return { kpis, timeSeriesData, campaignData, placementData, deviceData, countryData, referrerData };
+      return { kpis, timeSeriesData, campaignData, placementData, deviceData, countryData, unknownCountryCount, referrerData };
     },
   });
 
@@ -223,6 +229,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const placementData = data?.placementData ?? [];
   const deviceData = data?.deviceData ?? [];
   const countryData = data?.countryData ?? [];
+  const unknownCountryCount = data?.unknownCountryCount ?? 0;
   const referrerData = data?.referrerData ?? [];
 
   const conversionRate = kpis.totalOpens > 0 ? ((kpis.ctaClicks / kpis.totalOpens) * 100).toFixed(1) : '0.0';
@@ -520,19 +527,47 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           </div>
 
           {/* Geo: Scans by Country */}
-          {countryData.length > 0 && (
-            <div className="grid gap-4 lg:grid-cols-2">
-              <ChartCard title="Weltkarte" className="lg:col-span-1">
-                <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
-                  <Globe className="h-3.5 w-3.5" />
-                  Geografische Verteilung der QR-Scans
+          {(countryData.length > 0 || unknownCountryCount > 0) && (
+            <section className="space-y-3">
+              <div>
+                <h2 className="text-[13px] font-semibold tracking-tight">Geografie</h2>
+                <p className="text-[12px] text-muted-foreground">Woher deine Besucher kommen</p>
+              </div>
+
+              {countryData.length > 0 ? (
+                <div className="grid gap-4 lg:grid-cols-2">
+                  <ChartCard title="Weltkarte" className="lg:col-span-1">
+                    <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+                      <Globe className="h-3.5 w-3.5" />
+                      Geografische Verteilung der Scans
+                    </div>
+                    <WorldMap data={countryData} />
+                  </ChartCard>
+                  <ChartCard title="Scans nach Land" className="lg:col-span-1">
+                    <CountryChart data={countryData} />
+                  </ChartCard>
                 </div>
-                <WorldMap data={countryData} />
-              </ChartCard>
-              <ChartCard title="Scans nach Land" className="lg:col-span-1">
-                <CountryChart data={countryData} />
-              </ChartCard>
-            </div>
+              ) : (
+                <div className="rounded-lg border border-dashed border-border bg-muted/20 p-5 text-center">
+                  <Globe className="mx-auto h-6 w-6 text-muted-foreground/60" />
+                  <p className="mt-2 text-[13px] font-medium">Noch keine Länder-Daten</p>
+                  <p className="mt-1 text-[12px] text-muted-foreground max-w-md mx-auto">
+                    Sobald Scans von echten Besuchern über das Internet eingehen, erscheinen hier Weltkarte und Länder-Statistik.
+                  </p>
+                </div>
+              )}
+
+              {unknownCountryCount > 0 && (
+                <div className="rounded-lg border border-border bg-muted/20 px-4 py-2.5 flex items-start gap-2.5">
+                  <Globe className="h-3.5 w-3.5 mt-0.5 shrink-0 text-muted-foreground" />
+                  <p className="text-[12px] text-muted-foreground leading-relaxed">
+                    <span className="font-medium text-foreground">{unknownCountryCount} Scan{unknownCountryCount !== 1 ? 's' : ''} ohne Länder-Zuordnung.</span>{' '}
+                    Das kann an lokalen Tests im WLAN (LAN-IPs) oder an fehlenden Geo-Headers liegen.
+                    In Produktion (Vercel) werden Länder automatisch via Edge-Network erkannt.
+                  </p>
+                </div>
+              )}
+            </section>
           )}
 
           {/* Referrer Chart */}

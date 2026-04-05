@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
-import { hashIp, parseDevice, getClientIp, isBot } from '@/lib/tracking/events';
+import { hashIp, parseDevice, getClientIp, isBot, resolveCountry } from '@/lib/tracking/events';
 import { buildTargetUrlWithUtm } from '@/lib/qr/generate';
 import { isUrlSafe } from '@/lib/validations';
 
@@ -28,7 +28,7 @@ export async function GET(
   const ip = getClientIp(request);
   const ipHash = hashIp(ip);
   const deviceType = parseDevice(userAgent);
-  const country = request.headers.get('x-vercel-ip-country') || null;
+  const country = await resolveCountry(request.headers, ip);
   const botDetected = isBot(userAgent);
 
   // =========================================
