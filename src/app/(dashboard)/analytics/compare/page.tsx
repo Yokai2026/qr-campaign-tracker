@@ -48,11 +48,13 @@ export default function ComparePage() {
   async function fetchCampaignData(campaignId: string, name: string): Promise<CompareData> {
     const { data: events } = await supabase
       .from('redirect_events')
-      .select('id, ip_hash, device_type')
+      .select('id, ip_hash, device_type, is_bot')
       .eq('campaign_id', campaignId)
-      .eq('event_type', 'qr_open');
+      .in('event_type', ['qr_open', 'link_open']);
 
-    const rows = events || [];
+    const rows = (events || []).filter(
+      (e: { is_bot: boolean | null }) => !e.is_bot,
+    );
     const uniqueIps = new Set(rows.map((e: { ip_hash: string | null }) => e.ip_hash).filter(Boolean));
     const devices: Record<string, number> = {};
     rows.forEach((e: { device_type: string | null }) => {
