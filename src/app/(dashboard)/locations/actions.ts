@@ -78,7 +78,7 @@ export async function getLocation(id: string): Promise<{
 export async function createLocation(
   data: LocationInput
 ): Promise<{ success: true; id: string } | { success: false; error: string }> {
-  await requireAuth();
+  const profile = await requireAuth();
 
   const parsed = locationSchema.safeParse(data);
   if (!parsed.success) {
@@ -89,7 +89,7 @@ export async function createLocation(
 
   const { data: created, error } = await supabase
     .from('locations')
-    .insert(parsed.data)
+    .insert({ ...parsed.data, created_by: profile.id })
     .select('id')
     .single();
 
