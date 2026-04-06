@@ -6,6 +6,8 @@ type PdfReportData = {
   dateTo: string;
   kpis: {
     totalOpens: number;
+    qrScans: number;
+    linkClicks: number;
     uniqueScans: number;
     uniqueQrCodes: number;
     ctaClicks: number;
@@ -40,7 +42,9 @@ export function generateAnalyticsPdf(data: PdfReportData) {
     startY: 50,
     head: [['Metrik', 'Wert']],
     body: [
-      ['Scans gesamt', String(data.kpis.totalOpens)],
+      ['Aufrufe gesamt', String(data.kpis.totalOpens)],
+      ['  davon QR-Scans', String(data.kpis.qrScans)],
+      ['  davon Link-Klicks', String(data.kpis.linkClicks)],
       ['Einzelne Besucher', String(data.kpis.uniqueScans)],
       ['Verwendete QR-Codes', String(data.kpis.uniqueQrCodes)],
       ['Zielseite erreicht', String(data.kpis.ctaClicks)],

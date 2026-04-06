@@ -238,16 +238,27 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   async function handleExport() {
     const from = `${dateFrom}T00:00:00`;
     const to = `${dateTo}T23:59:59`;
+    const eventTypes = source === 'qr' ? ['qr_open'] : source === 'link' ? ['link_open'] : ['qr_open', 'link_open'];
 
     let query = supabase
       .from('redirect_events')
-      .select('short_code, event_type, device_type, destination_url, created_at, placements(name, placement_code, location:locations(venue_name, district)), campaigns:campaign_id(name)')
+      .select('short_code, event_type, device_type, destination_url, country, created_at, placements(name, placement_code, location:locations(venue_name, district)), campaigns:campaign_id(name)')
+      .in('event_type', eventTypes)
+      .eq('is_bot', false)
       .gte('created_at', from)
       .lte('created_at', to)
       .order('created_at', { ascending: false });
 
     if (campaignId !== 'all') query = query.eq('campaign_id', campaignId);
-    const { data } = await query;
+    let { data } = await query;
+
+    // Apply district filter client-side (matches chart logic)
+    if (district !== 'all' && data) {
+      data = data.filter((e: Record<string, unknown>) => {
+        const p = e.placements as { location: { district: string | null } | null } | null;
+        return p?.location?.district === district;
+      });
+    }
     if (!data || data.length === 0) return;
 
     const rows = data.map((e: Record<string, unknown>) => {
@@ -258,7 +269,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         short_code: e.short_code, event: e.event_type,
         kampagne: c?.name || '', platzierung: p?.name || '',
         code: p?.placement_code || '', standort: p?.location?.venue_name || '',
-        bezirk: p?.location?.district || '', geraet: e.device_type || '',
+        bezirk: p?.location?.district || '', land: e.country || '', geraet: e.device_type || '',
         ziel_url: e.destination_url || '',
       };
     });
