@@ -102,40 +102,72 @@ export default async function DashboardPage() {
 
       {/* Onboarding: first-time users only */}
       {!hasAnyData && (
-        <div className="rounded-lg border border-dashed border-border bg-muted/20 p-5">
-          <div className="flex items-start gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-background border border-border">
-              <Sparkles className="h-4 w-4 text-muted-foreground" />
+        <div className="rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary">
+              <Sparkles className="h-4 w-4 text-primary-foreground" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-[14px] font-semibold">Willkommen bei Spurig</h3>
-              <p className="mt-1 text-[13px] text-muted-foreground">
-                In 3 Schritten bist du startklar: Erstelle eine Kampagne, lege Standorte & Platzierungen an und generiere deine QR-Codes.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Link
-                  href="/campaigns/new"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-[12px] font-medium text-background hover:bg-foreground/90 transition-colors"
-                >
-                  <Megaphone className="h-3 w-3" />
-                  Kampagne erstellen
-                </Link>
-                <Link
-                  href="/locations/new"
-                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-[12px] font-medium hover:bg-muted/40 transition-colors"
-                >
-                  <MapPin className="h-3 w-3" />
-                  Standort anlegen
-                </Link>
-                <Link
-                  href="/qr-codes/new"
-                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-[12px] font-medium hover:bg-muted/40 transition-colors"
-                >
-                  <QrCode className="h-3 w-3" />
-                  QR-Code erzeugen
-                </Link>
+            <div>
+              <h3 className="text-[15px] font-semibold">So funktioniert Spurig</h3>
+              <p className="text-[12px] text-muted-foreground">In 4 einfachen Schritten zum trackbaren QR-Code</p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Step 1 */}
+            <Link href="/campaigns/new" className="group relative rounded-lg border border-border p-4 hover:border-primary/40 hover:bg-primary/[0.02] transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">1</span>
+                <Megaphone className="h-3.5 w-3.5 text-muted-foreground" />
               </div>
-            </div>
+              <h4 className="text-[13px] font-semibold group-hover:text-primary transition-colors">Kampagne erstellen</h4>
+              <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+                Dein Projekt — z.B. &quot;Sommerfest 2026&quot; oder &quot;Newsletter Aktion&quot;. Alles wird hier gebündelt.
+              </p>
+            </Link>
+
+            {/* Step 2 */}
+            <Link href="/locations/new" className="group relative rounded-lg border border-border p-4 hover:border-primary/40 hover:bg-primary/[0.02] transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">2</span>
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              <h4 className="text-[13px] font-semibold group-hover:text-primary transition-colors">Standort anlegen</h4>
+              <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+                Wo hängen deine QR-Codes? Z.B. Café, Schule, Büro. So siehst du, welcher Ort am besten performt.
+              </p>
+            </Link>
+
+            {/* Step 3 */}
+            <Link href="/placements/new" className="group relative rounded-lg border border-border p-4 hover:border-primary/40 hover:bg-primary/[0.02] transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">3</span>
+                <ClipboardList className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              <h4 className="text-[13px] font-semibold group-hover:text-primary transition-colors">Platzierung erstellen</h4>
+              <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+                Der genaue Spot — z.B. &quot;Poster am Eingang&quot; oder &quot;Flyer am Tresen&quot;. Verknüpft Kampagne + Standort.
+              </p>
+            </Link>
+
+            {/* Step 4 */}
+            <Link href="/qr-codes/new" className="group relative rounded-lg border border-border p-4 hover:border-primary/40 hover:bg-primary/[0.02] transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">4</span>
+                <QrCode className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              <h4 className="text-[13px] font-semibold group-hover:text-primary transition-colors">QR-Code generieren</h4>
+              <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+                Dein fertiger QR-Code — zum Ausdrucken oder digital teilen. Jeder Scan wird automatisch getrackt.
+              </p>
+            </Link>
+          </div>
+
+          <div className="mt-4 rounded-md bg-muted/30 px-4 py-2.5">
+            <p className="text-[12px] text-muted-foreground">
+              <span className="font-medium text-foreground">Tipp:</span> Starte mit Schritt 1 — die anderen Schritte bauen darauf auf. Du kannst auch direkt einen{' '}
+              <Link href="/links/new" className="text-primary hover:underline">Kurzlink erstellen</Link> ohne Kampagne.
+            </p>
           </div>
         </div>
       )}
