@@ -15,6 +15,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import type { Profile } from '@/types';
 
 type ProfileFormValues = {
+  username: string;
   display_name: string;
 };
 
@@ -25,7 +26,7 @@ export default function SettingsPage() {
   const [origin, setOrigin] = useState('');
 
   const { register, handleSubmit, reset } = useForm<ProfileFormValues>({
-    defaultValues: { display_name: '' },
+    defaultValues: { username: '', display_name: '' },
   });
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function SettingsPage() {
       const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       if (data) {
         setProfile(data as Profile);
-        reset({ display_name: data.display_name || '' });
+        reset({ username: data.username || '', display_name: data.display_name || '' });
       }
     }
     load();
@@ -47,7 +48,7 @@ export default function SettingsPage() {
     setLoading(true);
     const { error } = await supabase
       .from('profiles')
-      .update({ display_name: data.display_name })
+      .update({ username: data.username, display_name: data.display_name })
       .eq('id', profile.id);
 
     if (error) {
@@ -99,6 +100,15 @@ export default function SettingsPage() {
               <div className="space-y-1.5">
                 <Label htmlFor="settings-email" className="text-[12px] text-muted-foreground">E-Mail</Label>
                 <Input id="settings-email" value={profile.email} disabled className="h-8 text-[13px] bg-muted/30" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="username" className="text-[12px] text-muted-foreground">Benutzername</Label>
+                <Input
+                  id="username"
+                  {...register('username')}
+                  placeholder="mein_name"
+                  className="h-8 text-[13px]"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="display_name" className="text-[12px] text-muted-foreground">Anzeigename</Label>

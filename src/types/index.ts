@@ -33,6 +33,7 @@ export type PageEventType =
 export interface Profile {
   id: string;
   email: string;
+  username: string | null;
   display_name: string | null;
   role: UserRole;
   created_at: string;

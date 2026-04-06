@@ -10,40 +10,45 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { QrCode, Loader2 } from 'lucide-react';
 
-export default function LoginPage() {
-  const [identifier, setIdentifier] = useState('');
+export default function SignupPage() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
   const supabase = createClient();
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    let email = identifier;
-
-    // If input doesn't look like an email, resolve username to email
-    if (!identifier.includes('@')) {
-      const { data } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('username', identifier)
-        .single();
-
-      if (!data) {
-        setError('Benutzername nicht gefunden');
-        setLoading(false);
-        return;
-      }
-      email = data.email;
+    if (username.length < 3) {
+      setError('Benutzername muss mindestens 3 Zeichen haben');
+      setLoading(false);
+      return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      setError('Benutzername darf nur Buchstaben, Zahlen, - und _ enthalten');
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username,
+          display_name: username,
+        },
+      },
+    });
+
     if (error) {
-      setError('Ungültige Anmeldedaten');
+      setError(error.message);
       setLoading(false);
       return;
     }
@@ -60,26 +65,38 @@ export default function LoginPage() {
             <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
               <QrCode className="h-5 w-5 text-primary-foreground" />
             </div>
-            <CardTitle className="text-lg font-semibold tracking-tight">Spurig</CardTitle>
+            <CardTitle className="text-lg font-semibold tracking-tight">Konto erstellen</CardTitle>
             <CardDescription className="text-[13px]">
-              Melde dich an, um deine Kampagnen zu verwalten
+              Registriere dich, um Kampagnen zu verwalten
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleSignup} className="space-y-4">
               {error && (
                 <div className="rounded-md border border-red-200 bg-red-50 p-2.5 text-[13px] font-medium text-red-600 dark:border-red-900 dark:bg-red-950/50 dark:text-red-400">
                   {error}
                 </div>
               )}
               <div className="space-y-1.5">
-                <Label htmlFor="identifier" className="text-[12px] text-muted-foreground">Benutzername oder E-Mail</Label>
+                <Label htmlFor="username" className="text-[12px] text-muted-foreground">Benutzername</Label>
                 <Input
-                  id="identifier"
+                  id="username"
                   type="text"
-                  placeholder="name@beispiel.de oder benutzername"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder="mein_name"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="h-9 text-[13px]"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-[12px] text-muted-foreground">E-Mail</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@beispiel.de"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="h-9 text-[13px]"
                   required
                 />
@@ -89,9 +106,11 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type="password"
+                  placeholder="Mindestens 6 Zeichen"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="h-9 text-[13px]"
+                  minLength={6}
                   required
                 />
               </div>
@@ -99,17 +118,17 @@ export default function LoginPage() {
                 {loading ? (
                   <>
                     <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                    Wird angemeldet...
+                    Wird erstellt...
                   </>
                 ) : (
-                  'Anmelden'
+                  'Konto erstellen'
                 )}
               </Button>
             </form>
             <p className="mt-4 text-center text-[12px] text-muted-foreground">
-              Noch kein Konto?{' '}
-              <Link href="/signup" className="text-primary hover:underline">
-                Registrieren
+              Bereits ein Konto?{' '}
+              <Link href="/login" className="text-primary hover:underline">
+                Anmelden
               </Link>
             </p>
           </CardContent>
