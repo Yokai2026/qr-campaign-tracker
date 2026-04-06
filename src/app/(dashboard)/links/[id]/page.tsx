@@ -1,7 +1,12 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { getShortLink } from '../actions';
-import { LinkDetail } from './link-detail';
+import dynamic from 'next/dynamic';
+import { PageSkeleton } from '@/components/shared/loading-skeleton';
+
+const LinkDetail = dynamic(() => import('./link-detail').then((m) => m.LinkDetail), {
+  loading: () => <PageSkeleton />,
+});
 
 type Props = {
   params: Promise<{ id: string }>;

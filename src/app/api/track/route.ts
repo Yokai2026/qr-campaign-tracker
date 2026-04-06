@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
 
     const userAgent = request.headers.get('user-agent') || '';
     const referrer = request.headers.get('referer') || null;
-    const ip = getClientIp(request);
 
     // Resolve QR code context if qr_code_id is provided
     let placementId = event.placement_id || null;
