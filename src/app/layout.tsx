@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Spur',
+  title: 'Spurig',
   description: 'Multi-Channel Kampagnen-Tracking für QR-Codes, Kurzlinks und Social Media',
 };
 

@@ -41,7 +41,7 @@ export default function LoginPage() {
             <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
               <QrCode className="h-5 w-5 text-primary-foreground" />
             </div>
-            <CardTitle className="text-lg font-semibold tracking-tight">Spur</CardTitle>
+            <CardTitle className="text-lg font-semibold tracking-tight">Spurig</CardTitle>
             <CardDescription className="text-[13px]">
               Melde dich an, um deine Kampagnen zu verwalten
             </CardDescription>
@@ -91,7 +91,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="mt-4 text-center text-[11px] text-muted-foreground/50">
-          Spur · Multi-Channel Kampagnen-Tracking
+          Spurig · Multi-Channel Kampagnen-Tracking
         </p>
       </div>
     </div>

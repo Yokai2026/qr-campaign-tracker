@@ -101,7 +101,7 @@ export async function verifyCustomDomain(
 
   const expected = (domain as CustomDomain).verification_token;
   const host = (domain as CustomDomain).host;
-  const lookupName = `_spur-verify.${host}`;
+  const lookupName = `_spurig-verify.${host}`;
 
   try {
     const { resolveTxt } = await import('node:dns/promises');

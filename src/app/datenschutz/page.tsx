@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Shield, ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Datenschutzerklärung — Spur',
+  title: 'Datenschutzerklärung — Spurig',
   description: 'Informationen zum Datenschutz beim Kampagnen-Tracking',
 };
 

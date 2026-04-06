@@ -228,7 +228,7 @@ function DomainItem({
   isPending: boolean;
 }) {
   const [showSetup, setShowSetup] = useState(!domain.verified);
-  const recordName = `_spur-verify.${domain.host}`;
+  const recordName = `_spurig-verify.${domain.host}`;
 
   return (
     <div className="rounded-lg border border-border">

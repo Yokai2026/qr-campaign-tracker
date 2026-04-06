@@ -108,7 +108,7 @@ export default async function DashboardPage() {
               <Sparkles className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="flex-1">
-              <h3 className="text-[14px] font-semibold">Willkommen bei Spur</h3>
+              <h3 className="text-[14px] font-semibold">Willkommen bei Spurig</h3>
               <p className="mt-1 text-[13px] text-muted-foreground">
                 In 3 Schritten bist du startklar: Erstelle eine Kampagne, lege Standorte & Platzierungen an und generiere deine QR-Codes.
               </p>

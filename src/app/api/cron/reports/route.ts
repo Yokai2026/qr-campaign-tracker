@@ -48,13 +48,13 @@ export async function GET(request: NextRequest) {
       });
 
       const subject = campaignName
-        ? `Spur Report: ${campaignName} (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`
-        : `Spur Report: Alle Kampagnen (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`;
+        ? `Spurig Report: ${campaignName} (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`
+        : `Spurig Report: Alle Kampagnen (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`;
 
-      const fromEmail = process.env.RESEND_FROM_EMAIL || 'reports@spur.app';
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'reports@spurig.com';
 
       await resend.emails.send({
-        from: `Spur <${fromEmail}>`,
+        from: `Spurig <${fromEmail}>`,
         to: schedule.email,
         subject,
         html,

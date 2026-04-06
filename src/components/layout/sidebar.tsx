@@ -97,7 +97,7 @@ export function Sidebar() {
           <QrCode className="h-3 w-3 text-white/70" />
         </div>
         <span className="text-[13px] font-semibold tracking-tight text-white/90">
-          Spur
+          Spurig
         </span>
       </div>
 
@@ -163,7 +163,7 @@ export function Sidebar() {
           <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-neutral-900">
             <QrCode className="h-3 w-3 text-white/70" />
           </div>
-          <span className="text-[13px] font-semibold">Spur</span>
+          <span className="text-[13px] font-semibold">Spurig</span>
         </div>
       </div>
 
