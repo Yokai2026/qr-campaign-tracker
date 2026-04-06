@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
 import { trackEventSchema } from '@/lib/validations';
 import { hashIp, parseDevice, getClientIp } from '@/lib/tracking/events';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,16 @@ export async function OPTIONS() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 60 requests per minute per IP
+    const ip = getClientIp(request);
+    const rl = checkRateLimit(hashIp(ip), 60, 60_000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { ...corsHeaders, 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
+      );
+    }
+
     const body = await request.json();
     const parsed = trackEventSchema.safeParse(body);
 

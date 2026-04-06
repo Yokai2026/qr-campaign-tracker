@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase/server';
 import { hashIp, parseDevice, getClientIp, isBot, resolveCountry } from '@/lib/tracking/events';
 import { buildTargetUrlWithUtm } from '@/lib/qr/generate';
 import { isUrlSafe } from '@/lib/validations';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,12 +22,23 @@ export async function GET(
   { params }: { params: Promise<{ code: string }> }
 ) {
   const { code } = await params;
+
+  const ip = getClientIp(request);
+  const ipHash = hashIp(ip);
+
+  // Rate limit: 120 redirects per minute per IP (generous for real users, blocks abuse)
+  const rl = checkRateLimit(ipHash, 120, 60_000);
+  if (!rl.allowed) {
+    return new NextResponse(
+      errorHtml('Zu viele Anfragen.', 'Bitte warte einen Moment und versuche es erneut.'),
+      { status: 429, headers: { 'Content-Type': 'text/html', 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
+    );
+  }
+
   const supabase = await createServiceClient();
 
   const userAgent = request.headers.get('user-agent') || '';
   const referrer = request.headers.get('referer') || null;
-  const ip = getClientIp(request);
-  const ipHash = hashIp(ip);
   const deviceType = parseDevice(userAgent);
   const country = await resolveCountry(request.headers, ip);
   const botDetected = isBot(userAgent);
