@@ -42,14 +42,15 @@ export default async function DashboardPage() {
     supabase.from('locations').select('*', { count: 'exact', head: true }),
     supabase.from('placements').select('*', { count: 'exact', head: true }),
     supabase.from('qr_codes').select('*', { count: 'exact', head: true }),
-    supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'qr_open'),
-    supabase.from('redirect_events').select('ip_hash').eq('event_type', 'qr_open'),
+    supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'qr_open').eq('is_bot', false),
+    supabase.from('redirect_events').select('ip_hash').eq('event_type', 'qr_open').eq('is_bot', false),
     supabase.from('page_events').select('*', { count: 'exact', head: true }).eq('event_type', 'cta_click'),
-    supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'link_open'),
+    supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'link_open').eq('is_bot', false),
     supabase.from('campaigns').select('id, name, status, slug').order('updated_at', { ascending: false }).limit(5),
     supabase.from('redirect_events')
       .select('placement_id, placements(name, placement_code, location:locations(venue_name))')
       .eq('event_type', 'qr_open')
+      .eq('is_bot', false)
       .not('placement_id', 'is', null)
       .order('created_at', { ascending: false })
       .limit(100),
