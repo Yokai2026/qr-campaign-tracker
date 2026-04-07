@@ -175,7 +175,7 @@ export function LinkDetail({ link }: Props) {
 
       const { data: events } = await supabase
         .from('redirect_events')
-        .select('id, device_type, country, ip_hash, referrer, created_at, is_bot')
+        .select('id, device_type, browser_family, os_family, country, ip_hash, referrer, created_at, is_bot')
         .eq('short_link_id', link.id)
         .eq('event_type', 'link_open')
         .gte('created_at', from)

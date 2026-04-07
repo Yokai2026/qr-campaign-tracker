@@ -145,6 +145,8 @@ export interface RedirectEvent {
   referrer: string | null;
   user_agent: string | null;
   device_type: string | null;
+  browser_family: string | null;
+  os_family: string | null;
   ip_hash: string | null;
   destination_url: string | null;
   country: string | null;
@@ -163,6 +165,8 @@ export interface PageEvent {
   referrer: string | null;
   user_agent: string | null;
   device_type: string | null;
+  browser_family: string | null;
+  os_family: string | null;
   ip_hash: string | null;
   created_at: string;
 }
@@ -240,6 +244,21 @@ export interface ReportSchedule {
   created_at: string;
   updated_at: string;
   campaign?: Campaign;
+}
+
+// ============================================
+// Audit Log
+// ============================================
+
+export interface AuditLogEntry {
+  id: string;
+  user_id: string | null;
+  action: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  details: Record<string, unknown> | null;
+  ip_hash: string | null;
+  created_at: string;
 }
 
 // ============================================

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { User, Shield, Code, Loader2, Trash2 } from 'lucide-react';
+import { User, Shield, Code, Loader2, Trash2, Download } from 'lucide-react';
 import { deleteAccount } from './account-actions';
 import { ReportSchedules } from '@/components/settings/report-schedules';
 import { CustomDomains } from '@/components/settings/custom-domains';
@@ -182,6 +182,38 @@ export default function SettingsPage() {
 
       {/* Report Schedules */}
       <ReportSchedules />
+
+      {/* Datenexport (DSGVO Art. 20) */}
+      <Card className="border border-border">
+        <CardHeader>
+          <div className="flex items-center gap-2.5">
+            <Download className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <CardTitle className="text-[14px]">Meine Daten exportieren</CardTitle>
+              <CardDescription className="text-[12px]">
+                Alle deine personenbezogenen Daten als JSON herunterladen (Art. 20 DSGVO — Datenportabilität)
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-[12px] text-muted-foreground mb-3">
+            Der Export enthält dein Profil, Kampagnen, Platzierungen, QR-Codes, Kurzlinks, Report-Einstellungen
+            und Custom Domains. Anonymisierte Tracking-Daten (Scans) sind nicht enthalten, da sie keinen
+            direkten Personenbezug haben.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              window.location.href = '/api/export/my-data';
+            }}
+          >
+            <Download className="mr-1.5 h-3.5 w-3.5" />
+            Daten herunterladen
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Gefahrenzone */}
       <Card className="border border-destructive/30">

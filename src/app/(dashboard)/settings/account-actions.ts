@@ -2,6 +2,7 @@
 
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { logAudit } from '@/lib/audit';
 
 export async function deleteAccount(): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient();
@@ -10,6 +11,13 @@ export async function deleteAccount(): Promise<{ success: boolean; error?: strin
   if (!user) {
     return { success: false, error: 'Nicht authentifiziert' };
   }
+
+  // Log before deletion (user_id will be set to null after cascade)
+  await logAudit({
+    userId: user.id,
+    action: 'account.deleted',
+    details: { email: user.email },
+  });
 
   const serviceClient = await createServiceClient();
 

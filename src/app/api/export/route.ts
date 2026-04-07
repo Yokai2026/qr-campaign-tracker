@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { sanitizeUrl } from '@/lib/privacy';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,7 +81,7 @@ export async function GET(request: NextRequest) {
     case 'events': {
       let query = supabase
         .from('redirect_events')
-        .select('short_code, event_type, device_type, destination_url, created_at')
+        .select('short_code, event_type, device_type, browser_family, os_family, destination_url, created_at')
         .order('created_at', { ascending: false })
         .limit(10000);
 
@@ -94,10 +95,12 @@ export async function GET(request: NextRequest) {
         break;
       }
 
-      const headers = ['Datum', 'Short Code', 'Event', 'Gerät', 'Ziel-URL'];
+      const headers = ['Datum', 'Short Code', 'Event', 'Gerät', 'Browser', 'Betriebssystem', 'Ziel-URL'];
       const rows = data.map((e: Record<string, unknown>) => [
         (e.created_at as string).slice(0, 19),
-        e.short_code, e.event_type, e.device_type || '', e.destination_url || '',
+        e.short_code, e.event_type, e.device_type || '',
+        e.browser_family || '', e.os_family || '',
+        sanitizeUrl(String(e.destination_url || '')),
       ]);
 
       csvContent = [headers.join(';'), ...rows.map((r) => r.map((c) => `"${String(c ?? '').replace(/"/g, '""')}"`).join(';'))].join('\n');

@@ -4,6 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { campaignSchema } from '@/lib/validations';
 import { revalidatePath } from 'next/cache';
+import { logAudit } from '@/lib/audit';
 import type { Campaign, CampaignInput, CampaignTag } from '@/types';
 
 // ---------------------------------------------------------------------------
@@ -174,7 +175,7 @@ export async function updateCampaign(
 
 /** Delete a campaign by id. */
 export async function deleteCampaign(id: string): Promise<void> {
-  await requireAuth();
+  const profile = await requireAuth();
   const supabase = await createServiceClient();
 
   const { error } = await supabase
@@ -185,6 +186,13 @@ export async function deleteCampaign(id: string): Promise<void> {
   if (error) {
     throw new Error(`Kampagne konnte nicht gelöscht werden: ${error.message}`);
   }
+
+  await logAudit({
+    userId: profile.id,
+    action: 'campaign.deleted',
+    entityType: 'campaign',
+    entityId: id,
+  });
 
   revalidatePath('/campaigns');
 }

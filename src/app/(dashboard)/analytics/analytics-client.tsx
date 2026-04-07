@@ -34,6 +34,8 @@ type Props = {
   districts: string[];
 };
 
+type BreakdownEntry = { name: string; value: number };
+
 type AnalyticsData = {
   kpis: {
     totalOpens: number;
@@ -47,10 +49,12 @@ type AnalyticsData = {
   timeSeriesData: { date: string; qr: number; link: number }[];
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; opens: number; location: string }[];
-  deviceData: { name: string; value: number }[];
-  countryData: { name: string; value: number }[];
+  deviceData: BreakdownEntry[];
+  browserData: BreakdownEntry[];
+  osData: BreakdownEntry[];
+  countryData: BreakdownEntry[];
   unknownCountryCount: number;
-  referrerData: { name: string; value: number }[];
+  referrerData: BreakdownEntry[];
 };
 
 type SourceFilter = 'all' | 'qr' | 'link';
@@ -99,7 +103,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
       let redirectQuery = supabase
         .from('redirect_events')
-        .select('id, qr_code_id, short_link_id, campaign_id, placement_id, device_type, created_at, event_type, ip_hash, country, referrer, is_bot, destination_url, placements(name, placement_code, location:locations(venue_name, district))')
+        .select('id, qr_code_id, short_link_id, campaign_id, placement_id, device_type, browser_family, os_family, created_at, event_type, ip_hash, country, referrer, is_bot, destination_url, placements(name, placement_code, location:locations(venue_name, district))')
         .in('event_type', eventTypes)
         .eq('is_bot', false)
         .gte('created_at', from)
@@ -187,6 +191,26 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       });
       const deviceData = Object.entries(devMap).map(([name, value]) => ({ name, value }));
 
+      // Browser breakdown
+      const browserMap: Record<string, number> = {};
+      filteredEvents.forEach((e: { browser_family: string | null }) => {
+        const b = e.browser_family || 'unbekannt';
+        browserMap[b] = (browserMap[b] || 0) + 1;
+      });
+      const browserData = Object.entries(browserMap)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+
+      // OS breakdown
+      const osMap: Record<string, number> = {};
+      filteredEvents.forEach((e: { os_family: string | null }) => {
+        const o = e.os_family || 'unbekannt';
+        osMap[o] = (osMap[o] || 0) + 1;
+      });
+      const osData = Object.entries(osMap)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+
       // Country breakdown — separate real countries (ISO alpha-2) from unknown/local
       const countryMap: Record<string, number> = {};
       let unknownCountryCount = 0;
@@ -219,7 +243,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         .sort((a, b) => b.value - a.value)
         .slice(0, 10);
 
-      return { kpis, timeSeriesData, campaignData, placementData, deviceData, countryData, unknownCountryCount, referrerData };
+      return { kpis, timeSeriesData, campaignData, placementData, deviceData, browserData, osData, countryData, unknownCountryCount, referrerData };
     },
   });
 
@@ -228,6 +252,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const campaignData = data?.campaignData ?? [];
   const placementData = data?.placementData ?? [];
   const deviceData = data?.deviceData ?? [];
+  const browserData = data?.browserData ?? [];
+  const osData = data?.osData ?? [];
   const countryData = data?.countryData ?? [];
   const unknownCountryCount = data?.unknownCountryCount ?? 0;
   const referrerData = data?.referrerData ?? [];
@@ -242,7 +268,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
     let query = supabase
       .from('redirect_events')
-      .select('short_code, event_type, device_type, destination_url, country, created_at, placements(name, placement_code, location:locations(venue_name, district)), campaigns:campaign_id(name)')
+      .select('short_code, event_type, device_type, browser_family, os_family, destination_url, country, created_at, placements(name, placement_code, location:locations(venue_name, district)), campaigns:campaign_id(name)')
       .in('event_type', eventTypes)
       .eq('is_bot', false)
       .gte('created_at', from)
@@ -270,6 +296,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         kampagne: c?.name || '', platzierung: p?.name || '',
         code: p?.placement_code || '', standort: p?.location?.venue_name || '',
         bezirk: p?.location?.district || '', land: e.country || '', geraet: e.device_type || '',
+        browser: e.browser_family || '', betriebssystem: e.os_family || '',
         ziel_url: e.destination_url || '',
       };
     });
@@ -311,7 +338,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               size="sm"
               onClick={() => {
                 generateAnalyticsPdf({
-                  dateFrom, dateTo, kpis, campaignData, placementData, deviceData, countryData,
+                  dateFrom, dateTo, kpis, campaignData, placementData, deviceData, browserData, osData, countryData,
                 });
               }}
             >
@@ -531,6 +558,37 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                       boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
                     }}
                   />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartCard>
+          </div>
+
+          {/* Browser & OS Breakdown */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <ChartCard title="Browser" empty={browserData.length === 0}>
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie data={browserData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={{ fontSize: 11 }} strokeWidth={1}>
+                    {browserData.map((_, idx) => (
+                      <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6, border: '1px solid oklch(0.92 0 0)', boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)' }} />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Betriebssystem" empty={osData.length === 0}>
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie data={osData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={{ fontSize: 11 }} strokeWidth={1}>
+                    {osData.map((_, idx) => (
+                      <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6, border: '1px solid oklch(0.92 0 0)', boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)' }} />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>

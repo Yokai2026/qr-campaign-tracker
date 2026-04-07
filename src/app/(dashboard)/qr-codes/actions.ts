@@ -7,6 +7,7 @@ import { requireAuth } from '@/lib/auth';
 import { generateQrCode, buildRedirectUrl } from '@/lib/qr/generate';
 import { qrCodeSchema, isUrlSafe } from '@/lib/validations';
 import { getAppUrl } from '@/lib/constants';
+import { logAudit } from '@/lib/audit';
 import type { QrCode, QrCodeInput, QrStatusHistory, QrAction } from '@/types';
 
 // ---------------------------------------------------------------------------
@@ -410,7 +411,7 @@ export async function toggleQrCode(
  * Soft-delete (archive) a QR code by deactivating it and adding an archived history entry.
  */
 export async function deleteQrCode(id: string): Promise<void> {
-  await requireAuth();
+  const profile = await requireAuth();
   const supabase = await createServiceClient();
 
   // FK cascades handle qr_status_history; redirect_events uses ON DELETE SET NULL
@@ -420,6 +421,13 @@ export async function deleteQrCode(id: string): Promise<void> {
     .eq('id', id);
 
   if (error) throw new Error(error.message);
+
+  await logAudit({
+    userId: profile.id,
+    action: 'qr_code.deleted',
+    entityType: 'qr_code',
+    entityId: id,
+  });
 
   revalidatePath('/qr-codes');
 }

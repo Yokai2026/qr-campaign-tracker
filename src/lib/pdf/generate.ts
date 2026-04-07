@@ -16,6 +16,8 @@ type PdfReportData = {
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; location: string; opens: number }[];
   deviceData: { name: string; value: number }[];
+  browserData: { name: string; value: number }[];
+  osData: { name: string; value: number }[];
   countryData: { name: string; value: number }[];
 };
 
@@ -104,6 +106,52 @@ export function generateAnalyticsPdf(data: PdfReportData) {
       body: data.deviceData.map((d) => {
         const total = data.deviceData.reduce((s, x) => s + x.value, 0);
         return [d.name, String(d.value), `${((d.value / total) * 100).toFixed(1)}%`];
+      }),
+      theme: 'striped',
+      headStyles: { fillColor: [30, 30, 30] },
+      styles: { fontSize: 9 },
+    });
+  }
+
+  // Browsers
+  if (data.browserData.length > 0) {
+    const y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 12;
+
+    if (y > 250) doc.addPage();
+    const startY = y > 250 ? 20 : y;
+
+    doc.setFontSize(13);
+    doc.text('Browser', 14, startY);
+
+    autoTable(doc, {
+      startY: startY + 4,
+      head: [['Browser', 'Scans', 'Anteil']],
+      body: data.browserData.map((b) => {
+        const total = data.browserData.reduce((s, x) => s + x.value, 0);
+        return [b.name, String(b.value), `${((b.value / total) * 100).toFixed(1)}%`];
+      }),
+      theme: 'striped',
+      headStyles: { fillColor: [30, 30, 30] },
+      styles: { fontSize: 9 },
+    });
+  }
+
+  // Operating Systems
+  if (data.osData.length > 0) {
+    const y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 12;
+
+    if (y > 250) doc.addPage();
+    const startY = y > 250 ? 20 : y;
+
+    doc.setFontSize(13);
+    doc.text('Betriebssystem', 14, startY);
+
+    autoTable(doc, {
+      startY: startY + 4,
+      head: [['Betriebssystem', 'Scans', 'Anteil']],
+      body: data.osData.map((o) => {
+        const total = data.osData.reduce((s, x) => s + x.value, 0);
+        return [o.name, String(o.value), `${((o.value / total) * 100).toFixed(1)}%`];
       }),
       theme: 'striped',
       headStyles: { fillColor: [30, 30, 30] },
