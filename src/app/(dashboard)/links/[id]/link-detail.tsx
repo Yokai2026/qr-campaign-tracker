@@ -11,6 +11,7 @@ import {
   TrendingUp, Users, Globe, Monitor, ArrowUpRight, MousePointerClick,
   Pencil, Loader2, ChevronDown, ChevronUp,
 } from 'lucide-react';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend,
@@ -120,7 +121,6 @@ export function LinkDetail({ link }: Props) {
   }
 
   function handleDelete() {
-    if (!confirm('Diesen Link wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
     startTransition(async () => {
       const result = await deleteShortLink(link.id);
       if (result.success) {
@@ -263,10 +263,18 @@ export function LinkDetail({ link }: Props) {
                 <><ToggleRight className="mr-1.5 h-3.5 w-3.5" /> Aktivieren</>
               )}
             </Button>
-            <Button variant="outline" size="sm" className="text-destructive" onClick={handleDelete} disabled={isPending}>
-              <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-              Löschen
-            </Button>
+            <ConfirmDialog
+              trigger={
+                <Button variant="outline" size="sm" className="text-destructive" disabled={isPending}>
+                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                  Löschen
+                </Button>
+              }
+              title="Link löschen?"
+              description="Dieser Kurzlink und alle zugehörigen Tracking-Daten werden unwiderruflich gelöscht."
+              confirmLabel="Endgültig löschen"
+              onConfirm={handleDelete}
+            />
           </div>
         }
       />

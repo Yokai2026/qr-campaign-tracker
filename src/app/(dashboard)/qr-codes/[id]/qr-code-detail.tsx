@@ -24,6 +24,7 @@ import {
   Palette,
   ShieldAlert,
 } from 'lucide-react';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 
 import { updateQrCode, deleteQrCode } from '../actions';
 import { computeQrStatus } from '@/lib/qr/status';
@@ -186,7 +187,6 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
   }
 
   function handleDelete() {
-    if (!confirm('Diesen QR-Code wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
     setIsDeleting(true);
     startTransition(async () => {
       try {
@@ -420,16 +420,19 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
                     Der QR-Code wird unwiderruflich gelöscht.
                   </p>
                 </div>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleDelete}
-                  disabled={isDeleting || isPending}
-                >
-                  {isDeleting && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
-                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                  Löschen
-                </Button>
+                <ConfirmDialog
+                  trigger={
+                    <Button variant="destructive" size="sm" disabled={isDeleting || isPending}>
+                      {isDeleting && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                      <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                      Löschen
+                    </Button>
+                  }
+                  title="QR-Code löschen?"
+                  description="Dieser QR-Code und alle zugehörigen Scan-Daten werden unwiderruflich gelöscht."
+                  confirmLabel="Endgültig löschen"
+                  onConfirm={handleDelete}
+                />
               </div>
             </CardContent>
           </Card>

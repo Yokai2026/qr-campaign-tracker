@@ -102,7 +102,6 @@ export function LinkList({ links, groups }: LinkListProps) {
   }
 
   function handleDelete(id: string) {
-    if (!confirm('Diesen Link wirklich löschen?')) return;
     startTransition(async () => {
       const result = await deleteShortLink(id);
       if (result.success) {

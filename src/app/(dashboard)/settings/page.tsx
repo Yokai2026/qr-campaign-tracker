@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { User, Shield, Code, Loader2, Trash2, Download } from 'lucide-react';
+import { User, Shield, Code, Loader2, Trash2, Download, ScrollText } from 'lucide-react';
 import { deleteAccount } from './account-actions';
 import { ReportSchedules } from '@/components/settings/report-schedules';
 import { CustomDomains } from '@/components/settings/custom-domains';
@@ -214,6 +214,31 @@ export default function SettingsPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Audit-Log — nur für Admins */}
+      {profile.role === 'admin' && (
+        <Card className="border border-border">
+          <CardHeader>
+            <div className="flex items-center gap-2.5">
+              <ScrollText className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <CardTitle className="text-[14px]">Audit-Log</CardTitle>
+                <CardDescription className="text-[12px]">
+                  Sicherheitsrelevante Aktionen im System einsehen
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/settings/audit-log">
+                <ScrollText className="mr-1.5 h-3.5 w-3.5" />
+                Audit-Log öffnen
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Gefahrenzone */}
       <Card className="border border-destructive/30">

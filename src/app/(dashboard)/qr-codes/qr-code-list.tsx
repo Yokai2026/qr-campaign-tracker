@@ -116,7 +116,7 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
   }
 
   function handleDelete(id: string, shortCode: string) {
-    if (!confirm(`QR-Code "${shortCode}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`)) return;
+    // Delete proceeds directly — user already clicked explicit "Löschen" in dropdown
     startTransition(async () => {
       try {
         await deleteQrCode(id);
@@ -367,7 +367,7 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
             size="sm"
             className="h-7 text-[12px] text-destructive hover:text-destructive"
             onClick={() => {
-              if (!confirm(`${selectedRows.length} QR-Code(s) wirklich löschen?`)) return;
+              // Bulk delete proceeds directly — user clicked explicit bulk action
               startTransition(async () => {
                 for (const qr of selectedRows) {
                   await deleteQrCode(qr.id).catch(() => {});

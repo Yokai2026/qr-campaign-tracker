@@ -6,6 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { MapPin, Trash2 } from 'lucide-react';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { locationSchema } from '@/lib/validations';
 import { LOCATION_TYPE_LABELS, PLACEMENT_STATUS_LABELS } from '@/lib/constants';
 import type { Location, LocationInput, LocationType } from '@/types';
@@ -116,11 +117,6 @@ export function LocationDetailTabs({
   }
 
   async function handleDelete() {
-    const confirmed = window.confirm(
-      'Diesen Standort wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
-    );
-    if (!confirmed) return;
-
     setIsDeleting(true);
     try {
       const result = await deleteLocation(location.id);
@@ -153,15 +149,18 @@ export function LocationDetailTabs({
           />
         }
         action={
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-            {isDeleting ? 'Wird gelöscht...' : 'Löschen'}
-          </Button>
+          <ConfirmDialog
+            trigger={
+              <Button variant="destructive" size="sm" disabled={isDeleting}>
+                <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                {isDeleting ? 'Wird gelöscht...' : 'Löschen'}
+              </Button>
+            }
+            title="Standort löschen?"
+            description="Dieser Standort und alle zugehörigen Daten werden unwiderruflich gelöscht."
+            confirmLabel="Endgültig löschen"
+            onConfirm={handleDelete}
+          />
         }
       />
 

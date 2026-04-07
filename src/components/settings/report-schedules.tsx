@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Mail, Trash2, Plus, Loader2, Clock } from 'lucide-react';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import type { ReportFrequency } from '@/types';
 
 type Schedule = {
@@ -96,7 +97,6 @@ export function ReportSchedules() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Zeitplan wirklich löschen?')) return;
     const { error } = await supabase
       .from('report_schedules')
       .delete()
@@ -245,14 +245,17 @@ export function ReportSchedules() {
                     </div>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive"
-                  onClick={() => handleDelete(s.id)}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+                <ConfirmDialog
+                  trigger={
+                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  }
+                  title="Zeitplan löschen?"
+                  description="Dieser Report-Zeitplan wird unwiderruflich gelöscht."
+                  confirmLabel="Löschen"
+                  onConfirm={() => handleDelete(s.id)}
+                />
               </div>
             ))}
           </div>

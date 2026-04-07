@@ -1,15 +1,15 @@
 import { cn } from '@/lib/utils';
 
 const STATUS_STYLES: Record<string, { dot: string; text: string }> = {
-  draft:     { dot: 'bg-neutral-400', text: 'text-neutral-600 dark:text-neutral-400' },
+  draft:     { dot: 'bg-slate-400',   text: 'text-slate-600 dark:text-slate-400' },
   active:    { dot: 'bg-emerald-500', text: 'text-emerald-700 dark:text-emerald-400' },
-  inactive:  { dot: 'bg-neutral-400', text: 'text-neutral-600 dark:text-neutral-400' },
+  inactive:  { dot: 'bg-neutral-300', text: 'text-neutral-500 dark:text-neutral-500' },
   paused:    { dot: 'bg-amber-500',   text: 'text-amber-700 dark:text-amber-400' },
   completed: { dot: 'bg-blue-500',    text: 'text-blue-700 dark:text-blue-400' },
-  archived:  { dot: 'bg-neutral-400', text: 'text-neutral-500 dark:text-neutral-500' },
+  archived:  { dot: 'bg-violet-400',  text: 'text-violet-600 dark:text-violet-400' },
   expired:   { dot: 'bg-orange-500',  text: 'text-orange-700 dark:text-orange-400' },
-  planned:   { dot: 'bg-neutral-400', text: 'text-neutral-600 dark:text-neutral-400' },
-  installed: { dot: 'bg-blue-500',    text: 'text-blue-700 dark:text-blue-400' },
+  planned:   { dot: 'bg-cyan-400',    text: 'text-cyan-700 dark:text-cyan-400' },
+  installed: { dot: 'bg-teal-500',    text: 'text-teal-700 dark:text-teal-400' },
   removed:   { dot: 'bg-red-400',     text: 'text-red-600 dark:text-red-400' },
 };
 

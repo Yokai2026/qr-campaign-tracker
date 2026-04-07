@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Globe, Trash2, Plus, Loader2, Check, Copy, Star, AlertCircle } from 'lucide-react';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import type { CustomDomain } from '@/types';
 import {
   getCustomDomains,
@@ -62,7 +63,6 @@ export function CustomDomains() {
   }
 
   function handleDelete(id: string) {
-    if (!confirm('Domain wirklich entfernen?')) return;
     startTransition(async () => {
       const result = await deleteCustomDomain(id);
       if (!result.success) {
@@ -298,15 +298,17 @@ function DomainItem({
               {showSetup ? 'Verbergen' : 'Anleitung'}
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-muted-foreground hover:text-destructive"
-            onClick={() => onDelete(domain.id)}
-            disabled={isPending}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
+          <ConfirmDialog
+            trigger={
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" disabled={isPending}>
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            }
+            title="Domain entfernen?"
+            description={`Die Domain "${domain.host}" wird unwiderruflich entfernt. Kurzlinks über diese Domain funktionieren danach nicht mehr.`}
+            confirmLabel="Entfernen"
+            onConfirm={() => onDelete(domain.id)}
+          />
         </div>
       </div>
 

@@ -20,7 +20,7 @@ export function KPIStatCard({
 }: KPIStatCardProps) {
   return (
     <div className={cn(
-      'rounded-lg border border-border bg-card p-4',
+      'rounded-lg border border-border bg-card p-4 transition-all duration-150 hover:shadow-sm hover:border-border/80 cursor-pointer',
       className,
     )}>
       <div className="flex items-center justify-between">

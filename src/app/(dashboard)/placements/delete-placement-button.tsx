@@ -17,8 +17,6 @@ export function DeletePlacementButton({ id, name }: DeletePlacementButtonProps) 
   const router = useRouter();
 
   function handleDelete() {
-    if (!confirm(`Platzierung "${name}" wirklich löschen?`)) return;
-
     startTransition(async () => {
       try {
         await deletePlacement(id);

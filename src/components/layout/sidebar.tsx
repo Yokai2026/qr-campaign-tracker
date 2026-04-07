@@ -19,6 +19,7 @@ import {
   Shield,
   Scale,
   Search,
+  ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -58,7 +59,7 @@ export function Sidebar() {
         className={cn(
           'group flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] transition-colors duration-75',
           isActive
-            ? 'bg-white/[0.08] text-white font-medium'
+            ? 'bg-white/[0.08] text-white font-medium border-l-2 border-white/60 pl-[6px]'
             : 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
         )}
       >
@@ -136,6 +137,7 @@ export function Sidebar() {
         >
           <Shield className="h-[15px] w-[15px]" />
           Datenschutz
+          <ExternalLink className="ml-auto h-3 w-3 opacity-40" />
         </Link>
         <Link
           href="/impressum"
@@ -144,6 +146,7 @@ export function Sidebar() {
         >
           <Scale className="h-[15px] w-[15px]" />
           Impressum
+          <ExternalLink className="ml-auto h-3 w-3 opacity-40" />
         </Link>
         <button
           onClick={handleLogout}
