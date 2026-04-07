@@ -230,11 +230,9 @@ export default function SettingsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" size="sm" asChild>
-              <a href="/settings/audit-log">
-                <ScrollText className="mr-1.5 h-3.5 w-3.5" />
-                Audit-Log öffnen
-              </a>
+            <Button variant="outline" size="sm" render={<a href="/settings/audit-log" />}>
+              <ScrollText className="mr-1.5 h-3.5 w-3.5" />
+              Audit-Log öffnen
             </Button>
           </CardContent>
         </Card>

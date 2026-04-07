@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { cloneElement, isValidElement, useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,12 +10,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
 
 type ConfirmDialogProps = {
-  trigger: React.ReactNode;
+  trigger: React.ReactElement;
   title: string;
   description: string;
   confirmLabel?: string;
@@ -48,7 +47,8 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
+      {isValidElement(trigger) &&
+        cloneElement(trigger, { onClick: () => setOpen(true) } as React.HTMLAttributes<HTMLElement>)}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-[15px]">{title}</AlertDialogTitle>

@@ -25,6 +25,7 @@ import { formatDate, truncateUrl } from '@/lib/format';
 
 import { DataTable } from '@/components/shared/data-table';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -271,13 +272,21 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
                   <Download className="mr-2 h-3.5 w-3.5" />
                   SVG herunterladen
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleDelete(qr.id, qr.short_code)}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <Trash2 className="mr-2 h-3.5 w-3.5" />
-                  Löschen
-                </DropdownMenuItem>
+                <ConfirmDialog
+                  trigger={
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-3.5 w-3.5" />
+                      Löschen
+                    </DropdownMenuItem>
+                  }
+                  title="QR-Code löschen?"
+                  description={`Der QR-Code „${qr.short_code}" wird unwiderruflich gelöscht. Alle zugehörigen Scan-Daten gehen verloren.`}
+                  confirmLabel="Endgültig löschen"
+                  onConfirm={() => handleDelete(qr.id, qr.short_code)}
+                />
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -362,24 +371,28 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
             <Download className="mr-1.5 h-3 w-3" />
             PNGs herunterladen
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-[12px] text-destructive hover:text-destructive"
-            onClick={() => {
-              // Bulk delete proceeds directly — user clicked explicit bulk action
-              startTransition(async () => {
-                for (const qr of selectedRows) {
-                  await deleteQrCode(qr.id).catch(() => {});
-                }
-                toast.success(`${selectedRows.length} QR-Code(s) gelöscht`);
-                clearSelection();
-              });
+          <ConfirmDialog
+            trigger={
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[12px] text-destructive hover:text-destructive"
+              >
+                <Trash2 className="mr-1.5 h-3 w-3" />
+                Löschen ({selectedRows.length})
+              </Button>
+            }
+            title={`${selectedRows.length} QR-Code(s) löschen?`}
+            description="Alle ausgewählten QR-Codes werden unwiderruflich gelöscht. Zugehörige Scan-Daten gehen verloren."
+            confirmLabel="Endgültig löschen"
+            onConfirm={async () => {
+              for (const qr of selectedRows) {
+                await deleteQrCode(qr.id).catch(() => {});
+              }
+              toast.success(`${selectedRows.length} QR-Code(s) gelöscht`);
+              clearSelection();
             }}
-          >
-            <Trash2 className="mr-1.5 h-3 w-3" />
-            Löschen
-          </Button>
+          />
         </>
       )}
     />

@@ -136,6 +136,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  :focus-visible {
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "cv11", "ss01";

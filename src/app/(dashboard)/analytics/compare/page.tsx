@@ -1,11 +1,11 @@
-import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import { ChartSkeleton } from '@/components/shared/loading-skeleton';
-
-const CompareClient = dynamic(() => import('./compare-client').then((m) => m.CompareClient), {
-  ssr: false,
-  loading: () => <ChartSkeleton />,
-});
+import { CompareClient } from './compare-client';
 
 export default function ComparePage() {
-  return <CompareClient />;
+  return (
+    <Suspense fallback={<ChartSkeleton />}>
+      <CompareClient />
+    </Suspense>
+  );
 }

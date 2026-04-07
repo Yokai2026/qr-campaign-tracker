@@ -253,6 +253,7 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
                     size="icon-sm"
                     onClick={() => copyToClipboard(shortLink)}
                     aria-label="Kurzlink kopieren"
+                    title="Kurzlink kopieren"
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
