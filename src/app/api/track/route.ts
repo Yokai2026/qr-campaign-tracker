@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
 import { trackEventSchema } from '@/lib/validations';
-import { hashIp, parseDevice, getClientIp } from '@/lib/tracking/events';
+import { hashIp, getClientIp } from '@/lib/tracking/events';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { normalizeReferrer, sanitizeUrl, parseUserAgentMinimal, sanitizeMetadata } from '@/lib/privacy';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid event data', details: parsed.error.issues },
+        { error: 'Invalid event data' },
         { status: 400, headers: corsHeaders }
       );
     }
@@ -43,7 +44,8 @@ export async function POST(request: NextRequest) {
     const supabase = await createServiceClient();
 
     const userAgent = request.headers.get('user-agent') || '';
-    const referrer = request.headers.get('referer') || null;
+    const rawReferrer = request.headers.get('referer') || null;
+    const ua = parseUserAgentMinimal(userAgent);
 
     // Resolve QR code context if qr_code_id is provided
     let placementId = event.placement_id || null;
@@ -69,11 +71,13 @@ export async function POST(request: NextRequest) {
       placement_id: placementId,
       campaign_id: campaignId,
       session_id: event.session_id || null,
-      page_url: event.page_url || null,
-      metadata: event.metadata || null,
-      referrer,
-      user_agent: userAgent,
-      device_type: parseDevice(userAgent),
+      page_url: sanitizeUrl(event.page_url || null),
+      metadata: sanitizeMetadata(event.metadata),
+      referrer: normalizeReferrer(rawReferrer),
+      user_agent: null,
+      device_type: ua.device_type,
+      browser_family: ua.browser_family,
+      os_family: ua.os_family,
       ip_hash: hashIp(ip),
     });
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
-import { hashIp, parseDevice, getClientIp, isBot, resolveCountry } from '@/lib/tracking/events';
+import { hashIp, getClientIp, isBot, resolveCountry } from '@/lib/tracking/events';
+import { normalizeReferrer, sanitizeUrl, parseUserAgentMinimal } from '@/lib/privacy';
 import { buildTargetUrlWithUtm } from '@/lib/qr/generate';
 import { isUrlSafe } from '@/lib/validations';
 import { checkRateLimit } from '@/lib/rate-limit';
@@ -38,8 +39,8 @@ export async function GET(
   const supabase = await createServiceClient();
 
   const userAgent = request.headers.get('user-agent') || '';
-  const referrer = request.headers.get('referer') || null;
-  const deviceType = parseDevice(userAgent);
+  const rawReferrer = request.headers.get('referer') || null;
+  const ua = parseUserAgentMinimal(userAgent);
   const country = await resolveCountry(request.headers, ip);
   const botDetected = isBot(userAgent);
 
@@ -60,7 +61,7 @@ export async function GET(
 
   if (qr) {
     return handleQrRedirect(supabase, qr, {
-      code, userAgent, referrer, ipHash, deviceType, country, botDetected,
+      code, userAgent, referrer: normalizeReferrer(rawReferrer), ipHash, deviceType: ua.device_type, browserFamily: ua.browser_family, osFamily: ua.os_family, country, botDetected,
     });
   }
 
@@ -75,7 +76,7 @@ export async function GET(
 
   if (link) {
     return handleLinkRedirect(supabase, link, {
-      code, userAgent, referrer, ipHash, deviceType, country, botDetected,
+      code, userAgent, referrer: normalizeReferrer(rawReferrer), ipHash, deviceType: ua.device_type, browserFamily: ua.browser_family, osFamily: ua.os_family, country, botDetected,
     });
   }
 
@@ -97,6 +98,8 @@ type TrackingContext = {
   referrer: string | null;
   ipHash: string;
   deviceType: string;
+  browserFamily: string;
+  osFamily: string;
   country: string | null;
   botDetected: boolean;
 };
@@ -120,8 +123,10 @@ async function handleQrRedirect(
     campaign_id: campaignId,
     short_code: ctx.code,
     referrer: ctx.referrer,
-    user_agent: ctx.userAgent,
+    user_agent: null,
     device_type: ctx.deviceType,
+    browser_family: ctx.browserFamily,
+    os_family: ctx.osFamily,
     ip_hash: ctx.ipHash,
     country: ctx.country,
     is_bot: ctx.botDetected,
@@ -198,7 +203,7 @@ async function handleQrRedirect(
   targetUrl = url.toString();
 
   await supabase.from('redirect_events').insert({
-    ...baseEvent, event_type: 'qr_open', destination_url: targetUrl,
+    ...baseEvent, event_type: 'qr_open', destination_url: sanitizeUrl(targetUrl),
   });
 
   return NextResponse.redirect(targetUrl, 302);
@@ -217,8 +222,10 @@ async function handleLinkRedirect(
     campaign_id: link.campaign_id as string | null,
     short_code: ctx.code,
     referrer: ctx.referrer,
-    user_agent: ctx.userAgent,
+    user_agent: null,
     device_type: ctx.deviceType,
+    browser_family: ctx.browserFamily,
+    os_family: ctx.osFamily,
     ip_hash: ctx.ipHash,
     country: ctx.country,
     is_bot: ctx.botDetected,
@@ -269,7 +276,7 @@ async function handleLinkRedirect(
   targetUrl = url.toString();
 
   await supabase.from('redirect_events').insert({
-    ...baseEvent, event_type: 'link_open', destination_url: targetUrl,
+    ...baseEvent, event_type: 'link_open', destination_url: sanitizeUrl(targetUrl),
   });
 
   return NextResponse.redirect(targetUrl, 302);

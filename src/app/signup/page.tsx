@@ -48,7 +48,7 @@ export default function SignupPage() {
     });
 
     if (error) {
-      setError(error.message);
+      setError('Registrierung fehlgeschlagen. Bitte prüfe deine Eingaben.');
       setLoading(false);
       return;
     }
@@ -106,11 +106,11 @@ export default function SignupPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Mindestens 6 Zeichen"
+                  placeholder="Mindestens 10 Zeichen"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="h-9 text-[13px]"
-                  minLength={6}
+                  minLength={10}
                   required
                 />
               </div>

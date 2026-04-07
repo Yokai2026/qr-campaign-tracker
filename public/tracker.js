@@ -32,11 +32,22 @@
   // Simple session ID (per-tab)
   var sessionId = 'ses_' + Math.random().toString(36).substr(2, 12);
 
+  // Strip PII params from URL before sending
+  function sanitizePageUrl() {
+    try {
+      var url = new URL(window.location.href);
+      var pii = ['email','mail','phone','tel','name','token','auth','session','password','key','secret','fbclid','gclid','msclkid','dclid','twclid'];
+      pii.forEach(function(p) { url.searchParams.delete(p); });
+      url.hash = '';
+      return url.toString();
+    } catch(e) { return window.location.origin + window.location.pathname; }
+  }
+
   function send(eventType, metadata) {
     var payload = {
       event_type: eventType,
       session_id: sessionId,
-      page_url: window.location.href,
+      page_url: sanitizePageUrl(),
       metadata: metadata || {},
     };
     if (qrCode) payload.qr_code_id = qrCode;
