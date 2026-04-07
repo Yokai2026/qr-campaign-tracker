@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   Shield,
+  Scale,
   Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -135,6 +136,14 @@ export function Sidebar() {
         >
           <Shield className="h-[15px] w-[15px]" />
           Datenschutz
+        </Link>
+        <Link
+          href="/impressum"
+          target="_blank"
+          className="flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] text-white/30 transition-colors duration-75 hover:bg-white/[0.04] hover:text-white/50"
+        >
+          <Scale className="h-[15px] w-[15px]" />
+          Impressum
         </Link>
         <button
           onClick={handleLogout}

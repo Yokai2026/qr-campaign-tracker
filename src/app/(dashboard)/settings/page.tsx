@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { User, Shield, Code, Loader2 } from 'lucide-react';
+import { User, Shield, Code, Loader2, Trash2 } from 'lucide-react';
+import { deleteAccount } from './account-actions';
 import { ReportSchedules } from '@/components/settings/report-schedules';
 import { CustomDomains } from '@/components/settings/custom-domains';
 import { PageHeader } from '@/components/shared/page-header';
@@ -181,6 +182,68 @@ export default function SettingsPage() {
 
       {/* Report Schedules */}
       <ReportSchedules />
+
+      {/* Gefahrenzone */}
+      <Card className="border border-destructive/30">
+        <CardHeader>
+          <div className="flex items-center gap-2.5">
+            <Trash2 className="h-4 w-4 text-destructive" />
+            <div>
+              <CardTitle className="text-[14px] text-destructive">Gefahrenzone</CardTitle>
+              <CardDescription className="text-[12px]">
+                Konto und alle zugehörigen Daten unwiderruflich löschen
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-[12px] text-muted-foreground mb-3">
+            Diese Aktion löscht dein Konto, dein Profil und alle damit verbundenen Daten.
+            Anonymisierte Tracking-Daten (Scans) bleiben erhalten, da sie keinen Personenbezug haben.
+            Dieser Vorgang kann nicht rückgängig gemacht werden.
+          </p>
+          <DeleteAccountButton />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function DeleteAccountButton() {
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    setDeleting(true);
+    const result = await deleteAccount();
+    if (!result.success) {
+      toast.error(result.error || 'Fehler beim Löschen');
+      setDeleting(false);
+      setConfirming(false);
+    }
+  }
+
+  if (!confirming) {
+    return (
+      <Button variant="destructive" size="sm" onClick={() => setConfirming(true)}>
+        Konto löschen
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button variant="destructive" size="sm" disabled={deleting} onClick={handleDelete}>
+        {deleting ? (
+          <>
+            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+            Wird gelöscht...
+          </>
+        ) : 'Endgültig löschen'}
+      </Button>
+      <Button variant="outline" size="sm" onClick={() => setConfirming(false)} disabled={deleting}>
+        Abbrechen
+      </Button>
     </div>
   );
 }

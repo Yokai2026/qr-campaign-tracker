@@ -1,10 +1,26 @@
 import { createHash } from 'crypto';
 import { UAParser } from 'ua-parser-js';
 
+/**
+ * Anonymize an IP address by zeroing the last two octets (IPv4)
+ * or the last 80 bits (IPv6) before hashing.
+ * This ensures the raw IP can never be recovered from the hash.
+ */
+export function anonymizeIp(ip: string): string {
+  if (ip.includes(':')) {
+    // IPv6: keep first 48 bits (3 groups), zero the rest
+    const parts = ip.split(':');
+    return parts.slice(0, 3).join(':') + ':0:0:0:0:0';
+  }
+  // IPv4: zero the last two octets
+  const parts = ip.split('.');
+  return `${parts[0]}.${parts[1]}.0.0`;
+}
+
 export function hashIp(ip: string): string {
-  // Hash with a daily salt to anonymize while allowing same-day dedup
+  const anonymized = anonymizeIp(ip);
   const daySalt = new Date().toISOString().slice(0, 10);
-  return createHash('sha256').update(`${ip}:${daySalt}`).digest('hex').slice(0, 16);
+  return createHash('sha256').update(`${anonymized}:${daySalt}`).digest('hex').slice(0, 16);
 }
 
 export function parseDevice(userAgent: string): string {
@@ -52,13 +68,9 @@ export function isPrivateIp(ip: string): boolean {
 }
 
 /**
- * Resolve the visitor country using a fallback chain:
- * 1. CDN edge headers (Vercel, Cloudflare) — zero-latency, used in production
- * 2. Private/local IP detection — skip lookup, return null
- * 3. ip-api.com free tier — used when deploying behind non-CDN infra
- *
- * Returns an ISO 3166-1 alpha-2 code (e.g. "DE") or null when it cannot be determined.
- * Always completes within ~800ms even on API timeout.
+ * Resolve the visitor country from CDN edge headers (Vercel, Cloudflare).
+ * No external API calls — DSGVO-compliant, no third-party data transfer.
+ * Returns an ISO 3166-1 alpha-2 code (e.g. "DE") or null.
  */
 export async function resolveCountry(
   headers: Headers,
@@ -73,26 +85,7 @@ export async function resolveCountry(
     return edge.toUpperCase();
   }
 
-  // 2. Skip private/local IPs — they cannot be geolocated
-  if (isPrivateIp(ip)) return null;
-
-  // 3. Free IP geolocation fallback (no API key, 45 req/min)
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 800);
-    const res = await fetch(
-      `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,countryCode`,
-      { signal: controller.signal, cache: 'no-store' },
-    );
-    clearTimeout(timeoutId);
-    if (!res.ok) return null;
-    const data = (await res.json()) as { status?: string; countryCode?: string };
-    if (data.status === 'success' && data.countryCode && data.countryCode.length === 2) {
-      return data.countryCode.toUpperCase();
-    }
-  } catch {
-    // timeout, network error, or JSON parse — graceful degradation
-  }
-
+  // No external geolocation fallback — only CDN headers are DSGVO-compliant
+  // (no third-party data transfer without a DPA)
   return null;
 }

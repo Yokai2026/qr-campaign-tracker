@@ -28,8 +28,9 @@ export default function DatenschutzPage() {
         <section>
           <h2 className="text-[15px] font-semibold text-foreground mb-2">1. Verantwortlicher</h2>
           <p>
-            Diese Anwendung wird als internes Marketing-Tool betrieben. Für Fragen zum Datenschutz
-            wenden Sie sich bitte an den Betreiber der jeweiligen QR-Code-Kampagne.
+            Verantwortlich im Sinne der DSGVO ist der im{' '}
+            <a href="/impressum" className="underline underline-offset-2 hover:text-foreground">Impressum</a>{' '}
+            genannte Betreiber.
           </p>
         </section>
 
@@ -37,9 +38,9 @@ export default function DatenschutzPage() {
           <h2 className="text-[15px] font-semibold text-foreground mb-2">2. Welche Daten werden beim Scannen eines QR-Codes erfasst?</h2>
           <p>Beim Scannen eines QR-Codes werden folgende Daten anonymisiert verarbeitet:</p>
           <ul className="list-disc pl-5 space-y-1 mt-2">
-            <li><strong>Anonymisierter IP-Hash</strong> — Ihre IP-Adresse wird nicht gespeichert. Stattdessen wird ein täglicher Hash erzeugt, der keine Rückschlüsse auf Ihre tatsächliche IP-Adresse erlaubt. Die letzten zwei Oktette werden vor dem Hashing genullt.</li>
+            <li><strong>Anonymisierter IP-Hash</strong> — Ihre IP-Adresse wird nicht gespeichert. Die letzten zwei Oktette (IPv4) bzw. die letzten 80 Bits (IPv6) werden zunächst genullt, anschließend wird ein täglicher SHA-256-Hash erzeugt, der keine Rückschlüsse auf Ihre tatsächliche IP-Adresse erlaubt.</li>
             <li><strong>Gerätetyp</strong> — Ob Sie ein Mobilgerät, Tablet oder Desktop nutzen (abgeleitet aus dem User-Agent).</li>
-            <li><strong>Land</strong> — Das Land, aus dem der Scan erfolgt (via Server-Header, nicht GPS).</li>
+            <li><strong>Land</strong> — Das Land, aus dem der Scan erfolgt (ausschließlich via CDN-Edge-Header des Hosting-Anbieters, nicht über GPS oder externe Dienste).</li>
             <li><strong>Zeitpunkt</strong> — Datum und Uhrzeit des Scans.</li>
             <li><strong>Referrer</strong> — Die verweisende Seite, falls vorhanden.</li>
           </ul>
@@ -48,17 +49,29 @@ export default function DatenschutzPage() {
         <section>
           <h2 className="text-[15px] font-semibold text-foreground mb-2">3. Was wird NICHT erfasst</h2>
           <ul className="list-disc pl-5 space-y-1 mt-2">
-            <li>Keine Cookies — Es werden keine Tracking-Cookies gesetzt.</li>
-            <li>Keine IP-Adressen — Nur ein anonymisierter, nicht umkehrbarer Hash.</li>
+            <li>Keine Tracking-Cookies — Es werden keine Tracking- oder Werbe-Cookies gesetzt.</li>
+            <li>Keine IP-Adressen — Nur ein anonymisierter, nicht umkehrbarer Hash nach Oktett-Nullung.</li>
             <li>Kein Browser-Fingerprinting — Keine Canvas-, WebGL- oder Font-Analyse.</li>
-            <li>Keine Drittanbieter-Tracker — Kein Google Analytics, kein Facebook Pixel, keine externen Dienste.</li>
+            <li>Keine Drittanbieter-Tracker — Kein Google Analytics, kein Facebook Pixel, keine externen Analyse-Dienste.</li>
             <li>Kein GPS/Standort — Das Land wird über Server-Header ermittelt, nicht über Geräte-GPS.</li>
-            <li>Keine personenbezogenen Daten — Kein Name, keine E-Mail, keine Geräte-ID.</li>
+            <li>Keine personenbezogenen Daten der Scan-Nutzer — Kein Name, keine E-Mail, keine Geräte-ID.</li>
           </ul>
         </section>
 
         <section>
-          <h2 className="text-[15px] font-semibold text-foreground mb-2">4. Zweck der Datenverarbeitung</h2>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">4. Cookies</h2>
+          <p>
+            Diese Anwendung verwendet ausschließlich <strong>technisch notwendige Cookies</strong> für
+            die Session-Verwaltung registrierter Nutzer (Authentifizierung via Supabase Auth).
+            Diese Cookies sind für den Betrieb der Anwendung erforderlich und werden nicht für
+            Tracking-Zwecke eingesetzt. Eine Einwilligung ist hierfür gemäß § 25 Abs. 2 Nr. 2 TDDDG
+            nicht erforderlich.
+          </p>
+          <p>Beim Scannen eines QR-Codes werden <strong>keine Cookies</strong> gesetzt.</p>
+        </section>
+
+        <section>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">5. Zweck der Datenverarbeitung</h2>
           <p>
             Die anonymisierten Daten dienen ausschließlich der statistischen Auswertung von
             Offline-Marketing-Kampagnen. Dies umfasst:
@@ -72,39 +85,72 @@ export default function DatenschutzPage() {
         </section>
 
         <section>
-          <h2 className="text-[15px] font-semibold text-foreground mb-2">5. Rechtsgrundlage</h2>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">6. Rechtsgrundlage</h2>
           <p>
-            Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse).
-            Das berechtigte Interesse liegt in der Erfolgsmessung von Marketing-Maßnahmen.
+            Die Verarbeitung der anonymisierten Scan-Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
+            (berechtigtes Interesse an der Erfolgsmessung von Marketing-Maßnahmen).
             Da ausschließlich anonymisierte Daten verarbeitet werden, ist ein Personenbezug nicht herstellbar.
           </p>
+          <p>
+            Die Verarbeitung der Kontodaten registrierter Nutzer (E-Mail, Benutzername) erfolgt auf
+            Grundlage von Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).
+          </p>
         </section>
 
         <section>
-          <h2 className="text-[15px] font-semibold text-foreground mb-2">6. Speicherdauer</h2>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">7. Speicherdauer</h2>
           <p>
             Die anonymisierten Scan-Daten werden für die Dauer der jeweiligen Kampagne gespeichert,
-            maximal jedoch 24 Monate. Der tägliche Salt für die IP-Anonymisierung wird nach 24 Stunden verworfen,
+            maximal jedoch <strong>24 Monate</strong>. Ältere Daten werden automatisch gelöscht.
+            Der tägliche Salt für die IP-Anonymisierung wird nach 24 Stunden verworfen,
             sodass eine Zuordnung von Scans über Tagesgrenzen hinweg nicht möglich ist.
           </p>
-        </section>
-
-        <section>
-          <h2 className="text-[15px] font-semibold text-foreground mb-2">7. Ihre Rechte</h2>
           <p>
-            Da keine personenbezogenen Daten gespeichert werden, ist eine Auskunft, Berichtigung
-            oder Löschung individueller Datensätze technisch nicht möglich — es gibt keinen
-            Personenbezug. Sie haben dennoch das Recht, sich bei einer Aufsichtsbehörde zu beschweren.
+            Kontodaten registrierter Nutzer werden bis zur Löschung des Kontos gespeichert.
           </p>
         </section>
 
         <section>
-          <h2 className="text-[15px] font-semibold text-foreground mb-2">8. Hosting und Technik</h2>
-          <p>
-            Die Anwendung wird auf <strong>Vercel</strong> (Vercel Inc., San Francisco, USA) gehostet.
-            Die Datenbank wird von <strong>Supabase</strong> (Supabase Inc., San Francisco, USA) bereitgestellt.
-            Für beide Dienste gelten Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO
-            für die Datenübermittlung in Drittländer.
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">8. Ihre Rechte</h2>
+          <p>Sie haben folgende Rechte gemäß DSGVO:</p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li><strong>Auskunft</strong> (Art. 15) — Recht auf Auskunft über Ihre gespeicherten Daten.</li>
+            <li><strong>Berichtigung</strong> (Art. 16) — Recht auf Korrektur unrichtiger Daten.</li>
+            <li><strong>Löschung</strong> (Art. 17) — Registrierte Nutzer können ihr Konto und alle zugehörigen
+              Daten jederzeit in den Einstellungen löschen.</li>
+            <li><strong>Einschränkung</strong> (Art. 18) — Recht auf Einschränkung der Verarbeitung.</li>
+            <li><strong>Datenübertragbarkeit</strong> (Art. 20) — Recht auf Herausgabe Ihrer Daten in einem gängigen Format.</li>
+            <li><strong>Widerspruch</strong> (Art. 21) — Recht auf Widerspruch gegen die Verarbeitung.</li>
+            <li><strong>Beschwerde</strong> — Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren.</li>
+          </ul>
+          <p className="mt-2">
+            Bei anonymisierten Scan-Daten ist eine Zuordnung zu einzelnen Personen technisch nicht möglich,
+            weshalb Auskunfts- und Löschungsanfragen für diese Daten nicht umsetzbar sind.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">9. Hosting und Auftragsverarbeiter</h2>
+          <p>Wir setzen folgende Dienstleister ein:</p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li>
+              <strong>Vercel Inc.</strong> (San Francisco, USA) — Hosting der Anwendung.
+              Vercel ist unter dem EU-US Data Privacy Framework (DPF) zertifiziert.
+              Zusätzlich gelten Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO.
+            </li>
+            <li>
+              <strong>Supabase Inc.</strong> (San Francisco, USA) — Datenbank und Authentifizierung.
+              Supabase unterliegt Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO.
+            </li>
+            <li>
+              <strong>Resend Inc.</strong> (San Francisco, USA) — Versand von E-Mail-Berichten
+              an registrierte Nutzer. Die Verarbeitung erfolgt nur auf Anforderung des Nutzers
+              (Report-Scheduling). Resend unterliegt Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO.
+            </li>
+          </ul>
+          <p className="mt-2">
+            Schriftarten (Geist Sans/Mono) werden über Next.js optimiert und direkt vom
+            Hosting-Server ausgeliefert — es erfolgt kein Abruf von Google-Servern durch den Browser.
           </p>
         </section>
 
