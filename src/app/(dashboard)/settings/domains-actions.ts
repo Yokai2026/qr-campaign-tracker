@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { logAudit } from '@/lib/audit';
 import type { CustomDomain } from '@/types';
 
 // Hostname validation: letters/digits/dots/hyphens, at least one dot, no protocol/path.
@@ -73,11 +74,18 @@ export async function createCustomDomain(
 export async function deleteCustomDomain(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
-  await requireAuth();
+  const profile = await requireAuth();
   const supabase = await createClient();
 
   const { error } = await supabase.from('custom_domains').delete().eq('id', id);
   if (error) return { success: false, error: error.message };
+
+  await logAudit({
+    userId: profile.id,
+    action: 'campaign.deleted',
+    entityType: 'custom_domain',
+    entityId: id,
+  });
 
   revalidatePath('/settings');
   return { success: true };

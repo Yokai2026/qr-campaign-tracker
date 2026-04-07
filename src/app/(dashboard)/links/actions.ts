@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { shortLinkSchema, linkGroupSchema } from '@/lib/validations';
 import { revalidatePath } from 'next/cache';
+import { logAudit } from '@/lib/audit';
 import { nanoid } from 'nanoid';
 import type { ShortLink, LinkGroup } from '@/types';
 
@@ -147,11 +148,19 @@ export async function updateShortLink(
 }
 
 export async function deleteShortLink(id: string): Promise<{ success: boolean; error?: string }> {
-  await requireAuth();
+  const profile = await requireAuth();
   const supabase = await createClient();
 
   const { error } = await supabase.from('short_links').delete().eq('id', id);
   if (error) return { success: false, error: error.message };
+
+  await logAudit({
+    userId: profile.id,
+    action: 'short_link.deleted',
+    entityType: 'short_link',
+    entityId: id,
+  });
+
   revalidatePath('/links');
   return { success: true };
 }

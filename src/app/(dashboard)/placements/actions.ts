@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { placementSchema } from '@/lib/validations';
+import { logAudit } from '@/lib/audit';
 import type {
   Placement,
   PlacementInput,
@@ -193,7 +194,7 @@ export async function updatePlacement(id: string, input: Partial<PlacementInput>
  * Delete a placement by id.
  */
 export async function deletePlacement(id: string) {
-  await requireAuth();
+  const profile = await requireAuth();
   const supabase = await createServiceClient();
 
   const { error } = await supabase
@@ -204,6 +205,13 @@ export async function deletePlacement(id: string) {
   if (error) {
     throw new Error(`Platzierung konnte nicht gelöscht werden: ${error.message}`);
   }
+
+  await logAudit({
+    userId: profile.id,
+    action: 'placement.deleted',
+    entityType: 'placement',
+    entityId: id,
+  });
 
   revalidatePath('/placements');
 }
