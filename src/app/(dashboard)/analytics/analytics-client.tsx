@@ -22,6 +22,7 @@ import {
   TrendingUp, MousePointerClick, FileText, QrCode, Download, Users, FileDown, Globe,
   Link2, ArrowUpRight,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { format, subDays } from 'date-fns';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
 import { generateAnalyticsPdf } from '@/lib/pdf/generate';
@@ -262,58 +263,68 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const formRate = kpis.totalOpens > 0 ? ((kpis.formSubmits / kpis.totalOpens) * 100).toFixed(1) : '0.0';
 
   async function handleExport() {
-    const from = `${dateFrom}T00:00:00`;
-    const to = `${dateTo}T23:59:59`;
-    const eventTypes = source === 'qr' ? ['qr_open'] : source === 'link' ? ['link_open'] : ['qr_open', 'link_open'];
+    try {
+      const from = `${dateFrom}T00:00:00`;
+      const to = `${dateTo}T23:59:59`;
+      const eventTypes = source === 'qr' ? ['qr_open'] : source === 'link' ? ['link_open'] : ['qr_open', 'link_open'];
 
-    let query = supabase
-      .from('redirect_events')
-      .select('short_code, event_type, device_type, browser_family, os_family, destination_url, country, created_at, placements(name, placement_code, location:locations(venue_name, district)), campaigns:campaign_id(name)')
-      .in('event_type', eventTypes)
-      .eq('is_bot', false)
-      .gte('created_at', from)
-      .lte('created_at', to)
-      .order('created_at', { ascending: false });
+      let query = supabase
+        .from('redirect_events')
+        .select('short_code, event_type, device_type, browser_family, os_family, destination_url, country, created_at, placements(name, placement_code, location:locations(venue_name, district)), campaigns:campaign_id(name)')
+        .in('event_type', eventTypes)
+        .eq('is_bot', false)
+        .gte('created_at', from)
+        .lte('created_at', to)
+        .order('created_at', { ascending: false });
 
-    if (campaignId !== 'all') query = query.eq('campaign_id', campaignId);
-    let { data } = await query;
+      if (campaignId !== 'all') query = query.eq('campaign_id', campaignId);
+      let { data, error } = await query;
 
-    // Apply district filter client-side (matches chart logic)
-    if (district !== 'all' && data) {
-      data = data.filter((e: Record<string, unknown>) => {
-        const p = e.placements as { location: { district: string | null } | null } | null;
-        return p?.location?.district === district;
+      if (error) throw error;
+
+      // Apply district filter client-side (matches chart logic)
+      if (district !== 'all' && data) {
+        data = data.filter((e: Record<string, unknown>) => {
+          const p = e.placements as { location: { district: string | null } | null } | null;
+          return p?.location?.district === district;
+        });
+      }
+      if (!data || data.length === 0) {
+        toast.info('Keine Daten zum Exportieren im gewählten Zeitraum');
+        return;
+      }
+
+      const rows = data.map((e: Record<string, unknown>) => {
+        const p = e.placements as { name: string; placement_code: string; location: { venue_name: string; district: string | null } | null } | null;
+        const c = e.campaigns as { name: string } | null;
+        return {
+          datum: (e.created_at as string).slice(0, 19),
+          short_code: e.short_code, event: e.event_type,
+          kampagne: c?.name || '', platzierung: p?.name || '',
+          code: p?.placement_code || '', standort: p?.location?.venue_name || '',
+          bezirk: p?.location?.district || '', land: e.country || '', geraet: e.device_type || '',
+          browser: e.browser_family || '', betriebssystem: e.os_family || '',
+          ziel_url: e.destination_url || '',
+        };
       });
+
+      const headers = Object.keys(rows[0]);
+      const csv = [
+        headers.join(';'),
+        ...rows.map((r) => headers.map((h) => `"${(String((r as Record<string, unknown>)[h] ?? '')).replace(/"/g, '""')}"`).join(';')),
+      ].join('\n');
+
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analytics-${dateFrom}-${dateTo}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(`${rows.length} Einträge exportiert`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Export fehlgeschlagen');
     }
-    if (!data || data.length === 0) return;
-
-    const rows = data.map((e: Record<string, unknown>) => {
-      const p = e.placements as { name: string; placement_code: string; location: { venue_name: string; district: string | null } | null } | null;
-      const c = e.campaigns as { name: string } | null;
-      return {
-        datum: (e.created_at as string).slice(0, 19),
-        short_code: e.short_code, event: e.event_type,
-        kampagne: c?.name || '', platzierung: p?.name || '',
-        code: p?.placement_code || '', standort: p?.location?.venue_name || '',
-        bezirk: p?.location?.district || '', land: e.country || '', geraet: e.device_type || '',
-        browser: e.browser_family || '', betriebssystem: e.os_family || '',
-        ziel_url: e.destination_url || '',
-      };
-    });
-
-    const headers = Object.keys(rows[0]);
-    const csv = [
-      headers.join(';'),
-      ...rows.map((r) => headers.map((h) => `"${(String((r as Record<string, unknown>)[h] ?? '')).replace(/"/g, '""')}"`).join(';')),
-    ].join('\n');
-
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `analytics-${dateFrom}-${dateTo}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
   }
 
   return (
@@ -456,51 +467,57 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 label="Eindeutige Besucher"
                 value={kpis.uniqueScans}
                 icon={Users}
-                subtext={kpis.totalOpens ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% der Aufrufe` : 'Noch keine Daten'}
-                hint="Anzahl unterschiedlicher Personen (anonymisiert über IP-Hash). Echte Reichweite."
+                subtext={
+                  kpis.uniqueScans > 0
+                    ? `${((kpis.uniqueScans / kpis.totalOpens) * 100).toFixed(0)}% der Aufrufe`
+                    : kpis.totalOpens > 0
+                      ? 'Wird in Produktion erfasst'
+                      : 'Noch keine Daten'
+                }
+                hint="Verschiedene Besucher, erkannt über anonymisierten IP-Hash. Funktioniert erst mit echtem Traffic in Produktion (nicht lokal)."
               />
             </div>
           </section>
 
-          {/* Engagement — was passiert nach dem Aufruf */}
+          {/* Engagement — nur anzeigen wenn Landing-Page-Tracking aktiv */}
+          {(kpis.ctaClicks > 0 || kpis.formSubmits > 0) && (
+            <section className="space-y-3">
+              <div>
+                <h2 className="text-[13px] font-semibold tracking-tight">Engagement</h2>
+                <p className="text-[12px] text-muted-foreground">Was die Besucher auf der Zielseite tun</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
+                <KPIStatCard
+                  label="CTA-Klicks"
+                  value={kpis.ctaClicks}
+                  icon={MousePointerClick}
+                  subtext="Klicks auf der Zielseite"
+                  hint="Klicks auf Buttons/Links auf deiner Zielseite (via Tracking-Script)."
+                />
+                <KPIStatCard
+                  label="Formular-Abschlüsse"
+                  value={kpis.formSubmits}
+                  icon={FileText}
+                  subtext={kpis.formSubmits ? `${formRate}% der Besucher` : 'Noch keine Abschlüsse'}
+                  hint="Gesendete Formulare auf der Zielseite (z. B. Anmeldungen, Kontakte)."
+                />
+                <KPIStatCard
+                  label="Conversion-Rate"
+                  value={`${conversionRate}%`}
+                  icon={ArrowUpRight}
+                  subtext="CTA-Klicks ÷ Aufrufe"
+                  hint="Anteil der Aufrufe, die zu einer CTA-Aktion geführt haben."
+                />
+              </div>
+            </section>
+          )}
+
+          {/* Analyse — Charts */}
           <section className="space-y-3">
             <div>
-              <h2 className="text-[13px] font-semibold tracking-tight">Engagement</h2>
-              <p className="text-[12px] text-muted-foreground">Was die Besucher nach dem Aufruf tun</p>
+              <h2 className="text-[13px] font-semibold tracking-tight">Analyse</h2>
+              <p className="text-[12px] text-muted-foreground">Zeitverlauf, Kampagnen und Geräteverteilung</p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
-              <KPIStatCard
-                label="Aktive QR-Codes"
-                value={kpis.uniqueQrCodes}
-                icon={QrCode}
-                subtext={kpis.uniqueQrCodes ? 'Mit mind. 1 Scan' : 'Noch keine Aktivität'}
-                hint="QR-Codes, die im Zeitraum mindestens einmal gescannt wurden."
-              />
-              <KPIStatCard
-                label="CTA-Klicks"
-                value={kpis.ctaClicks}
-                icon={MousePointerClick}
-                subtext={kpis.ctaClicks ? 'Auf der Zielseite' : 'Noch keine Klicks'}
-                hint="Klicks auf Buttons/Links auf deiner Zielseite (benötigt eingebundenes Tracking-Script)."
-              />
-              <KPIStatCard
-                label="Formular-Abschlüsse"
-                value={kpis.formSubmits}
-                icon={FileText}
-                subtext={kpis.formSubmits ? `${formRate}% der Besucher` : 'Noch keine Abschlüsse'}
-                hint="Gesendete Formulare auf der Zielseite (z. B. Anmeldungen, Kontakte)."
-              />
-              <KPIStatCard
-                label="Conversion-Rate"
-                value={`${conversionRate}%`}
-                icon={ArrowUpRight}
-                subtext={kpis.ctaClicks ? 'CTA-Klicks ÷ Aufrufe' : 'Noch keine Daten'}
-                hint="Anteil der Aufrufe, die zu einer CTA-Aktion geführt haben. Zeigt wie gut deine Landing Page konvertiert."
-              />
-            </div>
-          </section>
-
-          {/* Charts */}
           <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard title="QR-Scans & Link-Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
               <ResponsiveContainer width="100%" height={280}>
@@ -523,11 +540,11 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Scans pro Kampagne" empty={campaignData.length === 0}>
+            <ChartCard title="Aufrufe pro Kampagne" empty={campaignData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={campaignData} layout="vertical">
                   <CartesianGrid {...GRID_STYLE} />
-                  <XAxis type="number" {...AXIS_STYLE} />
+                  <XAxis type="number" {...AXIS_STYLE} allowDecimals={false} />
                   <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={120} />
                   <Tooltip
                     contentStyle={{
@@ -537,7 +554,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                       boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
                     }}
                   />
-                  <Bar dataKey="opens" name="Scans" fill={SERIES_COLORS.scans} radius={[0, 3, 3, 0]} />
+                  <Bar dataKey="opens" name="Aufrufe" fill={SERIES_COLORS.scans} radius={[0, 3, 3, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -563,8 +580,14 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               </ResponsiveContainer>
             </ChartCard>
           </div>
+          </section>
 
-          {/* Browser & OS Breakdown */}
+          {/* Technik — Browser & Betriebssystem */}
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-[13px] font-semibold tracking-tight">Technik</h2>
+              <p className="text-[12px] text-muted-foreground">Welche Browser und Betriebssysteme deine Besucher nutzen</p>
+            </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard title="Browser" empty={browserData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
@@ -594,6 +617,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               </ResponsiveContainer>
             </ChartCard>
           </div>
+          </section>
 
           {/* Geo: Scans by Country */}
           {(countryData.length > 0 || unknownCountryCount > 0) && (
