@@ -106,12 +106,12 @@ export function LinkDetail({ link }: Props) {
     : `/r/${link.short_code}`;
 
   const isDirect = link.link_mode === 'direct';
-  const displayUrl = isDirect ? link.target_url : shortUrl;
 
   function handleCopy() {
-    navigator.clipboard.writeText(displayUrl);
+    // Always copy the tracking link — tracking only works via /r/CODE
+    navigator.clipboard.writeText(shortUrl);
     setCopied(true);
-    toast.success('Link kopiert');
+    toast.success('Tracking-Link kopiert');
     setTimeout(() => setCopied(false), 2000);
   }
 
@@ -291,7 +291,7 @@ export function LinkDetail({ link }: Props) {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-[14px] font-medium truncate">{displayUrl}</span>
+                <span className="text-[14px] font-medium truncate">{isDirect ? link.target_url : shortUrl}</span>
                 <button
                   onClick={handleCopy}
                   className="rounded p-1 text-muted-foreground hover:text-foreground transition-colors"

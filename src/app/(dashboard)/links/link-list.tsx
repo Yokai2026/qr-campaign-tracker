@@ -83,12 +83,11 @@ export function LinkList({ links, groups }: LinkListProps) {
   const hasActiveFilter = groupFilter !== 'all' || campaignFilter !== 'all';
 
   function handleCopy(link: ShortLink) {
-    const url = link.link_mode === 'direct'
-      ? link.target_url
-      : `${window.location.origin}/r/${link.short_code}`;
+    // Always copy the tracking link — tracking only works via /r/CODE
+    const url = `${window.location.origin}/r/${link.short_code}`;
     navigator.clipboard.writeText(url);
     setCopiedId(link.id);
-    toast.success('Link kopiert');
+    toast.success('Tracking-Link kopiert');
     setTimeout(() => setCopiedId(null), 2000);
   }
 
