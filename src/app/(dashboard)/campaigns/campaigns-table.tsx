@@ -98,9 +98,10 @@ const columns: ColumnDef<CampaignWithTagCount>[] = [
           variant="outline"
           size="xs"
           render={<Link href={`/campaigns/${row.original.id}`} />}
+          title="Bearbeiten"
         >
-          <Pencil className="mr-1 h-3 w-3" />
-          Bearbeiten
+          <Pencil className="h-3 w-3 sm:mr-1" />
+          <span className="hidden sm:inline">Bearbeiten</span>
         </Button>
         <DeleteCampaignButton
           campaignId={row.original.id}

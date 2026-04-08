@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { unstable_noStore as noStore } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
@@ -25,9 +26,11 @@ export default async function AnalyticsPage() {
   const uniqueDistricts = [...new Set((districts || []).map((d: { district: string }) => d.district).filter(Boolean))];
 
   return (
-    <AnalyticsClient
-      campaigns={campaigns || []}
-      districts={uniqueDistricts as string[]}
-    />
+    <Suspense fallback={<PageSkeleton />}>
+      <AnalyticsClient
+        campaigns={campaigns || []}
+        districts={uniqueDistricts as string[]}
+      />
+    </Suspense>
   );
 }

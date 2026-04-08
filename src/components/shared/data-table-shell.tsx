@@ -9,7 +9,7 @@ export function DataTableShell({ children, className }: DataTableShellProps) {
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-lg border border-border bg-card',
+        'overflow-x-auto rounded-lg border border-border bg-card',
         className,
       )}
     >

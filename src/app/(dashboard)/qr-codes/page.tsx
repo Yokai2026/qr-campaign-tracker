@@ -14,14 +14,16 @@ export default function QrCodesPage() {
         title="QR-Codes"
         description="Verwalte deine QR-Codes und deren Weiterleitungen"
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button size="sm" variant="outline" render={<Link href="/qr-codes/bulk" />}>
               <Upload className="mr-1.5 h-3.5 w-3.5" />
-              Bulk-Import
+              <span className="hidden sm:inline">Bulk-Import</span>
+              <span className="sm:hidden">Bulk</span>
             </Button>
             <Button size="sm" render={<Link href="/qr-codes/new" />}>
               <Plus className="mr-1.5 h-3.5 w-3.5" />
-              Neuer QR-Code
+              <span className="hidden sm:inline">Neuer QR-Code</span>
+              <span className="sm:hidden">Neu</span>
             </Button>
           </div>
         }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -63,13 +64,27 @@ type SourceFilter = 'all' | 'qr' | 'link';
 export function AnalyticsClient({ campaigns, districts }: Props) {
   const supabase = createClient();
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const [dateFrom, setDateFrom] = useState(format(subDays(new Date(), 30), 'yyyy-MM-dd'));
-  const [dateTo, setDateTo] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [campaignId, setCampaignId] = useState<string>('all');
-  const [district, setDistrict] = useState<string>('all');
-  const [source, setSource] = useState<SourceFilter>('all');
+  const [dateFrom, setDateFrom] = useState(searchParams.get('from') || format(subDays(new Date(), 30), 'yyyy-MM-dd'));
+  const [dateTo, setDateTo] = useState(searchParams.get('to') || format(new Date(), 'yyyy-MM-dd'));
+  const [campaignId, setCampaignId] = useState<string>(searchParams.get('campaign') || 'all');
+  const [district, setDistrict] = useState<string>(searchParams.get('district') || 'all');
+  const [source, setSource] = useState<SourceFilter>((searchParams.get('source') as SourceFilter) || 'all');
   const [isLive, setIsLive] = useState(false);
+
+  // Sync filters → URL (dates always included, 'all' values omitted)
+  useEffect(() => {
+    const params = new URLSearchParams();
+    params.set('from', dateFrom);
+    params.set('to', dateTo);
+    if (campaignId !== 'all') params.set('campaign', campaignId);
+    if (district !== 'all') params.set('district', district);
+    if (source !== 'all') params.set('source', source);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [dateFrom, dateTo, campaignId, district, source, pathname, router]);
 
   // Realtime: invalidate analytics on new events
   const invalidateAnalytics = useCallback(() => {
@@ -342,10 +357,11 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           </span>
         ) : undefined}
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button variant="outline" size="sm" render={<a href="/analytics/compare" />}>
               <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
-              A/B Vergleich
+              <span className="hidden sm:inline">A/B Vergleich</span>
+              <span className="sm:hidden">A/B</span>
             </Button>
             <Button
               variant="outline"
@@ -357,11 +373,13 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               }}
             >
               <FileDown className="mr-1.5 h-3.5 w-3.5" />
-              PDF Bericht
+              <span className="hidden sm:inline">PDF Bericht</span>
+              <span className="sm:hidden">PDF</span>
             </Button>
             <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="mr-1.5 h-3.5 w-3.5" />
-              CSV Export
+              <span className="hidden sm:inline">CSV Export</span>
+              <span className="sm:hidden">CSV</span>
             </Button>
           </div>
         }
@@ -548,7 +566,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 <BarChart data={campaignData} layout="vertical">
                   <CartesianGrid {...GRID_STYLE} />
                   <XAxis type="number" {...AXIS_STYLE} allowDecimals={false} />
-                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={120} />
+                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={80} />
                   <Tooltip
                     contentStyle={{
                       fontSize: 12,
@@ -565,7 +583,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <ChartCard title="Gerätetypen" empty={deviceData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={deviceData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={{ fontSize: 11 }} strokeWidth={1}>
+                  <Pie data={deviceData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={false} strokeWidth={1}>
                     {deviceData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
@@ -595,7 +613,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <ChartCard title="Browser" empty={browserData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={browserData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={{ fontSize: 11 }} strokeWidth={1}>
+                  <Pie data={browserData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={false} strokeWidth={1}>
                     {browserData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
@@ -609,7 +627,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <ChartCard title="Betriebssystem" empty={osData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={osData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={{ fontSize: 11 }} strokeWidth={1}>
+                  <Pie data={osData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={false} strokeWidth={1}>
                     {osData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
@@ -677,7 +695,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 <BarChart data={referrerData} layout="vertical">
                   <CartesianGrid {...GRID_STYLE} />
                   <XAxis type="number" {...AXIS_STYLE} />
-                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={140} />
+                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={100} />
                   <Tooltip
                     contentStyle={{
                       fontSize: 12,

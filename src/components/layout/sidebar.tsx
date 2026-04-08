@@ -91,20 +91,21 @@ export function Sidebar() {
     );
   }
 
-  const navContent = (
-    <>
-      {/* Brand */}
-      <div className="flex h-12 items-center gap-2 px-3">
-        <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-white/10">
-          <QrCode className="h-3 w-3 text-white/70" />
-        </div>
-        <span className="text-[13px] font-semibold tracking-tight text-white/90">
-          Spurig
-        </span>
+  const brandBlock = (
+    <div className="flex h-12 items-center gap-2 px-3">
+      <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-white/10">
+        <QrCode className="h-3 w-3 text-white/70" />
       </div>
+      <span className="text-[13px] font-semibold tracking-tight text-white/90">
+        Spurig
+      </span>
+    </div>
+  );
 
+  const navBody = (
+    <>
       {/* Search trigger */}
-      <div className="px-2 pt-1 pb-1">
+      <div className="px-2 pt-2 pb-1">
         <button
           onClick={() => {
             setMobileOpen(false);
@@ -162,12 +163,13 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile toggle */}
-      <div className="fixed left-0 top-0 z-40 flex h-12 w-full items-center border-b border-border bg-background px-4 lg:hidden">
+      <div className="fixed left-0 top-0 z-40 flex h-12 w-full items-center border-b border-border bg-background px-3 lg:hidden">
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-9 w-9 shrink-0"
           onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label={mobileOpen ? 'Menü schließen' : 'Menü öffnen'}
         >
           {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </Button>
@@ -182,24 +184,25 @@ export function Sidebar() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+          className="fixed inset-0 top-12 z-30 bg-black/60 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
-      {/* Mobile sidebar */}
+      {/* Mobile sidebar — below header, no duplicate brand */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-30 flex w-[220px] flex-col bg-[#111] transition-transform duration-200 ease-out lg:hidden',
+          'fixed top-12 bottom-0 left-0 z-30 flex w-[220px] flex-col bg-[#111] transition-transform duration-200 ease-out lg:hidden',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        {navContent}
+        {navBody}
       </aside>
 
       {/* Desktop sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-[220px] lg:flex-col lg:bg-[#111] lg:border-r lg:border-white/[0.06]">
-        {navContent}
+        {brandBlock}
+        {navBody}
       </aside>
     </>
   );
