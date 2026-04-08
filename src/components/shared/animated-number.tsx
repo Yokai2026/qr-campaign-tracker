@@ -26,12 +26,15 @@ export function AnimatedNumber({
   useEffect(() => {
     const start = prevValue.current;
     const end = value;
-    const startTime = performance.now();
 
-    if (start === end) {
+    // Skip animation for small values — rounding makes them flicker
+    if (end <= 10 || start === end) {
       setDisplay(formatFn(end));
+      prevValue.current = end;
       return;
     }
+
+    const startTime = performance.now();
 
     function tick(now: number) {
       const elapsed = now - startTime;

@@ -2,9 +2,11 @@ import { Suspense } from 'react';
 import { requireAuth } from '@/lib/auth';
 import { KPISkeleton } from '@/components/shared/loading-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PrivacyBadge } from '@/components/shared/privacy-badge';
 import { PerformanceKPIs } from './sections/performance-kpis';
 import { InventoryKPIs } from './sections/inventory-kpis';
 import { BottomLists } from './sections/bottom-lists';
+import { QrHealthCheck } from './sections/qr-health-check';
 
 function ListSkeleton() {
   return (
@@ -22,14 +24,22 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6 animate-in-card">
       {/* Header */}
-      <div>
-        <h1 className="text-lg font-semibold tracking-tight">
-          Willkommen, {profile.display_name || profile.email}
-        </h1>
-        <p className="mt-0.5 text-[13px] text-muted-foreground">
-          Übersicht deiner QR-Kampagnen
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight">
+            Willkommen, {profile.display_name || profile.email}
+          </h1>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">
+            Übersicht deiner QR-Kampagnen
+          </p>
+        </div>
+        <PrivacyBadge />
       </div>
+
+      {/* QR Health Alerts */}
+      <Suspense fallback={null}>
+        <QrHealthCheck />
+      </Suspense>
 
       {/* Performance KPIs — streamed independently */}
       <Suspense fallback={<KPISkeleton count={4} />}>

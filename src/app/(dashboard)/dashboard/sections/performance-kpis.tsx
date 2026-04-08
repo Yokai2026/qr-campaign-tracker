@@ -7,10 +7,12 @@ import {
   MapPin, ClipboardList, QrCode,
 } from 'lucide-react';
 
-/** Calculate percentage change, returns null if previous period has no data */
+/** Calculate percentage change, returns null if not meaningful */
 function calcDelta(current: number, previous: number): number | null {
+  // No data in either period — nothing to compare
   if (previous === 0 && current === 0) return null;
-  if (previous === 0) return current > 0 ? 100 : null;
+  // No data in previous period — delta is meaningless ("from nothing")
+  if (previous === 0) return null;
   return ((current - previous) / previous) * 100;
 }
 
