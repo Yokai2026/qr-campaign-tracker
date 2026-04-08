@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { resolveUsername } from './actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,10 +25,12 @@ export default function LoginPage() {
 
     let email = identifier;
 
-    // If input doesn't look like an email, resolve username to email via server action
-    // (bypasses RLS — profiles table requires authenticated role for SELECT)
+    // If input doesn't look like an email, resolve username via RPC function
+    // (SECURITY DEFINER bypasses RLS, works with anon key)
     if (!identifier.includes('@')) {
-      const resolved = await resolveUsername(identifier);
+      const { data: resolved } = await supabase.rpc('resolve_username', {
+        lookup_username: identifier,
+      });
 
       if (!resolved) {
         setError('Benutzername nicht gefunden');
