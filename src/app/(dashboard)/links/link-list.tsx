@@ -219,7 +219,7 @@ export function LinkList({ links, groups }: LinkListProps) {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger
-              render={<Button variant="ghost" size="icon" className="h-7 w-7" disabled={isPending} />}
+              render={<Button variant="ghost" size="icon" className="h-7 w-7" disabled={isPending} title="Aktionen" />}
             >
               <MoreVertical className="h-3.5 w-3.5" />
             </DropdownMenuTrigger>

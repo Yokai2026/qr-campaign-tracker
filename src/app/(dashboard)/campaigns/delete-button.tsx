@@ -45,7 +45,7 @@ export function DeleteCampaignButton({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button variant="ghost" size="icon" />}>
+      <DialogTrigger render={<Button variant="ghost" size="icon" title="Löschen" />}>
         <Trash2 className="h-4 w-4" />
         <span className="sr-only">Löschen</span>
       </DialogTrigger>

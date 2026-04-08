@@ -75,6 +75,7 @@ const columns: ColumnDef<Location>[] = [
         <Button
           variant="outline"
           size="icon-xs"
+          title="Bearbeiten"
           render={<Link href={`/locations/${row.original.id}`} />}
         >
           <Pencil className="h-3.5 w-3.5" />

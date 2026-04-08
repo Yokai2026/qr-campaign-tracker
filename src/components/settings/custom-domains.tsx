@@ -300,7 +300,7 @@ function DomainItem({
           )}
           <ConfirmDialog
             trigger={
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" disabled={isPending}>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" disabled={isPending} title="Domain entfernen">
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             }
@@ -338,6 +338,7 @@ function DomainItem({
                     variant="ghost"
                     size="icon"
                     className="h-5 w-5"
+                    title="Kopieren"
                     onClick={() => onCopyToken(domain.verification_token)}
                   >
                     <Copy className="h-3 w-3" />

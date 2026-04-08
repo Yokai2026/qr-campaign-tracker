@@ -221,6 +221,7 @@ export function LinkGroupManagement({
                             variant="ghost"
                             size="icon"
                             className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Aktionen"
                           />
                         }
                       >
