@@ -36,6 +36,25 @@ export interface Profile {
   username: string | null;
   display_name: string | null;
   role: UserRole;
+  trial_ends_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PlanTier = 'free' | 'standard' | 'pro';
+export type SubscriptionStatus = 'on_trial' | 'active' | 'past_due' | 'paused' | 'cancelled' | 'expired';
+
+export interface Subscription {
+  id: string;
+  user_id: string;
+  ls_subscription_id: string;
+  ls_customer_id: string;
+  ls_variant_id: string;
+  plan_tier: PlanTier;
+  status: SubscriptionStatus;
+  trial_ends_at: string | null;
+  current_period_end: string | null;
+  cancel_at: string | null;
   created_at: string;
   updated_at: string;
 }

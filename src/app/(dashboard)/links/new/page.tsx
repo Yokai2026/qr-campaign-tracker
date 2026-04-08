@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { Loader2, Link2, ChevronDown, ChevronUp } from 'lucide-react';
 
 import { createShortLink, getLinkGroups } from '../actions';
+import { checkFeatureAccess } from '@/lib/billing/check-access';
+import { UpgradeBanner } from '@/components/shared/upgrade-banner';
 import { createClient } from '@/lib/supabase/client';
 
 import { PageHeader } from '@/components/shared/page-header';
@@ -22,11 +24,18 @@ type Group = { id: string; name: string; color: string };
 export default function NewLinkPage() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [accessDenied, setAccessDenied] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [useCustomCode, setUseCustomCode] = useState(false);
   const [origin, setOrigin] = useState('');
+
+  useEffect(() => {
+    checkFeatureAccess('create').then(({ allowed }) => {
+      if (!allowed) setAccessDenied(true);
+    });
+  }, []);
 
   // Form state
   const [targetUrl, setTargetUrl] = useState('');
@@ -86,6 +95,15 @@ export default function NewLinkPage() {
         toast.error(result.error || 'Fehler beim Erstellen');
       }
     });
+  }
+
+  if (accessDenied) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-6">
+        <PageHeader title="Neuer Kurzlink" description="Erstelle einen trackbaren Kurzlink" breadcrumbs={[{ label: 'Kurzlinks', href: '/links' }, { label: 'Neu' }]} />
+        <UpgradeBanner description="Um neue Kurzlinks zu erstellen, benötigst du ein aktives Abo." />
+      </div>
+    );
   }
 
   return (

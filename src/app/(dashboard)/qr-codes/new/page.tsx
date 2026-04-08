@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 
 import { createQrCode, getPlacements } from '../actions';
+import { checkFeatureAccess } from '@/lib/billing/check-access';
+import { UpgradeBanner } from '@/components/shared/upgrade-banner';
 import { qrCodeSchema } from '@/lib/validations';
 import type { QrCodeInput } from '@/types';
 
@@ -85,6 +87,14 @@ type FormValues = {
 export default function NewQrCodePage() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [accessDenied, setAccessDenied] = useState(false);
+
+  // Check billing access on mount
+  useEffect(() => {
+    checkFeatureAccess('create').then(({ allowed }) => {
+      if (!allowed) setAccessDenied(true);
+    });
+  }, []);
 
   // Placement data (loaded on mount)
   const [placements, setPlacements] = useState<PlacementOption[]>([]);
@@ -191,6 +201,15 @@ export default function NewQrCodePage() {
         );
       }
     });
+  }
+
+  if (accessDenied) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Neuer QR-Code" description="Neuen QR-Code mit Weiterleitung erstellen" breadcrumbs={[{ label: 'QR-Codes', href: '/qr-codes' }, { label: 'Neu' }]} />
+        <UpgradeBanner description="Um neue QR-Codes zu erstellen, benötigst du ein aktives Abo." />
+      </div>
+    );
   }
 
   return (

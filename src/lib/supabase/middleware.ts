@@ -99,7 +99,7 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Allow public routes: redirect handler, tracking API, login, static files
-  const publicPaths = ['/r/', '/api/track', '/login', '/signup', '/api/qr/image', '/datenschutz', '/impressum'];
+  const publicPaths = ['/r/', '/api/track', '/login', '/signup', '/api/qr/image', '/api/webhooks/', '/datenschutz', '/impressum', '/pricing'];
   const isPublic = publicPaths.some((p) => path.startsWith(p));
 
   if (!user && !isPublic && path !== '/') {

@@ -12,8 +12,9 @@ import { User, Shield, Code, Loader2, Trash2, Download, ScrollText } from 'lucid
 import { deleteAccount } from './account-actions';
 import { ReportSchedules } from '@/components/settings/report-schedules';
 import { CustomDomains } from '@/components/settings/custom-domains';
+import { SubscriptionCard } from '@/components/settings/subscription-card';
 import { PageHeader } from '@/components/shared/page-header';
-import type { Profile } from '@/types';
+import type { Profile, Subscription } from '@/types';
 
 type ProfileFormValues = {
   username: string;
@@ -23,6 +24,7 @@ type ProfileFormValues = {
 export default function SettingsPage() {
   const supabase = createClient();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(false);
   const [origin, setOrigin] = useState('');
 
@@ -40,6 +42,15 @@ export default function SettingsPage() {
         setProfile(data as Profile);
         reset({ username: data.username || '', display_name: data.display_name || '' });
       }
+      // Load subscription
+      const { data: subData } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      if (subData) setSubscription(subData as Subscription);
     }
     load();
   }, [supabase, reset]);
@@ -83,6 +94,15 @@ export default function SettingsPage() {
       <PageHeader
         title="Einstellungen"
         description="Profil und Kontoeinstellungen verwalten"
+      />
+
+      <SubscriptionCard
+        subscription={subscription}
+        trialEndsAt={profile.trial_ends_at}
+        checkoutUrls={{
+          standard: `https://spurig.lemonsqueezy.com/checkout/buy/${process.env.NEXT_PUBLIC_LS_STANDARD_VARIANT || 'standard'}?checkout[custom][user_id]=${profile.id}&checkout[email]=${encodeURIComponent(profile.email)}`,
+          pro: `https://spurig.lemonsqueezy.com/checkout/buy/${process.env.NEXT_PUBLIC_LS_PRO_VARIANT || 'pro'}?checkout[custom][user_id]=${profile.id}&checkout[email]=${encodeURIComponent(profile.email)}`,
+        }}
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
