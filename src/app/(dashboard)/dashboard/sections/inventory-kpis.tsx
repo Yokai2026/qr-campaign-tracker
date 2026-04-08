@@ -34,6 +34,7 @@ export async function InventoryKPIs() {
             icon={Megaphone}
             hint="Eine Kampagne bündelt alle Platzierungen und QR-Codes für ein Marketing-Ziel."
             className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            animate
           />
         </Link>
         <Link href="/locations" className="group">
@@ -43,6 +44,7 @@ export async function InventoryKPIs() {
             icon={MapPin}
             hint="Orte an denen deine QR-Codes aushängen (z. B. Bibliothek, Café, Jugendzentrum)."
             className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            animate
           />
         </Link>
         <Link href="/placements" className="group">
@@ -52,6 +54,7 @@ export async function InventoryKPIs() {
             icon={ClipboardList}
             hint="Einzelne Anbringungen pro Standort (z. B. Poster am Eingang, Flyer am Tresen)."
             className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            animate
           />
         </Link>
         <Link href="/qr-codes" className="group">
@@ -61,6 +64,7 @@ export async function InventoryKPIs() {
             icon={QrCode}
             hint="Jede Platzierung hat einen eigenen QR-Code mit individueller Tracking-URL."
             className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            animate
           />
         </Link>
       </div>

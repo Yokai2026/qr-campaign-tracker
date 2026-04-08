@@ -1,5 +1,6 @@
-import { type LucideIcon, Info } from 'lucide-react';
+import { type LucideIcon, Info, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AnimatedNumber } from './animated-number';
 
 type KPIStatCardProps = {
   label: string;
@@ -8,7 +9,32 @@ type KPIStatCardProps = {
   subtext?: string;
   hint?: string;
   className?: string;
+  /** Percentage change vs. previous period (e.g. 12.5 = +12.5%) */
+  delta?: number | null;
+  /** Label for the comparison period */
+  deltaLabel?: string;
+  /** Animate the number counting up */
+  animate?: boolean;
 };
+
+function DeltaBadge({ delta, label }: { delta: number; label?: string }) {
+  const isPositive = delta > 0;
+  const isNeutral = delta === 0;
+  const Icon = isNeutral ? Minus : isPositive ? TrendingUp : TrendingDown;
+  const colorClass = isNeutral
+    ? 'text-muted-foreground'
+    : isPositive
+      ? 'text-emerald-600 dark:text-emerald-400'
+      : 'text-red-600 dark:text-red-400';
+
+  return (
+    <span className={cn('inline-flex items-center gap-0.5 text-[11px] font-medium', colorClass)}>
+      <Icon className="h-3 w-3" />
+      {isPositive ? '+' : ''}{delta.toFixed(1)}%
+      {label && <span className="text-muted-foreground font-normal ml-0.5">{label}</span>}
+    </span>
+  );
+}
 
 export function KPIStatCard({
   label,
@@ -17,7 +43,12 @@ export function KPIStatCard({
   subtext,
   hint,
   className,
+  delta,
+  deltaLabel,
+  animate = false,
 }: KPIStatCardProps) {
+  const numericValue = typeof value === 'number' ? value : null;
+
   return (
     <div className={cn(
       'rounded-lg border border-border bg-card p-4 transition-all duration-150 hover:shadow-sm hover:border-border/80 cursor-pointer',
@@ -39,7 +70,16 @@ export function KPIStatCard({
         <Icon className="h-4 w-4 text-muted-foreground/50" />
       </div>
       <div className="mt-2">
-        <p className="text-2xl font-semibold tracking-tight tabular-nums">{value}</p>
+        <div className="flex items-baseline gap-2">
+          <p className="text-2xl font-semibold tracking-tight tabular-nums">
+            {animate && numericValue !== null ? (
+              <AnimatedNumber value={numericValue} />
+            ) : (
+              value
+            )}
+          </p>
+          {delta != null && <DeltaBadge delta={delta} label={deltaLabel} />}
+        </div>
         {subtext && (
           <p className="mt-1 text-[12px] text-muted-foreground">{subtext}</p>
         )}

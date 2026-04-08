@@ -7,22 +7,51 @@ import {
   MapPin, ClipboardList, QrCode,
 } from 'lucide-react';
 
+/** Calculate percentage change, returns null if previous period has no data */
+function calcDelta(current: number, previous: number): number | null {
+  if (previous === 0 && current === 0) return null;
+  if (previous === 0) return current > 0 ? 100 : null;
+  return ((current - previous) / previous) * 100;
+}
+
 export async function PerformanceKPIs() {
   noStore();
   const supabase = await createClient();
 
+  // Current period: last 7 days; Previous period: 7-14 days ago
+  const now = new Date();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 86_400_000).toISOString();
+  const fourteenDaysAgo = new Date(now.getTime() - 14 * 86_400_000).toISOString();
+
   const [
+    // All-time totals (display values)
     { count: totalOpens },
     { data: ipHashData },
     { count: ctaClicks },
     { count: linkClicks },
     { count: campaignCount },
+    // Current 7 days
+    { count: currScans7d },
+    { data: currIpHash7d },
+    { count: currLinks7d },
+    // Previous 7 days (7-14 days ago)
+    { count: prevScans7d },
+    { data: prevIpHash7d },
+    { count: prevLinks7d },
   ] = await Promise.all([
     supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'qr_open').eq('is_bot', false),
     supabase.from('redirect_events').select('ip_hash').eq('event_type', 'qr_open').eq('is_bot', false),
     supabase.from('page_events').select('*', { count: 'exact', head: true }).eq('event_type', 'cta_click'),
     supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'link_open').eq('is_bot', false),
     supabase.from('campaigns').select('*', { count: 'exact', head: true }),
+    // Current 7d
+    supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'qr_open').eq('is_bot', false).gte('created_at', sevenDaysAgo),
+    supabase.from('redirect_events').select('ip_hash').eq('event_type', 'qr_open').eq('is_bot', false).gte('created_at', sevenDaysAgo),
+    supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'link_open').eq('is_bot', false).gte('created_at', sevenDaysAgo),
+    // Previous 7d
+    supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'qr_open').eq('is_bot', false).gte('created_at', fourteenDaysAgo).lt('created_at', sevenDaysAgo),
+    supabase.from('redirect_events').select('ip_hash').eq('event_type', 'qr_open').eq('is_bot', false).gte('created_at', fourteenDaysAgo).lt('created_at', sevenDaysAgo),
+    supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'link_open').eq('is_bot', false).gte('created_at', fourteenDaysAgo).lt('created_at', sevenDaysAgo),
   ]);
 
   const uniqueScans = new Set((ipHashData || []).map((e: { ip_hash: string | null }) => e.ip_hash).filter(Boolean)).size;
@@ -30,6 +59,13 @@ export async function PerformanceKPIs() {
     ? ((ctaClicks / totalOpens) * 100).toFixed(1)
     : '0';
   const hasAnyData = (campaignCount || 0) > 0 || (totalOpens || 0) > 0;
+
+  // Delta calculations: current 7d vs previous 7d
+  const currUnique7d = new Set((currIpHash7d || []).map((e: { ip_hash: string | null }) => e.ip_hash).filter(Boolean)).size;
+  const prevUnique7d = new Set((prevIpHash7d || []).map((e: { ip_hash: string | null }) => e.ip_hash).filter(Boolean)).size;
+  const scansDelta = calcDelta(currScans7d || 0, prevScans7d || 0);
+  const uniqueDelta = calcDelta(currUnique7d, prevUnique7d);
+  const linkDelta = calcDelta(currLinks7d || 0, prevLinks7d || 0);
 
   return (
     <>
@@ -124,6 +160,9 @@ export async function PerformanceKPIs() {
               subtext={totalOpens ? `${uniqueScans} eindeutig` : 'Noch keine Scans'}
               hint="Gesamtzahl aller QR-Code-Scans über alle Platzierungen hinweg."
               className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+              animate
+              delta={scansDelta}
+              deltaLabel="vs. 7 Tage"
             />
           </Link>
           <Link href="/analytics" className="group">
@@ -134,6 +173,9 @@ export async function PerformanceKPIs() {
               subtext={totalOpens ? `${((uniqueScans / totalOpens) * 100).toFixed(0)}% der Scans` : 'Noch keine Daten'}
               hint="Anzahl unterschiedlicher Personen (anonymisiert). Zeigt echte Reichweite statt nur Klicks."
               className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+              animate
+              delta={uniqueDelta}
+              deltaLabel="vs. 7 Tage"
             />
           </Link>
           <Link href="/links" className="group">
@@ -144,6 +186,9 @@ export async function PerformanceKPIs() {
               subtext={linkClicks ? 'Gesamt' : 'Noch keine Klicks'}
               hint="Klicks auf deine Kurzlinks (z. B. für Social Media oder digitale Kanäle)."
               className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+              animate
+              delta={linkDelta}
+              deltaLabel="vs. 7 Tage"
             />
           </Link>
           <Link href="/analytics" className="group">
