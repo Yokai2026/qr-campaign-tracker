@@ -91,6 +91,7 @@ export async function createShortLink(input: Record<string, unknown>): Promise<{
       description: data.description || null,
       campaign_id: data.campaign_id || null,
       link_group_id: data.link_group_id || null,
+      link_mode: data.link_mode || 'short',
       expires_at: data.expires_at || null,
       expired_url: data.expired_url || null,
       utm_source: data.utm_source || null,

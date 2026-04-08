@@ -61,6 +61,7 @@ export const shortLinkSchema = z.object({
     .regex(/^[a-zA-Z0-9_-]+$/, 'Nur Buchstaben, Zahlen, Bindestrich und Unterstrich')
     .optional()
     .or(z.literal('')),
+  link_mode: z.enum(['short', 'direct']).optional(),
   title: z.string().max(200).optional().or(z.literal('')),
   description: z.string().max(2000).optional().or(z.literal('')),
   campaign_id: z.string().uuid().optional().or(z.literal('')),

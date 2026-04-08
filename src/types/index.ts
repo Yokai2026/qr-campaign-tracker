@@ -207,6 +207,8 @@ export interface LinkGroup {
   campaign?: Campaign;
 }
 
+export type LinkMode = 'short' | 'direct';
+
 export interface ShortLink {
   id: string;
   short_code: string;
@@ -215,6 +217,7 @@ export interface ShortLink {
   description: string | null;
   campaign_id: string | null;
   link_group_id: string | null;
+  link_mode: LinkMode;
   active: boolean;
   archived: boolean;
   expires_at: string | null;

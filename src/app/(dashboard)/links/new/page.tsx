@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Loader2, Link2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, Link2, ChevronDown, ChevronUp, Crown } from 'lucide-react';
 
 import { createShortLink, getLinkGroups } from '../actions';
 import { checkFeatureAccess } from '@/lib/billing/check-access';
@@ -11,6 +11,7 @@ import { UpgradeBanner } from '@/components/shared/upgrade-banner';
 import { UtmTemplatePicker } from '@/components/shared/utm-template-picker';
 import { getPrimaryDomainHost } from '@/app/(dashboard)/settings/domains-actions';
 import { createClient } from '@/lib/supabase/client';
+import type { LinkMode } from '@/types';
 
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
@@ -27,15 +28,18 @@ export default function NewLinkPage() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [accessDenied, setAccessDenied] = useState(false);
+  const [isPro, setIsPro] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [useCustomCode, setUseCustomCode] = useState(false);
   const [origin, setOrigin] = useState('');
+  const [linkMode, setLinkMode] = useState<LinkMode>('short');
 
   useEffect(() => {
-    checkFeatureAccess('create').then(({ allowed }) => {
+    checkFeatureAccess('create').then(({ allowed, tier }) => {
       if (!allowed) setAccessDenied(true);
+      if (tier === 'pro') setIsPro(true);
     });
   }, []);
 
@@ -82,6 +86,7 @@ export default function NewLinkPage() {
       const result = await createShortLink({
         target_url: targetUrl,
         short_code: shortCode || undefined,
+        link_mode: linkMode,
         title: title || undefined,
         description: description || undefined,
         campaign_id: campaignId || undefined,
@@ -144,6 +149,46 @@ export default function NewLinkPage() {
             />
           </div>
 
+          {/* Link-Modus Toggle — Pro only */}
+          {isPro && (
+            <div className="space-y-1.5">
+              <Label className="text-[12px] text-muted-foreground flex items-center gap-1.5">
+                Link-Modus
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                  <Crown className="h-2.5 w-2.5" />
+                  Pro
+                </span>
+              </Label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLinkMode('short')}
+                  className={`flex-1 rounded-md border px-3 py-2 text-left text-[12px] transition-colors ${
+                    linkMode === 'short'
+                      ? 'border-primary bg-primary/5 text-foreground'
+                      : 'border-border text-muted-foreground hover:border-primary/50'
+                  }`}
+                >
+                  <span className="font-medium">Kurzlink</span>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">spurig.com/r/CODE</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLinkMode('direct')}
+                  className={`flex-1 rounded-md border px-3 py-2 text-left text-[12px] transition-colors ${
+                    linkMode === 'direct'
+                      ? 'border-primary bg-primary/5 text-foreground'
+                      : 'border-border text-muted-foreground hover:border-primary/50'
+                  }`}
+                >
+                  <span className="font-medium">Original-URL</span>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Echte URL anzeigen, trotzdem tracken</p>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {linkMode === 'short' && (
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label className="text-[12px] text-muted-foreground">Kurzcode</Label>
@@ -168,6 +213,16 @@ export default function NewLinkPage() {
               />
             </div>
           </div>
+          )}
+
+          {linkMode === 'direct' && (
+            <div className="rounded-md border border-dashed border-border bg-muted/30 px-3 py-2.5">
+              <p className="text-[12px] text-muted-foreground">
+                In der Link-Liste und beim Kopieren wird die Original-URL angezeigt.
+                Das Tracking läuft weiterhin über einen internen Kurzlink.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Titel (optional)</Label>
