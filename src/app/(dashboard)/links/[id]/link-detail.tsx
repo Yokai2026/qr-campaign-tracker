@@ -105,13 +105,10 @@ export function LinkDetail({ link }: Props) {
     ? `${window.location.origin}/r/${link.short_code}`
     : `/r/${link.short_code}`;
 
-  const isDirect = link.link_mode === 'direct';
-
   function handleCopy() {
-    // Always copy the tracking link — tracking only works via /r/CODE
     navigator.clipboard.writeText(shortUrl);
     setCopied(true);
-    toast.success('Tracking-Link kopiert');
+    toast.success('Link kopiert');
     setTimeout(() => setCopied(false), 2000);
   }
 
@@ -291,7 +288,7 @@ export function LinkDetail({ link }: Props) {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-[14px] font-medium truncate">{isDirect ? link.target_url : shortUrl}</span>
+                <span className="text-[14px] font-medium truncate">{shortUrl}</span>
                 <button
                   onClick={handleCopy}
                   className="rounded p-1 text-muted-foreground hover:text-foreground transition-colors"
@@ -300,17 +297,10 @@ export function LinkDetail({ link }: Props) {
                 </button>
               </div>
               <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                {isDirect ? (
-                  <span className="flex items-center gap-1">
-                    <Link2 className="h-3 w-3" />
-                    Tracking via {shortUrl}
-                  </span>
-                ) : (
-                  <a href={link.target_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-foreground">
-                    <ExternalLink className="h-3 w-3" />
-                    {link.target_url}
-                  </a>
-                )}
+                <a href={link.target_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-foreground">
+                  <ExternalLink className="h-3 w-3" />
+                  {link.target_url}
+                </a>
               </div>
             </div>
           </div>

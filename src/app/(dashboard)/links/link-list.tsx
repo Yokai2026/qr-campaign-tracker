@@ -82,12 +82,11 @@ export function LinkList({ links, groups }: LinkListProps) {
 
   const hasActiveFilter = groupFilter !== 'all' || campaignFilter !== 'all';
 
-  function handleCopy(link: ShortLink) {
-    // Always copy the tracking link — tracking only works via /r/CODE
-    const url = `${window.location.origin}/r/${link.short_code}`;
+  function handleCopy(shortCode: string, id: string) {
+    const url = `${window.location.origin}/r/${shortCode}`;
     navigator.clipboard.writeText(url);
-    setCopiedId(link.id);
-    toast.success('Tracking-Link kopiert');
+    setCopiedId(id);
+    toast.success('Link kopiert');
     setTimeout(() => setCopiedId(null), 2000);
   }
 
@@ -116,11 +115,10 @@ export function LinkList({ links, groups }: LinkListProps) {
   const columns: ColumnDef<ShortLink>[] = [
     {
       accessorKey: 'short_code',
-      header: 'Link',
+      header: 'Kurzlink',
       cell: ({ row }) => {
         const sl = row.original;
         const isCopied = copiedId === sl.id;
-        const isDirect = sl.link_mode === 'direct';
         return (
           <div className="flex items-center gap-2">
             <Link
@@ -128,10 +126,10 @@ export function LinkList({ links, groups }: LinkListProps) {
               className="flex items-center gap-1.5 font-medium text-[13px] hover:underline"
             >
               <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
-              {isDirect ? truncateUrl(sl.target_url, 35) : `/r/${sl.short_code}`}
+              /r/{sl.short_code}
             </Link>
             <button
-              onClick={() => handleCopy(sl)}
+              onClick={() => handleCopy(sl.short_code, sl.id)}
               className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
             >
               {isCopied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
