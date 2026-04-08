@@ -28,9 +28,10 @@ export default function DatenschutzPage() {
         <section>
           <h2 className="text-[15px] font-semibold text-foreground mb-2">1. Verantwortlicher</h2>
           <p>
-            Verantwortlich im Sinne der DSGVO ist der im{' '}
-            <a href="/impressum" className="underline underline-offset-2 hover:text-foreground">Impressum</a>{' '}
-            genannte Betreiber.
+            Verantwortlich im Sinne der DSGVO:<br />
+            David da Silva Gornik<br />
+            Weitere Angaben finden Sie im{' '}
+            <a href="/impressum" className="underline underline-offset-2 hover:text-foreground">Impressum</a>.
           </p>
         </section>
 
