@@ -187,7 +187,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       // Device breakdown
       const devMap: Record<string, number> = {};
       filteredEvents.forEach((e: { device_type: string | null }) => {
-        const dev = e.device_type || 'unbekannt';
+        const rawDev = e.device_type;
+        const dev = (!rawDev || rawDev === 'unknown') ? 'Unbekannt' : rawDev;
         devMap[dev] = (devMap[dev] || 0) + 1;
       });
       const deviceData = Object.entries(devMap).map(([name, value]) => ({ name, value }));
@@ -195,7 +196,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       // Browser breakdown
       const browserMap: Record<string, number> = {};
       filteredEvents.forEach((e: { browser_family: string | null }) => {
-        const b = e.browser_family || 'unbekannt';
+        const raw = e.browser_family;
+        const b = (!raw || raw === 'unknown') ? 'Unbekannt' : raw;
         browserMap[b] = (browserMap[b] || 0) + 1;
       });
       const browserData = Object.entries(browserMap)
@@ -205,7 +207,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       // OS breakdown
       const osMap: Record<string, number> = {};
       filteredEvents.forEach((e: { os_family: string | null }) => {
-        const o = e.os_family || 'unbekannt';
+        const raw = e.os_family;
+        const o = (!raw || raw === 'unknown') ? 'Unbekannt' : raw;
         osMap[o] = (osMap[o] || 0) + 1;
       });
       const osData = Object.entries(osMap)
