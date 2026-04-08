@@ -70,7 +70,7 @@ export async function GET(
   // =========================================
   const { data: link } = await supabase
     .from('short_links')
-    .select('*')
+    .select('*, link_mode')
     .eq('short_code', code)
     .maybeSingle();
 
@@ -261,19 +261,25 @@ async function handleLinkRedirect(
     return new NextResponse('Invalid redirect target', { status: 400 });
   }
 
-  targetUrl = buildTargetUrlWithUtm(targetUrl, {
-    utm_source: (link.utm_source as string) || undefined,
-    utm_medium: (link.utm_medium as string) || 'link',
-    utm_campaign: (link.utm_campaign as string) || undefined,
-    utm_content: (link.utm_content as string) || undefined,
-    utm_id: (link.utm_id as string) || undefined,
-  });
+  const isDirect = link.link_mode === 'direct';
 
-  // Append link attribution params
-  const url = new URL(targetUrl);
-  url.searchParams.set('sl', ctx.code);
-  if (link.campaign_id) url.searchParams.set('cid', link.campaign_id as string);
-  targetUrl = url.toString();
+  if (!isDirect) {
+    // Standard mode: append UTM + attribution params to the URL
+    targetUrl = buildTargetUrlWithUtm(targetUrl, {
+      utm_source: (link.utm_source as string) || undefined,
+      utm_medium: (link.utm_medium as string) || 'link',
+      utm_campaign: (link.utm_campaign as string) || undefined,
+      utm_content: (link.utm_content as string) || undefined,
+      utm_id: (link.utm_id as string) || undefined,
+    });
+
+    const url = new URL(targetUrl);
+    url.searchParams.set('sl', ctx.code);
+    if (link.campaign_id) url.searchParams.set('cid', link.campaign_id as string);
+    targetUrl = url.toString();
+  }
+  // Direct mode: clean redirect — no tracking params on the URL.
+  // Tracking happens server-side only (redirect_events insert below).
 
   await supabase.from('redirect_events').insert({
     ...baseEvent, event_type: 'link_open', destination_url: sanitizeUrl(targetUrl),

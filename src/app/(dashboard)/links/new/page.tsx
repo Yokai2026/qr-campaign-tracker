@@ -182,7 +182,7 @@ export default function NewLinkPage() {
                   }`}
                 >
                   <span className="font-medium">Original-URL</span>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Echte URL anzeigen, trotzdem tracken</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Sauberer Redirect ohne sichtbare Parameter</p>
                 </button>
               </div>
             </div>
