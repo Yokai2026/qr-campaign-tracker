@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Globe, Trash2, Plus, Loader2, Check, Copy, Star, AlertCircle } from 'lucide-react';
+import { Globe, Trash2, Plus, Loader2, Check, Copy, Star, AlertCircle, Crown } from 'lucide-react';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { UpgradeBanner } from '@/components/shared/upgrade-banner';
+import { checkFeatureAccess } from '@/lib/billing/check-access';
 import type { CustomDomain } from '@/types';
 import {
   getCustomDomains,
@@ -25,6 +27,14 @@ export function CustomDomains() {
   const [host, setHost] = useState('');
   const [isPending, startTransition] = useTransition();
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const [accessDenied, setAccessDenied] = useState(false);
+
+  // Check billing access on mount
+  useEffect(() => {
+    checkFeatureAccess('custom_domains').then(({ allowed }) => {
+      if (!allowed) setAccessDenied(true);
+    });
+  }, []);
 
   async function loadDomains() {
     const data = await getCustomDomains();
@@ -112,6 +122,37 @@ export function CustomDomains() {
       <Card className="border border-border">
         <CardContent className="flex items-center justify-center py-8">
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (accessDenied) {
+    return (
+      <Card className="border border-border">
+        <CardHeader>
+          <div className="flex items-center gap-2.5">
+            <Globe className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <CardTitle className="text-[14px] flex items-center gap-2">
+                Eigene Kurz-Domains
+                <span className="inline-flex items-center gap-0.5 rounded bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary">
+                  <Crown className="h-2.5 w-2.5" />
+                  Pro
+                </span>
+              </CardTitle>
+              <CardDescription className="text-[12px]">
+                Verwende eine eigene Domain statt der Standard-URL für QR-Codes und Kurzlinks
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <UpgradeBanner
+            title="Pro-Feature"
+            description="Eigene Kurz-Domains sind im Pro-Plan verfügbar. Upgrade, um deine eigene Domain für QR-Codes und Kurzlinks zu nutzen."
+            requiredTier="Pro"
+          />
         </CardContent>
       </Card>
     );

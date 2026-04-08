@@ -8,6 +8,8 @@ import { Loader2, Link2, ChevronDown, ChevronUp } from 'lucide-react';
 import { createShortLink, getLinkGroups } from '../actions';
 import { checkFeatureAccess } from '@/lib/billing/check-access';
 import { UpgradeBanner } from '@/components/shared/upgrade-banner';
+import { UtmTemplatePicker } from '@/components/shared/utm-template-picker';
+import { getPrimaryDomainHost } from '@/app/(dashboard)/settings/domains-actions';
 import { createClient } from '@/lib/supabase/client';
 
 import { PageHeader } from '@/components/shared/page-header';
@@ -51,17 +53,21 @@ export default function NewLinkPage() {
   const [utmCampaign, setUtmCampaign] = useState('');
   const [utmContent, setUtmContent] = useState('');
 
+  const [customDomainHost, setCustomDomainHost] = useState<string | null>(null);
+
   useEffect(() => {
     setOrigin(window.location.origin);
     const supabase = createClient();
 
     async function load() {
-      const [campaignsRes, groupsRes] = await Promise.all([
+      const [campaignsRes, groupsRes, primaryHost] = await Promise.all([
         supabase.from('campaigns').select('id, name').order('name'),
         getLinkGroups(),
+        getPrimaryDomainHost(),
       ]);
       setCampaigns((campaignsRes.data || []) as Campaign[]);
       setGroups(groupsRes as Group[]);
+      setCustomDomainHost(primaryHost);
     }
     load();
   }, []);
@@ -151,7 +157,7 @@ export default function NewLinkPage() {
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-[13px] text-muted-foreground shrink-0">
-                {origin}/r/
+                {customDomainHost ? `https://${customDomainHost}/` : `${origin}/r/`}
               </span>
               <Input
                 placeholder="auto-generiert"
@@ -280,6 +286,16 @@ export default function NewLinkPage() {
               <p className="text-[11px] text-muted-foreground mb-3">
                 Diese Parameter werden an die Ziel-URL angehängt, damit du in Google Analytics o.ä. siehst, woher die Besucher kommen.
               </p>
+              <div className="mb-3">
+                <UtmTemplatePicker
+                  onSelect={(values) => {
+                    if (values.utm_source) setUtmSource(values.utm_source);
+                    if (values.utm_medium) setUtmMedium(values.utm_medium);
+                    if (values.utm_campaign) setUtmCampaign(values.utm_campaign);
+                    if (values.utm_content) setUtmContent(values.utm_content);
+                  }}
+                />
+              </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label className="text-[12px] text-muted-foreground">Quelle</Label>

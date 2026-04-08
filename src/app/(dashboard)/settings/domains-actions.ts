@@ -184,6 +184,25 @@ export async function setPrimaryCustomDomain(
   return { success: true };
 }
 
+/**
+ * Returns the primary verified custom domain host for the current user, or null.
+ * Lightweight — used by create forms to show the short URL prefix.
+ */
+export async function getPrimaryDomainHost(): Promise<string | null> {
+  await requireAuth();
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from('custom_domains')
+    .select('host')
+    .eq('verified', true)
+    .eq('is_primary', true)
+    .limit(1)
+    .single();
+
+  return (data as { host: string } | null)?.host ?? null;
+}
+
 export async function unsetPrimaryCustomDomain(): Promise<{ success: boolean; error?: string }> {
   await requireAuth();
   const supabase = await createClient();

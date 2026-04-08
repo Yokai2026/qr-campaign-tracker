@@ -28,27 +28,15 @@ export default function ImpressumPage() {
         <section>
           <h2 className="text-[15px] font-semibold text-foreground mb-2">Angaben gemäß § 5 DDG</h2>
           <p>
-            {/* TODO: Betreiber-Daten hier eintragen */}
-            <strong>[Vor- und Nachname / Firmenname]</strong><br />
-            [Straße und Hausnummer]<br />
-            [PLZ Ort]<br />
-            [Land]
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-[15px] font-semibold text-foreground mb-2">Kontakt</h2>
-          <p>
-            E-Mail: <a href="mailto:[deine@email.de]" className="underline underline-offset-2">[deine@email.de]</a><br />
-            {/* Telefon ist optional für Privatpersonen, aber empfohlen */}
+            <strong>David da Silva Gornik</strong><br />
+            E-Mail: <a href="mailto:kontakt@spurig.com" className="underline underline-offset-2">kontakt@spurig.com</a>
           </p>
         </section>
 
         <section>
           <h2 className="text-[15px] font-semibold text-foreground mb-2">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
           <p>
-            [Vor- und Nachname]<br />
-            [Adresse wie oben]
+            David da Silva Gornik
           </p>
         </section>
 

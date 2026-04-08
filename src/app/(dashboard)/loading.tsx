@@ -1,6 +1,6 @@
 export default function DashboardLoading() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6 animate-shimmer">
       <div>
         <div className="h-6 w-52 rounded bg-muted" />
         <div className="mt-2 h-4 w-72 rounded bg-muted/60" />

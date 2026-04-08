@@ -1,6 +1,6 @@
 export default function SettingsLoading() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6 animate-shimmer">
       <div>
         <div className="h-5 w-32 rounded bg-muted" />
         <div className="mt-1.5 h-4 w-56 rounded bg-muted/60" />

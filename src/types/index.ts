@@ -266,6 +266,44 @@ export interface ReportSchedule {
 }
 
 // ============================================
+// UTM Templates
+// ============================================
+
+export interface UtmTemplate {
+  id: string;
+  user_id: string;
+  name: string;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  utm_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================
+// Scan Alerts
+// ============================================
+
+export type AlertMetric = 'total_scans' | 'unique_visitors';
+
+export interface ScanAlert {
+  id: string;
+  user_id: string;
+  email: string;
+  campaign_id: string | null;
+  metric: AlertMetric;
+  threshold: number;
+  cooldown_hours: number;
+  active: boolean;
+  last_triggered_at: string | null;
+  created_at: string;
+  updated_at: string;
+  campaign?: Campaign;
+}
+
+// ============================================
 // Audit Log
 // ============================================
 

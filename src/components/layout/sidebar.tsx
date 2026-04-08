@@ -22,7 +22,9 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { checkFeatureAccess } from '@/lib/billing/check-access';
+import type { EffectiveTier } from '@/lib/billing/gates';
 
 const mainNav = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -43,6 +45,11 @@ export function Sidebar() {
   const router = useRouter();
   const supabase = createClient();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [tier, setTier] = useState<EffectiveTier | null>(null);
+
+  useEffect(() => {
+    checkFeatureAccess('analytics').then(({ tier: t }) => setTier(t as EffectiveTier));
+  }, []);
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -91,6 +98,14 @@ export function Sidebar() {
     );
   }
 
+  const tierLabel: Record<string, string> = {
+    free: 'Free',
+    trial: 'Trial',
+    expired: 'Trial abgelaufen',
+    standard: 'Standard',
+    pro: 'Pro',
+  };
+
   const brandBlock = (
     <div className="flex h-12 items-center gap-2 px-3">
       <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-white/10">
@@ -99,6 +114,17 @@ export function Sidebar() {
       <span className="text-[13px] font-semibold tracking-tight text-white/90">
         Spurig
       </span>
+      {tier && (
+        <span className={cn(
+          'ml-auto rounded px-1.5 py-0.5 text-[10px] font-medium',
+          tier === 'pro' ? 'bg-violet-500/20 text-violet-300' :
+          tier === 'standard' ? 'bg-blue-500/20 text-blue-300' :
+          tier === 'trial' ? 'bg-amber-500/20 text-amber-300' :
+          'bg-white/10 text-white/40'
+        )}>
+          {tierLabel[tier] ?? tier}
+        </span>
+      )}
     </div>
   );
 

@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import { User, Shield, Code, Loader2, Trash2, Download, ScrollText } from 'lucide-react';
 import { deleteAccount } from './account-actions';
 import { ReportSchedules } from '@/components/settings/report-schedules';
+import { ScanAlerts } from '@/components/settings/scan-alerts';
+import { UtmTemplates } from '@/components/settings/utm-templates';
 import { CustomDomains } from '@/components/settings/custom-domains';
 import { SubscriptionCard } from '@/components/settings/subscription-card';
 import { PageHeader } from '@/components/shared/page-header';
@@ -202,6 +204,12 @@ export default function SettingsPage() {
 
       {/* Report Schedules */}
       <ReportSchedules />
+
+      {/* Scan Alerts */}
+      <ScanAlerts />
+
+      {/* UTM Templates */}
+      <UtmTemplates />
 
       {/* Datenexport (DSGVO Art. 20) */}
       <Card className="border border-border">

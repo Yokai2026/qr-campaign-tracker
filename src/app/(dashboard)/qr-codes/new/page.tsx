@@ -18,6 +18,8 @@ import {
 import { createQrCode, getPlacements } from '../actions';
 import { checkFeatureAccess } from '@/lib/billing/check-access';
 import { UpgradeBanner } from '@/components/shared/upgrade-banner';
+import { UtmTemplatePicker } from '@/components/shared/utm-template-picker';
+import { getPrimaryDomainHost } from '@/app/(dashboard)/settings/domains-actions';
 import { qrCodeSchema } from '@/lib/validations';
 import type { QrCodeInput } from '@/types';
 
@@ -158,10 +160,14 @@ export default function NewQrCodePage() {
 
   // Preview URL — initialize empty to avoid hydration mismatch
   const [baseUrl, setBaseUrl] = useState('');
+  const [customDomainHost, setCustomDomainHost] = useState<string | null>(null);
   useEffect(() => {
     setBaseUrl(window.location.origin);
+    getPrimaryDomainHost().then(setCustomDomainHost);
   }, []);
-  const previewShortUrl = baseUrl ? `${baseUrl}/r/<short-code>` : '';
+  const previewShortUrl = customDomainHost
+    ? `https://${customDomainHost}/<short-code>`
+    : baseUrl ? `${baseUrl}/r/<short-code>` : '';
 
   function onSubmit(data: FormValues) {
     const input: QrCodeInput = {
@@ -375,6 +381,15 @@ export default function NewQrCodePage() {
           </CardHeader>
           {showUtm && (
             <CardContent className="space-y-4">
+              <UtmTemplatePicker
+                onSelect={(values) => {
+                  if (values.utm_source) setValue('utm_source', values.utm_source);
+                  if (values.utm_medium) setValue('utm_medium', values.utm_medium);
+                  if (values.utm_campaign) setValue('utm_campaign', values.utm_campaign);
+                  if (values.utm_content) setValue('utm_content', values.utm_content);
+                  if (values.utm_id) setValue('utm_id', values.utm_id);
+                }}
+              />
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="utm_source">Quelle</Label>

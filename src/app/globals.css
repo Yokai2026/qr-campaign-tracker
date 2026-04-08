@@ -161,6 +161,30 @@
     animation: fadeIn 0.25s ease-out both;
   }
 
+  /* Skeleton shimmer — replaces animate-pulse for loading states.
+     Works both as a wrapper (.animate-shimmer > bg-muted children)
+     and directly on a single element (.animate-shimmer.bg-muted). */
+  .animate-shimmer[class*="bg-muted"],
+  .animate-shimmer [class*="bg-muted"] {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      oklch(0.92 0.003 285 / 60%) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+  .dark .animate-shimmer[class*="bg-muted"],
+  .dark .animate-shimmer [class*="bg-muted"] {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      oklch(0.25 0.005 285 / 40%) 50%,
+      transparent 100%
+    );
+  }
+
   /* Staggered entrance for child elements */
   .stagger-children > * {
     animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -187,5 +211,14 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }

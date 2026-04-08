@@ -1,6 +1,6 @@
 export default function CampaignsLoading() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6 animate-shimmer">
       <div className="flex items-start justify-between">
         <div>
           <div className="h-5 w-32 rounded bg-muted" />
