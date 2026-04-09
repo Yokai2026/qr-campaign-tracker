@@ -27,9 +27,11 @@ import { toast } from 'sonner';
 import { format, subDays } from 'date-fns';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
 import { generateAnalyticsPdf } from '@/lib/pdf/generate';
+import { generateForecast } from '@/lib/forecast';
 import { CountryChart } from '@/components/shared/country-chart';
 import { WorldMap } from '@/components/shared/world-map';
 import { PageHeader } from '@/components/shared/page-header';
+import { ChartTransition, StaggerContainer, StaggerItem } from '@/components/shared/chart-transition';
 
 type Props = {
   campaigns: { id: string; name: string }[];
@@ -277,8 +279,26 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const unknownCountryCount = data?.unknownCountryCount ?? 0;
   const referrerData = data?.referrerData ?? [];
 
+  // Forecast: combine QR + Link into total, then predict 7 days
+  const forecastData = generateForecast(
+    timeSeriesData.map((d) => ({ date: d.date, value: d.qr + d.link })),
+    7,
+  );
+  // Merge forecast back with QR/Link split for combined chart
+  const timeSeriesWithForecast = forecastData.map((f) => {
+    const original = timeSeriesData.find((d) => d.date === f.date);
+    return {
+      date: f.date,
+      qr: original?.qr ?? null,
+      link: original?.link ?? null,
+      forecast: f.forecast,
+    };
+  });
+
   const conversionRate = kpis.totalOpens > 0 ? ((kpis.ctaClicks / kpis.totalOpens) * 100).toFixed(1) : '0.0';
   const formRate = kpis.totalOpens > 0 ? ((kpis.formSubmits / kpis.totalOpens) * 100).toFixed(1) : '0.0';
+
+  const chartTransitionKey = `${dateFrom}-${dateTo}-${campaignId}-${district}-${source}`;
 
   async function handleExport() {
     try {
@@ -539,10 +559,11 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               <h2 className="text-[13px] font-semibold tracking-tight">Analyse</h2>
               <p className="text-[12px] text-muted-foreground">Zeitverlauf, Kampagnen und Geräteverteilung</p>
             </div>
+          <ChartTransition transitionKey={chartTransitionKey}>
           <div className="grid gap-4 lg:grid-cols-2">
-            <ChartCard title="QR-Scans & Link-Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
+            <ChartCard title="QR-Scans & Link-Klicks ueber Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewaehlten Zeitraum" className="lg:col-span-2">
               <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={timeSeriesData}>
+                <LineChart data={timeSeriesWithForecast}>
                   <CartesianGrid {...GRID_STYLE} />
                   <XAxis dataKey="date" {...AXIS_STYLE} />
                   <YAxis {...AXIS_STYLE} allowDecimals={false} />
@@ -555,8 +576,9 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} />
-                  <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={1.5} dot={false} />
+                  <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} connectNulls={false} />
+                  <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={1.5} dot={false} connectNulls={false} />
+                  <Line type="monotone" dataKey="forecast" name="Prognose" stroke={SERIES_COLORS.scans} strokeWidth={1.5} strokeDasharray="6 3" dot={false} connectNulls={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -601,6 +623,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               </ResponsiveContainer>
             </ChartCard>
           </div>
+          </ChartTransition>
           </section>
 
           {/* Technik — Browser & Betriebssystem */}

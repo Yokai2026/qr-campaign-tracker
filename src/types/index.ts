@@ -47,9 +47,9 @@ export type SubscriptionStatus = 'on_trial' | 'active' | 'past_due' | 'paused' |
 export interface Subscription {
   id: string;
   user_id: string;
-  ls_subscription_id: string;
-  ls_customer_id: string;
-  ls_variant_id: string;
+  stripe_subscription_id: string;
+  stripe_customer_id: string;
+  stripe_price_id: string;
   plan_tier: PlanTier;
   status: SubscriptionStatus;
   trial_ends_at: string | null;

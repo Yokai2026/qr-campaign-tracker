@@ -1,13 +1,15 @@
-import { getCheckoutUrl } from './lemonsqueezy';
+import { createCheckoutSession, createBillingPortalSession } from './stripe';
 
-export function getStandardCheckoutUrl(userId: string, email: string): string {
-  const variantId = process.env.LEMONSQUEEZY_STANDARD_VARIANT_ID;
-  if (!variantId) throw new Error('LEMONSQUEEZY_STANDARD_VARIANT_ID not set');
-  return getCheckoutUrl(variantId, userId, email);
+export async function getStandardCheckoutUrl(userId: string, email: string, customerId?: string): Promise<string> {
+  const priceId = process.env.STRIPE_STANDARD_PRICE_ID;
+  if (!priceId) throw new Error('STRIPE_STANDARD_PRICE_ID not set');
+  return createCheckoutSession({ priceId, userId, email, customerId });
 }
 
-export function getProCheckoutUrl(userId: string, email: string): string {
-  const variantId = process.env.LEMONSQUEEZY_PRO_VARIANT_ID;
-  if (!variantId) throw new Error('LEMONSQUEEZY_PRO_VARIANT_ID not set');
-  return getCheckoutUrl(variantId, userId, email);
+export async function getProCheckoutUrl(userId: string, email: string, customerId?: string): Promise<string> {
+  const priceId = process.env.STRIPE_PRO_PRICE_ID;
+  if (!priceId) throw new Error('STRIPE_PRO_PRICE_ID not set');
+  return createCheckoutSession({ priceId, userId, email, customerId });
 }
+
+export { createBillingPortalSession } from './stripe';

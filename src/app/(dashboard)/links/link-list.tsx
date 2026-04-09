@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useTransition } from 'react';
+import { useState, useMemo, useTransition, useEffect } from 'react';
 import Link from 'next/link';
 import { type ColumnDef } from '@tanstack/react-table';
 import {
@@ -16,6 +16,9 @@ import {
   X,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { createClient } from '@/lib/supabase/client';
+import { subDays, format } from 'date-fns';
+import { Sparkline } from '@/components/shared/sparkline';
 
 import type { ShortLink, LinkGroup } from '@/types';
 import { deleteShortLink, toggleShortLink } from './actions';
@@ -48,6 +51,42 @@ export function LinkList({ links, groups }: LinkListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [groupFilter, setGroupFilter] = useState<string>('all');
   const [campaignFilter, setCampaignFilter] = useState<string>('all');
+
+  // Sparkline data: map of short_link_id -> last 7 days click counts
+  const [sparklines, setSparklines] = useState<Record<string, number[]>>({});
+
+  useEffect(() => {
+    const supabase = createClient();
+    const days = 7;
+    const from = format(subDays(new Date(), days - 1), 'yyyy-MM-dd') + 'T00:00:00';
+
+    supabase
+      .from('redirect_events')
+      .select('short_link_id, created_at')
+      .eq('event_type', 'link_open')
+      .eq('is_bot', false)
+      .not('short_link_id', 'is', null)
+      .gte('created_at', from)
+      .then(({ data }) => {
+        if (!data) return;
+        const map: Record<string, Record<string, number>> = {};
+        for (const e of data) {
+          if (!e.short_link_id) continue;
+          if (!map[e.short_link_id]) map[e.short_link_id] = {};
+          const day = e.created_at.slice(0, 10);
+          map[e.short_link_id][day] = (map[e.short_link_id][day] || 0) + 1;
+        }
+        const result: Record<string, number[]> = {};
+        const today = new Date();
+        for (const [linkId, dayMap] of Object.entries(map)) {
+          result[linkId] = Array.from({ length: days }, (_, i) => {
+            const d = format(subDays(today, days - 1 - i), 'yyyy-MM-dd');
+            return dayMap[d] || 0;
+          });
+        }
+        setSparklines(result);
+      });
+  }, []);
 
   // Extract unique campaigns from links
   const campaigns = useMemo(() => {
@@ -191,6 +230,15 @@ export function LinkList({ links, groups }: LinkListProps) {
           {row.original.click_count.toLocaleString('de-DE')}
         </span>
       ),
+    },
+    {
+      id: 'trend',
+      header: '7-Tage',
+      cell: ({ row }) => {
+        const data = sparklines[row.original.id];
+        if (!data || data.every((v) => v === 0)) return <span className="text-muted-foreground text-xs">-</span>;
+        return <Sparkline data={data} width={56} height={20} color="oklch(0.60 0.10 165)" />;
+      },
     },
     {
       accessorKey: 'active',

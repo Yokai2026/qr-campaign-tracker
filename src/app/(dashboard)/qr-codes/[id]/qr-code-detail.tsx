@@ -34,6 +34,7 @@ import { QR_ACTION_LABELS } from '@/lib/constants';
 import type { QrCode, QrStatusHistory, RedirectRule, AbVariant } from '@/types';
 import { RedirectRulesEditor } from '@/components/redirect-rules/redirect-rules-editor';
 import { AbVariantsEditor } from '@/components/ab-testing/ab-variants-editor';
+import { AbResultsChart } from '@/components/ab-testing/ab-results-chart';
 import { QrDesignStudio } from '@/components/qr-design/qr-design-studio';
 import { PageHeader } from '@/components/shared/page-header';
 import { StatusBadge } from '@/components/shared/status-badge';
@@ -369,6 +370,12 @@ export function QrCodeDetail({ qrCode, history, redirectCount, redirectRules, ab
             variants={abVariants}
             qrCodeId={qrCode.id}
             userTier={userTier}
+          />
+
+          {/* A/B Test Results */}
+          <AbResultsChart
+            variants={abVariants}
+            qrCodeId={qrCode.id}
           />
 
           {/* QR Design Studio */}

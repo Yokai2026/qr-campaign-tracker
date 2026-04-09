@@ -3,13 +3,43 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { getStandardCheckoutUrl, getProCheckoutUrl } from '@/lib/billing/checkout';
+import { createBillingPortalSession } from '@/lib/billing/stripe';
 
 export async function getCheckoutUrls() {
   const profile = await requireAuth();
+  const supabase = await createClient();
+
+  // Check if user already has a Stripe customer ID
+  const { data: sub } = await supabase
+    .from('subscriptions')
+    .select('stripe_customer_id')
+    .eq('user_id', profile.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  const customerId = sub?.stripe_customer_id ?? undefined;
+
   return {
-    standard: getStandardCheckoutUrl(profile.id, profile.email),
-    pro: getProCheckoutUrl(profile.id, profile.email),
+    standard: await getStandardCheckoutUrl(profile.id, profile.email, customerId),
+    pro: await getProCheckoutUrl(profile.id, profile.email, customerId),
   };
+}
+
+export async function getBillingPortalUrl(): Promise<string | null> {
+  const profile = await requireAuth();
+  const supabase = await createClient();
+
+  const { data: sub } = await supabase
+    .from('subscriptions')
+    .select('stripe_customer_id')
+    .eq('user_id', profile.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!sub?.stripe_customer_id) return null;
+  return createBillingPortalSession(sub.stripe_customer_id);
 }
 
 export async function getSubscription() {

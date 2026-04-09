@@ -148,7 +148,7 @@ export default function PricingPage() {
       {/* Footer note */}
       <div className="border-t border-border py-8 text-center">
         <p className="text-[12px] text-muted-foreground">
-          Alle Preise inkl. USt. Abrechnung über Lemon Squeezy (Merchant of Record).
+          Alle Preise inkl. USt. Sichere Abrechnung ueber Stripe.
           DSGVO-konform. Deine Daten bleiben in der EU.
         </p>
       </div>

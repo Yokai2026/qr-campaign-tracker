@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useTransition } from 'react';
+import { useState, useMemo, useTransition, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { type ColumnDef } from '@tanstack/react-table';
@@ -16,6 +16,9 @@ import {
   X,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { createClient } from '@/lib/supabase/client';
+import { subDays, format } from 'date-fns';
+import { Sparkline } from '@/components/shared/sparkline';
 
 import type { QrCodeWithMeta } from './actions';
 import { toggleQrCode, deleteQrCode } from './actions';
@@ -56,6 +59,43 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [campaignFilter, setCampaignFilter] = useState<string>('all');
   const [placementFilter, setPlacementFilter] = useState<string>('all');
+
+  // Sparkline data: map of qr_code_id -> last 7 days scan counts
+  const [sparklines, setSparklines] = useState<Record<string, number[]>>({});
+
+  useEffect(() => {
+    const supabase = createClient();
+    const days = 7;
+    const from = format(subDays(new Date(), days - 1), 'yyyy-MM-dd') + 'T00:00:00';
+
+    supabase
+      .from('redirect_events')
+      .select('qr_code_id, created_at')
+      .eq('event_type', 'qr_open')
+      .eq('is_bot', false)
+      .not('qr_code_id', 'is', null)
+      .gte('created_at', from)
+      .then(({ data }) => {
+        if (!data) return;
+        const map: Record<string, Record<string, number>> = {};
+        for (const e of data) {
+          if (!e.qr_code_id) continue;
+          if (!map[e.qr_code_id]) map[e.qr_code_id] = {};
+          const day = e.created_at.slice(0, 10);
+          map[e.qr_code_id][day] = (map[e.qr_code_id][day] || 0) + 1;
+        }
+        // Build ordered arrays for each QR code
+        const result: Record<string, number[]> = {};
+        const today = new Date();
+        for (const [qrId, dayMap] of Object.entries(map)) {
+          result[qrId] = Array.from({ length: days }, (_, i) => {
+            const d = format(subDays(today, days - 1 - i), 'yyyy-MM-dd');
+            return dayMap[d] || 0;
+          });
+        }
+        setSparklines(result);
+      });
+  }, []);
 
   // Extract unique campaigns and placements
   const campaigns = useMemo(() => {
@@ -195,6 +235,16 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
         </div>
       ),
       accessorFn: (row) => row.placement_name ?? '',
+    },
+    {
+      id: 'trend',
+      header: '7-Tage',
+      cell: ({ row }) => {
+        const data = sparklines[row.original.id];
+        if (!data || data.every((v) => v === 0)) return <span className="text-muted-foreground text-xs">-</span>;
+        return <Sparkline data={data} width={56} height={20} />;
+      },
+      meta: { className: 'hidden md:table-cell w-20' },
     },
     {
       id: 'status',

@@ -17,10 +17,16 @@ import {
   ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 
-import type { ShortLink, LinkGroup } from '@/types';
+import type { ShortLink, LinkGroup, RedirectRule, AbVariant } from '@/types';
+import type { EffectiveTier } from '@/lib/billing/gates';
 import { deleteShortLink, toggleShortLink, updateShortLink, getLinkGroups } from '../actions';
 import { formatDate, formatDateTime } from '@/lib/format';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
+import { generateForecast } from '@/lib/forecast';
+import { ChartTransition } from '@/components/shared/chart-transition';
+import { RedirectRulesEditor } from '@/components/redirect-rules/redirect-rules-editor';
+import { AbVariantsEditor } from '@/components/ab-testing/ab-variants-editor';
+import { AbResultsChart } from '@/components/ab-testing/ab-results-chart';
 
 import { PageHeader } from '@/components/shared/page-header';
 import { KPIStatCard } from '@/components/shared/kpi-stat-card';
@@ -40,7 +46,12 @@ const TOOLTIP_STYLE = {
   boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
 };
 
-type Props = { link: ShortLink };
+type Props = {
+  link: ShortLink;
+  redirectRules?: RedirectRule[];
+  abVariants?: AbVariant[];
+  userTier?: EffectiveTier;
+};
 
 type Campaign = { id: string; name: string };
 
@@ -76,7 +87,7 @@ function buildEditForm(link: ShortLink): EditFormData {
   };
 }
 
-export function LinkDetail({ link }: Props) {
+export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier = 'expired' }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const [isPending, startTransition] = useTransition();
@@ -240,6 +251,20 @@ export function LinkDetail({ link }: Props) {
     totalClicks: 0, uniqueVisitors: 0, botClicks: 0,
     timeSeriesData: [], deviceData: [], countryData: [], referrerData: [],
   };
+
+  // Forecast for link clicks
+  const forecastData = generateForecast(
+    stats.timeSeriesData.map((d) => ({ date: d.date, value: d.clicks })),
+    7,
+  );
+  const timeSeriesWithForecast = forecastData.map((f) => {
+    const original = stats.timeSeriesData.find((d) => d.date === f.date);
+    return {
+      date: f.date,
+      clicks: original?.clicks ?? null,
+      forecast: f.forecast,
+    };
+  });
 
   return (
     <div className="space-y-6 animate-in-card">
@@ -498,6 +523,26 @@ export function LinkDetail({ link }: Props) {
         </Card>
       )}
 
+      {/* Conditional Redirect Rules */}
+      <RedirectRulesEditor
+        rules={redirectRules}
+        shortLinkId={link.id}
+        userTier={userTier}
+      />
+
+      {/* A/B Testing */}
+      <AbVariantsEditor
+        variants={abVariants}
+        shortLinkId={link.id}
+        userTier={userTier}
+      />
+
+      {/* A/B Test Results */}
+      <AbResultsChart
+        variants={abVariants}
+        shortLinkId={link.id}
+      />
+
       {/* KPIs */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <KPIStatCard label="Klicks (30 Tage)" value={stats.totalClicks} icon={MousePointerClick} />
@@ -512,17 +557,20 @@ export function LinkDetail({ link }: Props) {
       </div>
 
       {/* Charts */}
-      <ChartCard title="Klicks über Zeit" empty={stats.timeSeriesData.length === 0} emptyText="Keine Klicks im Zeitraum">
+      <ChartTransition transitionKey={link.id}>
+      <ChartCard title="Klicks ueber Zeit" empty={stats.timeSeriesData.length === 0} emptyText="Keine Klicks im Zeitraum">
         <ResponsiveContainer width="100%" height={260}>
-          <LineChart data={stats.timeSeriesData}>
+          <LineChart data={timeSeriesWithForecast}>
             <CartesianGrid {...GRID_STYLE} />
             <XAxis dataKey="date" {...AXIS_STYLE} />
             <YAxis {...AXIS_STYLE} />
             <Tooltip contentStyle={TOOLTIP_STYLE} />
-            <Line type="monotone" dataKey="clicks" name="Klicks" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} />
+            <Line type="monotone" dataKey="clicks" name="Klicks" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} connectNulls={false} />
+            <Line type="monotone" dataKey="forecast" name="Prognose" stroke={SERIES_COLORS.scans} strokeWidth={1.5} strokeDasharray="6 3" dot={false} connectNulls={false} />
           </LineChart>
         </ResponsiveContainer>
       </ChartCard>
+      </ChartTransition>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <ChartCard title="Gerätetypen" empty={stats.deviceData.length === 0}>

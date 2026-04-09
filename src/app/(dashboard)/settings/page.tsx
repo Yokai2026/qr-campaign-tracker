@@ -102,8 +102,8 @@ export default function SettingsPage() {
         subscription={subscription}
         trialEndsAt={profile.trial_ends_at}
         checkoutUrls={{
-          standard: `https://spurig.lemonsqueezy.com/checkout/buy/${process.env.NEXT_PUBLIC_LS_STANDARD_VARIANT || 'standard'}?checkout[custom][user_id]=${profile.id}&checkout[email]=${encodeURIComponent(profile.email)}`,
-          pro: `https://spurig.lemonsqueezy.com/checkout/buy/${process.env.NEXT_PUBLIC_LS_PRO_VARIANT || 'pro'}?checkout[custom][user_id]=${profile.id}&checkout[email]=${encodeURIComponent(profile.email)}`,
+          standard: `/api/checkout?plan=standard`,
+          pro: `/api/checkout?plan=pro`,
         }}
       />
 
