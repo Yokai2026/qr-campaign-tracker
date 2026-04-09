@@ -84,6 +84,26 @@ export const linkGroupSchema = z.object({
   campaign_id: z.string().uuid().optional().or(z.literal('')),
 });
 
+export const redirectRuleSchema = z.object({
+  qr_code_id: z.string().uuid().optional().or(z.literal('')),
+  short_link_id: z.string().uuid().optional().or(z.literal('')),
+  condition_type: z.enum(['device', 'os', 'browser', 'country', 'time_range', 'day_of_week']),
+  condition_value: z.record(z.string(), z.unknown()),
+  target_url: z.string().url('Gueltige URL erforderlich').max(2000),
+  label: z.string().max(200).optional().or(z.literal('')),
+  priority: z.number().int().min(0).optional(),
+  active: z.boolean().optional(),
+});
+
+export const abVariantSchema = z.object({
+  qr_code_id: z.string().uuid().optional().or(z.literal('')),
+  short_link_id: z.string().uuid().optional().or(z.literal('')),
+  target_url: z.string().url('Gueltige URL erforderlich').max(2000),
+  weight: z.number().int().min(1, 'Mindestens 1').max(100, 'Maximal 100'),
+  label: z.string().max(200).optional().or(z.literal('')),
+  active: z.boolean().optional(),
+});
+
 export const trackEventSchema = z.object({
   event_type: z.enum([
     'landing_page_view', 'cta_click', 'form_start',

@@ -5,6 +5,9 @@ import { normalizeReferrer, sanitizeUrl, parseUserAgentMinimal } from '@/lib/pri
 import { buildTargetUrlWithUtm } from '@/lib/qr/generate';
 import { isUrlSafe } from '@/lib/validations';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { evaluateRules } from '@/lib/redirect-rules/evaluate';
+import { selectVariant } from '@/lib/ab-testing/select';
+import type { RedirectRule, AbVariant } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -188,6 +191,45 @@ async function handleQrRedirect(
     return new NextResponse('Invalid redirect target', { status: 400 });
   }
 
+  // --- Conditional redirect rules (priority 1) ---
+  let abVariantId: string | null = null;
+  const { data: rules } = await supabase
+    .from('redirect_rules')
+    .select('*')
+    .eq('qr_code_id', qr.id as string)
+    .eq('active', true);
+
+  let ruleMatched = false;
+  if (rules && rules.length > 0) {
+    const ruleMatch = evaluateRules(rules as RedirectRule[], {
+      deviceType: ctx.deviceType,
+      osFamily: ctx.osFamily,
+      browserFamily: ctx.browserFamily,
+      country: ctx.country,
+    });
+    if (ruleMatch && isUrlSafe(ruleMatch)) {
+      targetUrl = ruleMatch;
+      ruleMatched = true;
+    }
+  }
+
+  // --- A/B testing (priority 2, only if no conditional rule matched) ---
+  if (!ruleMatched) {
+    const { data: variants } = await supabase
+      .from('ab_variants')
+      .select('*')
+      .eq('qr_code_id', qr.id as string)
+      .eq('active', true);
+
+    if (variants && variants.length > 0) {
+      const picked = selectVariant(variants as AbVariant[]);
+      if (picked && isUrlSafe(picked.target_url)) {
+        targetUrl = picked.target_url;
+        abVariantId = picked.id;
+      }
+    }
+  }
+
   targetUrl = buildTargetUrlWithUtm(targetUrl, {
     utm_source: (qr.utm_source as string) || undefined,
     utm_medium: (qr.utm_medium as string) || undefined,
@@ -204,6 +246,7 @@ async function handleQrRedirect(
 
   await supabase.from('redirect_events').insert({
     ...baseEvent, event_type: 'qr_open', destination_url: sanitizeUrl(targetUrl),
+    ab_variant_id: abVariantId,
   });
 
   return NextResponse.redirect(targetUrl, 302);
@@ -261,6 +304,45 @@ async function handleLinkRedirect(
     return new NextResponse('Invalid redirect target', { status: 400 });
   }
 
+  // --- Conditional redirect rules (priority 1) ---
+  let linkAbVariantId: string | null = null;
+  const { data: linkRules } = await supabase
+    .from('redirect_rules')
+    .select('*')
+    .eq('short_link_id', link.id as string)
+    .eq('active', true);
+
+  let linkRuleMatched = false;
+  if (linkRules && linkRules.length > 0) {
+    const ruleMatch = evaluateRules(linkRules as RedirectRule[], {
+      deviceType: ctx.deviceType,
+      osFamily: ctx.osFamily,
+      browserFamily: ctx.browserFamily,
+      country: ctx.country,
+    });
+    if (ruleMatch && isUrlSafe(ruleMatch)) {
+      targetUrl = ruleMatch;
+      linkRuleMatched = true;
+    }
+  }
+
+  // --- A/B testing (priority 2, only if no conditional rule matched) ---
+  if (!linkRuleMatched) {
+    const { data: linkVariants } = await supabase
+      .from('ab_variants')
+      .select('*')
+      .eq('short_link_id', link.id as string)
+      .eq('active', true);
+
+    if (linkVariants && linkVariants.length > 0) {
+      const picked = selectVariant(linkVariants as AbVariant[]);
+      if (picked && isUrlSafe(picked.target_url)) {
+        targetUrl = picked.target_url;
+        linkAbVariantId = picked.id;
+      }
+    }
+  }
+
   const isDirect = link.link_mode === 'direct';
 
   if (!isDirect) {
@@ -283,6 +365,7 @@ async function handleLinkRedirect(
 
   await supabase.from('redirect_events').insert({
     ...baseEvent, event_type: 'link_open', destination_url: sanitizeUrl(targetUrl),
+    ab_variant_id: linkAbVariantId,
   });
 
   return NextResponse.redirect(targetUrl, 302);

@@ -2,6 +2,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { getQrCode } from '../actions';
 import { QrCodeDetail } from './qr-code-detail';
+import { getSessionTier } from '@/lib/billing/gates';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -11,12 +12,10 @@ export default async function QrCodeDetailPage({ params }: Props) {
   noStore();
   const { id } = await params;
 
-  let data;
-  try {
-    data = await getQrCode(id);
-  } catch {
-    notFound();
-  }
+  const [data, session] = await Promise.all([
+    getQrCode(id).catch(() => null),
+    getSessionTier(),
+  ]);
 
   if (!data?.qrCode) {
     notFound();
@@ -27,6 +26,9 @@ export default async function QrCodeDetailPage({ params }: Props) {
       qrCode={data.qrCode}
       history={data.history}
       redirectCount={data.redirectCount}
+      redirectRules={data.redirectRules}
+      abVariants={data.abVariants}
+      userTier={session?.tier ?? 'expired'}
     />
   );
 }

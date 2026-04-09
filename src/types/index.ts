@@ -307,6 +307,53 @@ export interface ScanAlert {
 }
 
 // ============================================
+// Redirect Rules (Conditional Redirects)
+// ============================================
+
+export type ConditionType = 'device' | 'os' | 'browser' | 'country' | 'time_range' | 'day_of_week';
+
+export interface RedirectRule {
+  id: string;
+  qr_code_id: string | null;
+  short_link_id: string | null;
+  condition_type: ConditionType;
+  condition_value: Record<string, unknown>;
+  target_url: string;
+  label: string | null;
+  priority: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RedirectRuleInput {
+  qr_code_id?: string;
+  short_link_id?: string;
+  condition_type: ConditionType;
+  condition_value: Record<string, unknown>;
+  target_url: string;
+  label?: string;
+  priority?: number;
+  active?: boolean;
+}
+
+// ============================================
+// A/B Testing
+// ============================================
+
+export interface AbVariant {
+  id: string;
+  qr_code_id: string | null;
+  short_link_id: string | null;
+  target_url: string;
+  weight: number;
+  label: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================
 // Audit Log
 // ============================================
 

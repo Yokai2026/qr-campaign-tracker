@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanTier } from '@/types';
 
-export type Feature = 'create' | 'export' | 'reports' | 'custom_domains' | 'analytics';
+export type Feature = 'create' | 'export' | 'reports' | 'custom_domains' | 'conditional_redirects' | 'analytics';
 
 /** Which tier is required for each feature */
 const FEATURE_TIERS: Record<Feature, PlanTier> = {
@@ -11,6 +11,7 @@ const FEATURE_TIERS: Record<Feature, PlanTier> = {
   reports: 'standard',
   analytics: 'free',
   custom_domains: 'pro',
+  conditional_redirects: 'pro',
 };
 
 const TIER_RANK: Record<PlanTier | 'trial', number> = {

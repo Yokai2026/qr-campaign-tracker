@@ -8,7 +8,7 @@ import { generateQrCode, buildRedirectUrl } from '@/lib/qr/generate';
 import { qrCodeSchema, isUrlSafe } from '@/lib/validations';
 import { getAppUrl } from '@/lib/constants';
 import { logAudit } from '@/lib/audit';
-import type { QrCode, QrCodeInput, QrStatusHistory, QrAction } from '@/types';
+import type { QrCode, QrCodeInput, QrStatusHistory, QrAction, RedirectRule, AbVariant } from '@/types';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -111,7 +111,7 @@ export async function getQrCode(id: string) {
   await requireAuth();
   const supabase = await createClient();
 
-  const [qrResult, historyResult, countResult] = await Promise.all([
+  const [qrResult, historyResult, countResult, rulesResult, abResult] = await Promise.all([
     supabase
       .from('qr_codes')
       .select(`
@@ -134,6 +134,16 @@ export async function getQrCode(id: string) {
       .select('id', { count: 'exact', head: true })
       .eq('qr_code_id', id)
       .eq('event_type', 'qr_open'),
+    supabase
+      .from('redirect_rules')
+      .select('*')
+      .eq('qr_code_id', id)
+      .order('priority', { ascending: false }),
+    supabase
+      .from('ab_variants')
+      .select('*')
+      .eq('qr_code_id', id)
+      .order('created_at', { ascending: true }),
   ]);
 
   if (qrResult.error) throw new Error(qrResult.error.message);
@@ -142,6 +152,8 @@ export async function getQrCode(id: string) {
     qrCode: qrResult.data as QrCode,
     history: (historyResult.data ?? []) as QrStatusHistory[],
     redirectCount: countResult.count ?? 0,
+    redirectRules: (rulesResult.data ?? []) as RedirectRule[],
+    abVariants: (abResult.data ?? []) as AbVariant[],
   };
 }
 

@@ -31,7 +31,10 @@ import { computeQrStatus } from '@/lib/qr/status';
 import { downloadQrPng, downloadQrSvg } from '@/lib/qr/download';
 import { QR_ACTION_LABELS } from '@/lib/constants';
 
-import type { QrCode, QrStatusHistory } from '@/types';
+import type { QrCode, QrStatusHistory, RedirectRule, AbVariant } from '@/types';
+import { RedirectRulesEditor } from '@/components/redirect-rules/redirect-rules-editor';
+import { AbVariantsEditor } from '@/components/ab-testing/ab-variants-editor';
+import { QrDesignStudio } from '@/components/qr-design/qr-design-studio';
 import { PageHeader } from '@/components/shared/page-header';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { Button } from '@/components/ui/button';
@@ -87,10 +90,15 @@ function copyToClipboard(text: string) {
 // Props
 // ---------------------------------------------------------------------------
 
+import type { EffectiveTier } from '@/lib/billing/gates';
+
 interface QrCodeDetailProps {
   qrCode: QrCode;
   history: QrStatusHistory[];
   redirectCount: number;
+  redirectRules: RedirectRule[];
+  abVariants: AbVariant[];
+  userTier: EffectiveTier;
 }
 
 // ---------------------------------------------------------------------------
@@ -118,7 +126,7 @@ type EditFormValues = {
 // Component
 // ---------------------------------------------------------------------------
 
-export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailProps) {
+export function QrCodeDetail({ qrCode, history, redirectCount, redirectRules, abVariants, userTier }: QrCodeDetailProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -348,6 +356,28 @@ export function QrCodeDetail({ qrCode, history, redirectCount }: QrCodeDetailPro
               )}
             </CardContent>
           </Card>
+
+          {/* Conditional Redirect Rules */}
+          <RedirectRulesEditor
+            rules={redirectRules}
+            qrCodeId={qrCode.id}
+            userTier={userTier}
+          />
+
+          {/* A/B Testing */}
+          <AbVariantsEditor
+            variants={abVariants}
+            qrCodeId={qrCode.id}
+            userTier={userTier}
+          />
+
+          {/* QR Design Studio */}
+          <QrDesignStudio
+            redirectUrl={shortLink}
+            shortCode={qrCode.short_code}
+            initialFgColor={qrCode.qr_fg_color}
+            initialBgColor={qrCode.qr_bg_color}
+          />
 
           {/* Status History */}
           <Card>
