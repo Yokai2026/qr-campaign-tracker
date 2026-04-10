@@ -2,12 +2,17 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { CommandPalette } from '@/components/layout/command-palette';
 import { Toaster } from '@/components/ui/sonner';
 import { Providers } from '@/components/providers';
+import { TrialEndedModal } from '@/components/billing/trial-ended-modal';
+import { getSessionTier } from '@/lib/billing/gates';
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getSessionTier();
+  const trialEnded = session?.tier === 'expired';
+
   return (
     <Providers>
       <div className="min-h-screen bg-background">
@@ -19,6 +24,7 @@ export default function DashboardLayout({
         </main>
         <CommandPalette />
         <Toaster />
+        {trialEnded && <TrialEndedModal />}
       </div>
     </Providers>
   );

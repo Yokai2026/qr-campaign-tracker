@@ -131,7 +131,7 @@ interface RedirectRulesEditorProps {
 // ---------------------------------------------------------------------------
 
 export function RedirectRulesEditor({ rules: initialRules, qrCodeId, shortLinkId, userTier }: RedirectRulesEditorProps) {
-  const isPro = userTier === 'pro';
+  const isPro = userTier === 'paid' || userTier === 'trial';
   const [rules, setRules] = useState(initialRules);
   const [showAdd, setShowAdd] = useState(false);
   const [isPending, startTransition] = useTransition();

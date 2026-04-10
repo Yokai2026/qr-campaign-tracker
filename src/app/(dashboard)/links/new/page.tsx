@@ -37,7 +37,7 @@ export default function NewLinkPage() {
   useEffect(() => {
     checkFeatureAccess('create').then(({ allowed, tier }) => {
       if (!allowed) setAccessDenied(true);
-      if (tier === 'pro') setIsPro(true);
+      if (tier === 'paid' || tier === 'trial') setIsPro(true);
     });
   }, []);
 

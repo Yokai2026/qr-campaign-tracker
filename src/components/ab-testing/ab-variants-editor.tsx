@@ -50,7 +50,7 @@ interface AbVariantsEditorProps {
 // ---------------------------------------------------------------------------
 
 export function AbVariantsEditor({ variants: initialVariants, qrCodeId, shortLinkId, userTier }: AbVariantsEditorProps) {
-  const isPro = userTier === 'pro';
+  const isPro = userTier === 'paid' || userTier === 'trial';
   const [variants, setVariants] = useState(initialVariants);
   const [showAdd, setShowAdd] = useState(false);
   const [isPending, startTransition] = useTransition();
