@@ -15,7 +15,9 @@ const APP_ONLY_PATHS = [
   '/links',
   '/analytics',
   '/settings',
+  '/pricing',
   '/datenschutz',
+  '/impressum',
   '/favicon',
 ];
 
