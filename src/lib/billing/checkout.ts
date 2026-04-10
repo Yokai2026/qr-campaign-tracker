@@ -1,14 +1,14 @@
 import { createCheckoutSession, createBillingPortalSession } from './stripe';
 
-export async function getStandardCheckoutUrl(userId: string, email: string, customerId?: string): Promise<string> {
-  const priceId = process.env.STRIPE_STANDARD_PRICE_ID;
-  if (!priceId) throw new Error('STRIPE_STANDARD_PRICE_ID not set');
+export async function getMonthlyCheckoutUrl(userId: string, email: string, customerId?: string): Promise<string> {
+  const priceId = process.env.STRIPE_MONTHLY_PRICE_ID;
+  if (!priceId) throw new Error('STRIPE_MONTHLY_PRICE_ID not set');
   return createCheckoutSession({ priceId, userId, email, customerId });
 }
 
-export async function getProCheckoutUrl(userId: string, email: string, customerId?: string): Promise<string> {
-  const priceId = process.env.STRIPE_PRO_PRICE_ID;
-  if (!priceId) throw new Error('STRIPE_PRO_PRICE_ID not set');
+export async function getYearlyCheckoutUrl(userId: string, email: string, customerId?: string): Promise<string> {
+  const priceId = process.env.STRIPE_YEARLY_PRICE_ID;
+  if (!priceId) throw new Error('STRIPE_YEARLY_PRICE_ID not set');
   return createCheckoutSession({ priceId, userId, email, customerId });
 }
 

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getStandardCheckoutUrl, getProCheckoutUrl } from '@/lib/billing/checkout';
+import { getMonthlyCheckoutUrl, getYearlyCheckoutUrl } from '@/lib/billing/checkout';
 
 export async function GET(request: NextRequest) {
   const plan = request.nextUrl.searchParams.get('plan');
-  if (plan !== 'standard' && plan !== 'pro') {
+  if (plan !== 'monthly' && plan !== 'yearly') {
     return NextResponse.redirect(new URL('/pricing', request.url));
   }
 
@@ -25,9 +25,9 @@ export async function GET(request: NextRequest) {
 
   const customerId = sub?.stripe_customer_id ?? undefined;
 
-  const url = plan === 'pro'
-    ? await getProCheckoutUrl(user.id, user.email!, customerId)
-    : await getStandardCheckoutUrl(user.id, user.email!, customerId);
+  const url = plan === 'yearly'
+    ? await getYearlyCheckoutUrl(user.id, user.email!, customerId)
+    : await getMonthlyCheckoutUrl(user.id, user.email!, customerId);
 
   return NextResponse.redirect(url);
 }

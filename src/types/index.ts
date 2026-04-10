@@ -41,7 +41,8 @@ export interface Profile {
   updated_at: string;
 }
 
-export type PlanTier = 'free' | 'standard' | 'pro';
+export type PlanTier = 'free' | 'paid';
+export type BillingCycle = 'monthly' | 'yearly';
 export type SubscriptionStatus = 'on_trial' | 'active' | 'past_due' | 'paused' | 'cancelled' | 'expired';
 
 export interface Subscription {

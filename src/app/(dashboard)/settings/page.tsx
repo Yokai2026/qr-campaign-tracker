@@ -102,8 +102,8 @@ export default function SettingsPage() {
         subscription={subscription}
         trialEndsAt={profile.trial_ends_at}
         checkoutUrls={{
-          standard: `/api/checkout?plan=standard`,
-          pro: `/api/checkout?plan=pro`,
+          monthly: `/api/checkout?plan=monthly`,
+          yearly: `/api/checkout?plan=yearly`,
         }}
       />
 

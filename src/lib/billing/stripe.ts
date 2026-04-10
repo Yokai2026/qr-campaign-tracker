@@ -16,10 +16,24 @@ export function getStripe(): Stripe {
 
 /**
  * Map Stripe Price ID to plan tier.
+ * Currently there is only one paid tier ("Spurig") with two billing cycles.
+ * Any recognized price → 'paid'.
  */
-export function priceToTier(priceId: string): 'standard' | 'pro' {
-  if (priceId === process.env.STRIPE_PRO_PRICE_ID) return 'pro';
-  return 'standard';
+export function priceToTier(priceId: string): 'free' | 'paid' {
+  const monthly = process.env.STRIPE_MONTHLY_PRICE_ID;
+  const yearly = process.env.STRIPE_YEARLY_PRICE_ID;
+  if (priceId && (priceId === monthly || priceId === yearly)) return 'paid';
+  return 'free';
+}
+
+/**
+ * Map Stripe Price ID to billing cycle.
+ * Returns null if the price is unknown (shouldn't normally happen).
+ */
+export function priceToBillingCycle(priceId: string): 'monthly' | 'yearly' | null {
+  if (priceId === process.env.STRIPE_MONTHLY_PRICE_ID) return 'monthly';
+  if (priceId === process.env.STRIPE_YEARLY_PRICE_ID) return 'yearly';
+  return null;
 }
 
 /**

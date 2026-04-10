@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
-import { getStandardCheckoutUrl, getProCheckoutUrl } from '@/lib/billing/checkout';
+import { getMonthlyCheckoutUrl, getYearlyCheckoutUrl } from '@/lib/billing/checkout';
 import { createBillingPortalSession } from '@/lib/billing/stripe';
 
 export async function getCheckoutUrls() {
@@ -21,8 +21,8 @@ export async function getCheckoutUrls() {
   const customerId = sub?.stripe_customer_id ?? undefined;
 
   return {
-    standard: await getStandardCheckoutUrl(profile.id, profile.email, customerId),
-    pro: await getProCheckoutUrl(profile.id, profile.email, customerId),
+    monthly: await getMonthlyCheckoutUrl(profile.id, profile.email, customerId),
+    yearly: await getYearlyCheckoutUrl(profile.id, profile.email, customerId),
   };
 }
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { CreditCard, Clock, CheckCircle, AlertTriangle, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Subscription } from '@/types';
@@ -9,13 +8,7 @@ import type { Subscription } from '@/types';
 type Props = {
   subscription: Subscription | null;
   trialEndsAt: string | null;
-  checkoutUrls: { standard: string; pro: string };
-};
-
-const TIER_LABELS: Record<string, string> = {
-  free: 'Free',
-  standard: 'Standard',
-  pro: 'Pro',
+  checkoutUrls: { monthly: string; yearly: string };
 };
 
 const STATUS_CONFIG: Record<string, { label: string; icon: typeof CheckCircle; color: string }> = {
@@ -27,8 +20,10 @@ const STATUS_CONFIG: Record<string, { label: string; icon: typeof CheckCircle; c
   expired: { label: 'Abgelaufen', icon: AlertTriangle, color: 'text-red-600' },
 };
 
-function daysUntil(dateStr: string): number {
-  return Math.max(0, Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000));
+const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID;
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Props) {
@@ -36,9 +31,13 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
   useEffect(() => setMounted(true), []);
 
   const hasSub = subscription && ['active', 'on_trial', 'past_due'].includes(subscription.status);
-  const trialDaysLeft = trialEndsAt ? daysUntil(trialEndsAt) : 0;
-  const isTrialActive = !hasSub && trialDaysLeft > 0;
-  const isExpired = !hasSub && !isTrialActive;
+  const trialActive = trialEndsAt && new Date(trialEndsAt) > new Date();
+  const isTrialActive = !hasSub && trialActive;
+
+  // Determine billing cycle from stored price_id
+  const isYearly = hasSub && subscription?.stripe_price_id && MONTHLY_PRICE_ID
+    ? subscription.stripe_price_id !== MONTHLY_PRICE_ID
+    : false;
 
   return (
     <div className="rounded-lg border border-border bg-card">
@@ -54,7 +53,7 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
                 <div className="flex items-center gap-2">
                   <Crown className="h-4 w-4 text-amber-500" />
                   <span className="text-[15px] font-semibold">
-                    {TIER_LABELS[subscription.plan_tier] ?? subscription.plan_tier}
+                    Spurig {isYearly ? 'Jährlich' : 'Monatlich'}
                   </span>
                 </div>
                 {(() => {
@@ -71,20 +70,16 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
               </div>
               <div className="text-right text-[12px] text-muted-foreground">
                 {subscription.current_period_end && mounted && (
-                  <p>Nächste Zahlung: {new Date(subscription.current_period_end).toLocaleDateString('de-DE')}</p>
+                  <p>Nächste Zahlung: {formatDate(subscription.current_period_end)}</p>
+                )}
+                {subscription.trial_ends_at && mounted && subscription.status === 'on_trial' && (
+                  <p>Testzeitraum endet am: {formatDate(subscription.trial_ends_at)}</p>
                 )}
                 {subscription.cancel_at && mounted && (
-                  <p className="text-red-600">Endet am: {new Date(subscription.cancel_at).toLocaleDateString('de-DE')}</p>
+                  <p className="text-red-600">Endet am: {formatDate(subscription.cancel_at)}</p>
                 )}
               </div>
             </div>
-            {subscription.plan_tier !== 'pro' && (
-              <a href={checkoutUrls.pro} className="block">
-                <Button variant="outline" size="sm" className="w-full">
-                  Auf Pro upgraden
-                </Button>
-              </a>
-            )}
           </>
         ) : isTrialActive ? (
           <>
@@ -92,7 +87,7 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-blue-600" />
                 <span className="text-[13px] font-medium">
-                  Testphase — noch {mounted ? trialDaysLeft : '…'} {trialDaysLeft === 1 ? 'Tag' : 'Tage'}
+                  Testzeitraum endet am: {mounted && trialEndsAt ? formatDate(trialEndsAt) : '…'}
                 </span>
               </div>
               <p className="mt-1 text-[12px] text-muted-foreground">
@@ -101,17 +96,20 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
               </p>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
-              <a href={checkoutUrls.standard}>
+              <a href={checkoutUrls.monthly}>
                 <Button variant="outline" size="sm" className="w-full">
-                  Standard — 12,99 €/Mo
+                  Monatlich — 5,99 €/Mo
                 </Button>
               </a>
-              <a href={checkoutUrls.pro}>
+              <a href={checkoutUrls.yearly}>
                 <Button size="sm" className="w-full">
-                  Pro — 14,99 €/Mo
+                  Jährlich — 4,99 €/Mo
                 </Button>
               </a>
             </div>
+            <p className="text-center text-[11px] text-muted-foreground">
+              Jährlich spart 16 % (59,88 €/Jahr statt 71,88 €)
+            </p>
           </>
         ) : (
           <>
@@ -127,14 +125,14 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
               </p>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
-              <a href={checkoutUrls.standard}>
+              <a href={checkoutUrls.monthly}>
                 <Button variant="outline" size="sm" className="w-full">
-                  Standard — 12,99 €/Mo
+                  Monatlich — 5,99 €/Mo
                 </Button>
               </a>
-              <a href={checkoutUrls.pro}>
+              <a href={checkoutUrls.yearly}>
                 <Button size="sm" className="w-full">
-                  Pro — 14,99 €/Mo
+                  Jährlich — 4,99 €/Mo
                 </Button>
               </a>
             </div>

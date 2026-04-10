@@ -4,29 +4,33 @@ import type { PlanTier } from '@/types';
 
 export type Feature = 'create' | 'export' | 'reports' | 'custom_domains' | 'conditional_redirects' | 'analytics';
 
-/** Which tier is required for each feature */
+/**
+ * Which tier is required for each feature.
+ * Since there is only one paid plan, all features require 'paid' (or an active trial).
+ * 'analytics' is available on free tier (view-only, no new QR codes).
+ */
 const FEATURE_TIERS: Record<Feature, PlanTier> = {
-  create: 'standard',
-  export: 'standard',
-  reports: 'standard',
+  create: 'paid',
+  export: 'paid',
+  reports: 'paid',
   analytics: 'free',
-  custom_domains: 'pro',
-  conditional_redirects: 'pro',
+  custom_domains: 'paid',
+  conditional_redirects: 'paid',
 };
 
 const TIER_RANK: Record<PlanTier | 'trial', number> = {
   free: 0,
-  trial: 1,    // trial = full standard access
-  standard: 2,
-  pro: 3,
+  trial: 1,  // trial grants full paid-level access
+  paid: 2,
 };
 
 export type EffectiveTier = PlanTier | 'trial' | 'expired';
 
 /**
  * Returns the user's effective tier based on subscription + trial status.
- * - Active subscription → subscription tier
- * - No subscription but trial active → 'trial'
+ * - Active subscription → 'paid'
+ * - Stripe trial active → 'trial'
+ * - No subscription but profile trial active → 'trial'
  * - No subscription and trial expired → 'expired'
  */
 export async function getUserTier(userId: string): Promise<EffectiveTier> {
@@ -69,13 +73,11 @@ export function canAccessFeature(tier: EffectiveTier, feature: Feature): boolean
   if (tier === 'expired') return false;
 
   const requiredTier = FEATURE_TIERS[feature];
-  // Trial grants standard-level access
-  const effectiveRank = TIER_RANK[tier === 'trial' ? 'trial' : tier];
+  // Trial grants full paid-level access
+  if (tier === 'trial') return true;
+
+  const effectiveRank = TIER_RANK[tier];
   const requiredRank = TIER_RANK[requiredTier];
-
-  // Trial has rank 1 (between free and standard), but should grant standard access
-  if (tier === 'trial') return requiredTier !== 'pro';
-
   return effectiveRank >= requiredRank;
 }
 
