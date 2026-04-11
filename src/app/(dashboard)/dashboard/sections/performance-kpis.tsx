@@ -6,6 +6,7 @@ import {
   TrendingUp, Users, MousePointerClick, Target, ArrowRight, Sparkles, Megaphone,
   MapPin, ClipboardList, QrCode,
 } from 'lucide-react';
+import { DismissibleOnboarding } from './dismissible-onboarding';
 
 /** Calculate percentage change, returns null if not meaningful */
 function calcDelta(current: number, previous: number): number | null {
@@ -25,7 +26,11 @@ export async function PerformanceKPIs() {
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86_400_000).toISOString();
   const fourteenDaysAgo = new Date(now.getTime() - 14 * 86_400_000).toISOString();
 
+  const { data: { user } } = await supabase.auth.getUser();
+
   const [
+    // Profile for onboarding dismiss flag
+    { data: profile },
     // All-time totals (display values)
     { count: totalOpens },
     { data: ipHashData },
@@ -41,6 +46,9 @@ export async function PerformanceKPIs() {
     { data: prevIpHash7d },
     { count: prevLinks7d },
   ] = await Promise.all([
+    user
+      ? supabase.from('profiles').select('onboarding_dismissed_at').eq('id', user.id).maybeSingle()
+      : Promise.resolve({ data: null }),
     supabase.from('redirect_events').select('*', { count: 'exact', head: true }).eq('event_type', 'qr_open').eq('is_bot', false),
     supabase.from('redirect_events').select('ip_hash').eq('event_type', 'qr_open').eq('is_bot', false),
     supabase.from('page_events').select('*', { count: 'exact', head: true }).eq('event_type', 'cta_click'),
@@ -61,6 +69,8 @@ export async function PerformanceKPIs() {
     ? ((ctaClicks / totalOpens) * 100).toFixed(1)
     : '0';
   const hasAnyData = (campaignCount || 0) > 0 || (totalOpens || 0) > 0;
+  const onboardingDismissed = Boolean((profile as { onboarding_dismissed_at: string | null } | null)?.onboarding_dismissed_at);
+  const showOnboarding = !hasAnyData && !onboardingDismissed;
 
   // Delta calculations: current 7d vs previous 7d
   const currUnique7d = new Set((currIpHash7d || []).map((e: { ip_hash: string | null }) => e.ip_hash).filter(Boolean)).size;
@@ -71,8 +81,9 @@ export async function PerformanceKPIs() {
 
   return (
     <>
-      {/* Onboarding: first-time users only */}
-      {!hasAnyData && (
+      {/* Onboarding: first-time users only, until explicitly dismissed */}
+      {showOnboarding && (
+        <DismissibleOnboarding>
         <div className="rounded-lg border border-border bg-card p-6">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary">
@@ -137,6 +148,7 @@ export async function PerformanceKPIs() {
             </p>
           </div>
         </div>
+        </DismissibleOnboarding>
       )}
 
       {/* Performance KPIs */}

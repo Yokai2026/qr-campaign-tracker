@@ -37,6 +37,7 @@ export interface Profile {
   display_name: string | null;
   role: UserRole;
   trial_ends_at: string | null;
+  onboarding_dismissed_at: string | null;
   created_at: string;
   updated_at: string;
 }
