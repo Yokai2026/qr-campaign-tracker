@@ -67,6 +67,8 @@ export async function createCheckoutSession(opts: {
   const stripe = getStripe();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://spurig.com';
 
+  // No trial_period_days here: the 14-day trial is owned by profiles.trial_ends_at
+  // (set by DB trigger on signup). Adding a Stripe trial on top would double-count.
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: 'subscription',
     line_items: [{ price: opts.priceId, quantity: 1 }],
@@ -75,7 +77,6 @@ export async function createCheckoutSession(opts: {
     client_reference_id: opts.userId,
     customer_email: opts.customerId ? undefined : opts.email,
     subscription_data: {
-      trial_period_days: 14,
       metadata: { user_id: opts.userId },
     },
     metadata: { user_id: opts.userId },

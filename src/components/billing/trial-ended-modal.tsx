@@ -3,16 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { AlertTriangle, Sparkles, Download, LogOut, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { AlertCircle, Check, Download, LogOut, Loader2 } from 'lucide-react';
 
 /**
- * Hard paywall modal shown when a user's trial has expired and they have no
- * active subscription. Intentionally not dismissable — the only way out is to
- * subscribe, export data (DSGVO Art. 20), or log out.
- *
- * Short-link redirects at /r/[code] live outside (dashboard) and are NOT
- * blocked by this modal.
+ * Hard paywall shown when a user's trial has expired and no active subscription
+ * exists. Not dismissable — the only way out is to subscribe, export data
+ * (DSGVO Art. 20) or log out. Short-link redirects at /r/[code] live outside
+ * (dashboard) and are NOT blocked by this modal.
  */
 export function TrialEndedModal() {
   const router = useRouter();
@@ -40,78 +37,105 @@ export function TrialEndedModal() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="trial-ended-title"
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
     >
-      <div className="w-full max-w-md rounded-lg border border-border bg-card shadow-2xl">
-        <div className="border-b border-border px-6 py-4">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/15">
-              <AlertTriangle className="h-4 w-4 text-amber-600" />
-            </div>
-            <h2 id="trial-ended-title" className="text-[15px] font-semibold">
-              Testzeitraum abgelaufen
+      <div className="w-full max-w-lg overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+        {/* Header */}
+        <div className="flex flex-col items-center gap-3 px-6 pt-7 pb-5 text-center">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-500/15">
+            <AlertCircle className="h-5 w-5 text-amber-600" />
+          </div>
+          <div className="space-y-1">
+            <h2 id="trial-ended-title" className="text-[17px] font-semibold tracking-tight">
+              Dein Testzeitraum ist vorbei
             </h2>
+            <p className="text-[13px] text-muted-foreground">
+              Wähle einen Plan, um Spurig weiter zu nutzen.
+            </p>
           </div>
         </div>
 
-        <div className="space-y-5 p-6">
-          <p className="text-[13px] leading-relaxed text-muted-foreground">
-            Dein 14-tägiger Testzeitraum ist vorbei. Um Spurig weiter zu nutzen, wähle bitte ein Abo.
-            Deine bestehenden QR-Codes und Weiterleitungen funktionieren weiterhin.
-          </p>
-
-          <div className="rounded-md border border-amber-200 bg-amber-50/60 px-3 py-2 dark:border-amber-900/50 dark:bg-amber-950/30">
-            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-900 dark:text-amber-300">
-              <Sparkles className="h-3 w-3" />
-              Einführungspreis — über 50 % günstiger
+        {/* Plans */}
+        <div className="space-y-2.5 px-6 pb-5">
+          {/* Yearly — featured */}
+          <a
+            href="/api/checkout?plan=yearly"
+            className="group relative block rounded-lg border-2 border-primary bg-primary/[0.03] p-4 transition-all hover:bg-primary/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <div className="absolute -top-2.5 left-4 flex items-center gap-1.5">
+              <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
+                Beliebt · Spare 62 %
+              </span>
             </div>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">
-              Statt <span className="line-through">12,99 €/Mo</span> nur ab <span className="font-semibold text-foreground">4,99 €/Mo</span>
-            </p>
-          </div>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-[14px] font-semibold">Jährlich</span>
+                  <span className="text-[11px] text-muted-foreground">im Voraus</span>
+                </div>
+                <div className="mt-1 flex items-baseline gap-1.5">
+                  <span className="text-[22px] font-bold tracking-tight">4,99 €</span>
+                  <span className="text-[12px] text-muted-foreground">/ Monat</span>
+                </div>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  59,88 € jährlich · <span className="line-through">155,88 €</span> gespart
+                </p>
+              </div>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform group-hover:scale-105">
+                <Check className="h-4 w-4" strokeWidth={3} />
+              </div>
+            </div>
+          </a>
 
-          <div className="space-y-2">
-            <a href="/api/checkout?plan=yearly" className="block">
-              <Button size="sm" className="w-full justify-between">
-                <span className="flex items-center gap-2">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Jährlich — 4,99 €/Mo
-                </span>
-                <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold">
-                  −62 %
-                </span>
-              </Button>
-            </a>
-            <a href="/api/checkout?plan=monthly" className="block">
-              <Button variant="outline" size="sm" className="w-full justify-between">
-                <span>Monatlich — 5,99 €/Mo</span>
-                <span className="text-[10px] text-muted-foreground">−54 %</span>
-              </Button>
-            </a>
-          </div>
+          {/* Monthly */}
+          <a
+            href="/api/checkout?plan=monthly"
+            className="group block rounded-lg border border-border bg-card p-4 transition-all hover:border-border/80 hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-[14px] font-semibold">Monatlich</span>
+                  <span className="text-[11px] text-muted-foreground">flexibel</span>
+                </div>
+                <div className="mt-1 flex items-baseline gap-1.5">
+                  <span className="text-[22px] font-bold tracking-tight">5,99 €</span>
+                  <span className="text-[12px] text-muted-foreground">/ Monat</span>
+                </div>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  Jederzeit kündbar · <span className="line-through">12,99 €</span> spare 54 %
+                </p>
+              </div>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors group-hover:border-primary/40 group-hover:text-primary">
+                <Check className="h-4 w-4" />
+              </div>
+            </div>
+          </a>
+        </div>
 
-          <p className="text-center text-[11px] text-muted-foreground">
-            Abrechnung über Stripe. Jederzeit kündbar.
+        {/* Footer */}
+        <div className="border-t border-border bg-muted/20 px-6 py-4">
+          <p className="mb-3 text-center text-[11px] text-muted-foreground">
+            Sichere Abrechnung über Stripe · Keine Einrichtungsgebühr
           </p>
-
-          <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between text-[12px]">
             <a
               href="/api/export/my-data"
-              className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground"
+              className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
             >
-              <Download className="h-3 w-3" />
-              Daten exportieren (DSGVO)
+              <Download className="h-3.5 w-3.5" />
+              Daten exportieren
             </a>
             <button
               type="button"
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
             >
               {isLoggingOut ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <LogOut className="h-3 w-3" />
+                <LogOut className="h-3.5 w-3.5" />
               )}
               Abmelden
             </button>

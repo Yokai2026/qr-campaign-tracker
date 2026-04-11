@@ -44,7 +44,7 @@ export async function getUserTier(userId: string): Promise<EffectiveTier> {
     .in('status', ['active', 'on_trial', 'past_due'])
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (sub) {
     if (sub.status === 'on_trial') return 'trial';
@@ -56,7 +56,7 @@ export async function getUserTier(userId: string): Promise<EffectiveTier> {
     .from('profiles')
     .select('trial_ends_at')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (profile?.trial_ends_at) {
     const trialEnd = new Date(profile.trial_ends_at);

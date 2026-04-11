@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   const customerId = sub?.stripe_customer_id ?? undefined;
 

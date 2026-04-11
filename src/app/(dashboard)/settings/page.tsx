@@ -51,7 +51,7 @@ export default function SettingsPage() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
       if (subData) setSubscription(subData as Subscription);
     }
     load();

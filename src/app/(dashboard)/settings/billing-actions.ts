@@ -16,7 +16,7 @@ export async function getCheckoutUrls() {
     .eq('user_id', profile.id)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   const customerId = sub?.stripe_customer_id ?? undefined;
 
@@ -36,7 +36,7 @@ export async function getBillingPortalUrl(): Promise<string | null> {
     .eq('user_id', profile.id)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (!sub?.stripe_customer_id) return null;
   return createBillingPortalSession(sub.stripe_customer_id);
@@ -52,7 +52,7 @@ export async function getSubscription() {
     .eq('user_id', profile.id)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   return {
     subscription: data,
