@@ -100,9 +100,9 @@ export function Sidebar() {
 
   const tierLabel: Record<string, string> = {
     free: 'Free',
-    trial: 'Trial',
-    expired: 'Trial abgelaufen',
-    paid: 'Spurig',
+    trial: 'Testversion',
+    expired: 'Abgelaufen',
+    paid: 'Aktiv',
   };
 
   const brandBlock = (
