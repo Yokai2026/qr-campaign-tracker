@@ -1,114 +1,105 @@
-# Fortsetzung: Stripe-Refactor abschließen (5 TS-Fixes + Build + Tests)
+# Fortsetzung: Stripe Live-Modus, Hard-Paywall-Test, Doppel-Trial-Fix
 
-## Kontext
+## Was in der vorherigen Session (2026-04-10/11) gemacht wurde
 
-Projekt "Spurig" — QR-Campaign-Tracker. In der vorherigen Session wurde das Preismodell vereinfacht:
-- **Alt**: Zwei Tiers (Standard 12,99 €/Mo + Pro 14,99 €/Mo)
-- **Neu**: EIN Plan "Spurig" mit zwei Abrechnungszyklen — **5,99 €/Mo monatlich** oder **4,99 €/Mo bei Jahresbuchung** (59,88 €/Jahr)
-- **14 Tage kostenloser Trial** bleibt
+### ✅ Live deployed auf https://spurig.com
+1. **5 TypeScript-Errors** aus Preismodell-Refactor gefixt (`tier === 'pro'` → `'paid' || 'trial'`):
+   - `src/app/(dashboard)/links/new/page.tsx:40`
+   - `src/components/ab-testing/ab-variants-editor.tsx:53`
+   - `src/components/redirect-rules/redirect-rules-editor.tsx:134`
+   - `src/components/layout/sidebar.tsx:101-123` (tierLabel + Badge-Farben)
+2. **Trial-Transparenz auf Signup-Seite**: Info-Box "14 Tage kostenlos, danach Einführungspreis 5,99€"
+3. **Welcome-Screen** nach Signup mit konkretem Trial-Ende-Datum (`src/app/signup/page.tsx`)
+4. **TrialEndedModal** (`src/components/billing/trial-ended-modal.tsx`):
+   - Full-screen Hard-Paywall, **nicht schließbar**
+   - Eingebunden in `src/app/(dashboard)/layout.tsx` via `getSessionTier()` wenn `tier === 'expired'`
+   - DSGVO-Export + Logout bleiben möglich
+   - `/r/[code]` Redirects sind unblockiert (außerhalb dashboard-route)
+5. **Billing-Portal-Button** "Abo verwalten" in `src/components/settings/subscription-card.tsx`
+6. **Anchor-Pricing**: Streichpreis 12,99 € → 5,99 €/4,99 € als "Einführungspreis"
+   - Pricing-Page mit Hero-Banner, −54%/−62% Badges, "Beliebtester Plan"-Label
+   - Trial-Ended-Modal, Subscription-Card, Signup-Box konsistent
+   - **PAngV-konform**: 12,99€ war der frühere Standard-Tier-Preis (Refactor 26fcba9)
+7. **Middleware-Fix**: `/pricing` + `/impressum` in `APP_ONLY_PATHS` (`src/lib/supabase/middleware.ts`)
+8. **NEXT_PUBLIC_APP_URL** in Vercel-Production korrigiert: war `https://qr-campaign-tracker.vercel.app`, jetzt `https://spurig.com`
+9. **STRIPE_WEBHOOK_SECRET** in Vercel-Production gesetzt (`whsec_JyV50AsW1fybqEZUUZjiYQRx29wkuBwE`) + Webhook im Stripe-Sandbox-Dashboard angelegt für 4 Events:
+   - `checkout.session.completed`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+   - `invoice.payment_failed`
 
-## Was in der letzten Session gemacht wurde
+### Commits dieser Session
+- `2c80533` feat: Trial-UX — Transparenz, Welcome-Screen, Hard-Paywall-Modal
+- `3953045` fix: /pricing und /impressum in middleware APP_ONLY_PATHS aufnehmen
+- `201d916` feat: Anchor-Pricing — Streichpreis 12,99€ → 5,99€/4,99€
 
-### ✅ Fertig
-1. **Stripe-Sandbox angelegt**: "Spurig" Account, Produkt "Spurig" mit zwei Preisen (monatlich 5,99 €, jährlich 59,88 €)
-2. **`.env.local` aktualisiert** mit Test-Keys:
-   - `STRIPE_SECRET_KEY=sk_test_51TKlk2LAWTHGcAN4NM1jircp...`
-   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51TKlk2LAWTHGcAN4odEXMIYi...`
-   - `STRIPE_MONTHLY_PRICE_ID=price_1TKmBGLAWTHGcAN4DDYP8qh2`
-   - `STRIPE_YEARLY_PRICE_ID=price_1TKmBGLAWTHGcAN4bswavC7l`
-   - `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID=price_1TKmBGLAWTHGcAN4DDYP8qh2`
-   - `STRIPE_WEBHOOK_SECRET=whsec_placeholder_wird_nach_deploy_gesetzt` (TODO: später setzen)
-3. **Types vereinfacht**:
-   - `PlanTier = 'free' | 'paid'` (vorher `'free' | 'standard' | 'pro'`)
-   - Neu: `BillingCycle = 'monthly' | 'yearly'`
-4. **Code-Refactor**:
-   - `src/lib/billing/stripe.ts` — `priceToTier()` returnt `'paid'`, neue `priceToBillingCycle()`
-   - `src/lib/billing/checkout.ts` — `getMonthlyCheckoutUrl()` / `getYearlyCheckoutUrl()` statt `getStandardCheckoutUrl` / `getProCheckoutUrl`
-   - `src/lib/billing/gates.ts` — Feature-Gates vereinfacht, alle Paid-Features auf `'paid'` gemappt, `TIER_RANK = { free: 0, trial: 1, paid: 2 }`
-   - `src/lib/billing/index.ts` — neue Exports
-   - `src/app/api/checkout/route.ts` — Query-Param `?plan=monthly|yearly` statt `standard|pro`
-   - `src/app/(dashboard)/settings/billing-actions.ts` — `getCheckoutUrls()` returnt `{ monthly, yearly }`
-   - `src/components/settings/subscription-card.tsx` — UI auf "Spurig Monatlich/Jährlich", Trial-Ende-Datum statt "noch X Tage"
-   - `src/app/(dashboard)/settings/page.tsx` — neue checkoutUrls-Props
-   - `src/app/pricing/page.tsx` — 2-Karten-Layout Monthly/Yearly mit "16 % sparen" Badge
-5. **DB-Migrationen ausgeführt** (via Supabase MCP gegen Prod):
-   - **013_stripe_migration**: `ls_*` Spalten → `stripe_*` umbenannt
-   - **014_simplify_plan_tier**: Bestehende `'pro'`/`'standard'` Daten → `'paid'` gemigriert, check-constraint auf `('free', 'paid')` aktualisiert
-   - 2 manuelle Test-Subscriptions (`manual_forum`, `manual_ecoalca`) wurden korrekt auf `'paid'` gemigriert
+Branch ist lokal **5 Commits ahead von origin/master** (noch nicht gepusht).
 
-### ❌ Offen — HIER FORTSETZEN
+## ❌ Offen — HIER FORTSETZEN
 
-#### 1. [HOCH] 5 TypeScript-Errors fixen (trivial)
-Alle sind Vergleiche mit entfernten Tier-Werten. `npx tsc --noEmit` zeigt:
-
+### 1. [HOCH] Hard-Paywall-Test
+Trial-Ende simulieren via Supabase MCP gegen Prod-DB:
+```sql
+UPDATE profiles SET trial_ends_at = '2026-01-01' WHERE email = '<test-email>';
 ```
-src/app/(dashboard)/links/new/page.tsx:40       → tier === 'pro'          → tier === 'paid'
-src/components/ab-testing/ab-variants-editor.tsx:53  → tier === 'pro'    → tier === 'paid'
-src/components/layout/sidebar.tsx:120           → tier === 'pro'          → tier === 'paid'
-src/components/layout/sidebar.tsx:121           → tier === 'standard'     → tier === 'paid'
-src/components/redirect-rules/redirect-rules-editor.tsx:134  → tier === 'pro' → tier === 'paid'
-```
+Dann auf https://spurig.com einloggen → das `TrialEndedModal` muss auf jeder Dashboard-Route erscheinen, nicht schließbar sein, und nur die drei Wege bieten: Bezahlen / DSGVO-Export / Logout.
 
-**Vorgehen**: Jeder Vergleich `tier === 'pro'` → `tier === 'paid'`. Bei der Sidebar prüfen ob `tier === 'standard' || tier === 'pro'` zu einem einzigen `tier === 'paid'` wird. Beachte: `'trial'` und `'expired'` sind weiter gültige `EffectiveTier`-Werte.
+### 2. [HOCH] End-to-End Stripe-Checkout-Test mit Webhook
+Webhook ist live, also komplette E2E-Verifikation:
+1. Neuen Account auf https://spurig.com/signup anlegen
+2. Auf /pricing → "14 Tage kostenlos testen" klicken (monatlich + jährlich beide testen)
+3. Stripe-Checkout mit Testkarte `4242 4242 4242 4242`, `12/34`, CVC `123`
+4. Nach erfolgreichem Checkout: prüfen ob `subscriptions`-Row in Supabase angelegt wurde (via Webhook)
+5. In Settings prüfen: "Abo & Abrechnung" zeigt korrekten Plan-Namen ("Spurig Monatlich" vs "Spurig Jährlich")
+6. "Abo verwalten" Button → öffnet Stripe Billing Portal
 
-#### 2. [HOCH] Build + Tests grün
-```bash
-npx tsc --noEmit       # 0 errors
-npm run lint
-npm run test           # 152 Unit Tests müssen grün bleiben
-npm run build
-```
+### 3. [MITTEL] Doppel-Trial-Bug fixen
+**Problem**: Neue User bekommen `profiles.trial_ends_at = now() + 14 days` (DB-Trigger aus Migration 008). Beim Stripe-Checkout setzt unser Code zusätzlich `trial_period_days: 14` → das gibt einen ZWEITEN Trial nach Abo-Abschluss.
 
-#### 3. [MITTEL] Lokalen Checkout-Flow testen
-- `npm run dev` starten
-- Auf `/pricing` → "14 Tage kostenlos testen" klicken (monatlich + jährlich beide testen)
-- Wird zu Stripe Checkout weitergeleitet
-- Stripe-Test-Kreditkarte nutzen: `4242 4242 4242 4242`, Ablauf `12/34`, CVC `123`
-- **Webhook funktioniert nur NICHT lokal ohne Stripe CLI** — überspringe Webhook-Test für jetzt oder nutze `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
-- Verifiziere: Redirect zu `/settings?upgraded=1` funktioniert
+**Fix**: In `src/lib/billing/stripe.ts` die `trial_period_days` aus `createCheckoutSession()` entfernen. Nur den Profile-Trial verwenden, der bereits beim Signup gesetzt wird.
 
-#### 4. [MITTEL] Billing Portal Button in Settings einbauen (Task 6)
-- `getBillingPortalUrl()` existiert bereits in `billing-actions.ts`
-- In `subscription-card.tsx` bei `hasSub` einen Button "Abo verwalten" einbauen
-- Button triggert Server Action, redirected zum Stripe Billing Portal
-- Dort kann User: kündigen, Plan wechseln (monthly ↔ yearly), Rechnungen einsehen, Zahlungsmethode ändern
+### 4. [MITTEL] Stripe Live-Modus aktivieren
+**User-Action erforderlich**, ich kann nur die Vercel-ENV-Calls machen.
+1. Stripe Dashboard → oben rechts **"Aktivieren"**
+2. Firmendaten + IBAN eintragen, Identität verifizieren
+3. Im **Live-Modus** Produkt "Spurig" neu anlegen (Sandbox ≠ Live, separate Datenbank!)
+4. Neue Live-Price-IDs notieren (analog zu Sandbox: monatlich 5,99 € + jährlich 59,88 €)
+5. Live-Webhook einrichten (analog zu Sandbox, Endpoint-URL identisch: `https://spurig.com/api/webhooks/stripe`)
+6. Live-Keys + neuen `whsec_` Secret an mich liefern, dann setze ich:
+   - `STRIPE_SECRET_KEY=sk_live_...`
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...`
+   - `STRIPE_MONTHLY_PRICE_ID=price_...` (Live)
+   - `STRIPE_YEARLY_PRICE_ID=price_...` (Live)
+   - `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID=price_...` (Live)
+   - `STRIPE_WEBHOOK_SECRET=whsec_...` (Live)
+   in Vercel-Production + Redeploy.
 
-#### 5. [MITTEL] Trial-Ende bei Signup sichtbar machen (Task 3)
-- **Bei Registrierung**: Nach Signup-Erfolg zeigen: "Dein Testzeitraum endet am DD.MM.YYYY"
-- **Im Account/Settings**: Prominente Anzeige des Trial-End-Datums (nicht "noch X Tage") — in `subscription-card.tsx` bereits angefangen, prüfen ob vollständig
-- Auch in Sidebar/Header wenn möglich
+### 5. [NIEDRIG] CRON_SECRET rotieren
+War in einem Screenshot der vor-vorherigen Session sichtbar. Neuen Wert generieren und in Vercel + `.env.local` setzen.
 
-## Später (nach Deploy auf Vercel)
+### 6. [NIEDRIG] Resend Setup
+Für E-Mail-Versand (Report-Schedules, Scan-Alerts, Welcome-E-Mail nach Signup).
 
-### Webhook-Secret setzen
-Nach `npx vercel --prod --yes`:
-1. Im Stripe-Dashboard (Sandbox): **Entwickler → Webhooks → + Endpoint**
-2. URL: `https://spurig.com/api/webhooks/stripe`
-3. Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
-4. **Signing Secret** kopieren (`whsec_...`)
-5. In Vercel ENV + `.env.local` als `STRIPE_WEBHOOK_SECRET` eintragen (ersetzt Placeholder)
+## Tech-Notizen / Architektur
 
-### Live-Modus aktivieren
-- Stripe-Dashboard → **Aktivieren** (oben rechts)
-- Firmendaten + IBAN eintragen
-- Im Live-Modus Produkt "Spurig" neu anlegen (Sandbox ≠ Live)
-- Neue Price-IDs + Live-Keys (`sk_live_...`, `pk_live_...`) in Vercel eintragen
+### Effective Tier Logic
+`src/lib/billing/gates.ts` definiert `EffectiveTier = 'free' | 'trial' | 'paid' | 'expired'`. Die Hard-Paywall greift bei `'expired'`. Der Status wird live aus DB geprüft (kein Cache).
 
-### Offene TODOs aus vorheriger Session
-- **Resend Setup** für E-Mail-Versand
-- **CRON_SECRET** ändern (war in Screenshot sichtbar)
+### Webhook-Signatur
+`STRIPE_WEBHOOK_SECRET` ist live: `whsec_JyV50AsW1fybqEZUUZjiYQRx29wkuBwE` (Sandbox). Der Webhook-Handler in `src/app/api/webhooks/stripe/route.ts` verifiziert die Stripe-Signatur.
 
-## Architektur-Hinweise
-
-- **Feature-Gating**: Alle bezahlten Features prüfen `tier === 'paid' || tier === 'trial'`. Siehe `src/lib/billing/gates.ts`.
-- **Trial-Modell**: Neue User bekommen `profiles.trial_ends_at = now() + 14 days` automatisch (Handler in Migration 008). Beim Stripe-Checkout ist zusätzlich `trial_period_days: 14` gesetzt — das gibt einen ZWEITEN Trial nach Abo-Abschluss. **Bekannter Bug**: Doppel-Trial möglich. Fix für später: `trial_period_days` aus `createCheckoutSession` entfernen, nur Profile-Trial verwenden.
-- **Billing Cycle Detection (Client)**: `subscription-card.tsx` nutzt `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID` um zu prüfen ob ein Abo monatlich oder jährlich ist. Muss in Vercel auch gesetzt werden.
-
-## Wichtig
-
-- DSGVO-Konformität bleibt Pflicht
-- Supabase-Migrationen via MCP gegen Prod-DB
+### Wichtige Flags & Constraints
+- DSGVO-Konformität bleibt Pflicht (siehe Memory `feedback_dsgvo_compliance.md`)
+- Supabase-Migrationen via MCP gegen Prod-DB (siehe Memory `feedback_migrations.md`)
 - Deutsche UI, englischer Code
 - 152 Unit Tests + 19 E2E Tests müssen grün bleiben
-- Redirects werden NIE blockiert — auch nach Trial-Ende (nur CREATE blockiert)
+- **Redirects werden NIE blockiert** — auch nach Trial-Ende (`/r/[code]` liegt außerhalb der dashboard-route, das `TrialEndedModal` rendert nur in `(dashboard)/layout.tsx`)
 - Vercel Hobby: Crons max 1x/Tag
+
+### Bekannte Vercel-ENV-Werte
+- `NEXT_PUBLIC_APP_URL=https://spurig.com` ✅
+- `STRIPE_WEBHOOK_SECRET=whsec_JyV...BwE` ✅ (Sandbox)
+- `STRIPE_MONTHLY_PRICE_ID=price_1TKmBGLAWTHGcAN4DDYP8qh2` (Sandbox)
+- `STRIPE_YEARLY_PRICE_ID=price_1TKmBGLAWTHGcAN4bswavC7l` (Sandbox)
+- `STRIPE_SECRET_KEY=sk_test_51TKlk2...` (Sandbox)
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51TKlk2...` (Sandbox)
