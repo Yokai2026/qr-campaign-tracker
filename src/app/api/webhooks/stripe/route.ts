@@ -17,6 +17,20 @@ function getPeriodEnd(sub: Stripe.Subscription): string | null {
   return topEnd ? new Date(topEnd * 1000).toISOString() : null;
 }
 
+/**
+ * Read the subscription ID from an Invoice object.
+ * Stripe API "Basil" (2025-03-31) moved this from invoice.subscription to
+ * invoice.parent.subscription_details.subscription. Tries new location first,
+ * falls back to the old top-level field for older API versions.
+ */
+function getInvoiceSubId(invoice: Stripe.Invoice): string | null {
+  const parent = invoice.parent as unknown as { subscription_details?: { subscription?: string } } | null;
+  const newSub = parent?.subscription_details?.subscription;
+  if (newSub) return newSub;
+  const legacy = (invoice as unknown as { subscription?: string }).subscription;
+  return legacy ?? null;
+}
+
 export async function POST(request: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
@@ -97,12 +111,35 @@ export async function POST(request: NextRequest) {
     }
 
     case 'invoice.payment_failed': {
-      const invoice = event.data.object as unknown as Record<string, unknown>;
-      const subId = invoice.subscription as string | undefined;
+      const invoice = event.data.object as Stripe.Invoice;
+      const subId = getInvoiceSubId(invoice);
       if (!subId) break;
       await supabase
         .from('subscriptions')
         .update({ status: 'past_due' })
+        .eq('stripe_subscription_id', subId);
+      break;
+    }
+
+    case 'invoice.payment_succeeded': {
+      // Important for async payment methods (SEPA, Klarna) where the initial
+      // payment takes days to settle, and for recovering from past_due after
+      // a retry succeeds. customer.subscription.updated also fires, but this
+      // event is the explicit payment-cleared signal.
+      const invoice = event.data.object as Stripe.Invoice;
+      const subId = getInvoiceSubId(invoice);
+      if (!subId) break;
+      const stripe = getStripe();
+      const subscription = await stripe.subscriptions.retrieve(subId);
+      const priceId = subscription.items.data[0]?.price.id ?? '';
+      await supabase
+        .from('subscriptions')
+        .update({
+          stripe_price_id: priceId,
+          plan_tier: priceToTier(priceId),
+          status: mapStripeStatus(subscription.status),
+          current_period_end: getPeriodEnd(subscription),
+        })
         .eq('stripe_subscription_id', subId);
       break;
     }
