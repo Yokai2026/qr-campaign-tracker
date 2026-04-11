@@ -1,105 +1,110 @@
-# Fortsetzung: Stripe Live-Modus, Hard-Paywall-Test, Doppel-Trial-Fix
+# Fortsetzung: Hard-Paywall-Re-Test, Onboarding-Card, Stripe-Live, Doppel-Trial-Verifikation
 
-## Was in der vorherigen Session (2026-04-10/11) gemacht wurde
+## Session 2026-04-11 — was passiert ist
 
-### ✅ Live deployed auf https://spurig.com
-1. **5 TypeScript-Errors** aus Preismodell-Refactor gefixt (`tier === 'pro'` → `'paid' || 'trial'`):
-   - `src/app/(dashboard)/links/new/page.tsx:40`
-   - `src/components/ab-testing/ab-variants-editor.tsx:53`
-   - `src/components/redirect-rules/redirect-rules-editor.tsx:134`
-   - `src/components/layout/sidebar.tsx:101-123` (tierLabel + Badge-Farben)
-2. **Trial-Transparenz auf Signup-Seite**: Info-Box "14 Tage kostenlos, danach Einführungspreis 5,99€"
-3. **Welcome-Screen** nach Signup mit konkretem Trial-Ende-Datum (`src/app/signup/page.tsx`)
-4. **TrialEndedModal** (`src/components/billing/trial-ended-modal.tsx`):
-   - Full-screen Hard-Paywall, **nicht schließbar**
-   - Eingebunden in `src/app/(dashboard)/layout.tsx` via `getSessionTier()` wenn `tier === 'expired'`
-   - DSGVO-Export + Logout bleiben möglich
-   - `/r/[code]` Redirects sind unblockiert (außerhalb dashboard-route)
-5. **Billing-Portal-Button** "Abo verwalten" in `src/components/settings/subscription-card.tsx`
-6. **Anchor-Pricing**: Streichpreis 12,99 € → 5,99 €/4,99 € als "Einführungspreis"
-   - Pricing-Page mit Hero-Banner, −54%/−62% Badges, "Beliebtester Plan"-Label
-   - Trial-Ended-Modal, Subscription-Card, Signup-Box konsistent
-   - **PAngV-konform**: 12,99€ war der frühere Standard-Tier-Preis (Refactor 26fcba9)
-7. **Middleware-Fix**: `/pricing` + `/impressum` in `APP_ONLY_PATHS` (`src/lib/supabase/middleware.ts`)
-8. **NEXT_PUBLIC_APP_URL** in Vercel-Production korrigiert: war `https://qr-campaign-tracker.vercel.app`, jetzt `https://spurig.com`
-9. **STRIPE_WEBHOOK_SECRET** in Vercel-Production gesetzt (`whsec_JyV50AsW1fybqEZUUZjiYQRx29wkuBwE`) + Webhook im Stripe-Sandbox-Dashboard angelegt für 4 Events:
-   - `checkout.session.completed`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-   - `invoice.payment_failed`
+### ✅ Gefixt und gepusht (Commit `e144dea`)
+1. **Username-Bug live gefixt** — `handle_new_user`-Trigger schrieb `raw_user_meta_data->>'username'` nicht in `profiles.username`. Login per Username schlug daher fehl ("Benutzername nicht gefunden").
+   - Migration `015_fix_username_in_handle_new_user.sql` direkt via Supabase MCP auf Prod appliziert (Trigger + Backfill).
+   - Dein Account `tomatenkopf36@gmail.com` hat jetzt `username='David'`. Login via "David" oder E-Mail funktioniert beides.
+2. **405/406-Checkout-Bug gefixt** — Beim Klick auf "Jährlich"/"Monatlich" im `TrialEndedModal` bekamst du eine tote Chrome-Seite. Ursache: `.single()` in `src/app/api/checkout/route.ts:24` warf HTTP 406, weil noch keine `subscriptions`-Row existierte. Fix: `.maybeSingle()` an 6 Stellen:
+   - `src/app/api/checkout/route.ts`
+   - `src/lib/billing/gates.ts` (2×)
+   - `src/app/(dashboard)/settings/billing-actions.ts` (3×)
+   - `src/app/(dashboard)/settings/page.tsx`
+3. **Doppel-Trial-Bug gefixt** — `src/lib/billing/stripe.ts`: `trial_period_days: 14` entfernt. Nur noch der Profile-Trial (DB-Trigger) ist Source-of-Truth.
+4. **`TrialEndedModal` komplett redesignt** — klare Hierarchie Header → zwei klickbare Plan-Karten (Jährlich als "Beliebt · Spare 62 %" featured) → Footer mit DSGVO-Export + Logout. Ersetzt das vorherige Layout mit gestapelten Buttons + redundanter Amber-Box.
 
-### Commits dieser Session
-- `2c80533` feat: Trial-UX — Transparenz, Welcome-Screen, Hard-Paywall-Modal
-- `3953045` fix: /pricing und /impressum in middleware APP_ONLY_PATHS aufnehmen
-- `201d916` feat: Anchor-Pricing — Streichpreis 12,99€ → 5,99€/4,99€
+**Branch-Status:** origin/master ist jetzt bei `e144dea`, lokal clean. Vercel sollte den Deploy automatisch triggern.
 
-Branch ist lokal **5 Commits ahead von origin/master** (noch nicht gepusht).
+### Tests
+- Unit: 152/152 grün (vor den letzten 6 Edits gelaufen — **nochmal verifizieren**)
+- E2E: nicht gelaufen
+
+### User-DB-Zustand
+- `tomatenkopf36@gmail.com`: `trial_ends_at = 2026-04-22 21:52`, Trial läuft, voller Dashboard-Zugriff.
+- Noch keine Subscription angelegt.
 
 ## ❌ Offen — HIER FORTSETZEN
 
-### 1. [HOCH] Hard-Paywall-Test
-Trial-Ende simulieren via Supabase MCP gegen Prod-DB:
-```sql
-UPDATE profiles SET trial_ends_at = '2026-01-01' WHERE email = '<test-email>';
-```
-Dann auf https://spurig.com einloggen → das `TrialEndedModal` muss auf jeder Dashboard-Route erscheinen, nicht schließbar sein, und nur die drei Wege bieten: Bezahlen / DSGVO-Export / Logout.
+### 1. [HOCH] Hard-Paywall-Test WIEDERHOLEN nach Deploy
+Beim vorherigen Test war der Deploy noch nicht mit dem `maybeSingle`-Fix → Klick auf "Jährlich" → HTTP 405.
+Nach dem Deploy (Vercel auto-triggert nach `git push`):
+1. Warten bis Vercel grün ist (`vercel ls` oder im Dashboard)
+2. `UPDATE profiles SET trial_ends_at='2026-01-01' WHERE email='tomatenkopf36@gmail.com'`
+3. https://spurig.com/dashboard reloaden — **neues** `TrialEndedModal` sollte erscheinen (zwei Plan-Karten, Jährlich featured)
+4. Klick auf "Jährlich" → sollte jetzt tatsächlich zu Stripe-Checkout redirecten (nicht 405!)
+5. Screenshot, Verifikation
+6. Nach Test: `UPDATE profiles SET trial_ends_at='2026-04-22 21:52'`
 
-### 2. [HOCH] End-to-End Stripe-Checkout-Test mit Webhook
-Webhook ist live, also komplette E2E-Verifikation:
-1. Neuen Account auf https://spurig.com/signup anlegen
-2. Auf /pricing → "14 Tage kostenlos testen" klicken (monatlich + jährlich beide testen)
-3. Stripe-Checkout mit Testkarte `4242 4242 4242 4242`, `12/34`, CVC `123`
-4. Nach erfolgreichem Checkout: prüfen ob `subscriptions`-Row in Supabase angelegt wurde (via Webhook)
-5. In Settings prüfen: "Abo & Abrechnung" zeigt korrekten Plan-Namen ("Spurig Monatlich" vs "Spurig Jährlich")
-6. "Abo verwalten" Button → öffnet Stripe Billing Portal
+### 2. [HOCH] E2E Stripe-Checkout + Webhook-Test
+Falls #1 den Checkout öffnet, direkt durchziehen:
+- Testkarte: `4242 4242 4242 4242`, `12/34`, CVC `123`
+- Nach Checkout: `SELECT * FROM subscriptions WHERE user_id='1122b816-54ba-4774-b56c-a6cd637c4ff1'` prüfen — sollte eine Row geben, Status `active` (NICHT `on_trial`, weil Doppel-Trial-Fix)
+- Settings → "Abo & Abrechnung" sollte "Spurig Jährlich" zeigen
+- "Abo verwalten"-Button → Stripe Billing Portal öffnen
 
-### 3. [MITTEL] Doppel-Trial-Bug fixen
-**Problem**: Neue User bekommen `profiles.trial_ends_at = now() + 14 days` (DB-Trigger aus Migration 008). Beim Stripe-Checkout setzt unser Code zusätzlich `trial_period_days: 14` → das gibt einen ZWEITEN Trial nach Abo-Abschluss.
+### 3. [MITTEL] Onboarding-Card dismissable machen
+User-Feedback aus letzter Session: "Wenn man will diesen Text überspringen, dann wird er nicht mehr angezeigt." Card liegt in `src/app/(dashboard)/dashboard/sections/performance-kpis.tsx:75` (Rendering-Condition `!hasAnyData`). Aktuell kein X-Button.
 
-**Fix**: In `src/lib/billing/stripe.ts` die `trial_period_days` aus `createCheckoutSession()` entfernen. Nur den Profile-Trial verwenden, der bereits beim Signup gesetzt wird.
+**Plan:**
+- Migration 016: `ALTER TABLE profiles ADD COLUMN onboarding_dismissed_at timestamptz`
+- Server Action `dismissOnboarding()` in `src/app/(dashboard)/dashboard/actions.ts` (neu): setzt Feld, `revalidatePath('/dashboard')`
+- Performance-kpis.tsx: Condition erweitern um `!profile.onboarding_dismissed_at`
+- Neue Client-Wrapper-Komponente `<DismissibleOnboarding>` mit X-Button (top-right), optimistic hide
+- Zusätzlich: "Tour überspringen"-Text-Link neben dem Tipp im Footer der Card
 
 ### 4. [MITTEL] Stripe Live-Modus aktivieren
-**User-Action erforderlich**, ich kann nur die Vercel-ENV-Calls machen.
-1. Stripe Dashboard → oben rechts **"Aktivieren"**
-2. Firmendaten + IBAN eintragen, Identität verifizieren
-3. Im **Live-Modus** Produkt "Spurig" neu anlegen (Sandbox ≠ Live, separate Datenbank!)
-4. Neue Live-Price-IDs notieren (analog zu Sandbox: monatlich 5,99 € + jährlich 59,88 €)
-5. Live-Webhook einrichten (analog zu Sandbox, Endpoint-URL identisch: `https://spurig.com/api/webhooks/stripe`)
-6. Live-Keys + neuen `whsec_` Secret an mich liefern, dann setze ich:
+Unverändert aus vorheriger Session. Braucht User-Action:
+1. Stripe Dashboard → "Aktivieren" → Firmendaten, IBAN, Identität
+2. Im Live-Modus "Spurig" neu anlegen (Sandbox ≠ Live)
+3. Live-Price-IDs notieren (monatlich 5,99 € + jährlich 59,88 €)
+4. Live-Webhook einrichten, Endpoint: `https://spurig.com/api/webhooks/stripe`
+5. Claude die Live-Keys + `whsec_` liefern, dann Vercel-ENV setzen:
    - `STRIPE_SECRET_KEY=sk_live_...`
    - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...`
    - `STRIPE_MONTHLY_PRICE_ID=price_...` (Live)
    - `STRIPE_YEARLY_PRICE_ID=price_...` (Live)
    - `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID=price_...` (Live)
    - `STRIPE_WEBHOOK_SECRET=whsec_...` (Live)
-   in Vercel-Production + Redeploy.
 
 ### 5. [NIEDRIG] CRON_SECRET rotieren
-War in einem Screenshot der vor-vorherigen Session sichtbar. Neuen Wert generieren und in Vercel + `.env.local` setzen.
+War in Screenshot sichtbar. Neuen Wert generieren, in Vercel + `.env.local` setzen.
 
 ### 6. [NIEDRIG] Resend Setup
-Für E-Mail-Versand (Report-Schedules, Scan-Alerts, Welcome-E-Mail nach Signup).
+Für Report-Schedules, Scan-Alerts, Welcome-E-Mail.
 
-## Tech-Notizen / Architektur
+### 7. [NIEDRIG] Uniqueness-Check beim Signup
+Latenter Bug: Wenn zwei User denselben Username wollen, schlägt erst der DB-Insert fehl (Unique Partial Index `idx_profiles_username`) → Signup bricht mit unklarer Fehlermeldung. Lösung:
+- Client-side: vor Submit `resolve_username(input)` prüfen
+- Server-side: Signup-Action mit Pre-Check oder Unique-Error-Catching mit deutscher Meldung
+
+### 8. [NIEDRIG] Case-Mismatch Username Index
+`idx_profiles_username` ist case-sensitive (`btree(username)`), aber `resolve_username` vergleicht case-insensitive (`lower(username)`). Zwei User könnten als "david" und "David" nebeneinander existieren, `resolve_username` gäbe dann nur den ersten per `LIMIT 1` zurück. Fix: Index neu anlegen als `btree(lower(username))`.
+
+## Tech-Notizen
 
 ### Effective Tier Logic
-`src/lib/billing/gates.ts` definiert `EffectiveTier = 'free' | 'trial' | 'paid' | 'expired'`. Die Hard-Paywall greift bei `'expired'`. Der Status wird live aus DB geprüft (kein Cache).
+`src/lib/billing/gates.ts` → `EffectiveTier = 'free' | 'trial' | 'paid' | 'expired'`. Hard-Paywall greift bei `'expired'` im `(dashboard)/layout.tsx`.
 
-### Webhook-Signatur
-`STRIPE_WEBHOOK_SECRET` ist live: `whsec_JyV50AsW1fybqEZUUZjiYQRx29wkuBwE` (Sandbox). Der Webhook-Handler in `src/app/api/webhooks/stripe/route.ts` verifiziert die Stripe-Signatur.
+### Webhook
+- Endpoint: `src/app/api/webhooks/stripe/route.ts`
+- `STRIPE_WEBHOOK_SECRET=whsec_JyV50AsW1fybqEZUUZjiYQRx29wkuBwE` (Sandbox, in Vercel gesetzt)
 
-### Wichtige Flags & Constraints
-- DSGVO-Konformität bleibt Pflicht (siehe Memory `feedback_dsgvo_compliance.md`)
-- Supabase-Migrationen via MCP gegen Prod-DB (siehe Memory `feedback_migrations.md`)
+### Vercel-ENV (Sandbox)
+- `NEXT_PUBLIC_APP_URL=https://spurig.com` ✅
+- `STRIPE_MONTHLY_PRICE_ID=price_1TKmBGLAWTHGcAN4DDYP8qh2`
+- `STRIPE_YEARLY_PRICE_ID=price_1TKmBGLAWTHGcAN4bswavC7l`
+
+### Constraints
+- DSGVO-Konformität bleibt Pflicht
+- Supabase-Migrationen via MCP gegen Prod-DB
 - Deutsche UI, englischer Code
 - 152 Unit Tests + 19 E2E Tests müssen grün bleiben
-- **Redirects werden NIE blockiert** — auch nach Trial-Ende (`/r/[code]` liegt außerhalb der dashboard-route, das `TrialEndedModal` rendert nur in `(dashboard)/layout.tsx`)
+- Redirects werden NIE blockiert (`/r/[code]` liegt außerhalb dashboard-route)
 - Vercel Hobby: Crons max 1x/Tag
 
-### Bekannte Vercel-ENV-Werte
-- `NEXT_PUBLIC_APP_URL=https://spurig.com` ✅
-- `STRIPE_WEBHOOK_SECRET=whsec_JyV...BwE` ✅ (Sandbox)
-- `STRIPE_MONTHLY_PRICE_ID=price_1TKmBGLAWTHGcAN4DDYP8qh2` (Sandbox)
-- `STRIPE_YEARLY_PRICE_ID=price_1TKmBGLAWTHGcAN4bswavC7l` (Sandbox)
-- `STRIPE_SECRET_KEY=sk_test_51TKlk2...` (Sandbox)
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51TKlk2...` (Sandbox)
+### User-Kontext-Memory
+- `feedback_migrations.md` — Migrationen via MCP gegen Prod
+- `feedback_dsgvo_compliance.md` — DSGVO-Pflicht
+- `project_pricing_model.md` — EIN Plan, 5,99€/Mo oder 4,99€/Mo jährlich
+- `reference_secrets_location.md` — `.env.local`, sb_publishable_/sb_secret_
