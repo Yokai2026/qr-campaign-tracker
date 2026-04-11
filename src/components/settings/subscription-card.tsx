@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { CreditCard, Clock, CheckCircle, AlertTriangle, Crown, ExternalLink, Loader2 } from 'lucide-react';
+import { CreditCard, Clock, CheckCircle, AlertTriangle, Crown, ExternalLink, Loader2, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { getBillingPortalUrl } from '@/app/(dashboard)/settings/billing-actions';
@@ -13,19 +13,55 @@ type Props = {
   checkoutUrls: { monthly: string; yearly: string };
 };
 
-const STATUS_CONFIG: Record<string, { label: string; icon: typeof CheckCircle; color: string }> = {
-  active: { label: 'Aktiv', icon: CheckCircle, color: 'text-emerald-600' },
-  on_trial: { label: 'Testphase', icon: Clock, color: 'text-blue-600' },
-  past_due: { label: 'Zahlung ausstehend', icon: AlertTriangle, color: 'text-amber-600' },
-  paused: { label: 'Pausiert', icon: Clock, color: 'text-muted-foreground' },
-  cancelled: { label: 'Gekündigt', icon: AlertTriangle, color: 'text-red-600' },
-  expired: { label: 'Abgelaufen', icon: AlertTriangle, color: 'text-red-600' },
+type StatusKey = 'active' | 'on_trial' | 'past_due' | 'paused' | 'cancelled' | 'expired';
+
+const STATUS_CONFIG: Record<StatusKey, { label: string; icon: typeof CheckCircle; pill: string; dot: string }> = {
+  active: {
+    label: 'Aktiv',
+    icon: CheckCircle,
+    pill: 'bg-emerald-500/10 text-emerald-700 ring-1 ring-inset ring-emerald-500/20 dark:text-emerald-400',
+    dot: 'bg-emerald-500',
+  },
+  on_trial: {
+    label: 'Testversion',
+    icon: Clock,
+    pill: 'bg-blue-500/10 text-blue-700 ring-1 ring-inset ring-blue-500/20 dark:text-blue-400',
+    dot: 'bg-blue-500',
+  },
+  past_due: {
+    label: 'Zahlung ausstehend',
+    icon: AlertTriangle,
+    pill: 'bg-amber-500/10 text-amber-700 ring-1 ring-inset ring-amber-500/20 dark:text-amber-400',
+    dot: 'bg-amber-500',
+  },
+  paused: {
+    label: 'Pausiert',
+    icon: Clock,
+    pill: 'bg-muted text-muted-foreground ring-1 ring-inset ring-border',
+    dot: 'bg-muted-foreground',
+  },
+  cancelled: {
+    label: 'Gekündigt',
+    icon: AlertTriangle,
+    pill: 'bg-red-500/10 text-red-700 ring-1 ring-inset ring-red-500/20 dark:text-red-400',
+    dot: 'bg-red-500',
+  },
+  expired: {
+    label: 'Abgelaufen',
+    icon: AlertTriangle,
+    pill: 'bg-red-500/10 text-red-700 ring-1 ring-inset ring-red-500/20 dark:text-red-400',
+    dot: 'bg-red-500',
+  },
 };
 
 const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID;
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function formatDateLong(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Props) {
@@ -62,38 +98,70 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
       <div className="space-y-4 p-5">
         {hasSub ? (
           <>
-            <div className="flex items-center justify-between">
-              <div>
+            {/* Header row: plan name (big) + status pill */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-amber-500" />
-                  <span className="text-[15px] font-semibold">
-                    Spurig {isYearly ? 'Jährlich' : 'Monatlich'}
-                  </span>
-                </div>
-                {(() => {
-                  const cfg = STATUS_CONFIG[subscription.status];
-                  if (!cfg) return null;
-                  const Icon = cfg.icon;
-                  return (
-                    <div className={`mt-1 flex items-center gap-1 text-[12px] ${cfg.color}`}>
-                      <Icon className="h-3 w-3" />
-                      {cfg.label}
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-amber-500/10">
+                    <Crown className="h-3.5 w-3.5 text-amber-600 dark:text-amber-500" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-[16px] font-semibold leading-tight tracking-tight">
+                      Spurig · {isYearly ? 'Jährlich' : 'Monatlich'}
                     </div>
-                  );
-                })()}
+                    <div className="mt-0.5 flex items-baseline gap-1.5">
+                      <span className="text-[13px] font-medium tabular-nums">
+                        {isYearly ? '4,99 €' : '5,99 €'}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        / Monat{isYearly ? ' · jährlich abgerechnet' : ''}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-right text-[12px] text-muted-foreground">
-                {subscription.current_period_end && mounted && (
-                  <p>Nächste Zahlung: {formatDate(subscription.current_period_end)}</p>
-                )}
-                {subscription.trial_ends_at && mounted && subscription.status === 'on_trial' && (
-                  <p>Testzeitraum endet am: {formatDate(subscription.trial_ends_at)}</p>
-                )}
-                {subscription.cancel_at && mounted && (
-                  <p className="text-red-600">Endet am: {formatDate(subscription.cancel_at)}</p>
-                )}
-              </div>
+              {(() => {
+                const cfg = STATUS_CONFIG[subscription.status as StatusKey];
+                if (!cfg) return null;
+                return (
+                  <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${cfg.pill}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
+                    {cfg.label}
+                  </span>
+                );
+              })()}
             </div>
+
+            {/* Meta row: next billing, trial end, cancel warning */}
+            {mounted && (subscription.current_period_end || subscription.trial_ends_at || subscription.cancel_at) && (
+              <dl className="grid gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-[12px] sm:grid-cols-2">
+                {subscription.current_period_end && !subscription.cancel_at && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                    <dt className="text-muted-foreground">Nächste Abrechnung:</dt>
+                    <dd className="font-medium tabular-nums">{formatDateLong(subscription.current_period_end)}</dd>
+                  </div>
+                )}
+                {subscription.trial_ends_at && subscription.status === 'on_trial' && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                    <dt className="text-muted-foreground">Testphase endet:</dt>
+                    <dd className="font-medium tabular-nums">{formatDateLong(subscription.trial_ends_at)}</dd>
+                  </div>
+                )}
+                {subscription.cancel_at && (
+                  <div className="flex items-center gap-2 sm:col-span-2">
+                    <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+                    <dt className="text-muted-foreground">Läuft aus am:</dt>
+                    <dd className="font-medium tabular-nums text-amber-700 dark:text-amber-400">
+                      {formatDateLong(subscription.cancel_at)}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            )}
+
+            {/* Footer: CTA */}
             <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-[12px] text-muted-foreground">
                 Plan wechseln, Zahlungsmethode ändern oder kündigen.
