@@ -3,10 +3,18 @@ import { createServiceClient } from '@/lib/supabase/server';
 import { getStripe, priceToTier, mapStripeStatus } from '@/lib/billing/stripe';
 import type Stripe from 'stripe';
 
-/** Safely read current_period_end which may not be in newer SDK types */
+/**
+ * Read current_period_end from subscription.
+ * Stripe API "Basil" (2025-03-31) moved this field from the top-level
+ * Subscription object to the individual line items. We try items.data[0]
+ * first, then fall back to the top-level for older API versions.
+ */
 function getPeriodEnd(sub: Stripe.Subscription): string | null {
-  const v = (sub as unknown as Record<string, number>).current_period_end;
-  return v ? new Date(v * 1000).toISOString() : null;
+  const item = sub.items?.data?.[0] as unknown as Record<string, number> | undefined;
+  const itemEnd = item?.current_period_end;
+  if (itemEnd) return new Date(itemEnd * 1000).toISOString();
+  const topEnd = (sub as unknown as Record<string, number>).current_period_end;
+  return topEnd ? new Date(topEnd * 1000).toISOString() : null;
 }
 
 export async function POST(request: NextRequest) {
