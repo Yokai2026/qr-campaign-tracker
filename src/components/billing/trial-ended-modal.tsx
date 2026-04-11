@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { AlertCircle, Check, Download, LogOut, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowRight, Check, Download, LogOut, Loader2 } from 'lucide-react';
 
 /**
  * Hard paywall shown when a user's trial has expired and no active subscription
@@ -14,6 +14,8 @@ import { AlertCircle, Check, Download, LogOut, Loader2 } from 'lucide-react';
 export function TrialEndedModal() {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<'yearly' | 'monthly'>('yearly');
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Prevent background scroll while modal is open
   useEffect(() => {
@@ -30,6 +32,11 @@ export function TrialEndedModal() {
     await supabase.auth.signOut();
     router.push('/login');
     router.refresh();
+  }
+
+  function handleContinue() {
+    setIsRedirecting(true);
+    window.location.href = `/api/checkout?plan=${selectedPlan}`;
   }
 
   return (
@@ -56,11 +63,18 @@ export function TrialEndedModal() {
         </div>
 
         {/* Plans */}
-        <div className="space-y-2.5 px-6 pb-5">
+        <div role="radiogroup" aria-label="Plan auswählen" className="space-y-2.5 px-6 pb-4">
           {/* Yearly — featured */}
-          <a
-            href="/api/checkout?plan=yearly"
-            className="group relative block rounded-lg border-2 border-primary bg-primary/[0.03] p-4 transition-all hover:bg-primary/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          <button
+            type="button"
+            role="radio"
+            aria-checked={selectedPlan === 'yearly'}
+            onClick={() => setSelectedPlan('yearly')}
+            className={`group relative block w-full rounded-lg border-2 p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              selectedPlan === 'yearly'
+                ? 'border-primary bg-primary/[0.06]'
+                : 'border-border bg-card hover:border-primary/40 hover:bg-muted/30'
+            }`}
           >
             <div className="absolute -top-2.5 left-4 flex items-center gap-1.5">
               <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
@@ -81,16 +95,29 @@ export function TrialEndedModal() {
                   59,88 € jährlich · <span className="line-through">155,88 €</span> gespart
                 </p>
               </div>
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform group-hover:scale-105">
-                <Check className="h-4 w-4" strokeWidth={3} />
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all ${
+                  selectedPlan === 'yearly'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'border border-border text-muted-foreground group-hover:border-primary/40 group-hover:text-primary'
+                }`}
+              >
+                <Check className="h-4 w-4" strokeWidth={selectedPlan === 'yearly' ? 3 : 2} />
               </div>
             </div>
-          </a>
+          </button>
 
           {/* Monthly */}
-          <a
-            href="/api/checkout?plan=monthly"
-            className="group block rounded-lg border border-border bg-card p-4 transition-all hover:border-border/80 hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          <button
+            type="button"
+            role="radio"
+            aria-checked={selectedPlan === 'monthly'}
+            onClick={() => setSelectedPlan('monthly')}
+            className={`group block w-full rounded-lg border-2 p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              selectedPlan === 'monthly'
+                ? 'border-primary bg-primary/[0.06]'
+                : 'border-border bg-card hover:border-primary/40 hover:bg-muted/30'
+            }`}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
@@ -106,11 +133,39 @@ export function TrialEndedModal() {
                   Jederzeit kündbar · <span className="line-through">12,99 €</span> spare 54 %
                 </p>
               </div>
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors group-hover:border-primary/40 group-hover:text-primary">
-                <Check className="h-4 w-4" />
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all ${
+                  selectedPlan === 'monthly'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'border border-border text-muted-foreground group-hover:border-primary/40 group-hover:text-primary'
+                }`}
+              >
+                <Check className="h-4 w-4" strokeWidth={selectedPlan === 'monthly' ? 3 : 2} />
               </div>
             </div>
-          </a>
+          </button>
+        </div>
+
+        {/* Continue CTA */}
+        <div className="px-6 pb-5">
+          <button
+            type="button"
+            onClick={handleContinue}
+            disabled={isRedirecting}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-[14px] font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isRedirecting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Weiterleitung zu Stripe…
+              </>
+            ) : (
+              <>
+                Weiter zum Checkout
+                <ArrowRight className="h-4 w-4" />
+              </>
+            )}
+          </button>
         </div>
 
         {/* Footer */}
