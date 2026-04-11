@@ -1,167 +1,141 @@
-# Fortsetzung: Webhook `current_period_end`-Bug, Abo-Card-Redesign, Onboarding-Dismiss, Stripe-Live
+# Fortsetzung: Stripe Live-Modus + Verifikation des Webhooks im Prod
 
-## Session 2026-04-11 (Teil 2) — was passiert ist
+## Session 2026-04-11 (Teil 2+3) — was passiert ist
 
-### ✅ Gefixt und gepusht
+Große Session. Alles grün, 152/152 Unit-Tests, mehrere Stripe-Basil-Bugs
+gefixt, Settings-Card redesignt, Onboarding-Card dismissable, SEPA-Flow
+korrekt verdrahtet.
 
-**Commit `8b973b4` — Select-First-Flow im TrialEndedModal**
-- Vorher: Klick auf Plan-Karte = sofortiger Redirect zu Stripe
-- Jetzt: Karten sind `<button role="radio">`, User wählt aus, klickt dann "Weiter zum Checkout"
-- State: `selectedPlan: 'yearly' | 'monthly'` (default yearly), `isRedirecting` für Loader
-- `handleContinue()` → `window.location.href = /api/checkout?plan=${selectedPlan}`
+### ✅ Commits (alle auf `origin/master`)
 
-**Commit `ed20994` — Sidebar-Badge-Fix**
-- `src/components/layout/sidebar.tsx:101-106` — `tierLabel` neu:
-  - `trial: 'Testversion'` (war `'Trial'`)
-  - `expired: 'Abgelaufen'` (war `'Trial abgelaufen'`)
-  - `paid: 'Aktiv'` (war `'Spurig'` — doppelter Brand-Name)
-- Warum: Brand-Block zeigt bereits "Spurig" + Badge → zwei Mal "Spurig" nebeneinander.
+**`8b973b4` feat(billing): Select-First-Flow im TrialEndedModal**
+Vorher: Klick auf Plan-Karte = sofortiger Redirect. Jetzt: `<button role="radio">` Karten, User wählt aus, klickt "Weiter zum Checkout".
+
+**`ed20994` fix(ui): Sidebar-Badge 'Spurig' → 'Aktiv'**
+`src/components/layout/sidebar.tsx:101-106` — `tierLabel` neu: Testversion / Aktiv / Abgelaufen / Free. Vorher stand bei aktivem Abo zweimal "Spurig" nebeneinander (Brand + Badge).
+
+**`71d5bb2` docs: next-session-prompt**
+Doku-Update.
+
+**`f8a7199` fix(webhook): current_period_end aus items.data[0] (Basil)**
+Stripe API "Basil" (2025-03-31) hat `current_period_end` von Top-Level Subscription auf die Line Items verschoben. `getPeriodEnd()` liest jetzt zuerst `sub.items.data[0].current_period_end`, Fallback Top-Level.
+Bestehendes Abo `sub_1TL87OLAWTHGcAN4BhgNlDAf` via SQL auf `2026-05-11 20:27 UTC` backfilled.
+
+**`8a360eb` feat(settings): Abo-Card Redesign**
+`src/components/settings/subscription-card.tsx` komplett überarbeitet:
+- Plan-Name groß (16px) mit Crown-Badge
+- Preis + Abrechnungs-Intervall direkt sichtbar (5,99 €/Monat oder 4,99 €/Monat · jährlich abgerechnet)
+- Status als rechts-ausgerichtetes Pill mit farbigem Dot
+- Meta-Row in Sub-Box: Nächste Abrechnung, Testphase-Ende, Kündigungs-Warnung
+
+**`165a83c` feat(dashboard): Onboarding-Card dismissable**
+- Migration 016 (via MCP appliziert): `profiles.onboarding_dismissed_at timestamptz`
+- Server Action `dismissOnboarding()` in `src/app/(dashboard)/dashboard/actions.ts`
+- Client-Wrapper `DismissibleOnboarding` mit X-Button + optimistic hide + toast-rollback
+- `PerformanceKPIs` lädt `onboarding_dismissed_at` parallel und gatet auf `showOnboarding`
+- Profile-Type erweitert
+
+**`1ce342b` fix(webhook): invoice.subscription → parent.subscription_details + payment_succeeded**
+Zweiter Basil-Bug gefunden: `invoice.subscription` ist auch weg, jetzt unter `invoice.parent.subscription_details.subscription`. Neuer Helper `getInvoiceSubId()` liest neue Location mit Fallback.
+Zusätzlich: `invoice.payment_succeeded`-Handler für asynchrone Zahlungsmethoden (SEPA, Klarna) — zieht aktuellen Sub-State von Stripe und schreibt `status` + `current_period_end`.
 
 ### ✅ Vercel-ENVs gesetzt (Production)
-Waren alle **gar nicht gesetzt** — Ursache für den 500er auf `/api/checkout`. Jetzt gesetzt:
+Waren alle **gar nicht gesetzt** — Ursache für den 500er auf `/api/checkout` früher in der Session. Jetzt gesetzt:
 - `STRIPE_SECRET_KEY` (sk_test_…)
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (pk_test_…)
 - `STRIPE_MONTHLY_PRICE_ID=price_1TKmBGLAWTHGcAN4DDYP8qh2`
 - `STRIPE_YEARLY_PRICE_ID=price_1TKmBGLAWTHGcAN4bswavC7l`
 - `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID=price_1TKmBGLAWTHGcAN4DDYP8qh2`
-- `STRIPE_WEBHOOK_SECRET=whsec_…` (schon vorher gesetzt)
 
 ### ✅ Stripe Payment Methods für DACH optimiert
 Aktiviert: **Karten, SEPA, PayPal, Apple Pay, Google Pay, EPS, TWINT, Klarna, Link, Amazon Pay**
-Deaktiviert: alle Non-DACH (Bancontact, iDEAL, Przelewy24, Giropay, etc.)
+Deaktiviert: alle Non-DACH.
 
 ### ✅ E2E-Checkout-Test erfolgreich
-- Testkarte `4242 4242 4242 4242` / `12/34` / `123`
-- Subscription-Row angelegt:
-  - `user_id=1122b816-54ba-4774-b56c-a6cd637c4ff1`
-  - `stripe_subscription_id=sub_1TL87OLAWTHGcAN4BhgNlDAf`
-  - `stripe_customer_id=cus_UJlZ3KO3KYfU7J`
-  - `status=active`, `plan_tier=paid`
-  - `stripe_price_id=price_1TKmBGLAWTHGcAN4DDYP8qh2` (monthly)
-  - `created_at=2026-04-11 20:27:06`
-  - ⚠️ **`current_period_end=NULL`** — Webhook-Bug (siehe unten)
+Testkarte `4242 4242 4242 4242`, Abo angelegt, Status `active`, `current_period_end` korrekt nach Backfill.
 
 ---
 
 ## ❌ Offen — HIER FORTSETZEN
 
-### 1. [KRITISCH] Webhook `current_period_end`-Bug (Stripe API Basil)
+### 1. [HOCH] Webhook-Fix im Prod verifizieren
 
-**Datei:** `src/app/api/webhooks/stripe/route.ts` Zeile 7-10
+Nach Deploy von `1ce342b` sollte der nächste Stripe-Webhook-Event die Bugs nicht mehr haben. Check:
 
-**Problem:** Stripe API "Basil" (2025-03-31) hat `current_period_end` **weg vom Top-Level Subscription-Objekt** auf die einzelnen Line Items verschoben. Aktueller Code liest aus dem Top-Level → immer `null` in DB.
+1. Vercel: Letzter Deploy grün?
+2. Stripe Dashboard → Developers → Events → letzten `customer.subscription.updated` Event "Resend"-Klicken
+3. `SELECT current_period_end FROM subscriptions WHERE stripe_subscription_id='sub_1TL87OLAWTHGcAN4BhgNlDAf'` — sollte weiterhin gesetzt sein (nicht NULL werden)
+4. Alternativ: im Stripe Billing Portal das Test-Abo kündigen → `customer.subscription.updated` feuert → prüfen ob `cancel_at` korrekt geschrieben wird
 
-**Aktueller Code (falsch):**
-```typescript
-function getPeriodEnd(sub: Stripe.Subscription): string | null {
-  const v = (sub as unknown as Record<string, number>).current_period_end;
-  return v ? new Date(v * 1000).toISOString() : null;
-}
-```
+### 2. [HOCH] Stripe Live-Modus aktivieren
 
-**Korrekt:**
-```typescript
-function getPeriodEnd(sub: Stripe.Subscription): string | null {
-  const item = sub.items.data[0] as unknown as Record<string, number> | undefined;
-  const v = item?.current_period_end;
-  return v ? new Date(v * 1000).toISOString() : null;
-}
-```
-
-Funktion wird in zwei Handlern aufgerufen: `checkout.session.completed` und `customer.subscription.updated`.
-
-**Backfill für existierendes Abo:**
-Nach Fix das bereits angelegte Abo nachtragen. Via Stripe API:
-```bash
-# Mit STRIPE_SECRET_KEY aus .env.local
-curl https://api.stripe.com/v1/subscriptions/sub_1TL87OLAWTHGcAN4BhgNlDAf \
-  -u "$STRIPE_SECRET_KEY:"
-```
-→ `items.data[0].current_period_end` auslesen, in Unix-Epoch → ISO, dann:
-```sql
-UPDATE subscriptions
-SET current_period_end = '<ISO>'
-WHERE stripe_subscription_id = 'sub_1TL87OLAWTHGcAN4BhgNlDAf';
-```
-(via Supabase MCP gegen Prod)
-
-### 2. [HOCH] Abo-Card im Settings redesignen
-
-**Datei:** `src/components/settings/subscription-card.tsx`
-
-**User-Feedback (2026-04-11):** "ich will auch das die einstellung besser aussieht und klarer ist für den nutzer"
-
-**Aktueller Zustand:** Crown-Icon + "Spurig Monatlich" + Status als kleiner farbiger Text unten. Zu minimal, Info schwer zu scannen.
-
-**Ziel-Layout (Vorschlag):**
-- Plan-Name groß (z. B. "Spurig · Monatlich" als `text-[16px] font-semibold`)
-- Status als rechts-ausgerichtetes Pill (z. B. grün `Aktiv`, amber `Testversion`, rot `Gekündigt`)
-- Darunter: Preis + Abrechnungs-Intervall (`5,99 € / Monat` oder `4,99 € / Monat · jährlich abgerechnet`)
-- Darunter: Nächste Abrechnung am `current_period_end` (Datum als `d. MMMM yyyy`, de-Locale)
-- Button "Abo verwalten" → Stripe Billing Portal (unverändert)
-- Wenn `cancel_at_period_end=true`: Hinweisbanner "Läuft am … aus"
-
-**Settings-Page:** `src/app/(dashboard)/settings/page.tsx:101` rendert `<SubscriptionCard>` schon korrekt — nur die Card selbst bauen.
-
-### 3. [MITTEL] Onboarding-Card dismissable
-
-Unverändert aus letzter Session:
-- Migration 016: `ALTER TABLE profiles ADD COLUMN onboarding_dismissed_at timestamptz`
-- Server Action `dismissOnboarding()` in `src/app/(dashboard)/dashboard/actions.ts`
-- `src/app/(dashboard)/dashboard/sections/performance-kpis.tsx:75` — Condition erweitern um `!profile.onboarding_dismissed_at`
-- Neue Client-Wrapper-Komponente mit X-Button (top-right)
-
-### 4. [MITTEL] Stripe Live-Modus
-
-User-Action nötig (Stripe-Dashboard):
+**User-Action nötig** (Stripe-Dashboard):
 1. Aktivierung abschließen (Firmendaten, IBAN, Identität)
-2. Im Live-Modus "Spurig"-Produkt neu anlegen
-3. Live-Price-IDs notieren (monatlich 5,99 € + jährlich 59,88 €)
-4. Live-Webhook einrichten: `https://spurig.com/api/webhooks/stripe`
-5. Payment Methods im Live-Mode analog Sandbox aktivieren (Karten, SEPA, PayPal, Apple/Google Pay, EPS, TWINT, Klarna, Link, Amazon Pay)
-6. Claude liefert: Vercel-ENVs auf `sk_live_…` / `pk_live_…` / neue Price-IDs / neues `whsec_…` umstellen
+2. Im Live-Modus "Spurig"-Produkt neu anlegen (Sandbox-Produkte funktionieren NICHT im Live-Modus)
+3. Live-Price-IDs notieren: monatlich 5,99 € + jährlich 59,88 €
+4. Live-Webhook einrichten: Endpoint `https://spurig.com/api/webhooks/stripe`
+5. Payment Methods im Live-Mode analog Sandbox aktivieren
+6. Claude liefern, dann werden Vercel-ENVs umgestellt:
+   - `STRIPE_SECRET_KEY=sk_live_…`
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_…`
+   - `STRIPE_MONTHLY_PRICE_ID=price_…` (Live)
+   - `STRIPE_YEARLY_PRICE_ID=price_…` (Live)
+   - `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID=price_…` (Live)
+   - `STRIPE_WEBHOOK_SECRET=whsec_…` (Live)
+7. Test-Checkout im Live-Mode mit echter Karte (klein)
 
-### 5. [NIEDRIG] SEPA-Webhook-Events verifizieren
-SEPA ist asynchron — `payment_intent.processing` → `payment_intent.succeeded` (bis 5 Werktage später) oder `invoice.payment_failed`. Aktuell nur `checkout.session.completed` + `customer.subscription.updated` implementiert. Prüfen:
-- Werden SEPA-Subs initial korrekt als `active` angelegt oder braucht `incomplete`-Status?
-- `invoice.payment_failed` Handler vorhanden?
+### 3. [NIEDRIG] CRON_SECRET rotieren
+War in einem Screenshot sichtbar. Neuen Wert generieren, in Vercel + `.env.local` setzen.
 
-### 6. [NIEDRIG] Trial-Reset (nicht dringend)
-User hat aktives Abo → irrelevant. Falls doch: `UPDATE profiles SET trial_ends_at='2026-04-22 21:52' WHERE email='tomatenkopf36@gmail.com'` — derzeit steht `2026-01-01` (vom Test).
+### 4. [NIEDRIG] Resend Setup
+Für Report-Schedules, Scan-Alerts, Welcome-E-Mail.
 
-### 7. [NIEDRIG] CRON_SECRET rotieren, Resend-Setup, Username-Uniqueness-Check, Case-Mismatch Username-Index
-Unverändert aus vorheriger Session.
+### 5. [NIEDRIG] Uniqueness-Check beim Signup
+Latenter Bug: Zwei User mit demselben Username → DB-Insert fehlt → unklare Fehlermeldung. Pre-Check oder Unique-Error-Catching mit deutscher Meldung.
+
+### 6. [NIEDRIG] Case-Mismatch Username Index
+`idx_profiles_username` ist case-sensitive, aber `resolve_username` vergleicht case-insensitive. Fix: Index als `btree(lower(username))` neu anlegen.
+
+### 7. [NIEDRIG] Trial-Reset (wenn nötig)
+User hat aktives Abo → irrelevant. Falls doch:
+```sql
+UPDATE profiles SET trial_ends_at='2026-04-22 21:52'
+WHERE email='tomatenkopf36@gmail.com';
+```
+Steht derzeit auf `2026-01-01` (vom früheren Test).
 
 ---
 
 ## Tech-Notizen
 
-### DB-Zustand (Stand 2026-04-11 20:30)
-- `profiles` (tomatenkopf36@gmail.com): `trial_ends_at=2026-01-01`, aktives Abo vorhanden → Hard-Paywall greift nicht
-- `subscriptions`: 1 Row, aktiv, aber `current_period_end=NULL` (Bug #1)
+### DB-Zustand (Stand 2026-04-11 23:35)
+- `profiles` (tomatenkopf36@gmail.com): `trial_ends_at=2026-01-01`, aber aktives Abo vorhanden → voller Zugriff
+- `subscriptions`: 1 Row, aktiv, `current_period_end=2026-05-11 20:27:00+00`
 
-### Vercel-Deploys
-- Letzter Stand: `ed20994` (Sidebar-Badge-Fix) — Vercel auto-deployt
+### Webhook-Events jetzt abgedeckt
+- `checkout.session.completed` (Initial-Anlage via upsert)
+- `customer.subscription.updated` (Status/Cancel-Updates)
+- `customer.subscription.deleted` (expired)
+- `invoice.payment_failed` (past_due) — **nutzt neuen getInvoiceSubId()**
+- `invoice.payment_succeeded` (recovered to active) — **NEU, für SEPA/Klarna**
 
-### Uncommitted nach Sessionende
-- `chatgpt-dsgvo-prompt.md` (untracked, ignorieren)
-- `chatgpt-review-prompt.md` (untracked, ignorieren)
-- `.claude/worktrees/agent-a904edec` (submodule, ignorieren)
+### Stripe API Basil Breaking Changes (in diesem Projekt relevant)
+| Alt | Neu |
+|---|---|
+| `subscription.current_period_end` | `subscription.items.data[0].current_period_end` |
+| `subscription.current_period_start` | `subscription.items.data[0].current_period_start` |
+| `invoice.subscription` | `invoice.parent.subscription_details.subscription` |
+
+Beide Stellen sind jetzt über Helper in `src/app/api/webhooks/stripe/route.ts` abstrahiert (`getPeriodEnd`, `getInvoiceSubId`). Falls weitere Basil-Bugs auftauchen, neue Helper hinzufügen.
 
 ### Effective Tier Logic
-`src/lib/billing/gates.ts` → `EffectiveTier = 'free' | 'trial' | 'paid' | 'expired'`. Hard-Paywall greift bei `'expired'` im `(dashboard)/layout.tsx`.
-
-### Stripe API Version
-Code nutzt aktuell Stripe SDK mit Default-API-Version. Basil (2025-03-31) hat Breaking Changes:
-- `subscription.current_period_end` → `subscription.items.data[].current_period_end`
-- `subscription.current_period_start` → dito
-- Ggf. auch andere Stellen im Webhook/Settings prüfen, die diese Felder lesen
+`src/lib/billing/gates.ts` → `EffectiveTier = 'free' | 'trial' | 'paid' | 'expired'`. Hard-Paywall greift bei `'expired'` im `(dashboard)/layout.tsx`. `past_due` zählt als "hat Zugriff" (grace period).
 
 ### Constraints
 - DSGVO-Konformität Pflicht
 - Supabase-Migrationen via MCP gegen Prod
 - Deutsche UI, englischer Code
-- 152 Unit Tests + 19 E2E Tests müssen grün bleiben
+- 152 Unit Tests müssen grün bleiben
 - Redirects werden NIE blockiert (`/r/[code]` außerhalb dashboard)
 - Vercel Hobby: Crons max 1x/Tag
 
