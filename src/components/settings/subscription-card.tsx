@@ -132,15 +132,24 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
                 Bestehende Weiterleitungen bleiben aktiv.
               </p>
             </div>
+            <div className="rounded-md border border-amber-200 bg-amber-50/50 px-3 py-2 dark:border-amber-900/50 dark:bg-amber-950/20">
+              <p className="text-[11px] text-amber-900 dark:text-amber-300">
+                <span className="font-semibold">Einführungspreis:</span> Statt{' '}
+                <span className="line-through">12,99 €/Mo</span> nur ab{' '}
+                <span className="font-semibold">4,99 €/Mo</span>
+              </p>
+            </div>
             <div className="grid gap-2 sm:grid-cols-2">
               <a href={checkoutUrls.monthly}>
-                <Button variant="outline" size="sm" className="w-full">
-                  Monatlich — 5,99 €/Mo
+                <Button variant="outline" size="sm" className="w-full justify-between">
+                  <span>Monatlich — 5,99 €</span>
+                  <span className="text-[10px] text-muted-foreground">−54 %</span>
                 </Button>
               </a>
               <a href={checkoutUrls.yearly}>
-                <Button size="sm" className="w-full">
-                  Jährlich — 4,99 €/Mo
+                <Button size="sm" className="w-full justify-between">
+                  <span>Jährlich — 4,99 €</span>
+                  <span className="rounded bg-white/20 px-1 py-0.5 text-[9px] font-semibold">−62 %</span>
                 </Button>
               </a>
             </div>
@@ -161,15 +170,24 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
                 Wähle einen Plan, um QR-Codes und Links weiter erstellen zu können.
               </p>
             </div>
+            <div className="rounded-md border border-amber-200 bg-amber-50/50 px-3 py-2 dark:border-amber-900/50 dark:bg-amber-950/20">
+              <p className="text-[11px] text-amber-900 dark:text-amber-300">
+                <span className="font-semibold">Einführungspreis:</span> Statt{' '}
+                <span className="line-through">12,99 €/Mo</span> nur ab{' '}
+                <span className="font-semibold">4,99 €/Mo</span>
+              </p>
+            </div>
             <div className="grid gap-2 sm:grid-cols-2">
               <a href={checkoutUrls.monthly}>
-                <Button variant="outline" size="sm" className="w-full">
-                  Monatlich — 5,99 €/Mo
+                <Button variant="outline" size="sm" className="w-full justify-between">
+                  <span>Monatlich — 5,99 €</span>
+                  <span className="text-[10px] text-muted-foreground">−54 %</span>
                 </Button>
               </a>
               <a href={checkoutUrls.yearly}>
-                <Button size="sm" className="w-full">
-                  Jährlich — 4,99 €/Mo
+                <Button size="sm" className="w-full justify-between">
+                  <span>Jährlich — 4,99 €</span>
+                  <span className="rounded bg-white/20 px-1 py-0.5 text-[9px] font-semibold">−62 %</span>
                 </Button>
               </a>
             </div>

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Check, QrCode } from 'lucide-react';
+import { Check, QrCode, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const features = [
@@ -38,6 +38,10 @@ export default function PricingPage() {
 
       {/* Hero */}
       <div className="mx-auto max-w-5xl px-4 pt-16 pb-12 text-center sm:px-6">
+        <div className="mx-auto mb-4 inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-[12px] font-semibold text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+          <Sparkles className="h-3 w-3" />
+          Einführungspreis — über 50 % günstiger
+        </div>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           Einfache, transparente Preise
         </h1>
@@ -55,9 +59,18 @@ export default function PricingPage() {
             <h2 className="text-[15px] font-semibold">Monatlich</h2>
             <p className="mt-1 text-[13px] text-muted-foreground">Volle Flexibilität, monatlich kündbar.</p>
           </div>
-          <div className="mt-5 flex items-baseline gap-1">
-            <span className="text-3xl font-bold tracking-tight">5,99 €</span>
-            <span className="text-[13px] text-muted-foreground">/ Monat</span>
+          <div className="mt-5">
+            <div className="flex items-baseline gap-2">
+              <span className="text-[15px] text-muted-foreground line-through decoration-2">12,99 €</span>
+              <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                −54 %
+              </span>
+            </div>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="text-3xl font-bold tracking-tight">5,99 €</span>
+              <span className="text-[13px] text-muted-foreground">/ Monat</span>
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">Einführungspreis</p>
           </div>
           <Button className="mt-5 w-full" variant="outline" render={<Link href="/signup?plan=monthly" />}>
             14 Tage kostenlos testen
@@ -67,17 +80,25 @@ export default function PricingPage() {
         {/* Jährlich */}
         <div className="relative flex flex-col rounded-xl border border-primary bg-card p-6 shadow-lg ring-1 ring-primary/20">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-[11px] font-semibold text-primary-foreground">
-            16 % sparen
+            Beliebtester Plan · 16 % sparen
           </div>
           <div>
             <h2 className="text-[15px] font-semibold">Jährlich</h2>
             <p className="mt-1 text-[13px] text-muted-foreground">Ein Jahr buchen, jeden Monat sparen.</p>
           </div>
-          <div className="mt-5 flex items-baseline gap-1">
-            <span className="text-3xl font-bold tracking-tight">4,99 €</span>
-            <span className="text-[13px] text-muted-foreground">/ Monat</span>
+          <div className="mt-5">
+            <div className="flex items-baseline gap-2">
+              <span className="text-[15px] text-muted-foreground line-through decoration-2">12,99 €</span>
+              <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                −62 %
+              </span>
+            </div>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="text-3xl font-bold tracking-tight">4,99 €</span>
+              <span className="text-[13px] text-muted-foreground">/ Monat</span>
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">59,88 € jährlich abgerechnet · Einführungspreis</p>
           </div>
-          <p className="mt-1 text-[12px] text-muted-foreground">59,88 € jährlich abgerechnet</p>
           <Button className="mt-5 w-full" render={<Link href="/signup?plan=yearly" />}>
             14 Tage kostenlos testen
           </Button>

@@ -60,6 +60,16 @@ export function TrialEndedModal() {
             Deine bestehenden QR-Codes und Weiterleitungen funktionieren weiterhin.
           </p>
 
+          <div className="rounded-md border border-amber-200 bg-amber-50/60 px-3 py-2 dark:border-amber-900/50 dark:bg-amber-950/30">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-900 dark:text-amber-300">
+              <Sparkles className="h-3 w-3" />
+              Einführungspreis — über 50 % günstiger
+            </div>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Statt <span className="line-through">12,99 €/Mo</span> nur ab <span className="font-semibold text-foreground">4,99 €/Mo</span>
+            </p>
+          </div>
+
           <div className="space-y-2">
             <a href="/api/checkout?plan=yearly" className="block">
               <Button size="sm" className="w-full justify-between">
@@ -68,13 +78,14 @@ export function TrialEndedModal() {
                   Jährlich — 4,99 €/Mo
                 </span>
                 <span className="rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold">
-                  16 % sparen
+                  −62 %
                 </span>
               </Button>
             </a>
             <a href="/api/checkout?plan=monthly" className="block">
-              <Button variant="outline" size="sm" className="w-full">
-                Monatlich — 5,99 €/Mo
+              <Button variant="outline" size="sm" className="w-full justify-between">
+                <span>Monatlich — 5,99 €/Mo</span>
+                <span className="text-[10px] text-muted-foreground">−54 %</span>
               </Button>
             </a>
           </div>

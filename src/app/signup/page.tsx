@@ -146,8 +146,11 @@ export default function SignupPage() {
                 </span>
               </div>
               <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                Kein Zahlungsmittel erforderlich. Danach <strong className="text-foreground">5,99 €/Mo</strong> oder <strong className="text-foreground">4,99 €/Mo</strong> im Jahresabo.
-                Kein Auto-Upgrade — du entscheidest selbst, ob du weiter machst.
+                Kein Zahlungsmittel erforderlich. Danach Einführungspreis:{' '}
+                <span className="line-through">12,99 €/Mo</span>{' '}
+                <strong className="text-foreground">5,99 €/Mo</strong> (oder{' '}
+                <strong className="text-foreground">4,99 €/Mo</strong> im Jahresabo).
+                Kein Auto-Upgrade — du entscheidest selbst.
               </p>
             </div>
             <form onSubmit={handleSignup} className="space-y-4">
