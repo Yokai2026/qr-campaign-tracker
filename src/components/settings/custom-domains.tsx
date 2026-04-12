@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Globe, Trash2, Plus, Loader2, Check, Copy, Star, AlertCircle, Crown } from 'lucide-react';
+import { Globe, Trash2, Plus, Loader2, Check, Copy, Star, AlertCircle, Crown, Info, QrCode } from 'lucide-react';
+import Link from 'next/link';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { UpgradeBanner } from '@/components/shared/upgrade-banner';
 import { checkFeatureAccess } from '@/lib/billing/check-access';
@@ -65,7 +66,11 @@ export function CustomDomains() {
         toast.error(result.error || 'Fehler beim Hinzufügen');
         return;
       }
-      toast.success('Domain hinzugefügt — jetzt verifizieren');
+      if (result.warning) {
+        toast.warning(result.warning, { duration: 8000 });
+      } else {
+        toast.success('Domain hinzugefügt — jetzt DNS einrichten und verifizieren');
+      }
       setHost('');
       setShowForm(false);
       await loadDomains();
@@ -79,7 +84,11 @@ export function CustomDomains() {
         toast.error(result.error || 'Fehler beim Löschen');
         return;
       }
-      toast.success('Domain entfernt');
+      if (result.warning) {
+        toast.warning(result.warning, { duration: 8000 });
+      } else {
+        toast.success('Domain entfernt');
+      }
       setDomains((prev) => prev.filter((d) => d.id !== id));
     });
   }
@@ -90,7 +99,11 @@ export function CustomDomains() {
     setVerifyingId(null);
 
     if (result.verified) {
-      toast.success('Domain verifiziert');
+      if (result.warning) {
+        toast.warning(result.warning, { duration: 10000 });
+      } else {
+        toast.success('Domain verifiziert');
+      }
       await loadDomains();
     } else {
       toast.error(result.error || 'Verifizierung fehlgeschlagen');
@@ -180,6 +193,25 @@ export function CustomDomains() {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Explainer: 3-Step Guide */}
+        <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-2.5">
+          <div className="flex items-center gap-1.5 text-[12px] font-medium">
+            <Info className="h-3.5 w-3.5 text-muted-foreground" />
+            So richtest du eine eigene Kurz-Domain ein
+          </div>
+          <ol className="space-y-1.5 text-[11px] text-muted-foreground pl-1">
+            <li><span className="font-medium text-foreground">1.</span> Domain hier eintragen (z.B. <code className="font-mono">go.deine-marke.de</code>)</li>
+            <li><span className="font-medium text-foreground">2.</span> Zwei DNS-Records bei deinem Domain-Anbieter anlegen (Anleitung wird angezeigt)</li>
+            <li><span className="font-medium text-foreground">3.</span> „Verifizieren&quot; klicken — fertig. Deine QR-Codes zeigen beim Scan deine Domain statt spurig.com.</li>
+          </ol>
+          <div className="flex items-center gap-3 pt-1 text-[11px]">
+            <Link href="/qr-codes/new" className="inline-flex items-center gap-1 text-primary hover:underline">
+              <QrCode className="h-3 w-3" />
+              QR-Code mit eigener Domain erstellen
+            </Link>
+          </div>
+        </div>
+
         {/* Add form */}
         {showForm && (
           <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
