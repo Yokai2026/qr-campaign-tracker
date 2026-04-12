@@ -1,135 +1,150 @@
-# Fortsetzung: Stripe Live-Modus + Verifikation des Webhooks im Prod
+# Fortsetzung: Landing Page + finale Launch-Vorbereitung
 
-## Session 2026-04-11 (Teil 2+3) — was passiert ist
+## Session 2026-04-12 — was passiert ist
 
-Große Session. Alles grün, 152/152 Unit-Tests, mehrere Stripe-Basil-Bugs
-gefixt, Settings-Card redesignt, Onboarding-Card dismissable, SEPA-Flow
-korrekt verdrahtet.
+Mega produktive Session. Stripe komplett live, E-Mail-Infrastruktur selbst gehostet
+über n8n, Rechtliches aktualisiert, SEO-Grundlagen gesetzt. Die App ist zu ~90%
+launch-ready. Fehlt noch: Landing Page.
 
 ### ✅ Commits (alle auf `origin/master`)
 
-**`8b973b4` feat(billing): Select-First-Flow im TrialEndedModal**
-Vorher: Klick auf Plan-Karte = sofortiger Redirect. Jetzt: `<button role="radio">` Karten, User wählt aus, klickt "Weiter zum Checkout".
+**`88f14a4` feat(email): Resend durch n8n-Webhook ersetzen**
+- Resend-Package + `src/lib/email/resend.ts` entfernt
+- Neu: `src/lib/email/send.ts` → `fetch()` an n8n-Webhook
+- Beide Cron-Routes (`check-alerts`, `reports`) nutzen jetzt `sendEmail()`
+- n8n-Workflow als JSON: `n8n-workflows/spurig-email.json`
+- ENV: `N8N_EMAIL_WEBHOOK_URL=https://n8n.servrig.com/webhook/spurig-email`
 
-**`ed20994` fix(ui): Sidebar-Badge 'Spurig' → 'Aktiv'**
-`src/components/layout/sidebar.tsx:101-106` — `tierLabel` neu: Testversion / Aktiv / Abgelaufen / Free. Vorher stand bei aktivem Abo zweimal "Spurig" nebeneinander (Brand + Badge).
+**`4af7569` fix(legal): kontakt@ → info@spurig.com + Datenschutz-Update**
+- Impressum: E-Mail auf `info@spurig.com`
+- Datenschutz: Resend Inc. raus, Hetzner Online GmbH rein
 
-**`71d5bb2` docs: next-session-prompt**
-Doku-Update.
+**`9aa0faa` fix(launch-ready): Resend-Warnung + SEO + env.example**
+- Veraltete RESEND_API_KEY-Warnung in Settings entfernt
+- `.env.local.example` komplett (Stripe, Cron, n8n)
+- Root-Layout: OG-Tags, Twitter Cards, robots, title-template
+- `/robots.txt` via `src/app/robots.ts`
+- `/sitemap.xml` via `src/app/sitemap.ts`
 
-**`f8a7199` fix(webhook): current_period_end aus items.data[0] (Basil)**
-Stripe API "Basil" (2025-03-31) hat `current_period_end` von Top-Level Subscription auf die Line Items verschoben. `getPeriodEnd()` liest jetzt zuerst `sub.items.data[0].current_period_end`, Fallback Top-Level.
-Bestehendes Abo `sub_1TL87OLAWTHGcAN4BhgNlDAf` via SQL auf `2026-05-11 20:27 UTC` backfilled.
+### ✅ E-Mail-Infrastruktur (selbst gehostet, keine Drittanbieter-Kosten)
 
-**`8a360eb` feat(settings): Abo-Card Redesign**
-`src/components/settings/subscription-card.tsx` komplett überarbeitet:
-- Plan-Name groß (16px) mit Crown-Badge
-- Preis + Abrechnungs-Intervall direkt sichtbar (5,99 €/Monat oder 4,99 €/Monat · jährlich abgerechnet)
-- Status als rechts-ausgerichtetes Pill mit farbigem Dot
-- Meta-Row in Sub-Box: Nächste Abrechnung, Testphase-Ende, Kündigungs-Warnung
+**Eingehend** (Cloudflare Email Routing, kostenlos):
+- `info@spurig.com` → forwardet an `davidwhiteha@gmail.com`
+- Destination: `davidwhiteha@gmail.com` verifiziert
+- MX/TXT-Records von Cloudflare automatisch gesetzt
 
-**`165a83c` feat(dashboard): Onboarding-Card dismissable**
-- Migration 016 (via MCP appliziert): `profiles.onboarding_dismissed_at timestamptz`
-- Server Action `dismissOnboarding()` in `src/app/(dashboard)/dashboard/actions.ts`
-- Client-Wrapper `DismissibleOnboarding` mit X-Button + optimistic hide + toast-rollback
-- `PerformanceKPIs` lädt `onboarding_dismissed_at` parallel und gatet auf `showOnboarding`
-- Profile-Type erweitert
+**Ausgehend aus Gmail** ("Senden als"):
+- Gmail sendet als `info@spurig.com` via `smtp.gmail.com:587`
+- App-Passwort: siehe Gmail-Einstellungen
 
-**`1ce342b` fix(webhook): invoice.subscription → parent.subscription_details + payment_succeeded**
-Zweiter Basil-Bug gefunden: `invoice.subscription` ist auch weg, jetzt unter `invoice.parent.subscription_details.subscription`. Neuer Helper `getInvoiceSubId()` liest neue Location mit Fallback.
-Zusätzlich: `invoice.payment_succeeded`-Handler für asynchrone Zahlungsmethoden (SEPA, Klarna) — zieht aktuellen Sub-State von Stripe und schreibt `status` + `current_period_end`.
+**Ausgehend aus der App** (n8n auf Hetzner):
+- n8n: `https://n8n.servrig.com`
+- Credential: "Spurig SMTP" (Gmail SMTP, Port 587, SSL/TLS aus)
+- Workflow: "Spurig — E-Mail senden" (Webhook POST → Send Email)
+- From: `info@spurig.com`
+- Webhook-URL: `https://n8n.servrig.com/webhook/spurig-email`
+- Payload: `{ to, subject, html }`
 
-### ✅ Vercel-ENVs gesetzt (Production)
-Waren alle **gar nicht gesetzt** — Ursache für den 500er auf `/api/checkout` früher in der Session. Jetzt gesetzt:
-- `STRIPE_SECRET_KEY` (sk_test_…)
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (pk_test_…)
-- `STRIPE_MONTHLY_PRICE_ID=price_1TKmBGLAWTHGcAN4DDYP8qh2`
-- `STRIPE_YEARLY_PRICE_ID=price_1TKmBGLAWTHGcAN4bswavC7l`
-- `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID=price_1TKmBGLAWTHGcAN4DDYP8qh2`
-
-### ✅ Stripe Payment Methods für DACH optimiert
-Aktiviert: **Karten, SEPA, PayPal, Apple Pay, Google Pay, EPS, TWINT, Klarna, Link, Amazon Pay**
-Deaktiviert: alle Non-DACH.
-
-### ✅ E2E-Checkout-Test erfolgreich
-Testkarte `4242 4242 4242 4242`, Abo angelegt, Status `active`, `current_period_end` korrekt nach Backfill.
-
----
-
-## ✅ Erledigt (verifiziert 2026-04-12)
-
-### 1. ✅ Webhook-Fix im Prod verifiziert
-DB-Zustand sauber: `status=active`, `current_period_end=2026-05-11 20:27:00+00`, `cancel_at=null`. Basil-Fixes (`getPeriodEnd`, `getInvoiceSubId`) funktionieren.
-
-### 2. ✅ Stripe Live-Modus aktiv
-- `sk_live_` + `pk_live_` Keys in `.env.local` und Vercel
-- Neue Live-Price-IDs: `price_1TLJ8wPrLX1jIYMmZCxIGo4t` (monatlich), `price_1TLJ8wPrLX1jIYMm1btSMHQT` (jährlich)
-- Webhook-Secret gesetzt
-
-### 5. ✅ Username-Uniqueness-Check → `e6cfa9d`
-### 6. ✅ Case-insensitive Username Index → `e477176`
+### ✅ Vercel ENVs (Production)
+Alle gesetzt:
+- `STRIPE_SECRET_KEY=sk_live_...`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...`
+- `STRIPE_MONTHLY_PRICE_ID=price_1TLJ8wPrLX1jIYMmZCxIGo4t`
+- `STRIPE_YEARLY_PRICE_ID=price_1TLJ8wPrLX1jIYMm1btSMHQT`
+- `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID=price_1TLJ8wPrLX1jIYMmZCxIGo4t`
+- `STRIPE_WEBHOOK_SECRET=whsec_...`
+- `CRON_SECRET=Jw4uy1SccgT9Zdz49MLYgYY67E4VJwT9o/KI9l4Na7Y=`
+- `N8N_EMAIL_WEBHOOK_URL=https://n8n.servrig.com/webhook/spurig-email`
 
 ---
 
 ## ❌ Offen — HIER FORTSETZEN
 
-### 3. [NIEDRIG] CRON_SECRET rotieren
-War in einem Screenshot sichtbar. Neuen Wert generieren, in Vercel + `.env.local` setzen.
+### 1. [KRITISCH] Landing Page bauen
 
-### 4. [NIEDRIG] Resend Setup
-Für Report-Schedules, Scan-Alerts, Welcome-E-Mail.
+Root `/` redirected aktuell zum Dashboard. Für Verkauf brauchen wir eine echte
+Marketing-Landing-Page die unauthentifizierte Besucher überzeugt.
 
-### 5. [NIEDRIG] Uniqueness-Check beim Signup
-Latenter Bug: Zwei User mit demselben Username → DB-Insert fehlt → unklare Fehlermeldung. Pre-Check oder Unique-Error-Catching mit deutscher Meldung.
+**Brief:**
+- Hero: Headline + Subheadline + CTA ("14 Tage kostenlos testen")
+- Problem/Lösung: QR-Code-Tracking ohne Drittanbieter (DSGVO-Vorteil hervorheben)
+- Features-Grid: Kampagnen, Placements, QR-Codes, Analytics, Geo/Device
+- Preise (kurzer Block mit Link zu `/pricing`)
+- Sozialer Beweis (später, wenn Kunden da sind — jetzt weglassen oder generisch)
+- Footer: Impressum, Datenschutz, Kontakt
 
-### 6. [NIEDRIG] Case-Mismatch Username Index
-`idx_profiles_username` ist case-sensitive, aber `resolve_username` vergleicht case-insensitive. Fix: Index als `btree(lower(username))` neu anlegen.
+**Wichtig:** Root-Route `/` muss zur Landing Page zeigen, **aber authentifizierte
+User weiterhin zum Dashboard routen**. Aktuell gibt es einen Redirect —
+der muss bedingt werden (nur wenn eingeloggt).
 
-### 7. [NIEDRIG] Trial-Reset (wenn nötig)
-User hat aktives Abo → irrelevant. Falls doch:
-```sql
-UPDATE profiles SET trial_ends_at='2026-04-22 21:52'
-WHERE email='tomatenkopf36@gmail.com';
+Check: `src/app/page.tsx` existiert das überhaupt? Oder redirected die
+`middleware.ts` das direkt? Anschauen vor Umbau.
+
+**Design-Referenz:** Bestehender Look ist clean, minimalistisch, primary-purple.
+Tailwind 4 + shadcn/ui. Nicht zu verspielt.
+
+### 2. [SOLLTE GEFIXT] n8n-Webhook Error-Handling
+
+`src/lib/email/send.ts` hat minimales Error-Handling. Wenn n8n down ist, failen
+Reports/Alerts still. Optionen:
+- Retry-Logik (z.B. 3x mit exponential backoff)
+- Fallback: error ins Supabase-Log-Table schreiben
+- Admin-Notification wenn viele Fails in Folge
+
+### 3. [NICE TO HAVE] Stripe-Preise dynamisch
+
+Preise sind aktuell hardcoded in UI (`5,99 €`, `4,99 €`). Wenn sich Preise in
+Stripe ändern, driftet die UI. Fix: beim Build oder beim Request vom Stripe-API
+fetchen und cachen.
+
+### 4. [NICE TO HAVE] RLS-Policies-Audit
+
+Migrations existieren, aber Policies nie systematisch reviewed. Supabase MCP
+hat einen Security-Advisor — einmal laufen lassen:
 ```
-Steht derzeit auf `2026-01-01` (vom früheren Test).
+mcp__supabase__get_advisors type=security
+```
 
 ---
 
 ## Tech-Notizen
 
-### DB-Zustand (Stand 2026-04-11 23:35)
-- `profiles` (tomatenkopf36@gmail.com): `trial_ends_at=2026-01-01`, aber aktives Abo vorhanden → voller Zugriff
-- `subscriptions`: 1 Row, aktiv, `current_period_end=2026-05-11 20:27:00+00`
+### Audit-Ergebnis Status (2026-04-12)
+Das Full-Site-Audit ergab 85% → jetzt nach den Fixes ~90% launch-ready.
+- ✅ Auth-Flow sauber
+- ✅ Stripe solide (Basil-Fixes, SEPA, past_due recovery)
+- ✅ DSGVO-konform (IP-Anonymisierung, kein GA, kein FB Pixel, keine externen Schriftarten)
+- ✅ Security Headers (CSP, HSTS, X-Frame-Options)
+- ✅ Rate Limiting auf Redirects
+- ✅ SEO-Grundlagen (robots, sitemap, OG)
+- ❌ Keine Landing Page (Blocker für Verkauf)
 
-### Webhook-Events jetzt abgedeckt
-- `checkout.session.completed` (Initial-Anlage via upsert)
-- `customer.subscription.updated` (Status/Cancel-Updates)
-- `customer.subscription.deleted` (expired)
-- `invoice.payment_failed` (past_due) — **nutzt neuen getInvoiceSubId()**
-- `invoice.payment_succeeded` (recovered to active) — **NEU, für SEPA/Klarna**
+### E-Mail-System-Flow
+```
+App → fetch() → n8n.servrig.com/webhook/spurig-email
+                   ↓
+                 n8n Workflow (Webhook → Send Email)
+                   ↓
+                 smtp.gmail.com:587 (als info@spurig.com)
+                   ↓
+                 Empfänger
+```
 
-### Stripe API Basil Breaking Changes (in diesem Projekt relevant)
-| Alt | Neu |
-|---|---|
-| `subscription.current_period_end` | `subscription.items.data[0].current_period_end` |
-| `subscription.current_period_start` | `subscription.items.data[0].current_period_start` |
-| `invoice.subscription` | `invoice.parent.subscription_details.subscription` |
+### Cloudflare Email Routing
+Empfangene Mails an `info@spurig.com` → `davidwhiteha@gmail.com`.
+MX-Records: von Cloudflare automatisch gesetzt beim Enable.
 
-Beide Stellen sind jetzt über Helper in `src/app/api/webhooks/stripe/route.ts` abstrahiert (`getPeriodEnd`, `getInvoiceSubId`). Falls weitere Basil-Bugs auftauchen, neue Helper hinzufügen.
-
-### Effective Tier Logic
-`src/lib/billing/gates.ts` → `EffectiveTier = 'free' | 'trial' | 'paid' | 'expired'`. Hard-Paywall greift bei `'expired'` im `(dashboard)/layout.tsx`. `past_due` zählt als "hat Zugriff" (grace period).
-
-### Constraints
+### Constraints (unverändert)
 - DSGVO-Konformität Pflicht
 - Supabase-Migrationen via MCP gegen Prod
 - Deutsche UI, englischer Code
-- 152 Unit Tests müssen grün bleiben
 - Redirects werden NIE blockiert (`/r/[code]` außerhalb dashboard)
-- Vercel Hobby: Crons max 1x/Tag
+- Vercel Hobby: Crons max 1x/Tag — daher n8n als Alternative möglich für feinere Schedules
 
-### User-Kontext-Memory
+### User-Kontext-Memory (aktualisiert)
 - `feedback_migrations.md` — Migrationen via MCP gegen Prod
 - `feedback_dsgvo_compliance.md` — DSGVO-Pflicht
 - `project_pricing_model.md` — EIN Plan, 5,99€/Mo oder 4,99€/Mo jährlich
 - `reference_secrets_location.md` — `.env.local`, sb_publishable_/sb_secret_
+- `reference_n8n_server.md` — n8n.servrig.com (Hetzner), SMTP via Gmail
+- `reference_email_setup.md` — info@spurig.com via Cloudflare Email Routing + Gmail + n8n
