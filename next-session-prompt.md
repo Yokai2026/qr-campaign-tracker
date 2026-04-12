@@ -56,33 +56,22 @@ Testkarte `4242 4242 4242 4242`, Abo angelegt, Status `active`, `current_period_
 
 ---
 
+## ✅ Erledigt (verifiziert 2026-04-12)
+
+### 1. ✅ Webhook-Fix im Prod verifiziert
+DB-Zustand sauber: `status=active`, `current_period_end=2026-05-11 20:27:00+00`, `cancel_at=null`. Basil-Fixes (`getPeriodEnd`, `getInvoiceSubId`) funktionieren.
+
+### 2. ✅ Stripe Live-Modus aktiv
+- `sk_live_` + `pk_live_` Keys in `.env.local` und Vercel
+- Neue Live-Price-IDs: `price_1TLJ8wPrLX1jIYMmZCxIGo4t` (monatlich), `price_1TLJ8wPrLX1jIYMm1btSMHQT` (jährlich)
+- Webhook-Secret gesetzt
+
+### 5. ✅ Username-Uniqueness-Check → `e6cfa9d`
+### 6. ✅ Case-insensitive Username Index → `e477176`
+
+---
+
 ## ❌ Offen — HIER FORTSETZEN
-
-### 1. [HOCH] Webhook-Fix im Prod verifizieren
-
-Nach Deploy von `1ce342b` sollte der nächste Stripe-Webhook-Event die Bugs nicht mehr haben. Check:
-
-1. Vercel: Letzter Deploy grün?
-2. Stripe Dashboard → Developers → Events → letzten `customer.subscription.updated` Event "Resend"-Klicken
-3. `SELECT current_period_end FROM subscriptions WHERE stripe_subscription_id='sub_1TL87OLAWTHGcAN4BhgNlDAf'` — sollte weiterhin gesetzt sein (nicht NULL werden)
-4. Alternativ: im Stripe Billing Portal das Test-Abo kündigen → `customer.subscription.updated` feuert → prüfen ob `cancel_at` korrekt geschrieben wird
-
-### 2. [HOCH] Stripe Live-Modus aktivieren
-
-**User-Action nötig** (Stripe-Dashboard):
-1. Aktivierung abschließen (Firmendaten, IBAN, Identität)
-2. Im Live-Modus "Spurig"-Produkt neu anlegen (Sandbox-Produkte funktionieren NICHT im Live-Modus)
-3. Live-Price-IDs notieren: monatlich 5,99 € + jährlich 59,88 €
-4. Live-Webhook einrichten: Endpoint `https://spurig.com/api/webhooks/stripe`
-5. Payment Methods im Live-Mode analog Sandbox aktivieren
-6. Claude liefern, dann werden Vercel-ENVs umgestellt:
-   - `STRIPE_SECRET_KEY=sk_live_…`
-   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_…`
-   - `STRIPE_MONTHLY_PRICE_ID=price_…` (Live)
-   - `STRIPE_YEARLY_PRICE_ID=price_…` (Live)
-   - `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID=price_…` (Live)
-   - `STRIPE_WEBHOOK_SECRET=whsec_…` (Live)
-7. Test-Checkout im Live-Mode mit echter Karte (klein)
 
 ### 3. [NIEDRIG] CRON_SECRET rotieren
 War in einem Screenshot sichtbar. Neuen Wert generieren, in Vercel + `.env.local` setzen.

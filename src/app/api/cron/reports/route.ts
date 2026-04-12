@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
-import { getResend } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/send';
 import { buildReportHtml } from '@/lib/email/report-html';
 import { format, subDays, subWeeks, subMonths } from 'date-fns';
 import type { ReportFrequency } from '@/types';
@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createServiceClient();
-  const resend = getResend();
   const now = new Date().toISOString();
 
   // Find due schedules
@@ -51,14 +50,7 @@ export async function GET(request: NextRequest) {
         ? `Spurig Report: ${campaignName} (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`
         : `Spurig Report: Alle Kampagnen (${format(dateRange.from, 'dd.MM.')} - ${format(dateRange.to, 'dd.MM.')})`;
 
-      const fromEmail = process.env.RESEND_FROM_EMAIL || 'reports@spurig.com';
-
-      await resend.emails.send({
-        from: `Spurig <${fromEmail}>`,
-        to: schedule.email,
-        subject,
-        html,
-      });
+      await sendEmail({ to: schedule.email, subject, html });
 
       // Update schedule
       const nextRun = computeNextRun(schedule.frequency as ReportFrequency);

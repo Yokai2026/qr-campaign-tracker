@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
-import { getResend } from '@/lib/email/resend';
+import { sendEmail } from '@/lib/email/send';
 import { buildAlertHtml } from '@/lib/email/alert-html';
 import type { AlertMetric } from '@/types';
 
@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createServiceClient();
-  const resend = getResend();
   const now = new Date();
 
   // Find active alerts
@@ -68,14 +67,7 @@ export async function GET(request: NextRequest) {
         ? `Spurig Alert: ${METRIC_LABELS[metric]} >= ${alert.threshold} (${campaignName})`
         : `Spurig Alert: ${METRIC_LABELS[metric]} >= ${alert.threshold}`;
 
-      const fromEmail = process.env.RESEND_FROM_EMAIL || 'alerts@spurig.com';
-
-      await resend.emails.send({
-        from: `Spurig <${fromEmail}>`,
-        to: alert.email,
-        subject,
-        html,
-      });
+      await sendEmail({ to: alert.email, subject, html });
 
       // Update last_triggered_at
       await supabase
