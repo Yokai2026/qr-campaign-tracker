@@ -1,150 +1,227 @@
-# Fortsetzung: Landing Page + finale Launch-Vorbereitung
+# Fortsetzung: Custom-Domain-Feature (2 Varianten mit UI-Auswahl)
 
-## Session 2026-04-12 — was passiert ist
+## Session 2026-04-12 Teil 2 — was passiert ist
 
-Mega produktive Session. Stripe komplett live, E-Mail-Infrastruktur selbst gehostet
-über n8n, Rechtliches aktualisiert, SEO-Grundlagen gesetzt. Die App ist zu ~90%
-launch-ready. Fehlt noch: Landing Page.
+Kurze Bug-Fix-Session + gründliche Research zu Custom-Domain-Architektur.
+Das große Feature (2 Varianten für QR-Kurz-URLs) ist geplant aber noch nicht
+gebaut.
 
-### ✅ Commits (alle auf `origin/master`)
+### ✅ Commits (auf `origin/master`)
 
-**`88f14a4` feat(email): Resend durch n8n-Webhook ersetzen**
-- Resend-Package + `src/lib/email/resend.ts` entfernt
-- Neu: `src/lib/email/send.ts` → `fetch()` an n8n-Webhook
-- Beide Cron-Routes (`check-alerts`, `reports`) nutzen jetzt `sendEmail()`
-- n8n-Workflow als JSON: `n8n-workflows/spurig-email.json`
-- ENV: `N8N_EMAIL_WEBHOOK_URL=https://n8n.servrig.com/webhook/spurig-email`
+**`c2d4fd5` fix(rls): qr_codes + qr_status_history RLS für freistehende QR-Codes**
+- Migration 019 hat `placement_id` NULL-fähig gemacht
+- Aber RLS-Policies prüften Ownership ausschließlich via `placement → campaign → owner_id`
+- Bei `placement_id IS NULL` → `NULL IN (...)` → NULL (falsy) → alle Ops blockiert
+- `/qr-codes/new` mit „freistehender QR-Code" failte mit 403 + generischem
+  „Server Components render"-Error
+- **Fix:** Migration `020_rls_standalone_qr_codes.sql` — Policies erweitert
+  um `(placement_id IS NULL AND created_by = auth.uid())` als zweiten
+  Ownership-Pfad; `qr_status_history` nutzt LEFT JOIN für Standalone-QRs
+- Migration auf Prod-DB via MCP angewendet ✅
 
-**`4af7569` fix(legal): kontakt@ → info@spurig.com + Datenschutz-Update**
-- Impressum: E-Mail auf `info@spurig.com`
-- Datenschutz: Resend Inc. raus, Hetzner Online GmbH rein
+### 📚 Research-Ergebnisse (Custom-Domain-Architektur)
 
-**`9aa0faa` fix(launch-ready): Resend-Warnung + SEO + env.example**
-- Veraltete RESEND_API_KEY-Warnung in Settings entfernt
-- `.env.local.example` komplett (Stripe, Cron, n8n)
-- Root-Layout: OG-Tags, Twitter Cards, robots, title-template
-- `/robots.txt` via `src/app/robots.ts`
-- `/sitemap.xml` via `src/app/sitemap.ts`
+Nach Web-Search durch Vercel-Docs, Dub.co, Bitly-Patterns:
 
-### ✅ E-Mail-Infrastruktur (selbst gehostet, keine Drittanbieter-Kosten)
+**Grundregel:** Der QR-Code-Scanner zeigt den String aus dem QR-Code
+**exakt** an. Also muss die URL im QR die Kunden-Domain enthalten,
+Tracking passiert im Redirect-Handler hinter der Domain.
 
-**Eingehend** (Cloudflare Email Routing, kostenlos):
-- `info@spurig.com` → forwardet an `davidwhiteha@gmail.com`
-- Destination: `davidwhiteha@gmail.com` verifiziert
-- MX/TXT-Records von Cloudflare automatisch gesetzt
+**Top-3 Patterns (Dub.co-Nutzungsanteile):**
+- **Kunden-Subdomain** `go.kunde.de` — 32% (Marktführer)
+- **Vanity-TLD** `spurig.link` — 6,6% (gut als Default)
+- **Domain-Hack** `spur.ig` — 1,9% (selten verfügbar)
 
-**Ausgehend aus Gmail** ("Senden als"):
-- Gmail sendet als `info@spurig.com` via `smtp.gmail.com:587`
-- App-Passwort: siehe Gmail-Einstellungen
+**Bonus:** `.link`-TLDs bringen laut Dub.co ~30% höhere CTR.
 
-**Ausgehend aus der App** (n8n auf Hetzner):
-- n8n: `https://n8n.servrig.com`
-- Credential: "Spurig SMTP" (Gmail SMTP, Port 587, SSL/TLS aus)
-- Workflow: "Spurig — E-Mail senden" (Webhook POST → Send Email)
-- From: `info@spurig.com`
-- Webhook-URL: `https://n8n.servrig.com/webhook/spurig-email`
-- Payload: `{ to, subject, html }`
-
-### ✅ Vercel ENVs (Production)
-Alle gesetzt:
-- `STRIPE_SECRET_KEY=sk_live_...`
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...`
-- `STRIPE_MONTHLY_PRICE_ID=price_1TLJ8wPrLX1jIYMmZCxIGo4t`
-- `STRIPE_YEARLY_PRICE_ID=price_1TLJ8wPrLX1jIYMm1btSMHQT`
-- `NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID=price_1TLJ8wPrLX1jIYMmZCxIGo4t`
-- `STRIPE_WEBHOOK_SECRET=whsec_...`
-- `CRON_SECRET=Jw4uy1SccgT9Zdz49MLYgYY67E4VJwT9o/KI9l4Na7Y=`
-- `N8N_EMAIL_WEBHOOK_URL=https://n8n.servrig.com/webhook/spurig-email`
+**Sources:**
+- https://vercel.com/docs/multi-tenant/domain-management
+- https://vercel.com/templates/next.js/hostname-rewrites
+- https://dub.co/blog/custom-domains
+- https://dub.co/help/article/choosing-a-custom-domain
 
 ---
 
 ## ❌ Offen — HIER FORTSETZEN
 
-### 1. [KRITISCH] Landing Page bauen
+### 🎯 Zwei-Varianten-Feature: Standard vs. Eigene Domain
 
-Root `/` redirected aktuell zum Dashboard. Für Verkauf brauchen wir eine echte
-Marketing-Landing-Page die unauthentifizierte Besucher überzeugt.
+Der User soll beim QR-Create zwischen zwei Modi wählen können:
 
-**Brief:**
-- Hero: Headline + Subheadline + CTA ("14 Tage kostenlos testen")
-- Problem/Lösung: QR-Code-Tracking ohne Drittanbieter (DSGVO-Vorteil hervorheben)
-- Features-Grid: Kampagnen, Placements, QR-Codes, Analytics, Geo/Device
-- Preise (kurzer Block mit Link zu `/pricing`)
-- Sozialer Beweis (später, wenn Kunden da sind — jetzt weglassen oder generisch)
-- Footer: Impressum, Datenschutz, Kontakt
+**Variante A — Standard (spurig.com):**
+- Zero-Setup, sofort nutzbar
+- QR enthält `https://spurig.com/r/abc123`
+- Scan-Preview zeigt `spurig.com`
+- Saubere Tracking, alle Features
 
-**Wichtig:** Root-Route `/` muss zur Landing Page zeigen, **aber authentifizierte
-User weiterhin zum Dashboard routen**. Aktuell gibt es einen Redirect —
-der muss bedingt werden (nur wenn eingeloggt).
+**Variante B — Eigene Domain (go.kunde.de) [Pro-gated]:**
+- DNS-Setup beim Kunden (CNAME + TXT)
+- QR enthält `https://go.kunde.de/abc123`
+- Scan-Preview zeigt Kunden-Brand → Vertrauen
+- Saubere Tracking (Redirect läuft über Vercel-Middleware)
 
-Check: `src/app/page.tsx` existiert das überhaupt? Oder redirected die
-`middleware.ts` das direkt? Anschauen vor Umbau.
+Beide Varianten müssen in der UI **klar erläutert** werden, damit der User
+weiß was er wählt.
 
-**Design-Referenz:** Bestehender Look ist clean, minimalistisch, primary-purple.
-Tailwind 4 + shadcn/ui. Nicht zu verspielt.
+### Bestandsaufnahme (~70% fertig)
 
-### 2. [SOLLTE GEFIXT] n8n-Webhook Error-Handling
+**Bereits vorhanden:**
+- ✅ Tabelle `custom_domains` + RLS (Migration 003)
+- ✅ CRUD-Actions `src/app/(dashboard)/settings/domains-actions.ts`
+- ✅ TXT-Verify via `node:dns/promises`
+- ✅ Settings-UI `src/components/settings/custom-domains.tsx`
+  (mit DNS-Anleitung + Copy-Button)
+- ✅ `isKnownCustomHost()` + `getShortUrlBase()` in
+  `src/lib/custom-domains.ts`
+- ✅ `qr_codes.short_host` Column (persistiert pro-QR die Domain)
+- ✅ Pro-Tier Gating: `checkFeatureAccess('custom_domains')`
+- ✅ `is_primary` Flag pro User
 
-`src/lib/email/send.ts` hat minimales Error-Handling. Wenn n8n down ist, failen
-Reports/Alerts still. Optionen:
-- Retry-Logik (z.B. 3x mit exponential backoff)
-- Fallback: error ins Supabase-Log-Table schreiben
-- Admin-Notification wenn viele Fails in Folge
+**Was fehlt (Session-Scope ~3-4h):**
 
-### 3. [NICE TO HAVE] Stripe-Preise dynamisch
+#### Phase 1 — Middleware-Routing (30 min)
+- Neue Datei `src/middleware.ts` (existiert noch nicht auf Root-Ebene!)
+- Liest `host` aus Request-Header
+- Wenn ≠ primary App-Host: `isKnownCustomHost()` lookup (cached)
+- Custom-Host: rewrite `/{code}` → `/r/{code}` (kürzer + eleganter als `/r/`)
+- Unbekannter Host: 404
+- Wichtig: Supabase-Middleware (`src/lib/supabase/middleware.ts`) muss
+  integriert bleiben — nicht ersetzen, sondern kombinieren
 
-Preise sind aktuell hardcoded in UI (`5,99 €`, `4,99 €`). Wenn sich Preise in
-Stripe ändern, driftet die UI. Fix: beim Build oder beim Request vom Stripe-API
-fetchen und cachen.
+#### Phase 2 — Vercel SDK Integration (45 min)
+- `npm install @vercel/sdk`
+- Neue Server-Actions in `domains-actions.ts`:
+  - `addDomainToVercel(host)` — ruft `projectsAddProjectDomain()`
+  - `removeDomainFromVercel(host)` — ruft `projectsRemoveProjectDomain()`
+  - `verifyDomainOnVercel(host)` — ruft `projectsVerifyProjectDomain()`
+- Exponential Backoff für Vercel-API-Calls (Vercel-API ist flaky in Peak-Times)
+- User-Flow: Settings → „Domain hinzufügen" → DB-Insert + Vercel-API
+  parallel → UI zeigt CNAME-Record → Nach DNS-Setup: Verify-Button
+- Delete: DB + Vercel parallel cleanup
+- ENV-Vars nötig (User setzt lokal + in Vercel Production ENVs):
+  - `VERCEL_TOKEN` (von https://vercel.com/account/settings/tokens,
+    Scope: Full Account, Name: `spurig-domains-api`)
+  - `VERCEL_PROJECT_ID` (Dashboard → Project → Settings → General,
+    beginnt mit `prj_...`)
+  - `VERCEL_TEAM_ID` (nur bei Team-Account, beginnt mit `team_...`)
 
-### 4. [NICE TO HAVE] RLS-Policies-Audit
+#### Phase 3 — Zwei-Varianten-UI im QR-Create-Flow (90 min)
+Im `src/app/(dashboard)/qr-codes/new/page.tsx` neue Sektion oben:
 
-Migrations existieren, aber Policies nie systematisch reviewed. Supabase MCP
-hat einen Security-Advisor — einmal laufen lassen:
 ```
-mcp__supabase__get_advisors type=security
+┌─ Kurz-URL-Typ ────────────────────────────────┐
+│  ● Standard (spurig.com/r/abc)                │
+│    Keine Einrichtung nötig, sofort nutzbar    │
+│                                                │
+│  ○ Eigene Domain (go.kunde.de/abc)     [Pro]  │
+│    Zeigt deine Brand beim Scannen             │
+│    → Dropdown: verfügbare verifizierte Domains │
+└────────────────────────────────────────────────┘
 ```
+
+- Form-State: `url_mode: 'default' | 'custom'` + `custom_domain_id?: string`
+- Server-Action `createQrCode()` nimmt die gewählte Domain und persistiert
+  sie in `qr_codes.short_host`
+- Bei Mode `default`: `short_host = NULL` → `getShortUrlBase()` nimmt App-URL
+- Bei Mode `custom`: `short_host = <gewählter Host>`
+- **Wichtig:** QR-Generation (`generateQrCode()`) nutzt bereits
+  `getShortUrlBase()` — aber das muss pro-QR-Host-aware werden
+  (evtl. neue Funktion `buildRedirectUrlForHost(host, shortCode)`)
+
+#### Phase 4 — Settings-Explainer-Karte (30 min)
+Oben auf der Settings-Seite oder auf der Domains-Card:
+- 3 Schritte mit Icons: Domain eintragen → DNS setzen → verifizieren
+- FAQ-Block: „Brauche ich das?" mit klarer Empfehlung
+- Verlink-Button: „QR-Code mit eigener Domain erstellen"
+
+#### Phase 5 — Landing-Page-Block (30 min)
+Auf `/` (Marketing-Landing) neue Section:
+- Überschrift: „So sehen deine Besucher den QR-Code"
+- Zwei Screenshot-Mockups nebeneinander:
+  - Links: iPhone-Scan zeigt `spurig.com` (Standard)
+  - Rechts: iPhone-Scan zeigt `go.kunde.de` (Eigene Domain) ✨
+
+#### Phase 6 — Test + Deploy (30 min)
+- Lokal gegen eine Test-Subdomain (z.B. `test.spurig.com` selbst anlegen)
+- Full-Flow: Domain hinzufügen → DNS → Verify → QR erstellen → Scannen
+- Prod-Deploy
 
 ---
 
-## Tech-Notizen
+## Was vom User in der nächsten Session benötigt wird
 
-### Audit-Ergebnis Status (2026-04-12)
-Das Full-Site-Audit ergab 85% → jetzt nach den Fixes ~90% launch-ready.
-- ✅ Auth-Flow sauber
-- ✅ Stripe solide (Basil-Fixes, SEPA, past_due recovery)
-- ✅ DSGVO-konform (IP-Anonymisierung, kein GA, kein FB Pixel, keine externen Schriftarten)
-- ✅ Security Headers (CSP, HSTS, X-Frame-Options)
-- ✅ Rate Limiting auf Redirects
-- ✅ SEO-Grundlagen (robots, sitemap, OG)
-- ❌ Keine Landing Page (Blocker für Verkauf)
+Vor Start der Custom-Domain-Implementierung:
 
-### E-Mail-System-Flow
+1. **Vercel-API-Credentials in `.env.local` + Vercel Production ENVs:**
+   ```
+   VERCEL_TOKEN=<token_von_vercel_dashboard>
+   VERCEL_PROJECT_ID=prj_...
+   VERCEL_TEAM_ID=team_...   # nur wenn Team-Account
+   ```
+   Ansage: „Token ist gesetzt" (Token NICHT im Chat posten)
+
+2. **Entscheidung Vanity-Domain (optional, kein Blocker):**
+   - Soll parallel `spurig.link` (oder ähnlich) gekauft und als Default
+     gesetzt werden? Zeigt beim Scan dann `spurig.link/abc` statt
+     `spurig.com/r/abc` — kürzer und mehr gebrandet.
+   - Alternative: Bei `spurig.com` bleiben (aktuell gültig).
+
+3. **Pro-Gating-Entscheidung:**
+   - Aktuell ist Custom-Domain Pro-gated (`checkFeatureAccess('custom_domains')`)
+   - Passt so? Oder allen freischalten? (Default-Empfehlung: Pro-gated behalten
+     als Premium-Hook.)
+
+---
+
+## Tech-Notizen (Nachlese)
+
+### Custom-Domain-Flow (Architektur-Skizze)
+
 ```
-App → fetch() → n8n.servrig.com/webhook/spurig-email
-                   ↓
-                 n8n Workflow (Webhook → Send Email)
-                   ↓
-                 smtp.gmail.com:587 (als info@spurig.com)
-                   ↓
-                 Empfänger
+Kunde: DNS-Setup
+  go.kunde.de  CNAME  cname.vercel-dns.com
+  _spurig-verify.go.kunde.de  TXT  <verification-token>
+                    ↓
+Spurig-App: Vercel SDK addDomain()
+                    ↓
+Vercel: SSL-Cert automatisch via Let's Encrypt
+                    ↓
+Scan-Flow
+  QR enthält: https://go.kunde.de/abc123
+                    ↓
+  Request an go.kunde.de/abc123
+                    ↓
+  Vercel-Edge → src/middleware.ts
+                    ↓
+  isKnownCustomHost('go.kunde.de') → true
+                    ↓
+  rewrite /abc123 → /r/abc123
+                    ↓
+  src/app/r/[code]/route.ts (bestehend)
+                    ↓
+  302 Redirect zu Target-URL + UTM-Params
 ```
 
-### Cloudflare Email Routing
-Empfangene Mails an `info@spurig.com` → `davidwhiteha@gmail.com`.
-MX-Records: von Cloudflare automatisch gesetzt beim Enable.
+### RLS-Update vom 2026-04-12 (bereits auf Prod)
+
+Migration `020_rls_standalone_qr_codes.sql` erlaubt Standalone-QR-Codes
+(placement_id NULL) für INSERT/SELECT/UPDATE/DELETE via `created_by = auth.uid()`.
+Auch `qr_status_history` entsprechend angepasst.
 
 ### Constraints (unverändert)
+
 - DSGVO-Konformität Pflicht
 - Supabase-Migrationen via MCP gegen Prod
 - Deutsche UI, englischer Code
 - Redirects werden NIE blockiert (`/r/[code]` außerhalb dashboard)
-- Vercel Hobby: Crons max 1x/Tag — daher n8n als Alternative möglich für feinere Schedules
+- Eigene Middleware darf bestehende Supabase-Auth-Middleware NICHT
+  ersetzen, sondern muss diese umschließen/kombinieren
 
 ### User-Kontext-Memory (aktualisiert)
+
 - `feedback_migrations.md` — Migrationen via MCP gegen Prod
 - `feedback_dsgvo_compliance.md` — DSGVO-Pflicht
 - `project_pricing_model.md` — EIN Plan, 5,99€/Mo oder 4,99€/Mo jährlich
 - `reference_secrets_location.md` — `.env.local`, sb_publishable_/sb_secret_
 - `reference_n8n_server.md` — n8n.servrig.com (Hetzner), SMTP via Gmail
-- `reference_email_setup.md` — info@spurig.com via Cloudflare Email Routing + Gmail + n8n
+- `reference_email_setup.md` — info@spurig.com via Cloudflare Email Routing
