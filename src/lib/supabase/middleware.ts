@@ -1,26 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-// Paths that always stay on the primary app host.
-const APP_ONLY_PATHS = [
-  '/api',
-  '/_next',
-  '/login',
-  '/signup',
-  '/dashboard',
-  '/campaigns',
-  '/locations',
-  '/placements',
-  '/qr-codes',
-  '/links',
-  '/analytics',
-  '/settings',
-  '/pricing',
-  '/datenschutz',
-  '/impressum',
-  '/favicon',
-];
-
 /**
  * Returns the primary app host (without protocol, lowercase).
  * Used to decide whether an incoming request is on a custom domain.
@@ -39,9 +19,26 @@ function getAppHost(): string | null {
 }
 
 /**
- * If the request comes in on a custom (non-app) host, rewrite short-code-like
- * paths to /r/[code] so the existing redirect handler can serve them.
- * Returns a NextResponse if a rewrite/redirect happened, otherwise null.
+ * Minimal 404 body for custom-host requests that don't match a short code.
+ * Keeps the customer's branded domain clean — no Spurig landing/login leak.
+ */
+function customHostNotFound(): NextResponse {
+  const body = `<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Seite nicht gefunden</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fafafa;color:#111}
+.c{text-align:center;max-width:420px;padding:2rem}.c h1{font-size:1.25rem;font-weight:600;margin-bottom:.5rem}.c p{font-size:.875rem;color:#666}</style></head>
+<body><div class="c"><h1>Seite nicht gefunden</h1><p>Dieser Link existiert nicht.</p></div></body></html>`;
+  return new NextResponse(body, { status: 404, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+}
+
+/**
+ * If the request comes in on a custom (non-app) host:
+ * - /r/... → let through (redirect handler serves it)
+ * - /<shortcode> → rewrite to /r/<shortcode>
+ * - anything else (including /, app paths, nested paths, assets) → 404
+ *
+ * This keeps the customer's branded domain from ever showing the Spurig app UI.
+ * Returns a NextResponse if handled, otherwise null (= request is on app host).
  */
 function handleCustomHost(request: NextRequest): NextResponse | null {
   const host = request.headers.get('host')?.toLowerCase().split(':')[0];
@@ -52,21 +49,27 @@ function handleCustomHost(request: NextRequest): NextResponse | null {
   if (!appHost && (host === 'localhost' || host.endsWith('.localhost'))) return null;
   if (appHost && host === appHost) return null;
 
+  // From here on: request is on a custom host.
   const path = request.nextUrl.pathname;
+
+  // Next.js internals & favicons still need to resolve on custom hosts
+  // (e.g. 404 page styles). Let these through untouched.
+  if (path.startsWith('/_next/') || path === '/favicon.ico') return null;
 
   // Already targeting the redirect handler — let it through as-is.
   if (path.startsWith('/r/')) return null;
 
-  // Skip app-only paths (they shouldn't appear on custom domains, but be lenient).
-  if (APP_ONLY_PATHS.some((p) => path === p || path.startsWith(`${p}/`))) return null;
-
   // Match short-code shape: single path segment, alphanumerics + - _
   const match = path.match(/^\/([a-zA-Z0-9_-]{1,64})\/?$/);
-  if (!match) return null;
+  if (match) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/r/${match[1]}`;
+    return NextResponse.rewrite(url);
+  }
 
-  const url = request.nextUrl.clone();
-  url.pathname = `/r/${match[1]}`;
-  return NextResponse.rewrite(url);
+  // Any other path on a custom host (including "/", app paths, nested paths)
+  // must not expose the Spurig app UI → clean 404.
+  return customHostNotFound();
 }
 
 export async function updateSession(request: NextRequest) {
