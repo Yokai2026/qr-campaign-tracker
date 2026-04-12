@@ -323,14 +323,31 @@ function DomainItem({
 }) {
   const [showSetup, setShowSetup] = useState(!domain.verified);
   const [provider, setProvider] = useState<DnsProviderInfo | null>(null);
+  const [apex, setApex] = useState<string>('');
   const [nameservers, setNameservers] = useState<string[]>([]);
   const [pollAttempts, setPollAttempts] = useState(0);
   const [pollState, setPollState] = useState<'idle' | 'searching' | 'found' | 'exhausted'>(
     domain.verified ? 'idle' : 'searching'
   );
   const [supportSent, setSupportSent] = useState(false);
-  const recordName = `_spurig-verify.${domain.host}`;
   const MAX_POLL_ATTEMPTS = 20; // 20 × 15s = 5 min
+
+  // Subdomain-Präfix relativ zur Apex-Domain. Beispiel:
+  //   host=kurz.example.com + apex=example.com  → subdomain="kurz"
+  //   host=example.com      + apex=example.com  → subdomain=""  (Apex selbst)
+  const isApex = apex !== '' && domain.host === apex;
+  const subdomain = apex && !isApex ? domain.host.slice(0, -(apex.length + 1)) : '';
+  // Viele Provider (IONOS, Cloudflare, Strato, …) hängen die Domain im
+  // Formular automatisch an. Dort MUSS nur der Subdomain-Teil rein, sonst
+  // entsteht `_spurig-verify.kurz.example.com.example.com`.
+  const useSubOnly = provider?.nameFormat === 'subdomain-only';
+  const txtNameFqdn = `_spurig-verify.${domain.host}`;
+  const txtNameShort = isApex ? '_spurig-verify' : `_spurig-verify.${subdomain}`;
+  const cnameNameFqdn = domain.host;
+  const cnameNameShort = isApex ? '@' : subdomain;
+  const txtName = useSubOnly ? txtNameShort : txtNameFqdn;
+  const cnameName = useSubOnly ? cnameNameShort : cnameNameFqdn;
+  const recordName = txtNameFqdn; // für DNS-Lookup immer FQDN
 
   // Provider-Detection beim Mount (nur wenn unverifiziert)
   useEffect(() => {
@@ -340,6 +357,7 @@ function DomainItem({
       if (cancelled) return;
       setProvider(res.provider);
       setNameservers(res.nameservers);
+      setApex(res.apex);
     });
     return () => {
       cancelled = true;
@@ -566,8 +584,25 @@ function DomainItem({
               <div className="space-y-0.5 text-[11px]">
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground w-12">Name:</span>
-                  <code className="font-mono flex-1 truncate">{recordName}</code>
+                  <code className="font-mono flex-1 truncate">{txtName}</code>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5"
+                    title="Kopieren"
+                    onClick={() => {
+                      navigator.clipboard.writeText(txtName);
+                      toast.success('Name kopiert');
+                    }}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
                 </div>
+                {useSubOnly && (
+                  <p className="pl-14 text-[10px] text-muted-foreground">
+                    Vollständig: <code className="font-mono">{txtNameFqdn}</code>
+                  </p>
+                )}
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground w-12">Wert:</span>
                   <code className="font-mono flex-1 truncate">{domain.verification_token}</code>
@@ -586,24 +621,68 @@ function DomainItem({
             <div className="rounded-md border border-border bg-background p-2.5 space-y-1">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium">
-                  2. CNAME / A
+                  2. {isApex ? 'A' : 'CNAME'}
                 </span>
                 <span className="text-[11px] text-muted-foreground">Traffic-Weiterleitung</span>
               </div>
               <div className="space-y-0.5 text-[11px]">
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground w-12">Name:</span>
-                  <code className="font-mono flex-1 truncate">{domain.host}</code>
+                  <code className="font-mono flex-1 truncate">{cnameName}</code>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5"
+                    title="Kopieren"
+                    onClick={() => {
+                      navigator.clipboard.writeText(cnameName);
+                      toast.success('Name kopiert');
+                    }}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
                 </div>
+                {useSubOnly && !isApex && (
+                  <p className="pl-14 text-[10px] text-muted-foreground">
+                    Vollständig: <code className="font-mono">{cnameNameFqdn}</code>
+                  </p>
+                )}
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground w-12">Ziel:</span>
-                  <span className="text-[11px] text-muted-foreground">
-                    CNAME auf cname.vercel-dns.com (oder A auf 76.76.21.21)
-                  </span>
+                  {isApex ? (
+                    <code className="font-mono flex-1 truncate">76.76.21.21</code>
+                  ) : (
+                    <code className="font-mono flex-1 truncate">cname.vercel-dns.com</code>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5"
+                    title="Kopieren"
+                    onClick={() => {
+                      const target = isApex ? '76.76.21.21' : 'cname.vercel-dns.com';
+                      navigator.clipboard.writeText(target);
+                      toast.success('Ziel kopiert');
+                    }}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
+          {useSubOnly && !isApex && (
+            <p className="text-[11px] text-muted-foreground">
+              Hinweis: {provider?.label ?? 'Dein Anbieter'} hängt die Domain automatisch an — trage im Formular
+              nur den hier gezeigten Kurznamen ein, nicht die vollständige Variante.
+            </p>
+          )}
+          {isApex && (
+            <p className="text-[11px] text-muted-foreground">
+              Hinweis: Du verifizierst die Apex-Domain. CNAME ist auf dem Apex nicht erlaubt — nutze stattdessen
+              den A-Record auf <code className="font-mono">76.76.21.21</code>.
+            </p>
+          )}
           <p className="text-[11px] text-muted-foreground">
             DNS-Änderungen können einige Minuten dauern, bis sie aktiv sind.
           </p>
