@@ -41,6 +41,21 @@ export default function SignupPage() {
       return;
     }
 
+    // Pre-Check: Username bereits vergeben? (case-insensitive via RPC)
+    const { data: taken, error: checkError } = await supabase.rpc('username_exists', {
+      lookup_username: username,
+    });
+    if (checkError) {
+      setError('Benutzername konnte nicht geprüft werden. Bitte versuche es erneut.');
+      setLoading(false);
+      return;
+    }
+    if (taken === true) {
+      setError('Dieser Benutzername ist bereits vergeben. Bitte wähle einen anderen.');
+      setLoading(false);
+      return;
+    }
+
     const { error: signupError } = await supabase.auth.signUp({
       email,
       password,
@@ -53,7 +68,17 @@ export default function SignupPage() {
     });
 
     if (signupError) {
-      setError('Registrierung fehlgeschlagen. Bitte prüfe deine Eingaben.');
+      // Race-Condition-Fallback: Wenn der Pre-Check sauber war, aber der Trigger
+      // trotzdem am Unique-Index scheitert (paralleler Signup), ist das die
+      // plausibelste Ursache für einen DB-Fehler.
+      const msg = signupError.message?.toLowerCase() ?? '';
+      if (msg.includes('database') || msg.includes('duplicate') || msg.includes('unique')) {
+        setError('Dieser Benutzername ist bereits vergeben. Bitte wähle einen anderen.');
+      } else if (msg.includes('already registered') || msg.includes('already exists')) {
+        setError('Diese E-Mail-Adresse ist bereits registriert.');
+      } else {
+        setError('Registrierung fehlgeschlagen. Bitte prüfe deine Eingaben.');
+      }
       setLoading(false);
       return;
     }
