@@ -21,6 +21,21 @@ import {
   unsetPrimaryCustomDomain,
 } from '@/app/(dashboard)/settings/domains-actions';
 
+function normalizeHostInput(raw: string): string {
+  let h = raw.trim().toLowerCase();
+  // strip protocol
+  h = h.replace(/^https?:\/\//i, '');
+  // strip userinfo if pasted (rare, aber robust)
+  h = h.replace(/^[^@]+@/, '');
+  // strip path / query / hash — behalte nur host:port
+  h = h.split(/[/?#]/)[0];
+  // strip trailing dot (FQDN-Schreibweise)
+  h = h.replace(/\.$/, '');
+  // strip port (Records haben keinen Port)
+  h = h.split(':')[0];
+  return h;
+}
+
 export function CustomDomains() {
   const [domains, setDomains] = useState<CustomDomain[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,12 +71,14 @@ export function CustomDomains() {
   }, []);
 
   function handleCreate() {
-    if (!host.trim()) {
+    const normalized = normalizeHostInput(host);
+    if (!normalized) {
       toast.error('Hostname fehlt');
       return;
     }
+    if (normalized !== host) setHost(normalized);
     startTransition(async () => {
-      const result = await createCustomDomain(host);
+      const result = await createCustomDomain(normalized);
       if (!result.success) {
         toast.error(result.error || 'Fehler beim Hinzufügen');
         return;
@@ -226,7 +243,7 @@ export function CustomDomains() {
                 autoFocus
               />
               <p className="text-[11px] text-muted-foreground">
-                Nur der Hostname, ohne Protokoll oder Pfad
+                Protokoll (https://) und Pfad werden automatisch entfernt
               </p>
             </div>
             <div className="flex gap-2">
