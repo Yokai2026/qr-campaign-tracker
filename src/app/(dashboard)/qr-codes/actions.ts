@@ -6,7 +6,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { generateQrCode, buildRedirectUrl } from '@/lib/qr/generate';
 import { qrCodeSchema, isUrlSafe } from '@/lib/validations';
-import { getShortUrlBase } from '@/lib/custom-domains';
+import { getShortUrlBase, buildRedirectUrlForHost } from '@/lib/custom-domains';
 import { logAudit } from '@/lib/audit';
 import type { QrCode, QrCodeInput, QrStatusHistory, QrAction, RedirectRule, AbVariant } from '@/types';
 
@@ -220,10 +220,18 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
     placementCode = placement.placement_code as string | null;
   }
 
-  // Generate short code and URLs — uses primary custom domain if set, else app URL
+  // Generate short code + QR image URL.
+  // - If the form picked a specific short_host, use that branded URL (go.kunde.de/{code}).
+  // - Otherwise fall back to the primary custom domain (if any) or the app's default host.
   const shortCode = nanoid(8);
-  const baseUrl = await getShortUrlBase();
-  const redirectUrl = buildRedirectUrl(baseUrl, shortCode);
+  const explicitHost = input.short_host?.trim() || null;
+  let redirectUrl: string;
+  if (explicitHost) {
+    redirectUrl = await buildRedirectUrlForHost(explicitHost, shortCode);
+  } else {
+    const baseUrl = await getShortUrlBase();
+    redirectUrl = buildRedirectUrl(baseUrl, shortCode);
+  }
 
   // Generate QR code images with optional colors
   const fgColor = input.qr_fg_color || '#000000';
@@ -262,6 +270,7 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
       qr_bg_color: bgColor,
       max_scans: input.max_scans || null,
       limit_redirect_url: input.limit_redirect_url || null,
+      short_host: explicitHost,
     })
     .select()
     .single();
@@ -369,8 +378,14 @@ export async function updateQrCode(
 
   // Regenerate QR image if target URL or colors changed
   if (targetChanged || colorChanged) {
-    const baseUrl = await getShortUrlBase();
-    const redirectUrl = buildRedirectUrl(baseUrl, existing.short_code);
+    const existingHost = (existing.short_host as string | null) ?? null;
+    let redirectUrl: string;
+    if (existingHost) {
+      redirectUrl = await buildRedirectUrlForHost(existingHost, existing.short_code);
+    } else {
+      const baseUrl = await getShortUrlBase();
+      redirectUrl = buildRedirectUrl(baseUrl, existing.short_code);
+    }
     const fgColor = (updates.qr_fg_color as string) ?? existing.qr_fg_color ?? '#000000';
     const bgColor = (updates.qr_bg_color as string) ?? existing.qr_bg_color ?? '#FFFFFF';
     const { pngDataUrl, svgString } = await generateQrCode(redirectUrl, { fgColor, bgColor });

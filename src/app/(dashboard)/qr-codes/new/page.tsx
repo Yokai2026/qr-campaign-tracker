@@ -19,9 +19,11 @@ import { createQrCode, getPlacements } from '../actions';
 import { checkFeatureAccess } from '@/lib/billing/check-access';
 import { UpgradeBanner } from '@/components/shared/upgrade-banner';
 import { UtmTemplatePicker } from '@/components/shared/utm-template-picker';
-import { getPrimaryDomainHost } from '@/app/(dashboard)/settings/domains-actions';
+import { getVerifiedDomains } from '@/app/(dashboard)/settings/domains-actions';
 import { qrCodeSchema } from '@/lib/validations';
 import type { QrCodeInput } from '@/types';
+import Link from 'next/link';
+import { Crown } from 'lucide-react';
 
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
@@ -80,6 +82,8 @@ type FormValues = {
   qr_bg_color: string;
   max_scans: string;
   limit_redirect_url: string;
+  url_mode: 'default' | 'custom';
+  short_host: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -131,6 +135,8 @@ export default function NewQrCodePage() {
       qr_bg_color: '#FFFFFF',
       max_scans: '',
       limit_redirect_url: '',
+      url_mode: 'default',
+      short_host: '',
     },
   });
 
@@ -160,14 +166,22 @@ export default function NewQrCodePage() {
 
   // Preview URL — initialize empty to avoid hydration mismatch
   const [baseUrl, setBaseUrl] = useState('');
-  const [customDomainHost, setCustomDomainHost] = useState<string | null>(null);
+  const [verifiedDomains, setVerifiedDomains] = useState<{ id: string; host: string; is_primary: boolean }[]>([]);
+  const [canUseCustomDomain, setCanUseCustomDomain] = useState(false);
   useEffect(() => {
     setBaseUrl(window.location.origin);
-    getPrimaryDomainHost().then(setCustomDomainHost);
+    getVerifiedDomains().then(setVerifiedDomains);
+    checkFeatureAccess('custom_domains').then(({ allowed }) => setCanUseCustomDomain(allowed));
   }, []);
-  const previewShortUrl = customDomainHost
-    ? `https://${customDomainHost}/<short-code>`
-    : baseUrl ? `${baseUrl}/r/<short-code>` : '';
+
+  const watchUrlMode = watch('url_mode');
+  const watchShortHost = watch('short_host');
+  const previewShortUrl =
+    watchUrlMode === 'custom' && watchShortHost
+      ? `https://${watchShortHost}/<short-code>`
+      : baseUrl
+      ? `${baseUrl}/r/<short-code>`
+      : '';
 
   function onSubmit(data: FormValues) {
     const input: QrCodeInput = {
@@ -185,6 +199,7 @@ export default function NewQrCodePage() {
       qr_bg_color: data.qr_bg_color || undefined,
       max_scans: data.max_scans ? parseInt(data.max_scans, 10) : undefined,
       limit_redirect_url: data.limit_redirect_url || undefined,
+      short_host: data.url_mode === 'custom' && data.short_host ? data.short_host : undefined,
     };
 
     const result = formSchema.safeParse(input);
@@ -226,6 +241,114 @@ export default function NewQrCodePage() {
       />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
+        {/* URL-Mode: Standard vs. Eigene Domain */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Kurz-URL-Typ</CardTitle>
+            <CardDescription>
+              Welche Domain soll beim Scannen des QR-Codes sichtbar sein?
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Controller
+              name="url_mode"
+              control={control}
+              render={({ field }) => (
+                <div className="space-y-3">
+                  {/* Option 1: Standard */}
+                  <label
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
+                      field.value === 'default' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/30'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      value="default"
+                      checked={field.value === 'default'}
+                      onChange={() => field.onChange('default')}
+                      className="mt-0.5 h-4 w-4 accent-primary"
+                    />
+                    <div className="flex-1 text-sm">
+                      <div className="font-medium">Standard (spurig.com/r/abc)</div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Keine Einrichtung nötig, sofort nutzbar. Beim Scannen erscheint &quot;spurig.com&quot;.
+                      </p>
+                    </div>
+                  </label>
+
+                  {/* Option 2: Eigene Domain (Pro-gated) */}
+                  <label
+                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
+                      !canUseCustomDomain ? 'opacity-60 cursor-not-allowed' : ''
+                    } ${
+                      field.value === 'custom' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/30'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      value="custom"
+                      checked={field.value === 'custom'}
+                      onChange={() => canUseCustomDomain && field.onChange('custom')}
+                      disabled={!canUseCustomDomain}
+                      className="mt-0.5 h-4 w-4 accent-primary"
+                    />
+                    <div className="flex-1 text-sm">
+                      <div className="flex items-center gap-2 font-medium">
+                        Eigene Domain (go.kunde.de/abc)
+                        <span className="inline-flex items-center gap-0.5 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                          <Crown className="h-2.5 w-2.5" />
+                          Pro
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Beim Scannen erscheint deine eigene Domain — zeigt deine Brand, schafft Vertrauen.
+                      </p>
+                      {field.value === 'custom' && (
+                        <div className="mt-3 space-y-2">
+                          {verifiedDomains.length === 0 ? (
+                            <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-900 dark:text-amber-200">
+                              Du hast noch keine verifizierte Domain.{' '}
+                              <Link href="/settings" className="underline font-medium">
+                                Jetzt Domain hinzufügen
+                              </Link>
+                            </div>
+                          ) : (
+                            <Controller
+                              name="short_host"
+                              control={control}
+                              render={({ field: hostField }) => (
+                                <select
+                                  value={hostField.value}
+                                  onChange={(e) => hostField.onChange(e.target.value)}
+                                  className="w-full rounded-md border border-border bg-background px-2.5 py-1.5 text-sm"
+                                >
+                                  <option value="">— Domain wählen —</option>
+                                  {verifiedDomains.map((d) => (
+                                    <option key={d.id} value={d.host}>
+                                      {d.host}
+                                      {d.is_primary ? ' (Primär)' : ''}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                            />
+                          )}
+                        </div>
+                      )}
+                      {!canUseCustomDomain && (
+                        <p className="text-[11px] text-muted-foreground mt-1">
+                          Nur im Pro-Plan verfügbar.{' '}
+                          <Link href="/pricing" className="underline">Upgrade</Link>
+                        </p>
+                      )}
+                    </div>
+                  </label>
+                </div>
+              )}
+            />
+          </CardContent>
+        </Card>
+
         {/* Placement select */}
         <Card>
           <CardHeader>

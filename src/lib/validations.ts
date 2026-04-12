@@ -53,6 +53,17 @@ export const qrCodeSchema = z.object({
   qr_bg_color: z.string().regex(/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/, 'Ungültiger Farbcode').optional().or(z.literal('')),
   max_scans: z.number().int().min(1, 'Mindestens 1 Scan').optional(),
   limit_redirect_url: z.string().url('Gültige URL erforderlich').max(2000).optional().or(z.literal('')),
+  // Optional per-QR custom host (e.g. go.kunde.de). When empty/undefined, the
+  // QR uses the app's default short URL base (spurig.com).
+  short_host: z
+    .string()
+    .max(253)
+    .regex(
+      /^(?=.{1,253}$)(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))+$/,
+      'Ungültiger Hostname',
+    )
+    .optional()
+    .or(z.literal('')),
 });
 
 export const shortLinkSchema = z.object({

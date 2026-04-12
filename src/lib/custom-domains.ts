@@ -35,6 +35,22 @@ export async function buildShortUrl(shortCode: string): Promise<string> {
 }
 
 /**
+ * Build a redirect URL using an explicit host (per-QR short_host).
+ * - Custom host → https://{host}/{shortCode} (shorter, branded; middleware rewrites to /r/)
+ * - Empty host → falls back to app default https://app/r/{shortCode}
+ */
+export async function buildRedirectUrlForHost(
+  shortHost: string | null | undefined,
+  shortCode: string,
+): Promise<string> {
+  if (shortHost && shortHost.trim().length > 0) {
+    return `https://${shortHost.toLowerCase()}/${shortCode}`;
+  }
+  const base = getAppUrl();
+  return `${base}/r/${shortCode}`;
+}
+
+/**
  * Returns true if the given host is a known custom domain (any verified entry).
  * Used by middleware for host-based routing.
  */
