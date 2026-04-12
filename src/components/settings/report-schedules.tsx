@@ -261,11 +261,6 @@ export function ReportSchedules() {
           </div>
         )}
 
-        {!process.env.NEXT_PUBLIC_RESEND_CONFIGURED && (
-          <p className="text-[11px] text-muted-foreground/60 pt-1">
-            Hinweis: E-Mail-Versand erfordert RESEND_API_KEY in den Umgebungsvariablen.
-          </p>
-        )}
       </CardContent>
     </Card>
   );

@@ -14,8 +14,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Spurig',
-  description: 'Multi-Channel Kampagnen-Tracking für QR-Codes, Kurzlinks und Social Media',
+  title: {
+    default: 'Spurig — QR-Code Kampagnen-Tracking',
+    template: '%s — Spurig',
+  },
+  description: 'Tracke deine Offline-Kampagnen mit QR-Codes. Scans, Besucher, Geräte und Standorte — datenschutzkonform und ohne Drittanbieter.',
+  metadataBase: new URL('https://spurig.com'),
+  openGraph: {
+    type: 'website',
+    locale: 'de_DE',
+    siteName: 'Spurig',
+    title: 'Spurig — QR-Code Kampagnen-Tracking',
+    description: 'Tracke deine Offline-Kampagnen mit QR-Codes. Scans, Besucher, Geräte und Standorte — datenschutzkonform und ohne Drittanbieter.',
+    url: 'https://spurig.com',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Spurig — QR-Code Kampagnen-Tracking',
+    description: 'Tracke deine Offline-Kampagnen mit QR-Codes. Datenschutzkonform, ohne Drittanbieter.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
