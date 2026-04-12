@@ -1,70 +1,69 @@
-# Fortsetzung: Custom-Domain-Feature — Deploy + Prod-Smoke-Test
+# Fortsetzung: Custom-Domain-Feature — Smoke-Tests offen
 
-## Session 2026-04-12 Teil 4 — was passiert ist
+## Session 2026-04-13 — Stand
 
-Phase 1–5 implementiert, 4 Commits auf master, Build grün.
+**Deploy ist LIVE auf Production** (spurig.com). Letzter Commit auf master:
 
-### ✅ Commits (uncommitted → committed, nicht gepusht)
-1. `feat(custom-domains): Vercel SDK integration + middleware hardening`
-2. `feat(qr): short_host per QR-Code + zwei-Varianten-UI im Create-Flow`
-3. `feat(settings): Setup-Explainer für Custom Domains`
-4. `feat(landing): Pro-Feature-Section für eigene Domain`
+```
+b34ca34 fix(custom-domains): DNS-Records provider-aware anzeigen  ← deployed
+17e4604 feat(custom-domains): Setup-Assistent mit Provider-Erkennung + Auto-Polling
+eb598b8 fix(custom-domains): Hostname-Input robust normalisieren
+```
 
-### ✅ Build/Typecheck
-- `npx tsc --noEmit` → clean
-- `npm run build` → ✓ Compiled successfully, 29 static pages
-
-### ⚠️ Sicherheitsaufgabe (offen)
-
-**`VERCEL_TOKEN` wurde 2× im Chat gepostet → kompromittiert.** Vor Production:
-- Token auf https://vercel.com/account/settings/tokens löschen
-- Neuen Token anlegen (Name: `spurig-domains-api`, Scope: Full Account)
-- In `.env.local` UND Vercel Production ENVs ersetzen
+### ✅ Erledigt in Session 5
+1. **UI-Fix DNS-Records**: `custom-domains.tsx` — DNS-Records werden jetzt provider-aware angezeigt. Subdomain-Only-Provider (IONOS, Cloudflare, Strato, Hetzner, Namecheap, GoDaddy, Hostinger, Checkdomain, United Domains, Google) bekommen die Kurzform (`_spurig-verify.kurz` + `kurz`) mit FQDN als "Vollständig:"-Zeile. FQDN-Provider (ALL-INKL, AWS Route 53, Unknown) bekommen weiter volle Namen. Apex-Domain-Sonderfall: zeigt A-Record `76.76.21.21` statt CNAME. Copy-Buttons für Name + Ziel ergänzt.
+2. **VERCEL_TOKEN rotiert** (alter Token revoked, neuer angelegt Scope=Projekt-scoped, Name `spurig-domains-api`, No Expiration) — in `.env.local` UND Vercel Production ENVs gesetzt.
+3. **Vercel Production ENVs gesetzt**: `VERCEL_TOKEN`, `VERCEL_PROJECT_ID=prj_R5L9hgIou9KZCafyfz7QJzORuNiK`, `VERCEL_TEAM_ID`=leer (Personal Account).
+4. **Push**: `origin/master` = `b34ca34`. Vercel-Deploy: Duration 1m 17s, Status Ready, Production Current.
 
 ---
 
 ## ❌ Offen — HIER FORTSETZEN
 
-### Phase 6b — Deploy + Prod-Smoke-Test
+### Phase 6c — Prod-Smoke-Tests
 
-1. **Token rotieren** (siehe oben) — NICHT den aktuellen Token für Prod nehmen.
+User muss persönlich durchgehen (oder ich begleite live):
 
-2. **Vercel Prod-ENVs setzen:** Dashboard → Project → Settings → Environment Variables
-   - `VERCEL_TOKEN` (neuer rotierter Token!)
-   - `VERCEL_PROJECT_ID=prj_R5L9hgIou9KZCafyfz7QJzORuNiK`
-   - `VERCEL_TEAM_ID` (leer lassen — Personal Account)
-
-3. **Push:** `git push origin master` → Vercel auto-deploy
-
-4. **Prod-Smoke-Tests:**
-   - Landing-Page (`/`): Pro-Feature-Section mit beiden Phone-Mockups sichtbar, iPhone-Notch korrekt positioniert, URL-Bar-Lock-Icon (grün bei Pro, grau bei Standard).
-   - QR-Create (`/qr-codes/new`): Card "Kurz-URL-Typ" ganz oben; Pro-User sieht Radio "Eigene Domain" freigeschaltet, Non-Pro sieht Pro-Gate-Hinweis mit Link zu `/pricing`.
-   - Settings (`/settings` → Tab Custom Domains): 3-Schritt-Guide sichtbar; Domain hinzufügen → DB-Insert + Vercel-API-Call; bei Vercel-Fehler `toast.warning()` statt Error.
-   - Echte Test-Subdomain anlegen: `demo.spurig.com` → DNS CNAME auf `cname.vercel-dns.com` → verifizieren → QR mit dieser Domain erstellen → Scan → Redirect auf Target.
-   - Fremdhost-404: Request an `custom-domain.example/impressum` oder `/settings` → sauberes 404, nicht das Dashboard.
+1. **Landing** — https://spurig.com (Inkognito-Tab): Pro-Feature-Section mit beiden Phone-Mockups, iPhone-Notch + URL-Bar-Lock-Icon korrekt.
+2. **QR-Create** — `/qr-codes/new`: Card "Kurz-URL-Typ" ganz oben; Pro-User: Radio "Eigene Domain" freigeschaltet; Non-Pro: Pro-Gate mit Link zu `/pricing`.
+3. **Settings → Custom Domains** — `/settings`: 3-Schritt-Guide sichtbar; Domain hinzufügen → DB-Insert + Vercel-API-Call; bei Vercel-Fehler `toast.warning()`.
+4. **DNS-Records UI-Fix verifizieren** (neu!): Domain hinzufügen → Provider-Detection → bei IONOS/Cloudflare/Strato sollte Name in **Kurzform** angezeigt werden (z.B. `_spurig-verify.demo` statt `_spurig-verify.demo.spurig.com`) + Zeile "Vollständig: …" darunter.
+5. **Test-Subdomain** — `demo.spurig.com`:
+   - DNS-Record: CNAME `demo` → `cname.vercel-dns.com` bei spurig.com's Nameserver
+   - TXT: `_spurig-verify.demo` → Token aus UI
+   - Auto-Polling sollte innerhalb 5 min finden → Status auf "Verifiziert"
+   - QR-Code mit dieser Domain erstellen → Scan → Redirect auf Target
+6. **Fremdhost-404** — Request an `*.vercel.app` Preview-URL oder Custom-Host ohne Short-Code (`demo.spurig.com/impressum`) → sauberes 404, nicht das Dashboard.
 
 ---
 
-## Tech-Notizen
+## ⚠️ Bekannte Probleme / Tech-Debt
 
-### Offene Architektur-Fragen für später
-- `bulkCreateQrCodes()` in `qr-codes/actions.ts` nutzt kein `short_host` — später erweitern wenn Bedarf.
-- `short_links` hat `short_host`-Column (Migration 004) aber UI/Action-Support fehlt → separates Phase-Thema.
-- Per-QR `short_host` kann NICHT mehr geändert werden nach Create (kein UI dafür). Akzeptabel weil QR-Image sonst ungültig würde — aber dokumentieren.
+### Preview-Deployments werfen 404
+**Root Cause**: `src/lib/supabase/middleware.ts:43-73` `handleCustomHost()` behandelt jeden Host, der nicht `NEXT_PUBLIC_APP_URL` entspricht, als Custom-Host → 404. PR-/Branch-Previews auf `*.vercel.app` treffen nicht `spurig.com` → Preview-Thumbnail in Vercel-Dashboard zeigt "Seite nicht gefunden".
 
-### Pre-existing Lint-Issues (nicht Scope dieser Feature)
+**Fix (später)**: In `handleCustomHost()` vor der Custom-Host-Logik einfügen:
+```ts
+// Vercel preview/deployment URLs: immer als App-Host behandeln
+if (host.endsWith('.vercel.app')) return null;
+```
+
+**Warum nicht jetzt**: Produktion funktioniert. PR-Previews sind erst relevant, wenn Team-Workflow mit Branches kommt.
+
+### Pre-existing Lint-Issues (nicht Scope)
 - `report-schedules.tsx`, `scan-alerts.tsx`, `subscription-card.tsx`: React Compiler `set-state-in-effect` Errors
 - `data-table.tsx`: TanStack Table incompatible-library Warning
-- `middleware.ts:90` `options` unused Warning (pre-existing in Supabase-Cookie-Block)
+- `middleware.ts:90` `options` unused Warning
 
-### Constraints (unverändert)
+### Offene Architektur-Fragen
+- `bulkCreateQrCodes()` in `qr-codes/actions.ts` nutzt kein `short_host` — erweitern wenn Bedarf.
+- `short_links` hat `short_host`-Column (Migration 004) aber UI/Action-Support fehlt → separates Phase-Thema.
+- Per-QR `short_host` kann NICHT mehr geändert werden nach Create — akzeptabel, weil QR-Image sonst ungültig würde.
+
+---
+
+## Constraints (unverändert)
 - DSGVO-Konformität Pflicht
 - Supabase-Migrationen via MCP gegen Prod
 - Deutsche UI, englischer Code
 - Redirects werden NIE blockiert (`/r/[code]` außerhalb dashboard)
-
-### Session-4-Commits auf master (ungepusht)
-- `22ea2be` feat(custom-domains): Vercel SDK integration + middleware hardening
-- `eed9022` feat(qr): short_host per QR-Code + zwei-Varianten-UI im Create-Flow
-- `5afc0b1` feat(settings): Setup-Explainer für Custom Domains
-- `caf88b3` feat(landing): Pro-Feature-Section für eigene Domain
