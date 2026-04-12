@@ -11,6 +11,14 @@ import {
   verifyDomainOnVercel,
   isVercelConfigured,
 } from '@/lib/vercel/domains';
+import {
+  extractApex,
+  matchProviderFromNs,
+  PROVIDERS,
+  type DnsProviderKey,
+  type DnsProviderInfo,
+} from '@/lib/dns/providers';
+import { sendEmail } from '@/lib/email/send';
 import type { CustomDomain } from '@/types';
 
 // Hostname validation: letters/digits/dots/hyphens, at least one dot, no protocol/path.
@@ -286,6 +294,117 @@ export async function getPrimaryDomainHost(): Promise<string | null> {
     .single();
 
   return (data as { host: string } | null)?.host ?? null;
+}
+
+/**
+ * Erkennt den DNS-Anbieter der Domain via NS-Lookup. Liefert sowohl den
+ * erkannten Provider-Key (für provider-spezifische Guides) als auch die
+ * rohen Nameserver (falls der User das manuell prüfen will).
+ */
+export async function detectDnsProvider(host: string): Promise<{
+  key: DnsProviderKey;
+  provider: DnsProviderInfo;
+  nameservers: string[];
+  apex: string;
+}> {
+  await requireAuth();
+  const parsed = hostSchema.safeParse(host);
+  const clean = parsed.success ? parsed.data : host.toLowerCase().trim();
+  const apex = extractApex(clean);
+  try {
+    const { resolveNs } = await import('node:dns/promises');
+    const ns = await resolveNs(apex);
+    const key = matchProviderFromNs(ns);
+    return { key, provider: PROVIDERS[key], nameservers: ns, apex };
+  } catch {
+    return { key: 'unknown', provider: PROVIDERS.unknown, nameservers: [], apex };
+  }
+}
+
+/**
+ * Leichtgewichtiger DNS-Poll: Fragt NUR den TXT-Record ab, vergleicht Token,
+ * ruft aber NICHT die Vercel-API auf. Der UI-Polling-Loop nutzt das, um ohne
+ * Rate-Limit-Risiko alle paar Sekunden zu prüfen. Gefunden → UI triggert dann
+ * verifyCustomDomain() für den vollen Flow.
+ */
+export async function checkDnsRecord(
+  id: string
+): Promise<{ found: boolean; error?: string }> {
+  await requireAuth();
+  const supabase = await createClient();
+  const { data: domain } = await supabase
+    .from('custom_domains')
+    .select('host, verification_token')
+    .eq('id', id)
+    .single();
+  if (!domain) return { found: false, error: 'Domain nicht gefunden' };
+
+  const { host, verification_token } = domain as { host: string; verification_token: string };
+  const lookupName = `_spurig-verify.${host}`;
+  try {
+    const { resolveTxt } = await import('node:dns/promises');
+    const records = await resolveTxt(lookupName);
+    const flat = records.map((r) => r.join('').trim());
+    return { found: flat.includes(verification_token) };
+  } catch {
+    return { found: false };
+  }
+}
+
+/**
+ * Sendet eine Support-Anfrage an info@spurig.com mit allen Daten, die der
+ * Support braucht, um dem Kunden beim DNS-Setup zu helfen. Triggered nach
+ * mehreren gescheiterten Poll-Versuchen oder per Button „Hilfe anfordern".
+ */
+export async function requestDomainSupport(
+  id: string,
+  userNote?: string
+): Promise<{ success: boolean; error?: string }> {
+  const user = await requireAuth();
+  const supabase = await createClient();
+  const { data: domain } = await supabase
+    .from('custom_domains')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (!domain) return { success: false, error: 'Domain nicht gefunden' };
+
+  const d = domain as CustomDomain;
+  const apex = extractApex(d.host);
+  let nsList: string[] = [];
+  let provider: DnsProviderKey = 'unknown';
+  try {
+    const { resolveNs } = await import('node:dns/promises');
+    nsList = await resolveNs(apex);
+    provider = matchProviderFromNs(nsList);
+  } catch {
+    // ignore — info ist best-effort
+  }
+
+  const subject = `[Spurig] Support-Anfrage: Custom-Domain ${d.host}`;
+  const html = `
+    <h2>Kunden-Support: DNS-Setup benötigt Hilfe</h2>
+    <p><strong>Kunde:</strong> ${user.email ?? user.id}</p>
+    <p><strong>Domain:</strong> <code>${d.host}</code></p>
+    <p><strong>Erkannter Anbieter:</strong> ${PROVIDERS[provider].label}</p>
+    <p><strong>Nameserver:</strong><br><code>${nsList.join('<br>') || '— nicht ermittelbar —'}</code></p>
+    <p><strong>Verification-Token:</strong> <code>${d.verification_token}</code></p>
+    <p><strong>Erwarteter TXT-Record:</strong> <code>_spurig-verify.${d.host}</code> → Token (siehe oben)</p>
+    <p><strong>Erwarteter CNAME:</strong> <code>${d.host}</code> → <code>cname.vercel-dns.com</code></p>
+    ${userNote ? `<hr><p><strong>Nachricht vom Kunden:</strong></p><p>${userNote.replace(/[<>]/g, '')}</p>` : ''}
+    <hr>
+    <p style="color:#666;font-size:12px">Domain-ID: ${d.id} · Angelegt: ${d.created_at}</p>
+  `;
+
+  try {
+    await sendEmail({ to: 'info@spurig.com', subject, html });
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'E-Mail-Versand fehlgeschlagen',
+    };
+  }
 }
 
 export async function unsetPrimaryCustomDomain(): Promise<{ success: boolean; error?: string }> {

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Globe, Trash2, Plus, Loader2, Check, Copy, Star, AlertCircle, Crown, Info, QrCode } from 'lucide-react';
+import { Globe, Trash2, Plus, Loader2, Check, Copy, Star, AlertCircle, Crown, Info, QrCode, ExternalLink, LifeBuoy, Search } from 'lucide-react';
 import Link from 'next/link';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { UpgradeBanner } from '@/components/shared/upgrade-banner';
@@ -19,7 +19,11 @@ import {
   verifyCustomDomain,
   setPrimaryCustomDomain,
   unsetPrimaryCustomDomain,
+  detectDnsProvider,
+  checkDnsRecord,
+  requestDomainSupport,
 } from '@/app/(dashboard)/settings/domains-actions';
+import type { DnsProviderInfo } from '@/lib/dns/providers';
 
 function normalizeHostInput(raw: string): string {
   let h = raw.trim().toLowerCase();
@@ -318,7 +322,68 @@ function DomainItem({
   isPending: boolean;
 }) {
   const [showSetup, setShowSetup] = useState(!domain.verified);
+  const [provider, setProvider] = useState<DnsProviderInfo | null>(null);
+  const [nameservers, setNameservers] = useState<string[]>([]);
+  const [pollAttempts, setPollAttempts] = useState(0);
+  const [pollState, setPollState] = useState<'idle' | 'searching' | 'found' | 'exhausted'>(
+    domain.verified ? 'idle' : 'searching'
+  );
+  const [supportSent, setSupportSent] = useState(false);
   const recordName = `_spurig-verify.${domain.host}`;
+  const MAX_POLL_ATTEMPTS = 20; // 20 × 15s = 5 min
+
+  // Provider-Detection beim Mount (nur wenn unverifiziert)
+  useEffect(() => {
+    if (domain.verified) return;
+    let cancelled = false;
+    detectDnsProvider(domain.host).then((res) => {
+      if (cancelled) return;
+      setProvider(res.provider);
+      setNameservers(res.nameservers);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [domain.host, domain.verified]);
+
+  // Auto-Poll alle 15s: prüft ob TXT-Record sichtbar ist, triggert onVerify() wenn ja.
+  useEffect(() => {
+    if (domain.verified) return;
+    if (pollState !== 'searching') return;
+
+    const tick = async () => {
+      setPollAttempts((n) => n + 1);
+      const res = await checkDnsRecord(domain.id);
+      if (res.found) {
+        setPollState('found');
+        onVerify(domain.id); // full verify inkl. Vercel
+      }
+    };
+
+    // Erster Check nach 5s (gibt User Zeit DNS zu setzen bevor 1. Poll spammt)
+    const first = setTimeout(tick, 5000);
+    const interval = setInterval(tick, 15000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(interval);
+    };
+  }, [domain.id, domain.verified, pollState, onVerify]);
+
+  useEffect(() => {
+    if (pollAttempts >= MAX_POLL_ATTEMPTS && pollState === 'searching') {
+      setPollState('exhausted');
+    }
+  }, [pollAttempts, pollState]);
+
+  async function handleSupport() {
+    const result = await requestDomainSupport(domain.id);
+    if (result.success) {
+      toast.success('Support-Anfrage gesendet — wir melden uns per E-Mail');
+      setSupportSent(true);
+    } else {
+      toast.error(result.error || 'Support-Anfrage fehlgeschlagen');
+    }
+  }
 
   return (
     <div className="rounded-lg border border-border">
@@ -404,7 +469,89 @@ function DomainItem({
 
       {/* Setup instructions */}
       {showSetup && !domain.verified && (
-        <div className="border-t border-border bg-muted/20 px-3 py-3 space-y-2.5">
+        <div className="border-t border-border bg-muted/20 px-3 py-3 space-y-3">
+          {/* Live-Poll-Status */}
+          <div
+            className={
+              'flex items-center gap-2 rounded-md border px-2.5 py-2 text-[12px] ' +
+              (pollState === 'found'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400'
+                : pollState === 'exhausted'
+                ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-400'
+                : 'border-border bg-background text-muted-foreground')
+            }
+          >
+            {pollState === 'found' ? (
+              <>
+                <Check className="h-3.5 w-3.5 shrink-0" />
+                <span>DNS-Record gefunden — Verifizierung läuft…</span>
+              </>
+            ) : pollState === 'exhausted' ? (
+              <>
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                <span>
+                  Nach 5 Minuten kein DNS-Record gefunden. Bitte prüfe die Einträge
+                  bei deinem Anbieter — oder fordere unten Hilfe an.
+                </span>
+              </>
+            ) : (
+              <>
+                <Search className="h-3.5 w-3.5 shrink-0 animate-pulse" />
+                <span>
+                  DNS-Record wird automatisch gesucht… (Versuch {pollAttempts}/
+                  {MAX_POLL_ATTEMPTS}, alle 15&nbsp;Sekunden)
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Provider-Guide */}
+          {provider && (
+            <div className="rounded-md border border-border bg-background p-2.5 space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 text-[12px] font-medium">
+                  <Globe className="h-3.5 w-3.5 text-primary" />
+                  {provider.key === 'unknown'
+                    ? 'DNS-Anbieter nicht automatisch erkannt'
+                    : `Erkannt: ${provider.label}`}
+                </div>
+                {provider.dashboardUrl && (
+                  <Link
+                    href={provider.dashboardUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+                  >
+                    Zum Dashboard
+                    <ExternalLink className="h-2.5 w-2.5" />
+                  </Link>
+                )}
+              </div>
+              {provider.menuHint && (
+                <p className="text-[11px] text-muted-foreground">
+                  <span className="font-medium">Menü:</span> {provider.menuHint}
+                </p>
+              )}
+              <ol className="space-y-1 pl-4 text-[11px] text-muted-foreground list-decimal">
+                {provider.steps.map((s, i) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ol>
+              {nameservers.length > 0 && (
+                <details className="text-[11px] text-muted-foreground">
+                  <summary className="cursor-pointer hover:text-foreground">
+                    Nameserver anzeigen
+                  </summary>
+                  <ul className="mt-1 pl-3 font-mono space-y-0.5">
+                    {nameservers.map((ns) => (
+                      <li key={ns}>{ns}</li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
+          )}
+
           <p className="text-[12px] text-muted-foreground">
             Lege zwei DNS-Records bei deinem Domain-Anbieter an:
           </p>
@@ -458,9 +605,25 @@ function DomainItem({
             </div>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            DNS-Änderungen können einige Minuten dauern, bis sie aktiv sind. Zusätzlich
-            muss die Domain im Vercel-Dashboard dem Projekt hinzugefügt werden.
+            DNS-Änderungen können einige Minuten dauern, bis sie aktiv sind.
           </p>
+
+          {/* Support-Button — erscheint nach erschöpften Polls oder bleibt permanent sichtbar */}
+          <div className="flex items-center justify-between gap-2 border-t border-border pt-2.5">
+            <p className="text-[11px] text-muted-foreground">
+              Kommst du nicht weiter? Unser Support hilft dir beim DNS-Setup.
+            </p>
+            <Button
+              variant={pollState === 'exhausted' ? 'default' : 'outline'}
+              size="sm"
+              className="h-7 text-[12px] shrink-0"
+              onClick={handleSupport}
+              disabled={supportSent}
+            >
+              <LifeBuoy className="mr-1.5 h-3 w-3" />
+              {supportSent ? 'Anfrage gesendet' : 'Hilfe anfordern'}
+            </Button>
+          </div>
         </div>
       )}
     </div>
