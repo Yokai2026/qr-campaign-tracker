@@ -144,9 +144,9 @@ export default function DatenschutzPage() {
               Supabase unterliegt Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO.
             </li>
             <li>
-              <strong>Resend Inc.</strong> (San Francisco, USA) — Versand von E-Mail-Berichten
-              an registrierte Nutzer. Die Verarbeitung erfolgt nur auf Anforderung des Nutzers
-              (Report-Scheduling). Resend unterliegt Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO.
+              <strong>Hetzner Online GmbH</strong> (Gunzenhausen, Deutschland) — E-Mail-Versand
+              an registrierte Nutzer (Report-Scheduling, Scan-Alerts). Die Verarbeitung erfolgt
+              nur auf Anforderung des Nutzers. Hetzner unterliegt der DSGVO als deutscher Anbieter.
             </li>
           </ul>
           <p className="mt-2">

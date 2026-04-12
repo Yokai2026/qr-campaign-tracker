@@ -29,7 +29,7 @@ export default function ImpressumPage() {
           <h2 className="text-[15px] font-semibold text-foreground mb-2">Angaben gemäß § 5 DDG</h2>
           <p>
             <strong>David da Silva Gornik</strong><br />
-            E-Mail: <a href="mailto:kontakt@spurig.com" className="underline underline-offset-2">kontakt@spurig.com</a>
+            E-Mail: <a href="mailto:info@spurig.com" className="underline underline-offset-2">info@spurig.com</a>
           </p>
         </section>
 
