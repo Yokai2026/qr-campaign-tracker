@@ -14,6 +14,8 @@ import {
   Lock,
   Server,
   EyeOff,
+  Crown,
+  Globe,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -94,6 +96,84 @@ const steps = [
       'Scans laufen live ins Dashboard. Filtere nach Kampagne, Ort, Gerät, Zeitraum.',
   },
 ];
+
+function PhoneMockup({ url, variant }: { url: string; variant: 'standard' | 'pro' }) {
+  const isPro = variant === 'pro';
+  return (
+    <div
+      className={
+        'relative w-[240px] rounded-[2.25rem] border-[7px] border-neutral-900 bg-neutral-900 shadow-2xl ' +
+        (isPro ? 'shadow-primary/25' : 'shadow-black/20')
+      }
+    >
+      {/* Notch */}
+      <div className="absolute left-1/2 top-[7px] z-10 h-4 w-20 -translate-x-1/2 rounded-full bg-neutral-900" />
+      {/* Screen */}
+      <div className="overflow-hidden rounded-[1.75rem] bg-background">
+        {/* Status bar placeholder */}
+        <div className="h-6 bg-background" />
+        {/* Browser chrome */}
+        <div className="border-b border-border/60 bg-muted/40 px-3 py-2">
+          <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-background px-2.5 py-1">
+            <Lock
+              className={
+                'h-2.5 w-2.5 shrink-0 ' +
+                (isPro ? 'text-emerald-600' : 'text-muted-foreground')
+              }
+            />
+            <span
+              className={
+                'truncate text-[10px] font-medium ' +
+                (isPro ? 'text-foreground' : 'text-muted-foreground')
+              }
+            >
+              {url}
+            </span>
+          </div>
+        </div>
+        {/* Page content mock */}
+        <div className="flex min-h-[320px] flex-col gap-3 p-4">
+          <div className="flex items-center gap-2">
+            <div
+              className={
+                'flex h-6 w-6 items-center justify-center rounded-md ' +
+                (isPro
+                  ? 'bg-primary/15 text-primary'
+                  : 'bg-muted text-muted-foreground')
+              }
+            >
+              <QrCode className="h-3 w-3" />
+            </div>
+            <div className="h-2 w-20 rounded-full bg-muted" />
+          </div>
+          <div className="mt-1 space-y-1.5">
+            <div className="h-2.5 w-full rounded-full bg-muted" />
+            <div className="h-2.5 w-4/5 rounded-full bg-muted" />
+            <div className="h-2.5 w-2/3 rounded-full bg-muted" />
+          </div>
+          <div
+            className={
+              'mt-auto rounded-lg border p-3 ' +
+              (isPro
+                ? 'border-primary/30 bg-primary/5'
+                : 'border-border bg-muted/30')
+            }
+          >
+            <div className="flex items-center justify-between">
+              <div className="h-2 w-16 rounded-full bg-foreground/40" />
+              <div
+                className={
+                  'h-4 w-12 rounded-full ' +
+                  (isPro ? 'bg-primary' : 'bg-foreground/60')
+                }
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   return (
@@ -379,8 +459,93 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Teaser */}
+      {/* Eigene Domain (Pro) */}
       <section className="py-20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="mb-12 text-center">
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-semibold text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-400">
+              <Crown className="h-3 w-3" />
+              Pro-Feature
+            </div>
+            <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+              So sehen deine Besucher den QR-Code
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-[15px] text-muted-foreground">
+              Standard ist in Ordnung. Eigene Domain wirkt wie deine Marke —
+              und macht das Tracking unsichtbar für den Nutzer.
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2">
+            {/* Phone: Standard */}
+            <div className="flex flex-col items-center">
+              <div className="mb-4 text-center">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Standard
+                </div>
+                <div className="mt-1 text-[13px] text-muted-foreground">
+                  Kostenlos · Funktioniert sofort
+                </div>
+              </div>
+              <PhoneMockup url="spurig.com/r/a3b2c" variant="standard" />
+            </div>
+
+            {/* Phone: Pro */}
+            <div className="flex flex-col items-center">
+              <div className="mb-4 text-center">
+                <div className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-primary">
+                  <Crown className="h-3 w-3" />
+                  Eigene Domain
+                </div>
+                <div className="mt-1 text-[13px] text-muted-foreground">
+                  Pro · Deine Marke, nicht unsere
+                </div>
+              </div>
+              <PhoneMockup url="go.deine-marke.de/a3b2c" variant="pro" />
+            </div>
+          </div>
+
+          <div className="mt-12 grid gap-4 sm:grid-cols-3">
+            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Globe className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-[13px] font-semibold">Jede Subdomain</h3>
+                <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+                  go.deine-marke.de, qr.vereinsname.de, links.shop.de — du
+                  entscheidest.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Lock className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-[13px] font-semibold">HTTPS automatisch</h3>
+                <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+                  Zertifikat wird für dich ausgestellt. Ein DNS-Eintrag, fertig.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <ShieldCheck className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-[13px] font-semibold">Volles Tracking</h3>
+                <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+                  Alle Scans, Geo- und Gerätedaten wie gewohnt — nur unter deiner URL.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Teaser */}
+      <section className="border-t border-border bg-muted/30 py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="mb-10 text-center">
             <div className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-primary">
