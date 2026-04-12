@@ -6,7 +6,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 import { generateQrCode, buildRedirectUrl } from '@/lib/qr/generate';
 import { qrCodeSchema, isUrlSafe } from '@/lib/validations';
-import { getAppUrl } from '@/lib/constants';
+import { getShortUrlBase } from '@/lib/custom-domains';
 import { logAudit } from '@/lib/audit';
 import type { QrCode, QrCodeInput, QrStatusHistory, QrAction, RedirectRule, AbVariant } from '@/types';
 
@@ -202,22 +202,27 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
     throw new Error('Die Ziel-URL ist nicht sicher oder ungültig.');
   }
 
-  // Fetch placement with campaign for defaults
-  const { data: placement, error: placementErr } = await supabase
-    .from('placements')
-    .select('*, campaign:campaigns!campaign_id ( id, name, slug )')
-    .eq('id', input.placement_id)
-    .single();
+  // Placement is optional — only fetch if provided (for UTM defaults)
+  let campaign: { id: string; name: string; slug: string } | null = null;
+  let placementCode: string | null = null;
+  if (input.placement_id) {
+    const { data: placement, error: placementErr } = await supabase
+      .from('placements')
+      .select('*, campaign:campaigns!campaign_id ( id, name, slug )')
+      .eq('id', input.placement_id)
+      .single();
 
-  if (placementErr || !placement) {
-    throw new Error('Platzierung nicht gefunden.');
+    if (placementErr || !placement) {
+      throw new Error('Platzierung nicht gefunden.');
+    }
+
+    campaign = placement.campaign as { id: string; name: string; slug: string } | null;
+    placementCode = placement.placement_code as string | null;
   }
 
-  const campaign = placement.campaign as { id: string; name: string; slug: string } | null;
-
-  // Generate short code and URLs
+  // Generate short code and URLs — uses primary custom domain if set, else app URL
   const shortCode = nanoid(8);
-  const baseUrl = getAppUrl();
+  const baseUrl = await getShortUrlBase();
   const redirectUrl = buildRedirectUrl(baseUrl, shortCode);
 
   // Generate QR code images with optional colors
@@ -231,14 +236,14 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
   // Build SVG data URL for storage
   const svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(svgString).toString('base64')}`;
 
-  // Set UTM defaults from placement / campaign
+  // Set UTM defaults from placement / campaign (empty for freestanding QRs)
   const utmCampaign = input.utm_campaign || campaign?.slug || '';
-  const utmContent = input.utm_content || placement.placement_code || '';
+  const utmContent = input.utm_content || placementCode || '';
 
   const { data: qrCode, error: insertErr } = await supabase
     .from('qr_codes')
     .insert({
-      placement_id: input.placement_id,
+      placement_id: input.placement_id || null,
       short_code: shortCode,
       target_url: input.target_url,
       active: true,
@@ -364,7 +369,7 @@ export async function updateQrCode(
 
   // Regenerate QR image if target URL or colors changed
   if (targetChanged || colorChanged) {
-    const baseUrl = getAppUrl();
+    const baseUrl = await getShortUrlBase();
     const redirectUrl = buildRedirectUrl(baseUrl, existing.short_code);
     const fgColor = (updates.qr_fg_color as string) ?? existing.qr_fg_color ?? '#000000';
     const bgColor = (updates.qr_bg_color as string) ?? existing.qr_bg_color ?? '#FFFFFF';
@@ -471,7 +476,7 @@ export async function bulkCreateQrCodes(
   }
 
   const campaign = placement.campaign as { id: string; name: string; slug: string } | null;
-  const baseUrl = getAppUrl();
+  const baseUrl = await getShortUrlBase();
   const errors: string[] = [];
   let created = 0;
 

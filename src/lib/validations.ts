@@ -39,7 +39,7 @@ export const placementSchema = z.object({
 });
 
 export const qrCodeSchema = z.object({
-  placement_id: z.string().uuid('Platzierung ist erforderlich'),
+  placement_id: z.string().uuid().optional().or(z.literal('')),
   target_url: z.string().url('Gültige URL erforderlich').max(2000),
   note: z.string().max(500).optional().or(z.literal('')),
   valid_from: z.string().optional().or(z.literal('')),
@@ -50,7 +50,7 @@ export const qrCodeSchema = z.object({
   utm_content: z.string().max(200).optional().or(z.literal('')),
   utm_id: z.string().max(200).optional().or(z.literal('')),
   qr_fg_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Ungültiger Farbcode').optional().or(z.literal('')),
-  qr_bg_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Ungültiger Farbcode').optional().or(z.literal('')),
+  qr_bg_color: z.string().regex(/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/, 'Ungültiger Farbcode').optional().or(z.literal('')),
   max_scans: z.number().int().min(1, 'Mindestens 1 Scan').optional(),
   limit_redirect_url: z.string().url('Gültige URL erforderlich').max(2000).optional().or(z.literal('')),
 });

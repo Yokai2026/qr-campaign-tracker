@@ -235,9 +235,9 @@ export default function NewQrCodePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Placement combobox */}
+            {/* Placement combobox (optional) */}
             <div className="space-y-2">
-              <Label htmlFor="placement_id">Platzierung</Label>
+              <Label htmlFor="placement_id">Platzierung (optional)</Label>
               <Controller
                 name="placement_id"
                 control={control}
@@ -257,7 +257,7 @@ export default function NewQrCodePage() {
                         ? 'Laden...'
                         : selectedPlacement
                           ? `${selectedPlacement.name} (${selectedPlacement.campaign?.name ?? '-'})`
-                          : 'Platzierung wählen...'}
+                          : 'Keine — freistehender QR-Code'}
                       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
@@ -266,6 +266,22 @@ export default function NewQrCodePage() {
                         <CommandList>
                           <CommandEmpty>Keine Platzierung gefunden.</CommandEmpty>
                           <CommandGroup>
+                            <CommandItem
+                              key="__none__"
+                              value="keine freistehend ohne"
+                              onSelect={() => {
+                                field.onChange('');
+                                setComboOpen(false);
+                              }}
+                              data-checked={!field.value}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">Keine Auswahl</span>
+                                <span className="text-xs text-muted-foreground">
+                                  Freistehender QR-Code ohne Zuordnung
+                                </span>
+                              </div>
+                            </CommandItem>
                             {placements.map((p) => (
                               <CommandItem
                                 key={p.id}
@@ -291,6 +307,9 @@ export default function NewQrCodePage() {
                   </Popover>
                 )}
               />
+              <p className="text-xs text-muted-foreground">
+                Optional — ordne den QR-Code einer Platzierung zu (damit er in Kampagnen-Analytics auftaucht) oder lass es leer für einen freistehenden QR.
+              </p>
               {errors.placement_id && (
                 <p className="text-sm text-destructive">{errors.placement_id.message}</p>
               )}
@@ -497,27 +516,60 @@ export default function NewQrCodePage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="qr_bg_color">Hintergrund</Label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      value={watchBg}
-                      onChange={(e) => setValue('qr_bg_color', e.target.value)}
-                      className="h-9 w-12 cursor-pointer rounded-lg border border-border bg-transparent p-0.5"
-                    />
-                    <Input
-                      value={watchBg}
-                      onChange={(e) => setValue('qr_bg_color', e.target.value)}
-                      className="flex-1 font-mono uppercase"
-                      maxLength={7}
-                    />
-                  </div>
+                  {(() => {
+                    const bgIsTransparent = /^#[0-9A-Fa-f]{6}00$/.test(watchBg);
+                    return (
+                      <>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="color"
+                            value={bgIsTransparent ? '#FFFFFF' : watchBg.slice(0, 7)}
+                            onChange={(e) => setValue('qr_bg_color', e.target.value)}
+                            disabled={bgIsTransparent}
+                            className="h-9 w-12 cursor-pointer rounded-lg border border-border bg-transparent p-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                          />
+                          <Input
+                            value={bgIsTransparent ? 'transparent' : watchBg}
+                            onChange={(e) => setValue('qr_bg_color', e.target.value)}
+                            disabled={bgIsTransparent}
+                            className="flex-1 font-mono uppercase"
+                            maxLength={9}
+                          />
+                        </div>
+                        <label className="flex items-center gap-2 pt-1 text-xs text-muted-foreground cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={bgIsTransparent}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setValue('qr_bg_color', '#FFFFFF00');
+                              } else {
+                                setValue('qr_bg_color', '#FFFFFF');
+                              }
+                            }}
+                            className="h-3.5 w-3.5 accent-primary"
+                          />
+                          Transparenter Hintergrund (PNG mit Alpha)
+                        </label>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
               {/* Live preview */}
               <div className="flex items-center justify-center rounded-lg border bg-muted/30 p-4">
                 <div
                   className="flex h-24 w-24 items-center justify-center rounded-lg transition-colors"
-                  style={{ backgroundColor: watchBg }}
+                  style={
+                    /^#[0-9A-Fa-f]{6}00$/.test(watchBg)
+                      ? {
+                          backgroundImage:
+                            'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)',
+                          backgroundSize: '12px 12px',
+                          backgroundPosition: '0 0, 0 6px, 6px -6px, -6px 0px',
+                        }
+                      : { backgroundColor: watchBg }
+                  }
                 >
                   <QrCodeIcon
                     className="h-16 w-16 transition-colors"

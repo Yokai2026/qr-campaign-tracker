@@ -17,20 +17,29 @@ export async function generateQrCode(
   const fgColor = opts?.fgColor || '#000000';
   const bgColor = opts?.bgColor || '#FFFFFF';
 
+  // Detect transparent background (8-char hex ending in 00 alpha)
+  const isTransparent = /^#[0-9A-Fa-f]{6}00$/.test(bgColor);
+
   const options = {
     errorCorrectionLevel: 'M' as const,
     margin: 2,
     width: 400,
     color: {
       dark: fgColor,
-      light: bgColor,
+      light: isTransparent ? '#00000000' : bgColor,
     },
   };
 
-  const [pngDataUrl, svgString] = await Promise.all([
+  const [pngDataUrl, svgStringRaw] = await Promise.all([
     QRCode.toDataURL(url, { ...options, type: 'image/png' }),
     QRCode.toString(url, { ...options, type: 'svg' }),
   ]);
+
+  // For SVG: remove the background <path> when transparent so the QR sits on
+  // any surface without a filled rectangle underneath.
+  const svgString = isTransparent
+    ? svgStringRaw.replace(/<path[^>]*fill="#00000000"[^/]*\/>/g, '')
+    : svgStringRaw;
 
   return { pngDataUrl, svgString };
 }

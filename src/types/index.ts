@@ -447,7 +447,7 @@ export interface PlacementInput {
 }
 
 export interface QrCodeInput {
-  placement_id: string;
+  placement_id?: string;
   target_url: string;
   note?: string;
   valid_from?: string;
