@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { QrCode, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BillingToggle } from '@/components/landing/billing-toggle';
+import { StructuredData, softwareApplicationLd } from '@/components/seo/structured-data';
 
 export const metadata = {
   title: 'Preise — QR-Code-Tracking ab 4,99 €',
@@ -28,6 +29,7 @@ const features = [
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-background">
+      <StructuredData id="ld-pricing-app" data={softwareApplicationLd} />
       {/* Header */}
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">

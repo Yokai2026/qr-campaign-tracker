@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BillingToggle } from '@/components/landing/billing-toggle';
+import { StructuredData, softwareApplicationLd } from '@/components/seo/structured-data';
 
 const features = [
   {
@@ -165,6 +166,7 @@ function PhoneMockup({ url, variant }: { url: string; variant: 'standard' | 'pro
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
+      <StructuredData id="ld-software-application" data={softwareApplicationLd} />
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
