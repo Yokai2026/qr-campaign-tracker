@@ -275,7 +275,7 @@ export default function LandingPage() {
                 </div>
               </div>
               {/* fake dashboard grid */}
-              <div className="grid grid-cols-4 gap-3 p-4">
+              <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4 sm:gap-3 sm:p-4">
                 {[
                   { label: 'Scans', value: '2.847', trend: '+12 %' },
                   { label: 'Unique', value: '1.912', trend: '+8 %' },
@@ -289,7 +289,7 @@ export default function LandingPage() {
                     <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
                       {m.label}
                     </div>
-                    <div className="mt-1 text-xl font-bold tracking-tight">{m.value}</div>
+                    <div className="mt-1 text-lg font-bold tracking-tight sm:text-xl">{m.value}</div>
                     <div className="text-[10px] font-medium text-emerald-600">
                       {m.trend}
                     </div>
