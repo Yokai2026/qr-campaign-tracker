@@ -237,16 +237,18 @@ export function CustomDomains() {
         {showForm && (
           <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-[12px] text-muted-foreground">Hostname</Label>
+              <Label htmlFor="custom-domain-host" className="text-[12px] text-muted-foreground">Hostname</Label>
               <Input
+                id="custom-domain-host"
                 type="text"
                 value={host}
                 onChange={(e) => setHost(e.target.value)}
                 placeholder="kurz.example.com"
                 className="h-8 text-[13px]"
                 autoFocus
+                aria-describedby="custom-domain-host-hint"
               />
-              <p className="text-[11px] text-muted-foreground">
+              <p id="custom-domain-host-hint" className="text-[11px] text-muted-foreground">
                 Protokoll (https://) und Pfad werden automatisch entfernt
               </p>
             </div>
@@ -473,7 +475,7 @@ function DomainItem({
           )}
           <ConfirmDialog
             trigger={
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" disabled={isPending} title="Domain entfernen">
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" disabled={isPending} aria-label="Domain entfernen" title="Domain entfernen">
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             }
@@ -490,6 +492,9 @@ function DomainItem({
         <div className="border-t border-border bg-muted/20 px-3 py-3 space-y-3">
           {/* Live-Poll-Status */}
           <div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
             className={
               'flex items-center gap-2 rounded-md border px-2.5 py-2 text-[12px] ' +
               (pollState === 'found'
@@ -589,6 +594,7 @@ function DomainItem({
                     variant="ghost"
                     size="icon"
                     className="h-5 w-5"
+                    aria-label="TXT-Name kopieren"
                     title="Kopieren"
                     onClick={() => {
                       navigator.clipboard.writeText(txtName);
@@ -610,6 +616,7 @@ function DomainItem({
                     variant="ghost"
                     size="icon"
                     className="h-5 w-5"
+                    aria-label="Verifizierungs-Token kopieren"
                     title="Kopieren"
                     onClick={() => onCopyToken(domain.verification_token)}
                   >
@@ -633,6 +640,7 @@ function DomainItem({
                     variant="ghost"
                     size="icon"
                     className="h-5 w-5"
+                    aria-label="CNAME/A-Name kopieren"
                     title="Kopieren"
                     onClick={() => {
                       navigator.clipboard.writeText(cnameName);
@@ -658,6 +666,7 @@ function DomainItem({
                     variant="ghost"
                     size="icon"
                     className="h-5 w-5"
+                    aria-label="Ziel kopieren"
                     title="Kopieren"
                     onClick={() => {
                       const target = isApex ? '76.76.21.21' : 'cname.vercel-dns.com';

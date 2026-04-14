@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { Shield, ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Datenschutzerklärung — Spurig',
-  description: 'Informationen zum Datenschutz beim Kampagnen-Tracking',
+  title: 'Datenschutzerklärung',
+  description: 'DSGVO-Informationen zum Datenschutz beim QR-Code-Kampagnen-Tracking mit Spurig.',
+  alternates: { canonical: '/datenschutz' },
 };
 
 export default function DatenschutzPage() {

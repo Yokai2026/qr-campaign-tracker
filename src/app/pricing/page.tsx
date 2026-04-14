@@ -3,6 +3,17 @@ import { QrCode, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BillingToggle } from '@/components/landing/billing-toggle';
 
+export const metadata = {
+  title: 'Preise — QR-Code-Tracking ab 4,99 €',
+  description: 'DSGVO-konformes QR-Code-Tracking & Kampagnen-Analytics. Unbegrenzte QR-Codes, eigene Domain, 14 Tage kostenlos testen. Ab 4,99 € / Monat.',
+  alternates: { canonical: '/pricing' },
+  openGraph: {
+    title: 'Spurig Preise — QR-Code-Tracking ab 4,99 €',
+    description: 'Ein Plan, alles drin. Unbegrenzte QR-Codes, DSGVO-konform, 14 Tage kostenlos.',
+    url: 'https://spurig.com/pricing',
+  },
+};
+
 const features = [
   'Unbegrenzte QR-Codes & Kurzlinks',
   'Kampagnen-Management',

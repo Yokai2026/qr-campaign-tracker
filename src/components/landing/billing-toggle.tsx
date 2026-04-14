@@ -86,7 +86,7 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'default', includ
                 : 'bg-muted text-muted-foreground',
             )}
           >
-            −16 %
+            {billing === 'yearly' ? 'Spare 12 €' : '−16 %'}
           </span>
         </button>
       </div>

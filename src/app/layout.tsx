@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { CookieBanner } from '@/components/layout/cookie-banner';
 import './globals.css';
@@ -15,28 +15,39 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Spurig — QR-Code Kampagnen-Tracking',
+    default: 'Spurig — QR-Code Tracking & Analytics, DSGVO-konform',
     template: '%s — Spurig',
   },
-  description: 'Tracke deine Offline-Kampagnen mit QR-Codes. Scans, Besucher, Geräte und Standorte — datenschutzkonform und ohne Drittanbieter.',
+  description: 'DSGVO-konformes QR-Code-Tracking und Kampagnen-Analytics. Scans, Besucher, Geräte und Standorte in Echtzeit — ohne Drittanbieter, ohne Cookie-Banner.',
+  keywords: ['QR Code Tracking', 'QR Code Analytics', 'DSGVO QR Code', 'Kampagnen Tracking', 'QR-Code Analyse', 'Offline-Marketing Tracking'],
   metadataBase: new URL('https://spurig.com'),
+  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     locale: 'de_DE',
     siteName: 'Spurig',
-    title: 'Spurig — QR-Code Kampagnen-Tracking',
-    description: 'Tracke deine Offline-Kampagnen mit QR-Codes. Scans, Besucher, Geräte und Standorte — datenschutzkonform und ohne Drittanbieter.',
+    title: 'Spurig — QR-Code Tracking & Analytics, DSGVO-konform',
+    description: 'DSGVO-konformes QR-Code-Tracking und Kampagnen-Analytics. Scans, Besucher, Geräte und Standorte in Echtzeit — ohne Drittanbieter.',
     url: 'https://spurig.com',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Spurig — QR-Code Kampagnen-Tracking',
-    description: 'Tracke deine Offline-Kampagnen mit QR-Codes. Datenschutzkonform, ohne Drittanbieter.',
+    title: 'Spurig — QR-Code Tracking & Analytics',
+    description: 'DSGVO-konformes QR-Code-Tracking. Scans, Besucher, Geräte und Standorte in Echtzeit.',
   },
   robots: {
     index: true,
     follow: true,
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+  ],
 };
 
 export default function RootLayout({

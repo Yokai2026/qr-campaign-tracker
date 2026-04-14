@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { Scale, ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Impressum — Spurig',
-  description: 'Impressum und Anbieterkennzeichnung',
+  title: 'Impressum',
+  description: 'Impressum und Anbieterkennzeichnung — Spurig QR-Code Tracking.',
+  alternates: { canonical: '/impressum' },
 };
 
 export default function ImpressumPage() {
