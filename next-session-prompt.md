@@ -1,54 +1,69 @@
-# Fortsetzung: Custom-Domain-Feature — Smoke-Tests offen
+# Fortsetzung: UI/UX-Agents einsatzbereit + offene Smoke-Tests
 
-## Session 2026-04-13 — Stand
+## Session 2026-04-14 — Stand
 
-**Deploy ist LIVE auf Production** (spurig.com). Letzter Commit auf master:
+**Deploy ist LIVE auf Production** (spurig.com). Letzte Commits auf master:
 
 ```
-b34ca34 fix(custom-domains): DNS-Records provider-aware anzeigen  ← deployed
-17e4604 feat(custom-domains): Setup-Assistent mit Provider-Erkennung + Auto-Polling
-eb598b8 fix(custom-domains): Hostname-Input robust normalisieren
+2794c29  feat(claude): 16 UI/UX-Agenten + 4 Frontend-Skills installiert  ← NEU
+3633ae7  feat(landing): Billing-Toggle mit Auswahl-Feeling + cleanerer Mobile-View
+146c975  docs: next-session-prompt nach Deploy von Custom-Domains
+b34ca34  fix(custom-domains): DNS-Records provider-aware anzeigen
 ```
 
-### ✅ Erledigt in Session 5
-1. **UI-Fix DNS-Records**: `custom-domains.tsx` — DNS-Records werden jetzt provider-aware angezeigt. Subdomain-Only-Provider (IONOS, Cloudflare, Strato, Hetzner, Namecheap, GoDaddy, Hostinger, Checkdomain, United Domains, Google) bekommen die Kurzform (`_spurig-verify.kurz` + `kurz`) mit FQDN als "Vollständig:"-Zeile. FQDN-Provider (ALL-INKL, AWS Route 53, Unknown) bekommen weiter volle Namen. Apex-Domain-Sonderfall: zeigt A-Record `76.76.21.21` statt CNAME. Copy-Buttons für Name + Ziel ergänzt.
-2. **VERCEL_TOKEN rotiert** (alter Token revoked, neuer angelegt Scope=Projekt-scoped, Name `spurig-domains-api`, No Expiration) — in `.env.local` UND Vercel Production ENVs gesetzt.
-3. **Vercel Production ENVs gesetzt**: `VERCEL_TOKEN`, `VERCEL_PROJECT_ID=prj_R5L9hgIou9KZCafyfz7QJzORuNiK`, `VERCEL_TEAM_ID`=leer (Personal Account).
-4. **Push**: `origin/master` = `b34ca34`. Vercel-Deploy: Duration 1m 17s, Status Ready, Production Current.
+### ✅ Erledigt in Session 6
+- **16 Community-Agents** in `.claude/agents/` installiert (kuratiert aus wshobson/agents 33.6k★, davila7/claude-code-templates 24.6k★, VoltAgent 17.3k★, iannuttall 2.0k★)
+- **4 Skills** in `.claude/skills/`: `wcag-audit-patterns`, `screen-reader-testing`, `tailwind-design-system` (+ references), `nextjs-app-router-patterns`
+- VoltAgent `ui-designer` bereinigt (context-manager-Protokoll entfernt, da wir kein Multi-Agent-Framework nutzen)
+- `expert-nextjs-developer` Copilot-Tools-Liste entfernt (erbt jetzt alle Claude-Code-Tools)
 
 ---
 
-## ❌ Offen — HIER FORTSETZEN
+## 🛠 Jetzt nutzbar — Agent-Übersicht
 
-### Phase 6c — Prod-Smoke-Tests
+**UI/Visual Design**: `ui-ux-designer` (opinionated Screenshot-Review), `ui-designer` (Design-Systeme), `frontend-designer` (Mockup→Code, shadcn-aware), `ui-visual-validator` (Visual-Regression)
 
-User muss persönlich durchgehen (oder ich begleite live):
+**Frontend Code**: `frontend-developer` (React 19), `expert-nextjs-developer` (Next.js 16), `nextjs-developer`, `react-performance-optimizer` (Core Web Vitals)
 
-1. **Landing** — https://spurig.com (Inkognito-Tab): Pro-Feature-Section mit beiden Phone-Mockups, iPhone-Notch + URL-Bar-Lock-Icon korrekt.
-2. **QR-Create** — `/qr-codes/new`: Card "Kurz-URL-Typ" ganz oben; Pro-User: Radio "Eigene Domain" freigeschaltet; Non-Pro: Pro-Gate mit Link zu `/pricing`.
-3. **Settings → Custom Domains** — `/settings`: 3-Schritt-Guide sichtbar; Domain hinzufügen → DB-Insert + Vercel-API-Call; bei Vercel-Fehler `toast.warning()`.
-4. **DNS-Records UI-Fix verifizieren** (neu!): Domain hinzufügen → Provider-Detection → bei IONOS/Cloudflare/Strato sollte Name in **Kurzform** angezeigt werden (z.B. `_spurig-verify.demo` statt `_spurig-verify.demo.spurig.com`) + Zeile "Vollständig: …" darunter.
-5. **Test-Subdomain** — `demo.spurig.com`:
-   - DNS-Record: CNAME `demo` → `cname.vercel-dns.com` bei spurig.com's Nameserver
-   - TXT: `_spurig-verify.demo` → Token aus UI
-   - Auto-Polling sollte innerhalb 5 min finden → Status auf "Verifiziert"
-   - QR-Code mit dieser Domain erstellen → Scan → Redirect auf Target
-6. **Fremdhost-404** — Request an `*.vercel.app` Preview-URL oder Custom-Host ohne Short-Code (`demo.spurig.com/impressum`) → sauberes 404, nicht das Dashboard.
+**A11y/UX**: `accessibility-tester` (WCAG 2.1/2.2), `web-accessibility-checker`, `ux-researcher`
+
+**SEO/Marketing**: `seo-analyzer`, `seo-meta-optimizer`, `seo-structure-architect`, `seo-content-writer`, `content-marketer`
+
+**Skills (auto-loaded)**: `tailwind-design-system`, `nextjs-app-router-patterns`, `wcag-audit-patterns`, `screen-reader-testing`
+
+### Vorgeschlagene erste Einsätze
+- `ui-ux-designer` auf die Landing-Page (`spurig.com`) loslassen für Kritik-Review
+- `accessibility-tester` auf `/settings` + Custom-Domain-Wizard für WCAG-Audit
+- `react-performance-optimizer` auf Dashboard-Routes für Core-Web-Vitals-Check
+- `seo-analyzer` auf komplette Public-Routes für SEO-Baseline
 
 ---
 
-## ⚠️ Bekannte Probleme / Tech-Debt
+## ❌ Offen — Weiterhin zu erledigen
+
+### Phase 6c — Prod-Smoke-Tests (aus Session 5 noch offen?)
+
+Falls noch nicht durchgegangen (bitte prüfen):
+1. **Landing** — https://spurig.com (Inkognito): Pro-Feature-Section mit Phone-Mockups, iPhone-Notch korrekt
+2. **QR-Create** — `/qr-codes/new`: Card "Kurz-URL-Typ" ganz oben; Pro-User: Radio "Eigene Domain" freigeschaltet
+3. **Settings → Custom Domains** — `/settings`: 3-Schritt-Guide, DB-Insert + Vercel-API-Call
+4. **DNS-Records UI-Fix verifizieren**: IONOS/Cloudflare/Strato → Kurzform + "Vollständig:"-Zeile
+5. **Test-Subdomain** — `demo.spurig.com`: CNAME + TXT → Auto-Polling → Verifiziert → QR erstellen → Scan → Redirect
+6. **Fremdhost-404** — `*.vercel.app` Preview oder `demo.spurig.com/impressum` → sauberes 404
+
+---
+
+## ⚠️ Bekannte Probleme / Tech-Debt (unverändert)
 
 ### Preview-Deployments werfen 404
-**Root Cause**: `src/lib/supabase/middleware.ts:43-73` `handleCustomHost()` behandelt jeden Host, der nicht `NEXT_PUBLIC_APP_URL` entspricht, als Custom-Host → 404. PR-/Branch-Previews auf `*.vercel.app` treffen nicht `spurig.com` → Preview-Thumbnail in Vercel-Dashboard zeigt "Seite nicht gefunden".
+**Root Cause**: `src/lib/supabase/middleware.ts:43-73` `handleCustomHost()` behandelt jeden Nicht-`NEXT_PUBLIC_APP_URL`-Host als Custom-Host.
 
-**Fix (später)**: In `handleCustomHost()` vor der Custom-Host-Logik einfügen:
+**Fix**:
 ```ts
 // Vercel preview/deployment URLs: immer als App-Host behandeln
 if (host.endsWith('.vercel.app')) return null;
 ```
-
-**Warum nicht jetzt**: Produktion funktioniert. PR-Previews sind erst relevant, wenn Team-Workflow mit Branches kommt.
+Nicht kritisch — Produktion läuft, PR-Previews erst relevant bei Team-Workflow.
 
 ### Pre-existing Lint-Issues (nicht Scope)
 - `report-schedules.tsx`, `scan-alerts.tsx`, `subscription-card.tsx`: React Compiler `set-state-in-effect` Errors
@@ -56,9 +71,19 @@ if (host.endsWith('.vercel.app')) return null;
 - `middleware.ts:90` `options` unused Warning
 
 ### Offene Architektur-Fragen
-- `bulkCreateQrCodes()` in `qr-codes/actions.ts` nutzt kein `short_host` — erweitern wenn Bedarf.
-- `short_links` hat `short_host`-Column (Migration 004) aber UI/Action-Support fehlt → separates Phase-Thema.
-- Per-QR `short_host` kann NICHT mehr geändert werden nach Create — akzeptabel, weil QR-Image sonst ungültig würde.
+- `bulkCreateQrCodes()` in `qr-codes/actions.ts` nutzt kein `short_host`
+- `short_links.short_host`-Column (Migration 004) ohne UI/Action-Support
+- Per-QR `short_host` immutable nach Create (akzeptabel)
+
+---
+
+## 🎯 Mögliche Session-7-Richtungen
+
+**A. Smoke-Tests + Bug-Fixes** — restliche Prod-Smoke-Tests durchgehen, gefundene Bugs fixen
+**B. UI-Audit mit neuen Agents** — `ui-ux-designer` + `accessibility-tester` auf Dashboard + Landing, Fixes umsetzen
+**C. Performance-Pass** — `react-performance-optimizer` + Core-Web-Vitals-Messung, Bundle-Analyse
+**D. SEO-Baseline** — `seo-analyzer` + `seo-meta-optimizer` auf Landing, Meta-Tags + Schema ausbauen
+**E. Preview-Deploy-Fix** — oben beschriebenes 1-Zeilen-Fix in middleware.ts + Test
 
 ---
 
@@ -67,3 +92,4 @@ if (host.endsWith('.vercel.app')) return null;
 - Supabase-Migrationen via MCP gegen Prod
 - Deutsche UI, englischer Code
 - Redirects werden NIE blockiert (`/r/[code]` außerhalb dashboard)
+- `.env.local` ist gitignored — neue Keys niemals committen
