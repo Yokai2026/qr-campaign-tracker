@@ -1,89 +1,125 @@
-# Fortsetzung: UI/UX-Agents einsatzbereit + offene Smoke-Tests
+# Fortsetzung: Landing-Page Modernisierung (4-Phasen-Plan)
 
-## Session 2026-04-14 — Stand
+## Session 2026-04-14 (Session 7) — Stand
 
-**Deploy ist LIVE auf Production** (spurig.com). Letzte Commits auf master:
+**Deploy LIVE auf spurig.com.** Neueste Commits (alle auf master, gepusht):
 
 ```
-2794c29  feat(claude): 16 UI/UX-Agenten + 4 Frontend-Skills installiert  ← NEU
-3633ae7  feat(landing): Billing-Toggle mit Auswahl-Feeling + cleanerer Mobile-View
-146c975  docs: next-session-prompt nach Deploy von Custom-Domains
-b34ca34  fix(custom-domains): DNS-Records provider-aware anzeigen
+86abea7  fix(seo): JSON-LD SSR-rendern statt client-injecten
+99c54b6  feat(ui+a11y): Yearly-Empfohlen-Badge + höherer Badge-Kontrast
+8d66996  fix(landing): Dashboard-Mock-Grid bricht auf Mobile <380px
+a139081  feat(seo+a11y): SEO-Baseline + WCAG-Fixes aus Agent-Audit
+58a5e06  feat(seo): JSON-LD SoftwareApplication + Offer schema (ersetzt durch 86abea7)
 ```
 
-### ✅ Erledigt in Session 6
-- **16 Community-Agents** in `.claude/agents/` installiert (kuratiert aus wshobson/agents 33.6k★, davila7/claude-code-templates 24.6k★, VoltAgent 17.3k★, iannuttall 2.0k★)
-- **4 Skills** in `.claude/skills/`: `wcag-audit-patterns`, `screen-reader-testing`, `tailwind-design-system` (+ references), `nextjs-app-router-patterns`
-- VoltAgent `ui-designer` bereinigt (context-manager-Protokoll entfernt, da wir kein Multi-Agent-Framework nutzen)
-- `expert-nextjs-developer` Copilot-Tools-Liste entfernt (erbt jetzt alle Claude-Code-Tools)
+### ✅ Session 7 erledigt
+
+**SEO-Baseline** (aus `seo-analyzer`-Agent-Report)
+- `/impressum` + `/datenschutz` Title-Suffix-Bug gefixt (war "Impressum — Spurig — Spurig")
+- Site-wide Title: "Spurig — QR-Code Tracking & Analytics, DSGVO-konform"
+- Keywords-Array: QR Code Tracking, QR Code Analytics, DSGVO QR Code, Kampagnen Tracking, QR-Code Analyse, Offline-Marketing Tracking
+- `alternates.canonical` auf allen Pages (/, /pricing, /impressum, /datenschutz)
+- Explizites `export const viewport` mit themeColor (light/dark)
+- `/pricing` eigene Metadata mit Preis-Anker im Title ("ab 4,99 €")
+- **JSON-LD SoftwareApplication + Offer** via `src/components/seo/structured-data.tsx` — SSR-inline gerendert (nicht client-injected), auf / und /pricing eingebunden
+
+**A11y / WCAG 2.1 AA** (aus `accessibility-tester`-Agent-Report, Settings → Custom-Domains)
+- aria-label auf Trash-Delete + 4x Copy-Icon-Buttons (WCAG 4.1.2)
+- role=status + aria-live=polite auf DNS-Polling-Statusblock (WCAG 4.1.3)
+- Label htmlFor + Input id + aria-describedby für Hostname-Feld (WCAG 1.3.1)
+- Status-Badges von text-emerald-600/amber-600 → -700 für WCAG-AA-Kontrast (Light-Mode)
+
+**UI** (aus `ui-ux-designer`-Agent-Report)
+- Billing-Toggle: "Spare 12 €" statt "−16 %" wenn Jahres-Plan aktiv (konkrete Euros > Prozent)
+- "Empfohlen"-Badge über Jahres-Button wenn aktiv
+- Dashboard-Mock-Grid: 2-col auf Mobile, 4-col ab sm (brach auf iPhone SE)
+
+**Live verifiziert** via curl (08.04.2026 ~20:39):
+- JSON-LD inline im HTML ✓
+- "Empfohlen"-Badge ✓
+- "Spare 12 €" ✓
+- Mobile-Grid ✓
+- Canonical + Keywords + themeColor ✓
 
 ---
 
-## 🛠 Jetzt nutzbar — Agent-Übersicht
+## 🎯 Session 8 — Landing-Modernisierung (4-Phasen-Plan)
 
-**UI/Visual Design**: `ui-ux-designer` (opinionated Screenshot-Review), `ui-designer` (Design-Systeme), `frontend-designer` (Mockup→Code, shadcn-aware), `ui-visual-validator` (Visual-Regression)
+User-Feedback nach Screenshot-Review: "moderner, verständlicher, schöner, passender — lass dir Zeit".
 
-**Frontend Code**: `frontend-developer` (React 19), `expert-nextjs-developer` (Next.js 16), `nextjs-developer`, `react-performance-optimizer` (Core Web Vitals)
+**Diagnose**: Landing wirkt wie 100 andere Next.js-SaaS-Templates. Generischer Gradient-Text, Geist-Font, Lila-Akzent, 6 gleiche Feature-Cards. Nicht schlecht, aber **forgettable**.
 
-**A11y/UX**: `accessibility-tester` (WCAG 2.1/2.2), `web-accessibility-checker`, `ux-researcher`
+### Phase 1 — Foundation (START HIER)
+- **Display-Serif für Headings**: `Instrument Serif` oder `Fraunces` via `next/font/google`
+  - Variable in `globals.css` (`--font-heading`), anwenden auf H1 + H2
+  - Geist bleibt für Body/UI
+- **Hero-Subline umschreiben**: aktuell emotional ("das dir wirklich gehört"), soll **Outcome-first** werden
+  - Neu: *"Sieh, welches Plakat, welcher Flyer, welche Visitenkarte konvertiert — in Echtzeit, DSGVO-konform, ohne Cookie-Banner."*
+- **Step-Section** (`#how-it-works`): große Step-Nummern `01 / 02 / 03` prominent, stärkerer visueller Kontrast zwischen den 3 Schritten (aktuell sehen sie aus wie normale Feature-Cards)
 
-**SEO/Marketing**: `seo-analyzer`, `seo-meta-optimizer`, `seo-structure-architect`, `seo-content-writer`, `content-marketer`
+### Phase 2 — Bento-Features
+- Statt 3×2 Grid mit gleichen Cards → **asymmetrisches Bento-Grid**
+  - 1 große Card (z.B. "Analytics in Echtzeit" mit Mini-Chart-Preview)
+  - 2 mittlere Cards (Geo-Tracking, Geräte-Erkennung)
+  - 3 kleine Cards (A/B-Testing, CSV-Export, E-Mail-Reports)
+- **Feature-Copy-Rewrite**: Outcomes statt Features
+  - Aktuell: "Analytics in Echtzeit"
+  - Besser: "In 30 Sekunden weißt du, ob dein Messeflyer gelesen wurde"
+- Hover-States: subtle scale + border-highlight
 
-**Skills (auto-loaded)**: `tailwind-design-system`, `nextjs-app-router-patterns`, `wcag-audit-patterns`, `screen-reader-testing`
+### Phase 3 — FAQ-Section (neu)
+- Accordion mit typischen Fragen:
+  - "Ist das wirklich DSGVO-konform?" (mit Auftragsverarbeitung-Link)
+  - "Kann ich bestehende QR-Codes importieren?"
+  - "Was passiert nach den 14 Tagen Trial?"
+  - "Kann ich jederzeit kündigen?"
+  - "Kann ich auch ohne eigene Domain tracken?"
+  - "Was unterscheidet Spurig von Google Analytics mit QR-Codes?"
+- **FAQPage JSON-LD Schema** für Google Rich Results (wiederverwendbare `StructuredData`-Component)
 
-### Vorgeschlagene erste Einsätze
-- `ui-ux-designer` auf die Landing-Page (`spurig.com`) loslassen für Kritik-Review
-- `accessibility-tester` auf `/settings` + Custom-Domain-Wizard für WCAG-Audit
-- `react-performance-optimizer` auf Dashboard-Routes für Core-Web-Vitals-Check
-- `seo-analyzer` auf komplette Public-Routes für SEO-Baseline
+### Phase 4 — Pricing-Refresh
+- Features-Checkliste direkt in der Preis-Card sichtbar (aktuell hinter "Details"-Klick)
+- Mobile-CTA-Hierarchie fixen (P1 aus UI-Agent): Primary vs Secondary visuell klarer trennen
+- Vorher/Nachher-Vergleich: "Ohne Spurig" (chaotisch) vs "Mit Spurig" (strukturiert) — visueller Split
 
 ---
 
-## ❌ Offen — Weiterhin zu erledigen
+## 🛠 Nützliche Agents/Skills für Session 8
 
-### Phase 6c — Prod-Smoke-Tests (aus Session 5 noch offen?)
-
-Falls noch nicht durchgegangen (bitte prüfen):
-1. **Landing** — https://spurig.com (Inkognito): Pro-Feature-Section mit Phone-Mockups, iPhone-Notch korrekt
-2. **QR-Create** — `/qr-codes/new`: Card "Kurz-URL-Typ" ganz oben; Pro-User: Radio "Eigene Domain" freigeschaltet
-3. **Settings → Custom Domains** — `/settings`: 3-Schritt-Guide, DB-Insert + Vercel-API-Call
-4. **DNS-Records UI-Fix verifizieren**: IONOS/Cloudflare/Strato → Kurzform + "Vollständig:"-Zeile
-5. **Test-Subdomain** — `demo.spurig.com`: CNAME + TXT → Auto-Polling → Verifiziert → QR erstellen → Scan → Redirect
-6. **Fremdhost-404** — `*.vercel.app` Preview oder `demo.spurig.com/impressum` → sauberes 404
+- **`frontend-designer`** — Mockup → Code, kennt shadcn
+- **`ui-ux-designer`** — iterative Reviews nach jedem Phasen-Deploy
+- **`ui-visual-validator`** — Visual-Regression nach Änderungen
+- Skills: `tailwind-design-system`, `nextjs-app-router-patterns`
 
 ---
 
-## ⚠️ Bekannte Probleme / Tech-Debt (unverändert)
+## ⚠️ Noch offen (pre-Session-7, unverändert)
 
-### Preview-Deployments werfen 404
-**Root Cause**: `src/lib/supabase/middleware.ts:43-73` `handleCustomHost()` behandelt jeden Nicht-`NEXT_PUBLIC_APP_URL`-Host als Custom-Host.
+### Bekannte Probleme
+- **Preview-Deploys werfen 404** — 1-Zeilen-Fix in `src/lib/supabase/middleware.ts:43-73`:
+  ```ts
+  if (host.endsWith('.vercel.app')) return null;
+  ```
+- **Pre-existing Lint-Issues** (nicht Scope):
+  - `report-schedules.tsx`, `scan-alerts.tsx`, `subscription-card.tsx`: React Compiler `set-state-in-effect` Errors
+  - `data-table.tsx`: TanStack Table incompatible-library Warning
+  - `middleware.ts:90` `options` unused Warning
 
-**Fix**:
-```ts
-// Vercel preview/deployment URLs: immer als App-Host behandeln
-if (host.endsWith('.vercel.app')) return null;
-```
-Nicht kritisch — Produktion läuft, PR-Previews erst relevant bei Team-Workflow.
+### SEO-Restposten (aus Session-7-Audit, noch offen)
+- **OG-Image** — `public/og-image.png` (1200×630) fehlt komplett, Link-Previews zeigen nix
+- **Favicon-Set** — `favicon.ico`, `apple-touch-icon.png`, `icon.png` fehlen, Default Next.js-Favicon läuft noch
+- **Pricing H1 SEO-tauglicher**: "Ein Plan. Alles drin." → "QR-Code-Tracking ab 4,99 € — ein Plan, alles drin."
 
-### Pre-existing Lint-Issues (nicht Scope)
-- `report-schedules.tsx`, `scan-alerts.tsx`, `subscription-card.tsx`: React Compiler `set-state-in-effect` Errors
-- `data-table.tsx`: TanStack Table incompatible-library Warning
-- `middleware.ts:90` `options` unused Warning
+### Prod-Smoke-Tests (nie final durchgegangen)
+1. Landing — Pro-Feature-Section mit Phone-Mockups, iPhone-Notch
+2. QR-Create `/qr-codes/new` — "Kurz-URL-Typ"-Card + Pro-Radio
+3. Settings → Custom Domains — 3-Schritt-Guide (aber A11y nachgezogen)
+4. Test-Subdomain `demo.spurig.com` E2E: CNAME+TXT → Auto-Polling → Verifiziert → QR → Scan → Redirect
+5. Fremdhost-404-Verhalten
 
-### Offene Architektur-Fragen
+### Architektur-Fragen
 - `bulkCreateQrCodes()` in `qr-codes/actions.ts` nutzt kein `short_host`
 - `short_links.short_host`-Column (Migration 004) ohne UI/Action-Support
-- Per-QR `short_host` immutable nach Create (akzeptabel)
-
----
-
-## 🎯 Mögliche Session-7-Richtungen
-
-**A. Smoke-Tests + Bug-Fixes** — restliche Prod-Smoke-Tests durchgehen, gefundene Bugs fixen
-**B. UI-Audit mit neuen Agents** — `ui-ux-designer` + `accessibility-tester` auf Dashboard + Landing, Fixes umsetzen
-**C. Performance-Pass** — `react-performance-optimizer` + Core-Web-Vitals-Messung, Bundle-Analyse
-**D. SEO-Baseline** — `seo-analyzer` + `seo-meta-optimizer` auf Landing, Meta-Tags + Schema ausbauen
-**E. Preview-Deploy-Fix** — oben beschriebenes 1-Zeilen-Fix in middleware.ts + Test
 
 ---
 
@@ -93,3 +129,10 @@ Nicht kritisch — Produktion läuft, PR-Previews erst relevant bei Team-Workflo
 - Deutsche UI, englischer Code
 - Redirects werden NIE blockiert (`/r/[code]` außerhalb dashboard)
 - `.env.local` ist gitignored — neue Keys niemals committen
+- Privacy-first: IP-Anonymisierung, keine Drittanbieter ohne DPA
+
+## Tipps für Session 8
+- **Display-Font live testen** via `next/font/google` — kein Font-Download nötig, nur Import
+- **Bento-Grid**: Tailwind CSS Grid mit `grid-template-areas` oder `col-span-2` + `row-span-2` Utilities
+- **FAQ-Accordion**: shadcn `Accordion` verwenden (Radix-basiert, A11y-fertig)
+- **Per Phase commiten + deployen**, nicht am Ende alles auf einmal — User will Zwischenfeedback
