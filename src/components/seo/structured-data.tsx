@@ -1,5 +1,3 @@
-import Script from 'next/script';
-
 type JsonLdValue =
   | string
   | number
@@ -13,15 +11,16 @@ type StructuredDataProps = {
   data: { [key: string]: JsonLdValue };
 };
 
+// Inline JSON-LD must render in SSR'd HTML so crawlers see it without executing JS.
+// Content is a static, developer-authored object — no untrusted input, so the
+// dangerouslySetInnerHTML usage is safe (XSS requires attacker-controlled strings).
 export function StructuredData({ id, data }: StructuredDataProps) {
   return (
-    <Script
+    <script
       id={id}
       type="application/ld+json"
-      strategy="beforeInteractive"
-    >
-      {JSON.stringify(data)}
-    </Script>
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
   );
 }
 
