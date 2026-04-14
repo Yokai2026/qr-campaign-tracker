@@ -77,6 +77,14 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'default', includ
             billing === 'yearly' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
           )}
         >
+          {billing === 'yearly' && (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-2.5 right-3 rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-primary-foreground shadow-sm [animation:fadeIn_200ms_ease-out]"
+            >
+              Empfohlen
+            </span>
+          )}
           Jährlich
           <span
             className={cn(

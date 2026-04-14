@@ -414,12 +414,12 @@ function DomainItem({
             <div className="flex items-center gap-2 text-[13px]">
               <span className="font-medium font-mono truncate">{domain.host}</span>
               {domain.verified ? (
-                <span className="inline-flex items-center gap-0.5 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                <span className="inline-flex items-center gap-0.5 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
                   <Check className="h-2.5 w-2.5" />
                   Verifiziert
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-0.5 rounded bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                <span className="inline-flex items-center gap-0.5 rounded bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-400">
                   <AlertCircle className="h-2.5 w-2.5" />
                   Unverifiziert
                 </span>
