@@ -5,8 +5,6 @@ import {
   BarChart3,
   Smartphone,
   MapPin,
-  Zap,
-  Mail,
   FileDown,
   Sparkles,
   Check,
@@ -18,37 +16,26 @@ import {
   Globe,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { BillingToggle } from '@/components/landing/billing-toggle';
 
 const features = [
   {
     icon: BarChart3,
     title: 'Analytics in Echtzeit',
     description:
-      'Scans, Unique Visitors, Conversion-Raten. Übersichtliche Charts statt Zahlenchaos.',
+      'Scans, Unique Visitors, Conversion-Raten. Übersichtlich statt Zahlenchaos.',
   },
   {
     icon: MapPin,
     title: 'Geo- & Platzierungs-Daten',
     description:
-      'Siehe sofort, welches Plakat am Bahnhof besser performt als das vor dem Café.',
+      'Welches Plakat am Bahnhof performt besser als das vor dem Café? Du siehst es sofort.',
   },
   {
     icon: Smartphone,
     title: 'Geräte-Erkennung',
     description:
       'iOS, Android, Desktop — erkenne wer, wo, womit scannt.',
-  },
-  {
-    icon: Zap,
-    title: 'A/B-Tests & Redirects',
-    description:
-      'Ein QR-Code, mehrere Ziele. Teste Varianten ohne neu drucken zu müssen.',
-  },
-  {
-    icon: Mail,
-    title: 'E-Mail-Reports & Alerts',
-    description:
-      'Wöchentliche Reports automatisch ins Postfach. Scan-Alerts bei Spitzen.',
   },
   {
     icon: FileDown,
@@ -388,7 +375,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             {features.map((f) => {
               const Icon = f.icon;
               return (
@@ -406,6 +393,12 @@ export default function LandingPage() {
                 </div>
               );
             })}
+          </div>
+          <div className="mt-6 text-center">
+            <Link href="/pricing" className="inline-flex items-center gap-1 text-[13px] font-medium text-primary hover:underline">
+              Alle Features ansehen
+              <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
         </div>
       </section>
@@ -505,41 +498,19 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="mt-12 grid gap-4 sm:grid-cols-3">
-            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Globe className="h-4 w-4" />
-              </div>
-              <div>
-                <h3 className="text-[13px] font-semibold">Jede Subdomain</h3>
-                <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-                  go.deine-marke.de, qr.vereinsname.de, links.shop.de — du
-                  entscheidest.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Lock className="h-4 w-4" />
-              </div>
-              <div>
-                <h3 className="text-[13px] font-semibold">HTTPS automatisch</h3>
-                <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-                  Zertifikat wird für dich ausgestellt. Ein DNS-Eintrag, fertig.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <ShieldCheck className="h-4 w-4" />
-              </div>
-              <div>
-                <h3 className="text-[13px] font-semibold">Volles Tracking</h3>
-                <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-                  Alle Scans, Geo- und Gerätedaten wie gewohnt — nur unter deiner URL.
-                </p>
-              </div>
-            </div>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <Globe className="h-3.5 w-3.5 text-primary" />
+              Jede Subdomain möglich
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Lock className="h-3.5 w-3.5 text-primary" />
+              HTTPS automatisch
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+              Volles Tracking
+            </span>
           </div>
         </div>
       </section>
@@ -547,7 +518,7 @@ export default function LandingPage() {
       {/* Pricing Teaser */}
       <section className="border-t border-border bg-muted/30 py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="mb-10 text-center">
+          <div className="mb-8 text-center">
             <div className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-primary">
               Ein Plan, alles drin
             </div>
@@ -555,48 +526,17 @@ export default function LandingPage() {
               Faire Preise. Keine Tier-Tricks.
             </h2>
             <p className="mx-auto mt-3 max-w-lg text-[15px] text-muted-foreground">
-              Unbegrenzte Kampagnen, QR-Codes und Scans. In beiden Varianten.
+              Unbegrenzte Kampagnen, QR-Codes und Scans.
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border border-border bg-card p-6">
-              <div className="text-[13px] font-semibold">Monatlich</div>
-              <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-[14px] text-muted-foreground line-through">12,99 €</span>
-              </div>
-              <div className="mt-1 flex items-baseline gap-1">
-                <span className="text-3xl font-bold tracking-tight">5,99 €</span>
-                <span className="text-[13px] text-muted-foreground">/ Monat</span>
-              </div>
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                Monatlich kündbar
-              </p>
-            </div>
-
-            <div className="relative rounded-xl border border-primary bg-card p-6 shadow-md ring-1 ring-primary/20">
-              <div className="absolute -top-2.5 right-4 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                16 % sparen
-              </div>
-              <div className="text-[13px] font-semibold">Jährlich</div>
-              <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-[14px] text-muted-foreground line-through">12,99 €</span>
-              </div>
-              <div className="mt-1 flex items-baseline gap-1">
-                <span className="text-3xl font-bold tracking-tight">4,99 €</span>
-                <span className="text-[13px] text-muted-foreground">/ Monat</span>
-              </div>
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                59,88 € jährlich abgerechnet
-              </p>
-            </div>
-          </div>
+          <BillingToggle href="/signup" />
 
           <div className="mt-6 text-center">
-            <Button variant="outline" render={<Link href="/pricing" />}>
-              Alle Details ansehen
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
+            <Link href="/pricing" className="inline-flex items-center gap-1 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground">
+              Was ist enthalten?
+              <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
         </div>
       </section>
