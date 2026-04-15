@@ -1,91 +1,85 @@
 # Next Session — Spurig Landing Redesign
 
 **Stand:** 2026-04-15
-**Letzte Session:** Session 8 — Editorial Premium SaaS Redesign (Phase 1)
+**Letzte Sessions:** Session 8 Phase 2 — FAQ + Pricing-Page + OG/Icon-Set
 
 ---
 
 ## Status
 
-**Build & Lint grün.** Neue Landing in Production-tauglichem Zustand.
+**Build + Lint grün. Alle Änderungen live auf master gepusht.**
 
-### Was erledigt ist
-1. `REDESIGN_PLAN.md` geschrieben (Bestandsanalyse, Designrichtung, Prioritäten, DoD).
-2. **Design-System upgegradet:**
-   - `Instrument Serif` als Display-Font eingebunden (`layout.tsx`)
-   - Neue Tokens: `cream`, `ink`, `subtle` + Elevation-Scale (`shadow-xs/sm/md/lg/glow`)
-   - Neue Utilities: `.bg-dot-grid`, `.bg-line-grid`, `.bg-aura`, `.bg-grain`, `.mask-fade-y`, `.card-lift`, `.text-gradient-violet`, `.font-display`, `.tabular`
-   - Primary leicht intensiviert (`oklch 0.52 0.17 285`)
-3. **Landing refactored:** Monolith (630 LoC) → 10 Section-Components + 3 UI-Helper
-4. **Alle Sections neu:**
-   - `SiteHeader` — eigenes SVG-Logo, feinere Nav mit 4. Link (So funktioniert's)
-   - `Hero` — Serif-Italic-Headline-Akzent, Aura+Dot-Grid-Backdrop, Premium-CTAs
-   - `HeroDashboardMock` — realistisches Multi-Panel-Dashboard (KPIs mit Sparklines, Chart mit Comparison-Line, Top-Kampagnen, Insight-Strip, schwebende Live-Chips)
-   - `StepsSection` — große Serif-Numerals, Cream-Background, dashed Mono-Details, Connector-Lines
-   - `FeaturesBento` — 5-Card-Bento (1 Hero mit Mini-Chart, 1 Ink-dark-Card mit Pulse-Dot, 3 Feature-Cards mit Stats/Chips/Bars)
-   - `PrivacySection` — 2-Spalten mit Editorial-Quote + Mono-DSGVO-Badges + EU-Card
-   - `DomainShowcase` — 3-Spalten-Layout (Phone → Arrow → Phone) mit richerem Phone-Mock
-   - `PricingTeaser` — 2-Spalten mit Inline-Feature-Liste (8 Features) + Trust-Bar
-   - `FinalCTA` — Ink-Card mit Radial-Gradient-Mesh, Pulse-Status, Live-Scan-Preview
-   - `SiteFooter` — 3 Spalten + Brand-Story + Status-Dot + Italic-Tagline
+### Session 8 Phase 1 (bereits erledigt, Commit `bef2670`)
+- Design-Tokens + Instrument Serif
+- Landing refactored: Monolith → 10 Section-Components + 3 UI-Helper
+- Alle Sections neu (Hero, Steps, Bento, Privacy, Domain, Pricing-Teaser, Final-CTA, Footer)
 
-### Dateien geändert / erstellt
-- `src/app/layout.tsx` (Instrument_Serif + Variable)
-- `src/app/globals.css` (komplett neu strukturiert, neue Tokens + Utilities)
-- `src/app/page.tsx` (auf ~25 Zeilen reduziert, nur Composition)
-- **Neu `src/components/landing/`:** site-header, hero, hero-dashboard-mock, steps-section, features-bento, privacy-section, domain-showcase, pricing-teaser, final-cta, site-footer
-- **Neu `src/components/ui/`:** section-eyebrow, section-heading, grid-backdrop
-- `REDESIGN_PLAN.md`, `NEXT_SESSION.md`, `NEXT_SESSION_PROMPT.md`
+### Session 8 Phase 2 (neu erledigt)
+**Commit `4b1cb5c` — FAQ + Pricing:**
+- `FaqSection` (`src/components/landing/faq-section.tsx`) — 8 Q&A als native `<details>/<summary>`, zero-JS, a11y-konform, erstes Item `open` by default
+- `faqPageLd(items)` Helper in `structured-data.tsx` — FAQPage JSON-LD
+- Landing: FAQ zwischen `PricingTeaser` + `FinalCTA`, zweites JSON-LD-Script
+- `/pricing` komplett auf neues Section-System gehoben: `SiteHeader/SiteFooter`, `SectionEyebrow + SectionHeading`, Aura+Dot-Grid-Hero, wiederverwendete `FaqSection` + `FinalCTA`
 
-### Design-Entscheidungen (wichtig)
-- **Typografie-Pattern:** Sans-Bold Headline + Serif-Italic Accent (nicht Gradient-Text für Haupt-Headlines).
-- **Farbpalette:** Muted Violet Primary + Cream Surfaces + Deep Ink Dark — editorial, kein Spielzeug-Lila.
-- **Keine neuen Libraries** installiert — Motion/Lucide/shadcn reichen vollständig.
-- **Motion minimal:** nur CSS-basiert (`stagger-children`, `.card-lift`, `pulseDot` keyframe).
-- **Responsive:** Bento kollabiert auf Mobile sauber, Phone-Showcase wird 2-spaltig (Arrow versteckt).
+**Commit `87a0f3c` — OG + Icons:**
+- `src/app/opengraph-image.tsx` + `twitter-image.tsx` — 1200×630 PNG via `next/og`, editorial Spurig-Design (cream bg, violet aura, serif italic, feature chips)
+- `src/app/icon.svg` — statisches dunkles Rounded-Square mit QR-Mark
+- `src/app/apple-icon.tsx` — 180×180 PNG via ImageResponse
+- `organizationLd.logo` → `/icon.svg` umgestellt
+- Middleware erweitert um `/opengraph-image`, `/twitter-image`, `/icon`, `/apple-icon` als public routes (vorher 307 → /login)
+
+### Getestet live (via curl gegen dev server)
+- `/` 200, `/pricing` 200, `/datenschutz` 200, `/impressum` 200, `/login` 200
+- 8 FAQ-`<details>` im SSR-HTML, erstes mit `open=""`
+- FAQPage JSON-LD mit allen 8 Fragen (Landing + Pricing)
+- `/opengraph-image` 200 PNG 116KB (gültige Magic-Bytes)
+- `/twitter-image` 200 PNG 116KB
+- `/apple-icon` 200 PNG 11KB
+- `/icon.svg` 200 SVG 526B
+- `og:image`, `twitter:image`, `og:image:width/height` korrekt in HTML-Head
 
 ---
 
-## Offen / Nächste Schritte (5-10 konkrete Aufgaben)
+## Offen / Nächste Schritte
 
-### Phase 2 — Feinschliff (priorisiert)
-1. **Live-Preview im Browser testen** (`npm run dev`) — visuelle Checks Desktop + Mobile, speziell:
+### Phase 3 — Polish & Feinschliff
+1. **Visuelle Browser-Kontrolle** (nie mit echtem Browser gemacht) — Desktop Chrome/Safari + iPhone-Viewport.
    - Hero-Dashboard-Mock auf sehr kleinen Screens (<360px)
    - Features-Bento bei `sm:` und `lg:` Breakpoints
-   - Domain-Showcase 3-Spalten → 2-Spalten Collapse
-2. **Dark-Mode-Pass** — jede Section einmal im Dark Mode durchsehen (Cream, Ink, Gradient-Mesh).
-3. **Pricing-Seite (`/pricing`)** — noch alte Struktur, könnte vom neuen Section-System profitieren.
-4. **FAQ-Section hinzufügen** (war in Session 8 Plan Phase 3) — als neue Component `faq-section.tsx` zwischen Pricing + FinalCTA, plus `FAQPage` JSON-LD Schema.
-5. **OG-Image generieren** für Social-Shares (statischer oder dynamisch via `opengraph-image.tsx`).
-6. **Favicon-Set** (bisher fehlt komplett) — 16/32/180/512 SVG + ICO.
-7. **Motion-Library-Enhancement** (optional): `motion` für Scroll-Reveal der Bento-Cards und Hero-Dashboard (sparsam, nur View-Enter).
-8. **Testimonials/Logos-Sektion** — Social Proof fehlt noch ganz. Falls noch keine Logos da sind: "Genutzt von …"-Platzhalter mit 4-6 ghost-Logos.
-9. **Performance-Audit** — Lighthouse-Scan gegen Hero (Inline-SVG-Größen, Font-Loading-Strategy — Instrument Serif `display: swap` steht, aber Preload prüfen).
-10. **Content-Pass** — Copy einmal laut lesen, Spurig-Tone konsistent machen. Subline des Hero könnte noch schärfer werden.
+   - Domain-Showcase 3→2 Spalten Collapse
+   - FAQ-Accordion Chevron-Rotation bei Click
+2. **Dark-Mode-Pass** — jede Section einmal im Dark Mode durchsehen.
+3. **OG-Image live validieren** via https://opengraph.xyz/?url=https://spurig.com — Layout check auf Twitter/LinkedIn/Slack-Preview.
+4. **Testimonials / Social Proof** — weiterhin offen. Ghost-Logos oder "Geeignet für …"-Sektor-Zeile zwischen Hero + Steps.
+5. **Motion-Enhancement** (optional) — `motion`-Scroll-Reveal für Bento-Cards.
+6. **Performance-Audit** — Lighthouse, speziell Font-Loading + Inline-SVG-Größen.
+7. **Content-Pass** — Copy einmal laut lesen, Hero-Subline ggf. schärfen.
+8. **`not-found.tsx`** auf Spurig-Branding heben — ungeprüft, vermutlich noch Next-Default.
 
 ### Bekannte Kanten / technische Schulden
-- **Pre-existing Lint-Errors** (nicht durch Redesign!): `src/components/settings/*.tsx` (3 × `react-hooks/set-state-in-effect`). Eigenes Ticket.
-- **Pricing-Seite** (`/pricing`) bisher nicht angefasst.
-- **Dashboard-App-Screens** (intern) bisher nicht redesignt — nur Landing.
+- **Pre-existing Lint-Errors** (nicht durch Redesign): `src/components/settings/*.tsx`, `shared/data-table.tsx`. Eigenes Ticket.
+- **Dashboard-App-Screens** (intern) weiterhin alter Look.
+- **Middleware public-paths** wurde für Images erweitert — künftige dynamische Metadata-Routes daran denken.
 
 ---
 
-## Wichtige Projekt-Konventionen
+## Wichtige Dateien (Referenz)
 
-- Deutsche UI, englischer Code.
-- `@/` = `src/`
-- Server-Components default, `"use client"` nur bei Interaktivität.
-- `oklch(...)` statt HEX — für bessere Farbkonsistenz und Dark-Mode-Portabilität.
-- Neue UI-Utilities immer als shared Component in `src/components/ui/` ablegen.
-- Display-Serif NUR als Inline-Akzent, nicht für Body oder Nav.
+- Landing Composition: `src/app/page.tsx` (~30 LoC)
+- Pricing: `src/app/pricing/page.tsx`
+- Landing Components: `src/components/landing/*.tsx` (11 Dateien inkl. faq-section)
+- Section Helpers: `src/components/ui/{section-eyebrow,section-heading,grid-backdrop}.tsx`
+- Design Tokens: `src/app/globals.css` (cream, ink, aura, dot-grid, line-grid, card-lift, font-display)
+- SEO: `src/components/seo/structured-data.tsx` — `softwareApplicationLd`, `faqPageLd(items)`, `organizationLd`
+- OG/Icons: `src/app/{opengraph-image,twitter-image,apple-icon}.tsx` + `src/app/icon.svg`
+- Middleware public-paths: `src/lib/supabase/middleware.ts:107`
 
 ---
 
 ## Startanweisung für nächste Session
 
-1. `REDESIGN_PLAN.md` lesen.
-2. Diese Datei lesen.
-3. `NEXT_SESSION_PROMPT.md` als Ausgangs-Prompt nehmen.
-4. Mit Phase 2 Punkt 1 (Live-Preview + Mobile-Checks) starten.
-5. Dark-Mode-Pass als schneller zweiter Schritt.
-6. Danach FAQ-Section als erste größere neue Komponente.
+1. `REDESIGN_PLAN.md` + diese Datei + `NEXT_SESSION_PROMPT.md` lesen.
+2. `git log --oneline -6` — letzter Stand.
+3. `npm run dev` + echter Browser-Check auf `/` + `/pricing` (Desktop + Mobile).
+4. Dark-Mode-Toggle prüfen (next-themes, vermutlich System-Preference).
+5. Danach Phase 3 Punkt 3 (OG-Preview validieren) oder Punkt 4 (Testimonials).
