@@ -116,7 +116,7 @@ export function Sidebar() {
       {tier && (
         <span className={cn(
           'ml-auto rounded px-1.5 py-0.5 text-[10px] font-medium',
-          tier === 'paid' ? 'bg-violet-500/20 text-violet-300' :
+          tier === 'paid' ? 'bg-emerald-500/20 text-emerald-300' :
           tier === 'trial' ? 'bg-amber-500/20 text-amber-300' :
           'bg-white/10 text-white/40'
         )}>

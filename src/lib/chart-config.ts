@@ -10,25 +10,29 @@ export const CHART_COLORS = {
   quinary: 'var(--chart-5)',
 } as const;
 
-/** Palette for pie/bar charts with multiple categories */
+/**
+ * Palette for pie/bar charts with multiple categories.
+ * Neutral-first with semantic accents — no violet/brand-color dominance.
+ * Order: near-black → mid-neutral → emerald → amber → rose → teal → indigo-grey → warm-grey.
+ */
 export const CHART_PALETTE = [
-  'oklch(0.55 0.15 285)',
-  'oklch(0.60 0.10 230)',
+  'oklch(0.25 0 0)',
+  'oklch(0.55 0 0)',
   'oklch(0.65 0.12 165)',
-  'oklch(0.55 0.08 340)',
-  'oklch(0.60 0.10 70)',
-  'oklch(0.50 0.12 30)',
-  'oklch(0.58 0.10 280)',
-  'oklch(0.55 0.10 170)',
+  'oklch(0.70 0.12 70)',
+  'oklch(0.60 0.12 20)',
+  'oklch(0.60 0.10 200)',
+  'oklch(0.45 0 0)',
+  'oklch(0.75 0 0)',
 ] as const;
 
-/** Named semantic colors for specific data series */
+/** Named semantic colors for specific data series — neutral primary, semantic accents only */
 export const SERIES_COLORS = {
-  scans: 'oklch(0.55 0.15 285)',
-  clicks: 'oklch(0.60 0.10 165)',
-  forms: 'oklch(0.60 0.10 70)',
-  active: 'oklch(0.60 0.10 165)',
-  inactive: 'oklch(0.60 0 0)',
+  scans: 'oklch(0.25 0 0)',
+  clicks: 'oklch(0.65 0.12 165)',
+  forms: 'oklch(0.70 0.12 70)',
+  active: 'oklch(0.65 0.12 165)',
+  inactive: 'oklch(0.65 0 0)',
 } as const;
 
 /** Shared axis/grid styling */

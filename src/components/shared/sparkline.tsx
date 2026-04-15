@@ -18,7 +18,7 @@ export function Sparkline({
   data,
   width = 64,
   height = 24,
-  color = 'oklch(0.55 0.15 285)',
+  color = 'oklch(0.25 0 0)',
   className,
 }: SparklineProps) {
   const pathD = useMemo(() => {

@@ -55,9 +55,8 @@ type TooltipState = {
 function getColor(value: number, max: number): string {
   if (value === 0) return 'oklch(0.95 0 0)';
   const ratio = Math.min(value / max, 1);
-  const l = 0.85 - ratio * 0.4;
-  const c = 0.05 + ratio * 0.12;
-  return `oklch(${l} ${c} 285)`;
+  const l = 0.85 - ratio * 0.55;
+  return `oklch(${l} 0 0)`;
 }
 
 function WorldMapInner({ data }: WorldMapProps) {
@@ -120,7 +119,7 @@ function WorldMapInner({ data }: WorldMapProps) {
                     style={{
                       default: { outline: 'none' },
                       hover: {
-                        fill: value > 0 ? 'oklch(0.50 0.15 285)' : 'oklch(0.88 0.02 285)',
+                        fill: value > 0 ? 'oklch(0.20 0 0)' : 'oklch(0.90 0 0)',
                         outline: 'none',
                         cursor: value > 0 ? 'pointer' : 'default',
                       },

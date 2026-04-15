@@ -6,7 +6,7 @@ const STATUS_STYLES: Record<string, { dot: string; text: string }> = {
   inactive:  { dot: 'bg-neutral-300', text: 'text-neutral-500 dark:text-neutral-500' },
   paused:    { dot: 'bg-amber-500',   text: 'text-amber-700 dark:text-amber-400' },
   completed: { dot: 'bg-blue-500',    text: 'text-blue-700 dark:text-blue-400' },
-  archived:  { dot: 'bg-violet-400',  text: 'text-violet-600 dark:text-violet-400' },
+  archived:  { dot: 'bg-slate-400',   text: 'text-slate-500 dark:text-slate-400' },
   expired:   { dot: 'bg-orange-500',  text: 'text-orange-700 dark:text-orange-400' },
   planned:   { dot: 'bg-cyan-400',    text: 'text-cyan-700 dark:text-cyan-400' },
   installed: { dot: 'bg-teal-500',    text: 'text-teal-700 dark:text-teal-400' },
