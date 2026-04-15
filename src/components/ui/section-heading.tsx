@@ -1,9 +1,9 @@
 import { cn } from '@/lib/utils';
 
 type Props = {
-  /** First part — rendered in sans-bold. */
+  /** Primary heading text. */
   children: React.ReactNode;
-  /** Optional serif-italic accent appended inline. */
+  /** Optional muted accent appended inline (shown in lighter weight + muted color). */
   accent?: React.ReactNode;
   /** `as` element — defaults to h2. Use h1 for hero. */
   as?: 'h1' | 'h2' | 'h3';
@@ -42,7 +42,7 @@ export function SectionHeading({
       {accent && (
         <>
           {' '}
-          <span className="font-display font-normal italic tracking-[-0.01em] text-primary">
+          <span className="font-normal text-muted-foreground">
             {accent}
           </span>
         </>

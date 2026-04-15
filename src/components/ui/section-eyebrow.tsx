@@ -9,7 +9,7 @@ type Props = {
 
 const TONES: Record<NonNullable<Props['tone']>, string> = {
   primary:
-    'border-primary/20 bg-primary/[0.06] text-primary dark:border-primary/30 dark:bg-primary/[0.12]',
+    'border-border bg-muted/60 text-foreground',
   emerald:
     'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-400',
   amber:

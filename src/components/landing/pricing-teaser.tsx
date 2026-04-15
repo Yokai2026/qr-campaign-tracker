@@ -44,7 +44,7 @@ export function PricingTeaser() {
           <div className="order-2 lg:order-1">
             <div className="rounded-2xl border border-border bg-background/70 p-6 shadow-sm backdrop-blur sm:p-7">
               <div className="mb-4 flex items-center gap-2">
-                <div className="font-display text-[20px] italic text-primary">Alles drin</div>
+                <div className="text-[13px] font-semibold uppercase tracking-wider text-foreground">Alles drin</div>
                 <div className="h-px flex-1 bg-border" />
                 <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                   Keine Add-ons

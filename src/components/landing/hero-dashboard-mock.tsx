@@ -96,7 +96,7 @@ export function HeroDashboardMock() {
                   <polyline
                     points="0,16 10,14 20,15 30,10 40,11 50,7 60,8 70,4 80,5"
                     fill="none"
-                    stroke="oklch(0.55 0.15 285)"
+                    stroke="oklch(0.25 0 0)"
                     strokeWidth="1.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -131,8 +131,8 @@ export function HeroDashboardMock() {
               <svg viewBox="0 0 400 140" className="mt-3 h-28 w-full sm:h-32">
                 <defs>
                   <linearGradient id="lp-area" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="oklch(0.55 0.15 285)" stopOpacity="0.32" />
-                    <stop offset="100%" stopColor="oklch(0.55 0.15 285)" stopOpacity="0" />
+                    <stop offset="0%" stopColor="oklch(0.25 0 0)" stopOpacity="0.32" />
+                    <stop offset="100%" stopColor="oklch(0.25 0 0)" stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 {/* horizontal gridlines */}
@@ -158,14 +158,14 @@ export function HeroDashboardMock() {
                 <path
                   d="M0,110 L30,100 L60,82 L90,90 L120,60 L150,70 L180,40 L210,50 L240,30 L270,44 L300,22 L330,34 L360,14 L400,8"
                   fill="none"
-                  stroke="oklch(0.55 0.15 285)"
+                  stroke="oklch(0.25 0 0)"
                   strokeWidth="1.75"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 {/* highlight dot */}
-                <circle cx="360" cy="14" r="3.5" fill="oklch(0.55 0.15 285)" />
-                <circle cx="360" cy="14" r="6" fill="oklch(0.55 0.15 285)" fillOpacity="0.15" />
+                <circle cx="360" cy="14" r="3.5" fill="oklch(0.25 0 0)" />
+                <circle cx="360" cy="14" r="6" fill="oklch(0.25 0 0)" fillOpacity="0.15" />
               </svg>
             </div>
 

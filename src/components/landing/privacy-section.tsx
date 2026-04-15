@@ -53,7 +53,7 @@ export function PrivacySection() {
               className="mt-5"
               accent={<>Er ist das Fundament.</>}
             >
-              Datenschutz ist kein Häkchen.
+              Datenschutz ist kein Häkchen —
             </SectionHeading>
             <p className="mt-5 text-[15px] leading-[1.6] text-muted-foreground">
               Die meisten Tracking-Tools senden deine Daten an Google, Facebook
@@ -67,12 +67,11 @@ export function PrivacySection() {
             </p>
 
             {/* Quote block */}
-            <blockquote className="mt-8 rounded-2xl border-l-2 border-primary bg-cream px-5 py-4 text-[14px] leading-relaxed text-foreground">
-              <span className="font-display text-[22px] italic leading-none text-primary">
-                „
-              </span>
-              Unsere Daten bleiben in Frankfurt. Keine US-Provider, kein
-              Datenabfluss, keine Überraschungen beim DSFA.
+            <blockquote className="mt-8 rounded-2xl border-l-2 border-foreground bg-subtle px-5 py-4 text-[14px] leading-relaxed text-foreground">
+              <p className="text-[15px] leading-relaxed">
+                Unsere Daten bleiben in Frankfurt. Keine US-Provider, kein
+                Datenabfluss, keine Überraschungen beim DSFA.
+              </p>
               <footer className="mt-2 text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
                 So einfach ist das.
               </footer>
@@ -111,9 +110,9 @@ export function PrivacySection() {
             </ul>
 
             {/* EU hosting card */}
-            <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-cream to-background p-5">
+            <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-subtle p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background font-display text-[22px] font-normal italic text-primary">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background text-[14px] font-bold tracking-wider text-foreground">
                   EU
                 </div>
                 <div>

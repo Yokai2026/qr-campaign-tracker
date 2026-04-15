@@ -33,7 +33,7 @@ export function StepsSection() {
   return (
     <section
       id="so-funktioniert"
-      className="relative overflow-hidden border-y border-border bg-cream py-20 sm:py-28"
+      className="relative overflow-hidden border-y border-border bg-subtle py-20 sm:py-28"
     >
       <div
         aria-hidden
@@ -65,9 +65,9 @@ export function StepsSection() {
           <SectionHeading
             as="h2"
             className="mt-4"
-            accent={<>— an einem Nachmittag.</>}
+            accent={<>an einem Nachmittag.</>}
           >
-            Vom Plakat zur Auswertung
+            Vom Plakat zur Auswertung —
           </SectionHeading>
           <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground sm:text-[16px]">
             Kein Wochenende für Excel. Kein Agentur-Ticket. Du klickst dich
@@ -89,10 +89,10 @@ export function StepsSection() {
                 )}
                 <article className="card-lift group relative flex h-full flex-col gap-5 rounded-2xl border border-border bg-background/90 p-6 shadow-sm backdrop-blur sm:p-7">
                   <header className="flex items-start justify-between">
-                    <span className="font-display text-[58px] font-normal italic leading-none tracking-[-0.03em] text-primary/80">
+                    <span className="tabular text-[48px] font-semibold leading-none tracking-[-0.05em] text-foreground/15">
                       {step.number}
                     </span>
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-primary transition-colors group-hover:border-primary/30 group-hover:bg-primary/5">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors group-hover:border-foreground/40">
                       <Icon className="h-4 w-4" />
                     </span>
                   </header>
@@ -106,7 +106,7 @@ export function StepsSection() {
                   </div>
                   <div className="mt-auto border-t border-dashed border-border pt-4">
                     <div className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-foreground/60" />
                       {step.detail}
                     </div>
                   </div>

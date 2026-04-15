@@ -62,10 +62,7 @@ export function SiteFooter() {
               </span>
             </Link>
             <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
-              QR-Code-Tracking aus Deutschland.{' '}
-              <span className="font-display italic">
-                Ohne Drittanbieter, ohne Cookies — ganz bei dir.
-              </span>
+              QR-Code-Tracking aus Deutschland. Ohne Drittanbieter, ohne Cookies — ganz bei dir.
             </p>
             <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-[11px] text-muted-foreground">
               <span className="relative flex h-1.5 w-1.5">
@@ -102,7 +99,7 @@ export function SiteFooter() {
             © {new Date().getFullYear()} Spurig. Alle Rechte vorbehalten. Hosting in der EU.
             Zahlungen sicher über Stripe.
           </p>
-          <p className="font-display text-[13px] italic text-muted-foreground">
+          <p className="text-[12px] text-muted-foreground">
             Gebaut mit Ruhe in Deutschland.
           </p>
         </div>

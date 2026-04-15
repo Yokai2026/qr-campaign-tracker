@@ -16,10 +16,10 @@ export function FinalCTA() {
           {/* Layered backdrop */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-80"
+            className="pointer-events-none absolute inset-0 opacity-60"
             style={{
               background:
-                'radial-gradient(ellipse 70% 80% at 50% 0%, oklch(0.55 0.17 285 / 0.45), transparent 65%), radial-gradient(ellipse 50% 60% at 20% 100%, oklch(0.60 0.14 240 / 0.30), transparent 70%)',
+                'radial-gradient(ellipse 70% 80% at 50% 0%, oklch(0.30 0 0 / 0.55), transparent 65%), radial-gradient(ellipse 50% 60% at 80% 100%, oklch(0.25 0 0 / 0.40), transparent 70%)',
             }}
           />
           <div
@@ -42,10 +42,10 @@ export function FinalCTA() {
                 Jetzt startklar
               </div>
 
-              <h2 className="mt-5 text-balance text-[32px] font-semibold leading-[1.05] tracking-[-0.02em] sm:text-[42px]">
-                Starte jetzt,{' '}
-                <span className="font-display font-normal italic text-white/90">
-                  zahlst du später.
+              <h2 className="mt-5 text-balance text-[32px] font-semibold leading-[1.05] tracking-[-0.025em] sm:text-[44px]">
+                Starte jetzt.{' '}
+                <span className="text-white/60 font-normal">
+                  Zahlst du später.
                 </span>
               </h2>
               <p className="mt-4 max-w-md text-[14.5px] leading-relaxed text-white/70">

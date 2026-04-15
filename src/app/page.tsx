@@ -5,6 +5,7 @@ import {
 } from '@/components/seo/structured-data';
 import { SiteHeader } from '@/components/landing/site-header';
 import { Hero } from '@/components/landing/hero';
+import { SectorStrip } from '@/components/landing/sector-strip';
 import { StepsSection } from '@/components/landing/steps-section';
 import { FeaturesBento } from '@/components/landing/features-bento';
 import { PrivacySection } from '@/components/landing/privacy-section';
@@ -22,6 +23,7 @@ export default function LandingPage() {
       <SiteHeader />
       <main>
         <Hero />
+        <SectorStrip />
         <StepsSection />
         <FeaturesBento />
         <PrivacySection />

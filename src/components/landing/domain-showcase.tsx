@@ -114,7 +114,7 @@ export function DomainShowcase() {
             className="mt-4"
             accent={<>durch die Augen deiner Kunden.</>}
           >
-            So sieht dein QR-Code aus —
+            So sieht dein QR-Code aus
           </SectionHeading>
           <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground sm:text-[16px]">
             Standard ist in Ordnung. Mit deiner eigenen Domain wirkt der QR-Code
@@ -145,7 +145,7 @@ export function DomainShowcase() {
               <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-primary">
                 Upgrade
               </div>
-              <div className="font-display text-[15px] italic text-muted-foreground">
+              <div className="text-[13px] text-muted-foreground">
                 eigene Marke
               </div>
             </div>

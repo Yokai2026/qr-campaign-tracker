@@ -97,9 +97,7 @@ export function FaqSection() {
         <div className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-between gap-4 rounded-2xl border border-dashed border-border bg-card/50 px-6 py-5 text-center sm:flex-row sm:text-left">
           <div>
             <p className="text-[14px] font-semibold tracking-tight text-foreground">
-              <span className="font-display font-normal italic">
-                Deine Frage nicht dabei?
-              </span>
+              Deine Frage nicht dabei?
             </p>
             <p className="mt-1 text-[13px] text-muted-foreground">
               Schreib uns kurz — wir antworten persönlich, meist innerhalb weniger

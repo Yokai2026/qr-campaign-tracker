@@ -5,9 +5,8 @@ export const size = { width: 180, height: 180 };
 export const contentType = 'image/png';
 
 const COLORS = {
-  bg: '#1C1A24',
+  bg: '#0A0A0A',
   fg: '#FFFFFF',
-  accent: '#6B4EB4',
 };
 
 export default function AppleIcon() {
@@ -20,7 +19,7 @@ export default function AppleIcon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: `radial-gradient(ellipse 80% 60% at 50% 0%, rgba(107,78,180,0.45), transparent 70%), ${COLORS.bg}`,
+          background: COLORS.bg,
           color: COLORS.fg,
         }}
       >

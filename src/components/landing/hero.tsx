@@ -14,14 +14,13 @@ const TRUST = [
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* Layered backdrop — aura + dot-grid */}
-      <GridBackdrop variant="aura" className="h-[640px]" fade />
-      <GridBackdrop variant="dots" className="h-[560px] opacity-60" fade />
+      {/* Subtle dot-grid only — no aura, no violet */}
+      <GridBackdrop variant="dots" className="h-[560px] opacity-50" fade />
 
       <div className="relative mx-auto max-w-5xl px-4 pt-20 pb-12 text-center sm:px-6 sm:pt-28 sm:pb-20">
         {/* Announcement */}
-        <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/70 py-1 pl-1 pr-3 text-[12px] font-medium text-muted-foreground shadow-sm backdrop-blur">
-          <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/[0.08] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-primary">
+        <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card py-1 pl-1 pr-3 text-[12px] font-medium text-muted-foreground shadow-sm">
+          <span className="inline-flex items-center gap-1 rounded-full bg-foreground px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-background">
             <Sparkles className="h-2.5 w-2.5" />
             Neu
           </span>
@@ -31,20 +30,17 @@ export function Hero() {
           <span className="sm:hidden">DSGVO-konform · Einführungspreis</span>
         </div>
 
-        {/* Headline — sans-bold + serif italic accent */}
-        <h1 className="text-balance text-[40px] font-semibold leading-[1.02] tracking-[-0.025em] sm:text-[58px] md:text-[68px]">
-          QR-Code-Tracking,
+        {/* Headline — sans only, pure weight hierarchy */}
+        <h1 className="text-balance text-[40px] font-semibold leading-[1.02] tracking-[-0.03em] sm:text-[58px] md:text-[72px]">
+          QR-Codes, die zeigen,
           <br />
-          <span className="font-display font-normal italic tracking-[-0.01em] text-gradient-violet">
-            das dir wirklich gehört.
-          </span>
+          <span className="text-muted-foreground">was wirklich funktioniert.</span>
         </h1>
 
-        {/* Subline — ergebnisorientiert */}
+        {/* Subline — outcome-first, short */}
         <p className="mx-auto mt-6 max-w-2xl text-pretty text-[16px] leading-[1.55] text-muted-foreground sm:text-[18px]">
-          Miss, welches Plakat, welcher Flyer und welche Visitenkarte wirklich
-          Scans bringt — in Echtzeit, ohne Cookies, ohne Google Analytics. Deine
-          Daten bleiben in der EU. Und bei dir.
+          Messe in Echtzeit, welches Plakat, welcher Flyer oder welche Visitenkarte
+          Scans bringt. DSGVO-konform, ohne Cookies, Hosting in der EU.
         </p>
 
         {/* CTAs */}

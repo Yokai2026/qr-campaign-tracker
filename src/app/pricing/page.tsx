@@ -54,8 +54,7 @@ export default function PricingPage() {
       <main>
         {/* Hero */}
         <section className="relative overflow-hidden">
-          <GridBackdrop variant="aura" className="h-[460px]" fade />
-          <GridBackdrop variant="dots" className="h-[420px] opacity-60" fade />
+          <GridBackdrop variant="dots" className="h-[420px] opacity-50" fade />
 
           <div className="relative mx-auto max-w-5xl px-4 pt-20 pb-10 text-center sm:px-6 sm:pt-24 sm:pb-14">
             <SectionEyebrow tone="amber" icon={<Sparkles className="h-3 w-3" />}>
@@ -66,7 +65,7 @@ export default function PricingPage() {
               className="mt-5"
               accent={<>alles drin.</>}
             >
-              Ein Plan,
+              Ein Plan —
             </SectionHeading>
             <p className="mx-auto mt-6 max-w-xl text-pretty text-[16px] leading-relaxed text-muted-foreground sm:text-[17px]">
               Unbegrenzte Kampagnen, QR-Codes und Scans. Keine Nutzerpakete,
@@ -98,9 +97,7 @@ export default function PricingPage() {
             </p>
 
             <div className="mx-auto mt-6 flex max-w-md items-center justify-center gap-2 text-[12px] text-muted-foreground">
-              <span className="font-display italic">
-                Noch Fragen zur Abrechnung?
-              </span>
+              <span>Noch Fragen zur Abrechnung?</span>
               <Link href="#faq" className="font-medium text-primary hover:underline">
                 Direkt zu den Antworten
               </Link>
