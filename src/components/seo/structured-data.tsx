@@ -79,6 +79,22 @@ export const softwareApplicationLd = {
   },
 };
 
+export function faqPageLd(items: { q: string; a: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    inLanguage: 'de-DE',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
+  };
+}
+
 export const organizationLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',

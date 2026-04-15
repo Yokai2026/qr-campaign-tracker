@@ -1,21 +1,33 @@
 import Link from 'next/link';
-import { QrCode, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Sparkles, ShieldCheck, CreditCard, Undo2 } from 'lucide-react';
 import { BillingToggle } from '@/components/landing/billing-toggle';
-import { StructuredData, softwareApplicationLd } from '@/components/seo/structured-data';
+import { SiteHeader } from '@/components/landing/site-header';
+import { SiteFooter } from '@/components/landing/site-footer';
+import { FaqSection, FAQ_ITEMS } from '@/components/landing/faq-section';
+import { FinalCTA } from '@/components/landing/final-cta';
+import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import { SectionHeading } from '@/components/ui/section-heading';
+import { GridBackdrop } from '@/components/ui/grid-backdrop';
+import {
+  StructuredData,
+  softwareApplicationLd,
+  faqPageLd,
+} from '@/components/seo/structured-data';
 
 export const metadata = {
   title: 'Preise — QR-Code-Tracking ab 4,99 €',
-  description: 'DSGVO-konformes QR-Code-Tracking & Kampagnen-Analytics. Unbegrenzte QR-Codes, eigene Domain, 14 Tage kostenlos testen. Ab 4,99 € / Monat.',
+  description:
+    'DSGVO-konformes QR-Code-Tracking & Kampagnen-Analytics. Unbegrenzte QR-Codes, eigene Domain, 14 Tage kostenlos testen. Ab 4,99 € / Monat.',
   alternates: { canonical: '/pricing' },
   openGraph: {
     title: 'Spurig Preise — QR-Code-Tracking ab 4,99 €',
-    description: 'Ein Plan, alles drin. Unbegrenzte QR-Codes, DSGVO-konform, 14 Tage kostenlos.',
+    description:
+      'Ein Plan, alles drin. Unbegrenzte QR-Codes, DSGVO-konform, 14 Tage kostenlos.',
     url: 'https://spurig.com/pricing',
   },
 };
 
-const features = [
+const FEATURES = [
   'Unbegrenzte QR-Codes & Kurzlinks',
   'Kampagnen-Management',
   'Analytics & Dashboard in Echtzeit',
@@ -26,56 +38,81 @@ const features = [
   'QR-Design-Studio mit Logo',
 ];
 
+const TRUST_ROW = [
+  { icon: ShieldCheck, label: 'EU-Hosting · DSGVO' },
+  { icon: CreditCard, label: 'Zahlung via Stripe' },
+  { icon: Undo2, label: 'Jederzeit kündbar' },
+];
+
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-background">
-      <StructuredData id="ld-pricing-app" data={softwareApplicationLd} />
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-neutral-900">
-              <QrCode className="h-3 w-3 text-white/70" />
-            </div>
-            <span className="text-[13px] font-semibold">Spurig</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" render={<Link href="/login" />}>
-              Anmelden
-            </Button>
-            <Button size="sm" render={<Link href="/signup" />}>
-              Registrieren
-            </Button>
+      <StructuredData id="ld-software-application" data={softwareApplicationLd} />
+      <StructuredData id="ld-faq-page" data={faqPageLd(FAQ_ITEMS)} />
+      <SiteHeader />
+
+      <main>
+        {/* Hero */}
+        <section className="relative overflow-hidden">
+          <GridBackdrop variant="aura" className="h-[460px]" fade />
+          <GridBackdrop variant="dots" className="h-[420px] opacity-60" fade />
+
+          <div className="relative mx-auto max-w-5xl px-4 pt-20 pb-10 text-center sm:px-6 sm:pt-24 sm:pb-14">
+            <SectionEyebrow tone="amber" icon={<Sparkles className="h-3 w-3" />}>
+              Einführungspreis — über 50 % günstiger
+            </SectionEyebrow>
+            <SectionHeading
+              as="h1"
+              className="mt-5"
+              accent={<>alles drin.</>}
+            >
+              Ein Plan,
+            </SectionHeading>
+            <p className="mx-auto mt-6 max-w-xl text-pretty text-[16px] leading-relaxed text-muted-foreground sm:text-[17px]">
+              Unbegrenzte Kampagnen, QR-Codes und Scans. Keine Nutzerpakete,
+              keine Feature-Paywall. 14 Tage kostenlos — ohne Kreditkarte.
+            </p>
+
+            <ul className="mx-auto mt-8 flex max-w-xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[12px] text-muted-foreground">
+              {TRUST_ROW.map((t) => {
+                const Icon = t.icon;
+                return (
+                  <li key={t.label} className="inline-flex items-center gap-1.5">
+                    <Icon className="h-3 w-3 text-primary" aria-hidden />
+                    {t.label}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-        </div>
-      </header>
+        </section>
 
-      {/* Hero */}
-      <div className="mx-auto max-w-5xl px-4 pt-14 pb-10 text-center sm:px-6 sm:pt-20 sm:pb-12">
-        <div className="mx-auto mb-4 inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-[12px] font-semibold text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
-          <Sparkles className="h-3 w-3" />
-          Einführungspreis — über 50 % günstiger
-        </div>
-        <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-          Ein Plan. Alles drin.
-        </h1>
-        <p className="mx-auto mt-3 max-w-md text-[15px] text-muted-foreground">
-          14 Tage kostenlos testen. Keine Kreditkarte. Jederzeit kündbar.
-        </p>
-      </div>
+        {/* Billing toggle + price card */}
+        <section className="relative pb-16">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6">
+            <BillingToggle href="/signup" includedFeatures={FEATURES} />
 
-      {/* Billing Toggle + Preis-Card mit Features inline */}
-      <div className="mx-auto max-w-5xl px-4 pb-16 sm:px-6">
-        <BillingToggle href="/signup" includedFeatures={features} />
-      </div>
+            <p className="mx-auto mt-10 max-w-md text-center text-[12px] leading-relaxed text-muted-foreground">
+              Alle Preise inkl. USt. Sichere Abrechnung über Stripe.
+              DSGVO-konform. Deine Daten bleiben in der EU.
+            </p>
 
-      {/* Footer note */}
-      <div className="border-t border-border py-8 text-center">
-        <p className="mx-auto max-w-md px-4 text-[12px] text-muted-foreground">
-          Alle Preise inkl. USt. Sichere Abrechnung über Stripe.
-          DSGVO-konform. Deine Daten bleiben in der EU.
-        </p>
-      </div>
+            <div className="mx-auto mt-6 flex max-w-md items-center justify-center gap-2 text-[12px] text-muted-foreground">
+              <span className="font-display italic">
+                Noch Fragen zur Abrechnung?
+              </span>
+              <Link href="#faq" className="font-medium text-primary hover:underline">
+                Direkt zu den Antworten
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <FaqSection />
+        <FinalCTA />
+      </main>
+
+      <SiteFooter />
     </div>
   );
 }
