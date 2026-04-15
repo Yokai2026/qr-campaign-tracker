@@ -100,7 +100,7 @@ export const organizationLd = {
   '@type': 'Organization',
   name: 'Spurig',
   url: 'https://spurig.com',
-  logo: 'https://spurig.com/icon.png',
+  logo: 'https://spurig.com/icon.svg',
   inLanguage: 'de-DE',
   sameAs: [],
 };
