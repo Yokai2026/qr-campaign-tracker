@@ -1,20 +1,21 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'Spurig — QR-Code-Tracking, DSGVO-konform, aus Deutschland.';
+export const alt = 'Spurig — QR-Codes, die zeigen, was wirklich funktioniert.';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-// Palette — mirrors src/app/globals.css tokens (can't read CSS vars from ImageResponse).
+// Palette — mirrors monochrome tokens from globals.css.
+// ImageResponse can't read CSS vars, so mirror the near-black/neutral scale inline.
 const COLORS = {
-  cream: '#F8F3EA',
-  ink: '#1C1A24',
-  primary: '#6B4EB4',
-  primarySoft: 'rgba(107, 78, 180, 0.14)',
-  border: '#E3DDD0',
-  muted: '#6E6A77',
-  foreground: '#15141A',
+  background: '#FFFFFF',
+  foreground: '#111113', // near-black, matches oklch(0.145 0 0)
+  muted: '#737373', // matches oklch(0.45 0 0)
+  subtle: '#F5F5F5',
+  border: '#E5E5E5',
+  ink: '#1A1A1A',
   emerald: '#10B981',
+  dot: '#D4D4D4',
 };
 
 export default async function OgImage() {
@@ -27,14 +28,16 @@ export default async function OgImage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: `radial-gradient(ellipse 60% 50% at 30% 0%, rgba(107,78,180,0.28), transparent 70%), radial-gradient(ellipse 45% 40% at 100% 100%, rgba(107,78,180,0.14), transparent 70%), ${COLORS.cream}`,
+          background: COLORS.background,
+          backgroundImage: `radial-gradient(circle at 1px 1px, ${COLORS.dot} 1px, transparent 0)`,
+          backgroundSize: '24px 24px',
           padding: '56px 64px',
           fontFamily: 'sans-serif',
           color: COLORS.foreground,
           position: 'relative',
         }}
       >
-        {/* Top bar: logo + tagline chip */}
+        {/* Top bar: logo + status pill */}
         <div
           style={{
             display: 'flex',
@@ -87,7 +90,7 @@ export default async function OgImage() {
             </div>
           </div>
 
-          {/* Top-right: status pill */}
+          {/* Status pill */}
           <div
             style={{
               display: 'flex',
@@ -109,16 +112,16 @@ export default async function OgImage() {
                 background: COLORS.emerald,
               }}
             />
-            Einführungspreis aktiv
+            DSGVO-konform · EU-Hosting
           </div>
         </div>
 
-        {/* Middle: headline + subline */}
-        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: 1020 }}>
+        {/* Middle: headline + subline — sans-only, mirrors new hero */}
+        <div style={{ display: 'flex', flexDirection: 'column', maxWidth: 1060 }}>
           <div
             style={{
-              fontSize: 96,
-              fontWeight: 700,
+              fontSize: 92,
+              fontWeight: 600,
               letterSpacing: '-0.035em',
               lineHeight: 1.02,
               color: COLORS.foreground,
@@ -126,18 +129,8 @@ export default async function OgImage() {
               flexDirection: 'column',
             }}
           >
-            <span>QR-Code-Tracking,</span>
-            <span
-              style={{
-                fontFamily: 'serif',
-                fontStyle: 'italic',
-                fontWeight: 400,
-                color: COLORS.primary,
-                letterSpacing: '-0.02em',
-              }}
-            >
-              das dir wirklich gehört.
-            </span>
+            <span>QR-Codes, die zeigen,</span>
+            <span style={{ color: COLORS.muted }}>was wirklich funktioniert.</span>
           </div>
 
           <div
@@ -146,15 +139,15 @@ export default async function OgImage() {
               fontSize: 26,
               lineHeight: 1.4,
               color: COLORS.muted,
-              maxWidth: 860,
+              maxWidth: 880,
             }}
           >
-            DSGVO-konformes QR-Code-Tracking und Kampagnen-Analytics.
-            Ohne Drittanbieter, ohne Cookies — Hosting in der EU.
+            Messe in Echtzeit, welches Plakat, welcher Flyer oder welche Visitenkarte
+            Scans bringt — ohne Cookies, ohne Drittanbieter.
           </div>
         </div>
 
-        {/* Bottom: URL + feature chips */}
+        {/* Bottom: URL + neutral chips */}
         <div
           style={{
             display: 'flex',
@@ -175,16 +168,17 @@ export default async function OgImage() {
           </div>
 
           <div style={{ display: 'flex', gap: 12 }}>
-            {['DSGVO · Art. 32', 'EU-Hosting', 'ab 4,99 € / Monat'].map((chip) => (
+            {['DSGVO · Art. 32', 'Ohne Cookies', 'ab 4,99 € / Monat'].map((chip) => (
               <div
                 key={chip}
                 style={{
                   padding: '12px 20px',
                   borderRadius: 999,
-                  background: COLORS.primarySoft,
-                  color: COLORS.primary,
+                  background: COLORS.subtle,
+                  border: `1px solid ${COLORS.border}`,
+                  color: COLORS.foreground,
                   fontSize: 18,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   letterSpacing: '-0.005em',
                 }}
               >
@@ -194,16 +188,15 @@ export default async function OgImage() {
           </div>
         </div>
 
-        {/* Subtle top hairline */}
+        {/* Bottom hairline */}
         <div
           style={{
             position: 'absolute',
-            top: 0,
+            bottom: 0,
             left: 0,
             right: 0,
             height: 1,
-            background: COLORS.primary,
-            opacity: 0.25,
+            background: COLORS.border,
           }}
         />
       </div>
