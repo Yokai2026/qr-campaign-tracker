@@ -49,7 +49,7 @@ export function StepsSection() {
               <path
                 d="M 40 0 L 0 0 0 40"
                 fill="none"
-                stroke="oklch(0.50 0.02 265 / 0.07)"
+                stroke="oklch(0 0 0 / 0.06)"
                 strokeWidth="1"
               />
             </pattern>
@@ -78,12 +78,12 @@ export function StepsSection() {
             const Icon = step.icon;
             return (
               <li key={step.number} className="grid items-start gap-4 py-10 md:grid-cols-[100px_1fr_240px]">
-                <span className="font-heading text-[72px] font-extrabold leading-none tracking-[-0.04em] text-accent-warm/20">
+                <span className="tabular-nums font-mono text-[64px] font-light leading-none tracking-[-0.04em] text-foreground/15">
                   {step.number}
                 </span>
                 <div>
                   <div className="flex items-center gap-3">
-                    <Icon className="h-4 w-4 text-accent-warm" />
+                    <Icon className="h-4 w-4 text-brand" />
                     <h3 className="font-heading text-[20px] font-semibold tracking-tight">
                       {step.title}
                     </h3>
@@ -93,7 +93,7 @@ export function StepsSection() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground md:justify-end md:pt-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent-warm/60" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-brand/60" />
                   {step.detail}
                 </div>
               </li>

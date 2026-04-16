@@ -45,7 +45,7 @@ export function MobileBottomNav() {
                 <tab.icon
                   className={cn(
                     'h-5 w-5',
-                    isActive ? 'text-accent-warm' : 'text-muted-foreground'
+                    isActive ? 'text-brand' : 'text-muted-foreground'
                   )}
                 />
                 <span className="font-medium">{tab.name}</span>

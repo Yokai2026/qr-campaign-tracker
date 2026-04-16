@@ -1,101 +1,38 @@
 import Link from 'next/link';
-import { Globe, Lock, ShieldCheck, ArrowRight, QrCode, Crown } from 'lucide-react';
+import { Globe, Lock, ShieldCheck, ArrowRight, Crown } from 'lucide-react';
 import { SectionHeading } from '@/components/ui/section-heading';
 
-function PhoneFrame({
+function URLBar({
   url,
   variant,
-  label,
 }: {
   url: string;
   variant: 'standard' | 'pro';
-  label?: string;
 }) {
   const isPro = variant === 'pro';
   return (
     <div
       className={
-        'relative mx-auto w-[260px] rounded-[2.5rem] border-[8px] border-neutral-950 bg-neutral-950 shadow-2xl ' +
-        (isPro ? 'shadow-primary/30' : 'shadow-black/30')
+        'flex w-full items-center gap-2 rounded-2xl border px-4 py-3.5 shadow-[var(--shadow-sm)] transition-shadow ' +
+        (isPro
+          ? 'border-brand/30 bg-card ring-1 ring-brand/10'
+          : 'border-border bg-muted/40')
       }
     >
-      {/* Notch */}
-      <div className="absolute left-1/2 top-[7px] z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-neutral-950" />
-      {/* Screen */}
-      <div className="overflow-hidden rounded-[2rem] bg-background">
-        <div className="h-7 bg-background" />
-        {/* Browser chrome */}
-        <div className="border-b border-border/60 bg-muted/40 px-3 py-2">
-          <div className="flex items-center gap-1.5 rounded-full border border-border/60 bg-background px-2.5 py-1">
-            <Lock
-              className={
-                'h-2.5 w-2.5 shrink-0 ' +
-                (isPro ? 'text-emerald-600' : 'text-muted-foreground')
-              }
-            />
-            <span
-              className={
-                'truncate text-[10px] font-medium ' +
-                (isPro ? 'text-foreground' : 'text-muted-foreground')
-              }
-            >
-              {url}
-            </span>
-          </div>
-        </div>
-        {/* Page mock */}
-        <div className="flex min-h-[340px] flex-col gap-3 p-4">
-          <div className="flex items-center gap-2">
-            <div
-              className={
-                'flex h-6 w-6 items-center justify-center rounded-md ' +
-                (isPro
-                  ? 'bg-primary/15 text-primary'
-                  : 'bg-muted text-muted-foreground')
-              }
-            >
-              <QrCode className="h-3 w-3" />
-            </div>
-            <div
-              className={
-                'h-2 rounded-full ' +
-                (isPro ? 'w-24 bg-foreground/70' : 'w-20 bg-muted')
-              }
-            />
-          </div>
-          <div className="mt-1 space-y-1.5">
-            <div className="h-2.5 w-full rounded-full bg-muted" />
-            <div className="h-2.5 w-4/5 rounded-full bg-muted" />
-            <div className="h-2.5 w-2/3 rounded-full bg-muted" />
-          </div>
-          {/* Small preview chunk */}
-          <div
-            className={
-              'mt-2 rounded-lg border p-3 ' +
-              (isPro
-                ? 'border-primary/30 bg-primary/5'
-                : 'border-border bg-muted/30')
-            }
-          >
-            <div className="flex items-center justify-between">
-              <div className="h-2 w-16 rounded-full bg-foreground/40" />
-              <div
-                className={
-                  'h-4 w-14 rounded-full ' +
-                  (isPro ? 'bg-primary' : 'bg-foreground/60')
-                }
-              />
-            </div>
-            <div className="mt-2 space-y-1">
-              <div className="h-1.5 w-full rounded-full bg-muted" />
-              <div className="h-1.5 w-3/4 rounded-full bg-muted" />
-            </div>
-          </div>
-          <div className="mt-auto text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
-            {label}
-          </div>
-        </div>
-      </div>
+      <Lock
+        className={
+          'h-3.5 w-3.5 shrink-0 ' +
+          (isPro ? 'text-brand' : 'text-muted-foreground')
+        }
+      />
+      <span
+        className={
+          'truncate font-mono text-[14px] tracking-tight ' +
+          (isPro ? 'text-foreground' : 'text-muted-foreground')
+        }
+      >
+        {url}
+      </span>
     </div>
   );
 }
@@ -105,13 +42,9 @@ export function DomainShowcase() {
     <section className="relative py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="max-w-2xl">
-          <p className="text-[13px] font-medium uppercase tracking-[0.08em] text-accent-warm">
-            Pro-Feature
-          </p>
           <SectionHeading
             as="h2"
             align="left"
-            className="mt-3"
             accent={<>durch die Augen deiner Kunden.</>}
           >
             So sieht dein QR-Code aus
@@ -122,70 +55,61 @@ export function DomainShowcase() {
           </p>
         </div>
 
-
-        <div className="mt-14 grid items-center gap-10 md:grid-cols-[1fr_auto_1fr]">
-          {/* Phone: Standard */}
-          <div className="flex flex-col items-center">
-            <div className="mb-4 text-center">
-              <div className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="mt-14 grid gap-5 md:grid-cols-2">
+          {/* Standard */}
+          <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 sm:p-8">
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
                 Standard
-              </div>
-              <div className="mt-1 text-[12px] text-muted-foreground">
-                Kostenlos · Funktioniert sofort
-              </div>
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                Im Plan enthalten
+              </span>
             </div>
-            <PhoneFrame url="spurig.com/r/a3b2c" variant="standard" label="Im Plan enthalten" />
+            <URLBar url="spurig.com/r/a3b2c" variant="standard" />
+            <p className="text-[13.5px] leading-relaxed text-muted-foreground">
+              Funktioniert sofort, ohne Setup. Sichtbar als{' '}
+              <span className="text-foreground">spurig.com</span> — neutral,
+              aber nicht deine Marke.
+            </p>
           </div>
 
-          {/* Arrow + label */}
-          <div className="hidden flex-col items-center justify-center md:flex">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
-              <ArrowRight className="h-5 w-5" />
-            </div>
-            <div className="mt-3 text-center">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-primary">
-                Upgrade
-              </div>
-              <div className="text-[13px] text-muted-foreground">
-                eigene Marke
-              </div>
-            </div>
-          </div>
-
-          {/* Phone: Pro */}
-          <div className="flex flex-col items-center">
-            <div className="mb-4 text-center">
-              <div className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-                <Crown className="h-2.5 w-2.5" />
+          {/* Pro */}
+          <div className="flex flex-col gap-4 rounded-3xl border border-brand/30 bg-card p-6 ring-1 ring-brand/10 shadow-[var(--shadow-md)] sm:p-8">
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
+                <Crown className="h-3 w-3" />
                 Eigene Domain
-              </div>
-              <div className="mt-1 text-[12px] text-muted-foreground">
-                Pro · Deine Marke, nicht unsere
-              </div>
+              </span>
+              <span className="text-[11px] text-brand">
+                Pro
+              </span>
             </div>
-            <PhoneFrame url="go.deine-marke.de/a3b2c" variant="pro" label="Premium-Wirkung" />
+            <URLBar url="go.deine-marke.de/a3b2c" variant="pro" />
+            <p className="text-[13.5px] leading-relaxed text-muted-foreground">
+              Volle Markenwirkung. Subdomain frei wählbar, HTTPS automatisch,
+              Tracking läuft im Hintergrund weiter.
+            </p>
           </div>
         </div>
 
-        {/* Feature Row */}
-        <div className="mx-auto mt-12 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-3 rounded-2xl border border-border bg-card/60 px-6 py-4 text-[13px] text-muted-foreground backdrop-blur sm:gap-x-10">
+        {/* Feature row */}
+        <div className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[13px] text-muted-foreground sm:gap-x-10">
           <span className="inline-flex items-center gap-2">
-            <Globe className="h-3.5 w-3.5 text-primary" />
+            <Globe className="h-3.5 w-3.5 text-brand" />
             Jede Subdomain möglich
           </span>
-          <span className="hidden h-4 w-px bg-border sm:inline-block" />
           <span className="inline-flex items-center gap-2">
-            <Lock className="h-3.5 w-3.5 text-primary" />
+            <Lock className="h-3.5 w-3.5 text-brand" />
             HTTPS automatisch
           </span>
-          <span className="hidden h-4 w-px bg-border sm:inline-block" />
           <span className="inline-flex items-center gap-2">
-            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+            <ShieldCheck className="h-3.5 w-3.5 text-brand" />
             Volles Tracking
           </span>
           <Link
             href="/pricing"
-            className="ml-auto inline-flex items-center gap-1 text-[12px] font-medium text-primary hover:underline"
+            className="ml-auto inline-flex items-center gap-1 text-[12px] font-medium text-foreground hover:underline"
           >
             Pro ansehen <ArrowRight className="h-3 w-3" />
           </Link>

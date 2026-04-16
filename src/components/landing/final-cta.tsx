@@ -42,9 +42,9 @@ export function FinalCTA() {
                 Jetzt startklar
               </div>
 
-              <h2 className="mt-5 font-heading text-balance text-[32px] font-bold leading-[1.05] tracking-[-0.025em] sm:text-[44px]">
+              <h2 className="mt-5 font-heading text-balance text-[32px] font-semibold leading-[1.07] tracking-[-0.025em] sm:text-[42px]">
                 Starte jetzt.{' '}
-                <span className="text-white/60 font-normal">
+                <span className="text-white/55 font-normal">
                   Zahlst du später.
                 </span>
               </h2>
@@ -74,7 +74,7 @@ export function FinalCTA() {
               <ul className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-white/60">
                 {REASSURANCE.map((r) => (
                   <li key={r} className="inline-flex items-center gap-1.5">
-                    <Check className="h-3 w-3 text-accent-warm" />
+                    <Check className="h-3 w-3 text-brand" />
                     {r}
                   </li>
                 ))}

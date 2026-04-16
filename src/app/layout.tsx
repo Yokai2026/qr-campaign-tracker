@@ -1,19 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Bricolage_Grotesque, IBM_Plex_Sans, Geist_Mono } from 'next/font/google';
+import { Inter, Geist_Mono } from 'next/font/google';
 import { CookieBanner } from '@/components/layout/cookie-banner';
 import './globals.css';
 
-const bricolage = Bricolage_Grotesque({
-  variable: '--font-bricolage',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
   display: 'swap',
-});
-
-const ibmPlex = IBM_Plex_Sans({
-  variable: '--font-ibm-plex',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  display: 'swap',
+  axes: ['opsz'],
 });
 
 const geistMono = Geist_Mono({
@@ -69,7 +63,7 @@ export default function RootLayout({
     <html
       lang="de"
       data-scroll-behavior="smooth"
-      className={`${bricolage.variable} ${ibmPlex.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <a

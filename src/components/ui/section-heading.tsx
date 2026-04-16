@@ -15,9 +15,9 @@ type Props = {
 };
 
 const SIZES: Record<NonNullable<Props['as']>, string> = {
-  h1: 'text-[40px] sm:text-[56px] md:text-[68px] leading-[1.02]',
-  h2: 'text-[30px] sm:text-[40px] md:text-[44px] leading-[1.08]',
-  h3: 'text-[22px] sm:text-[26px] leading-[1.15]',
+  h1: 'text-[40px] sm:text-[54px] md:text-[64px] leading-[1.04]',
+  h2: 'text-[30px] sm:text-[38px] md:text-[44px] leading-[1.08]',
+  h3: 'text-[22px] sm:text-[26px] leading-[1.18]',
 };
 
 export function SectionHeading({
@@ -31,7 +31,7 @@ export function SectionHeading({
   return (
     <Tag
       className={cn(
-        'font-heading font-bold tracking-[-0.025em] text-foreground',
+        'font-heading font-semibold tracking-[-0.025em] text-foreground',
         SIZES[Tag],
         balance && 'text-balance',
         align === 'center' && 'text-center',

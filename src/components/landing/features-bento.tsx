@@ -15,13 +15,9 @@ export function FeaturesBento() {
     <section id="features" className="relative py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="max-w-2xl">
-          <p className="text-[13px] font-medium uppercase tracking-[0.08em] text-accent-warm">
-            Was Spurig kann
-          </p>
           <SectionHeading
             as="h2"
             align="left"
-            className="mt-3"
           >
             Kampagnen-Tracking, aufs Wesentliche reduziert.
           </SectionHeading>
@@ -36,10 +32,9 @@ export function FeaturesBento() {
           <article className="card-lift relative col-span-1 flex flex-col gap-5 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-6 lg:col-span-4 lg:row-span-2 lg:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-primary">
-                  <BarChart3 className="h-3 w-3" />
-                  Analytics
-                </div>
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                  <BarChart3 className="h-4 w-4" />
+                </span>
                 <h3 className="mt-3 text-[22px] font-semibold tracking-tight sm:text-[24px]">
                   Echtzeit-Analytics, die du verstehst.
                 </h3>
@@ -65,8 +60,8 @@ export function FeaturesBento() {
               <svg viewBox="0 0 400 100" className="h-20 w-full sm:h-24" aria-hidden>
                 <defs>
                   <linearGradient id="bento-area" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--accent-warm)" stopOpacity="0.30" />
-                    <stop offset="100%" stopColor="var(--accent-warm)" stopOpacity="0" />
+                    <stop offset="0%" stopColor="var(--brand)" stopOpacity="0.30" />
+                    <stop offset="100%" stopColor="var(--brand)" stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 <g stroke="currentColor" strokeOpacity="0.08" strokeDasharray="2 3">
@@ -80,12 +75,12 @@ export function FeaturesBento() {
                 <path
                   d="M0,80 L25,75 L50,60 L75,62 L100,45 L125,55 L150,35 L175,42 L200,30 L225,38 L250,22 L275,30 L300,18 L325,25 L350,10 L400,6"
                   fill="none"
-                  stroke="var(--accent-warm)"
+                  stroke="var(--brand)"
                   strokeWidth="1.75"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                <circle cx="350" cy="10" r="3" fill="var(--accent-warm)" />
+                <circle cx="350" cy="10" r="3" fill="var(--brand)" />
               </svg>
               <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border/60 pt-3 text-[11px]">
                 <div>
@@ -106,7 +101,7 @@ export function FeaturesBento() {
 
           {/* Geo + Placement */}
           <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-warm/10 text-accent-warm">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
               <MapPin className="h-4 w-4" />
             </span>
             <h3 className="text-[16px] font-semibold tracking-tight">
@@ -131,7 +126,7 @@ export function FeaturesBento() {
 
           {/* Devices */}
           <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-warm/10 text-accent-warm">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
               <Smartphone className="h-4 w-4" />
             </span>
             <h3 className="text-[16px] font-semibold tracking-tight">
@@ -182,7 +177,7 @@ export function FeaturesBento() {
           {/* Exports */}
           <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-3">
             <div className="flex items-center justify-between">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-warm/10 text-accent-warm">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
                 <FileDown className="h-4 w-4" />
               </span>
               <div className="flex items-center gap-1">
