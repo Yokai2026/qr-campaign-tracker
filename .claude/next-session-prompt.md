@@ -1,62 +1,120 @@
-# Next Session: Design Overhaul Phase 2
+# Next Session: Design Overhaul Phase 3 — Grosses Redesign
 
 ## Kontext
-Wir haben in Session 2026-04-16 einen grossen UI/UX-Redesign gestartet.
-Ziel: Spurig soll modern, authentisch und menschlich wirken — nicht wie von KI generiert.
+Nach Screenshot-Review (2026-04-16) ist klar: Die bisherigen Aenderungen reichen nicht.
+Die Seite wirkt immer noch "zusammengebaut" statt "designed".
+User-Feedback: Fonts passen nicht, Farben nicht stimmig, Pricing unklar, nicht modern genug.
 
-Ein UI/UX-Audit und ein WCAG-Accessibility-Audit wurden durchgefuehrt.
-Die Foundation-Aenderungen (Fonts, Farben, Accessibility-Basics) und die wichtigsten
-Landing-Page-Komponenten wurden bereits umgebaut. Build ist clean.
+## Entscheidung steht an: Kompletter visueller Reboot
 
-## Was bereits gemacht wurde
-- **Fonts**: Geist Sans -> Bricolage Grotesque (Headings) + IBM Plex Sans (Body) + Geist Mono (Code)
-- **Farben**: Warmer Amber-Akzent `--accent-warm: oklch(0.75 0.15 70)` eingefuehrt, Chart-Palette warm+cool
-- **Accessibility**: `prefers-reduced-motion`, Focus-Indikatoren, Skip-Navigation-Link, Viewport zoom
-- **Hero**: Gradient-Text entfernt, font-heading, warmer Akzent auf Pill + Checkmarks
-- **Hero-Mock**: Floating Chips + Browser Chrome entfernt, minimaler App-Header
-- **Header**: Nav links-aligned statt centered
-- **Steps**: Von Card-Grid zu Timeline-Layout redesigned (links-aligned, grosse Nummern, Divider)
-- **Features Bento**: Links-aligned Header, SectionEyebrow entfernt, warmer Akzent-Label
-- **Pricing**: Links-aligned Header, Eyebrow entfernt, warme Checkmarks
-- **FAQ**: Eyebrow entfernt, Heading vereinfacht
-- **Final CTA**: font-heading, warme Checkmarks, Floating Chip entfernt
-- **Sidebar**: Kontrast erhoeht (WCAG AA)
-- **Layout**: `id="main-content"` auf Landing + Dashboard
+Der User muss in der naechsten Session entscheiden, welche Richtung:
 
-## Was noch offen ist (in Prioritaets-Reihenfolge)
+### Option A: "Linear/Notion"-Richtung (empfohlen)
+- **Font**: Inter Variable fuer alles (wie Linear, Notion, Cal.com)
+- **Akzent**: Teal/Emerald (`#0D9488`) — sagt "Wachstum, Daten, Tracking"
+- **Vibe**: Clean, technisch, vertrauenswuerdig, minimal
+- **Referenzen**: linear.app, resend.com, betterstack.com
 
-### Hoch
-1. **Visual Check** — Dev-Server starten, Landing Page + Dashboard im Browser pruefen.
-   Sicherstellen dass Bricolage Grotesque + IBM Plex Sans korrekt laden und gut aussehen.
-2. **Domain-Showcase** (`src/components/landing/domain-showcase.tsx`) — Hat noch SectionEyebrow,
-   ggf. links-alignen oder Eyebrow durch schlichteres Label ersetzen
-3. **Sector-Strip** (`src/components/landing/sector-strip.tsx`) — Pruefen ob es zum neuen Design passt
-4. **Site-Footer** (`src/components/landing/site-footer.tsx`) — Brand-Name mit font-heading
-5. **Features Bento Icon-Backgrounds** — bg-primary/10 -> bg-accent-warm/10 fuer die Feature-Icon-Badges
-6. **Bento chart highlight** — oklch(0.28 0.06 265) Highlight-Dot in features-bento auf accent-warm
+### Option B: "Warm-Neutral"
+- **Font**: Satoshi 600-700 (Headings) + Inter 400-500 (Body)
+- **Akzent**: Verfeinertes Amber (weniger laut, konsistenter)
+- **Vibe**: Warm, nahbar, deutsch-handwerklich
+- **Referenzen**: amie.so, notion.so
 
-### Mittel
-7. **Mobile Bottom-Navigation** fuer Dashboard — Persistent Bottom Tab Bar statt Hamburger
-8. **Dashboard KPI-Consolidation** — Performance + Inventory KPIs zusammenfuehren (8 Cards -> Gruppen)
-9. **Copy-Variation-Pass** — Heading-Patterns variieren, nicht alle mit accent-prop oder em-dash
-10. **Table Accessibility** — `scope="col"` auf `<th>` in `src/components/ui/table.tsx`
-11. **Form-Field aria-describedby** — Error-Messages mit Input verbinden in `src/components/shared/form-field.tsx`
-12. **Sidebar Mobile Focus-Management** — Focus-Trap bei offenem Mobile-Menu
+### Option C: "Dark Premium"
+- **Font**: General Sans oder Manrope
+- **Akzent**: Violet/Indigo (`#7C3AED`)
+- **Vibe**: Premium, developer-tool, dunkel
+- **Referenzen**: cursor.com, linear.app (dark mode)
 
-### Nice-to-have
-13. **Scroll-triggered Entrance-Animationen** auf Landing-Sections (Intersection Observer oder Motion)
-14. **Interactive Pricing Toggle** — Micro-Animation beim Preiswechsel
-15. **Monochrome Chart-Palette im Dashboard** auf warm+cool umstellen (Dashboard-spezifisch)
+## Was in JEDER Option passiert
 
-## Phase 4: Qualitaetssicherung (nach Abschluss)
-- `ui-visual-validator` Agent fuer visuellen Abgleich
-- `superpowers:requesting-code-review` Skill fuer Code-Review
-- Nochmal WCAG-Audit um sicherzustellen dass nichts verschlechtert wurde
+### 1. Font-Swap
+- Bricolage Grotesque + IBM Plex Sans RAUS
+- Neue Font(s) via `next/font/google` rein
+- `--font-heading` und `--font-sans` in globals.css updaten
 
-## Design-Regeln (merken!)
-- Bricolage Grotesque nur fuer Headings (`font-heading`), IBM Plex Sans fuer Body (`font-sans`)
-- `--accent-warm` sparsam: CTAs, Highlights, Step-Nummern, Labels — nicht alles amber machen
-- Layouts variieren: Centered nur fuer Hero + FAQ, Rest links-aligned oder asymmetrisch
-- Keine SectionEyebrow-Pills (ausser Privacy-Section wo es passt)
-- Keine floating Deko-Chips
-- Keine fake Browser-Chrome-Mockups
+### 2. Farb-Vereinfachung
+- EIN Akzent-Farbe, konsequent ueberall (Buttons, Links, Badges, Charts, Icons)
+- Keine konkurrierenden Farben (kein Amber + Gruen + Blau gleichzeitig)
+- Neutrals auf Zinc-Palette: `#09090B` (dark), `#71717A` (muted), `#FAFAFA` (light)
+
+### 3. Pricing-Section komplett neu
+- Preis als GROESSTES Element (48-64px font-size)
+- Single Card, zentriert
+- Feature-Checkliste UNTER dem Preis (nicht daneben)
+- CTA-Button direkt am Preis, keine Aufteilung links/rechts
+
+### 4. Visual Cleanup
+- Uppercase-Labels und Pills reduzieren
+- Domain-Showcase Phone-Mockups vereinfachen (Browser-Chrome ist immer noch drin)
+- Einheitliches Card-Pattern ueberall
+- Weniger Badges, Chips, Deko-Elemente
+
+## Was bereits erledigt ist (Session 2026-04-16, Phase 2)
+
+### Landing
+- Domain-Showcase: SectionEyebrow -> warmes Label, links-aligned
+- Features-Bento: Icon-Backgrounds auf accent-warm, Chart-Linie/Gradient auf accent-warm
+- Site-Footer: font-heading auf Brand-Name
+
+### Dashboard
+- Mobile Bottom-Navigation (5 Tabs: Dashboard, Kampagnen, QR-Codes, Analytik, Mehr)
+- Sidebar: Focus-Trap fuer Mobile-Menu (Escape schliesst, Tab-Cycling)
+
+### Accessibility
+- Table: `scope="col"` Default auf allen `<th>`
+- FormField: `aria-describedby` verbindet Inputs mit Error/Help Messages
+- InputField + TextareaField: `aria-describedby` + `aria-invalid`
+
+### Aus Phase 1 (fruehere Session)
+- Hero: Gradient-Text entfernt, font-heading, warmer Akzent
+- Hero-Mock: Floating Chips + Browser Chrome entfernt
+- Header: Nav links-aligned
+- Steps: Timeline-Layout mit grossen Nummern
+- Features Bento: Links-aligned Header
+- Pricing: Links-aligned Header, warme Checkmarks
+- FAQ: Eyebrow entfernt
+- Final CTA: font-heading, warme Checkmarks
+- Sidebar: Kontrast erhoeht
+- Skip-Navigation, Focus-Indikatoren, prefers-reduced-motion
+
+## Recherche-Ergebnisse (fuer Umsetzung)
+
+### Top SaaS-Font-Kombis 2025/26
+1. **Inter Variable** (alles) — Linear, Notion, Cal.com
+2. **Satoshi 700** (headings) + **Inter 400** (body) — warm aber clean
+3. **General Sans** (headings) + **Inter** (body) — neutral-expressiv
+4. **Manrope** — futuristisch, gut fuer datenreiche UIs
+
+### Farb-Trends
+- Nicht pure #000/#FFF — stattdessen #09090B/#FAFAFA (tinted neutrals)
+- Zinc-Palette als System: #71717A, #A1A1AA, #D4D4D8
+- Single strong accent: Teal, Violet, oder verfeinertes Amber
+- Emerald nur fuer "Erfolg"-Signale, nicht als Primaer-Akzent
+
+### Pricing Best Practices
+- Preis = groesstes Text-Element der Section
+- Spar-Anzeige bei Toggle: konkrete Euros > Prozent
+- Social Proof neben Preis (User-Zahl, Logos)
+- CTA sagt was passiert: "14 Tage kostenlos testen" statt "Starten"
+
+### Referenz-Sites (checken!)
+- linear.app — dark, monochrome, product-first
+- betterstack.com — dark theme, echte Screenshots
+- resend.com — developer-tool, clean typography
+- amie.so — clean, spezifische Value Props
+- notion.so — weiss, bold CTAs, Whitespace
+
+## Noch offen (unabhaengig vom Redesign)
+- Dashboard KPI-Consolidation (8 Cards -> Gruppen/Tabs)
+- Copy-Variation-Pass (Heading-Patterns variieren)
+- Scroll-triggered Entrance-Animationen
+- Monochrome Dashboard-Charts auf neue Palette umstellen
+
+## Constraints (unveraendert)
+- DSGVO-Konformitaet Pflicht
+- Deutsche UI, englischer Code
+- Privacy-first
+- Build muss clean bleiben
+- Per Phase commiten
