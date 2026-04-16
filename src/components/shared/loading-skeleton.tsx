@@ -10,17 +10,17 @@ export function PageSkeleton() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-24 rounded-lg" />
+          <Skeleton key={i} className="h-24 rounded-2xl" />
         ))}
       </div>
-      <Skeleton className="h-64 rounded-lg" />
+      <Skeleton className="h-64 rounded-2xl" />
     </div>
   );
 }
 
 export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
       <div className="border-b border-border px-4 py-3">
         <div className="flex gap-6">
           {Array.from({ length: cols }).map((_, i) => (
@@ -48,7 +48,7 @@ export function KPISkeleton({ count = 4 }: { count?: number }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} className="h-24 rounded-lg" />
+        <Skeleton key={i} className="h-24 rounded-2xl" />
       ))}
     </div>
   );
@@ -56,7 +56,7 @@ export function KPISkeleton({ count = 4 }: { count?: number }) {
 
 export function ChartSkeleton({ className }: { className?: string }) {
   return (
-    <div className={cn('rounded-lg border border-border bg-card', className)}>
+    <div className={cn('rounded-2xl border border-border bg-card', className)}>
       <div className="border-b border-border px-4 py-3">
         <Skeleton className="h-4 w-32" />
       </div>
@@ -69,7 +69,7 @@ export function ChartSkeleton({ className }: { className?: string }) {
 
 export function FormSkeleton() {
   return (
-    <div className="space-y-5 rounded-lg border border-border bg-card p-5">
+    <div className="space-y-5 rounded-2xl border border-border bg-card p-5">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="space-y-2">
           <Skeleton className="h-3 w-16" />

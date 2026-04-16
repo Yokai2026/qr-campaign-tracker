@@ -51,7 +51,7 @@ export function KPIStatCard({
 
   return (
     <div className={cn(
-      'rounded-lg border border-border bg-card p-4 transition-all duration-150 hover:shadow-sm hover:border-border/80 cursor-pointer',
+      'rounded-2xl border border-border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[var(--shadow-md)] cursor-pointer',
       className,
     )}>
       <div className="flex items-center justify-between">

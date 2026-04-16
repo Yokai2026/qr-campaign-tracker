@@ -65,16 +65,17 @@ export function PageHeader({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2.5">
-            <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
+            <h1 className="text-[22px] font-semibold tracking-[-0.015em] sm:text-[24px]">{title}</h1>
             {badge}
           </div>
           {description && (
-            <p className="mt-0.5 text-[13px] text-muted-foreground">{description}</p>
+            <p className="mt-1 text-[13.5px] text-muted-foreground">{description}</p>
           )}
         </div>
         {action}
         {!action && actionLabel && actionHref && (
           <Button
+            variant="brand"
             size="sm"
             className="self-start"
             render={<Link href={actionHref} />}

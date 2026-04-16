@@ -23,8 +23,8 @@ export async function InventoryKPIs() {
   return (
     <section className="space-y-3">
       <div>
-        <h2 className="text-[13px] font-semibold tracking-tight">Bestand</h2>
-        <p className="text-[12px] text-muted-foreground">Was du bereits angelegt hast</p>
+        <h2 className="text-[14px] font-semibold tracking-tight">Bestand</h2>
+        <p className="text-[12.5px] text-muted-foreground">Was du bereits angelegt hast</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
         <Link href="/campaigns" className="group">
@@ -33,7 +33,7 @@ export async function InventoryKPIs() {
             value={campaignCount || 0}
             icon={Megaphone}
             hint="Eine Kampagne bündelt alle Platzierungen und QR-Codes für ein Marketing-Ziel."
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            className="group-hover:border-brand/30 group-hover:bg-brand/[0.03]"
             animate
           />
         </Link>
@@ -43,7 +43,7 @@ export async function InventoryKPIs() {
             value={locationCount || 0}
             icon={MapPin}
             hint="Orte an denen deine QR-Codes aushängen (z. B. Bibliothek, Café, Jugendzentrum)."
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            className="group-hover:border-brand/30 group-hover:bg-brand/[0.03]"
             animate
           />
         </Link>
@@ -53,7 +53,7 @@ export async function InventoryKPIs() {
             value={placementCount || 0}
             icon={ClipboardList}
             hint="Einzelne Anbringungen pro Standort (z. B. Poster am Eingang, Flyer am Tresen)."
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            className="group-hover:border-brand/30 group-hover:bg-brand/[0.03]"
             animate
           />
         </Link>
@@ -63,7 +63,7 @@ export async function InventoryKPIs() {
             value={qrCodeCount || 0}
             icon={QrCode}
             hint="Jede Platzierung hat einen eigenen QR-Code mit individueller Tracking-URL."
-            className="transition-colors group-hover:border-border/80 group-hover:bg-muted/30"
+            className="group-hover:border-brand/30 group-hover:bg-brand/[0.03]"
             animate
           />
         </Link>

@@ -12,7 +12,7 @@ function ListSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Skeleton key={i} className="h-64 rounded-lg" />
+        <Skeleton key={i} className="h-64 rounded-2xl" />
       ))}
     </div>
   );
@@ -26,10 +26,10 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight">
+          <h1 className="text-[22px] font-semibold tracking-[-0.015em] sm:text-[26px]">
             Willkommen, {profile.display_name || profile.email}
           </h1>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">
+          <p className="mt-1 text-[13.5px] text-muted-foreground">
             Übersicht deiner QR-Kampagnen
           </p>
         </div>
