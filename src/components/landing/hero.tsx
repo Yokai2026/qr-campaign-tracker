@@ -45,10 +45,11 @@ export function Hero() {
           </span>
         </h1>
 
-        {/* Subline — ein Satz */}
+        {/* Subline — konkret, mit den drei Hauptvorteilen */}
         <p className="mx-auto mt-7 max-w-xl text-pretty text-[17px] leading-[1.55] text-muted-foreground sm:text-[18.5px]">
-          Sieh in Echtzeit, welches Plakat, welcher Flyer oder welche Visitenkarte
-          dir wirklich Kunden bringt.
+          Sieh live, welches Plakat, welcher Flyer oder welche Visitenkarte dir
+          wirklich Kunden bringt. Ohne Cookies, ohne Banner, gehostet in
+          Frankfurt.
         </p>
 
         {/* CTAs — bigger, bolder, livelier */}
