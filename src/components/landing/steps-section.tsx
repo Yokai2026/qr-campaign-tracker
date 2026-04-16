@@ -50,7 +50,7 @@ export function StepsSection() {
               <path
                 d="M 40 0 L 0 0 0 40"
                 fill="none"
-                stroke="oklch(0.50 0.01 285 / 0.06)"
+                stroke="oklch(0.50 0.02 265 / 0.07)"
                 strokeWidth="1"
               />
             </pattern>
@@ -89,7 +89,7 @@ export function StepsSection() {
                 )}
                 <article className="card-lift group relative flex h-full flex-col gap-5 rounded-2xl border border-border bg-background/90 p-6 shadow-sm backdrop-blur sm:p-7">
                   <header className="flex items-start justify-between">
-                    <span className="tabular text-[48px] font-semibold leading-none tracking-[-0.05em] text-foreground/15">
+                    <span className="tabular text-[48px] font-bold leading-none tracking-[-0.05em] text-primary/20">
                       {step.number}
                     </span>
                     <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors group-hover:border-foreground/40">

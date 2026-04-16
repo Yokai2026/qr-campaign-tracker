@@ -107,12 +107,12 @@ export default function SignupPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-sm animate-in-page">
-          <Card className="border border-border">
+          <Card className="border border-border shadow-[var(--shadow-lg)]">
             <CardHeader className="text-center pb-2">
-              <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 shadow-[var(--shadow-sm)]">
                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
               </div>
-              <CardTitle className="text-lg font-semibold tracking-tight">Willkommen bei Spurig!</CardTitle>
+              <CardTitle className="text-xl font-semibold tracking-tight">Willkommen bei Spurig!</CardTitle>
               <CardDescription className="text-[13px]">
                 Dein Konto wurde erstellt.
               </CardDescription>
@@ -130,7 +130,6 @@ export default function SignupPage() {
                 </p>
               </div>
               <Button
-                size="sm"
                 className="mt-4 w-full"
                 onClick={() => {
                   router.push('/dashboard');
@@ -152,12 +151,12 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-in-page">
-        <Card className="border border-border">
+        <Card className="border border-border shadow-[var(--shadow-lg)]">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-[var(--shadow-sm)]">
               <QrCode className="h-5 w-5 text-primary-foreground" />
             </div>
-            <CardTitle className="text-lg font-semibold tracking-tight">Konto erstellen</CardTitle>
+            <CardTitle className="text-xl font-semibold tracking-tight">Konto erstellen</CardTitle>
             <CardDescription className="text-[13px]">
               Registriere dich, um Kampagnen zu verwalten
             </CardDescription>
@@ -180,7 +179,7 @@ export default function SignupPage() {
             </div>
             <form onSubmit={handleSignup} className="space-y-4">
               {error && (
-                <div className="rounded-md border border-red-200 bg-red-50 p-2.5 text-[13px] font-medium text-red-600 dark:border-red-900 dark:bg-red-950/50 dark:text-red-400">
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-[13px] font-medium text-red-600 dark:border-red-900 dark:bg-red-950/50 dark:text-red-400">
                   {error}
                 </div>
               )}
@@ -192,7 +191,7 @@ export default function SignupPage() {
                   placeholder="mein_name"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="h-9 text-[13px]"
+                  className="h-10 text-[13px]"
                   required
                 />
               </div>
@@ -204,7 +203,7 @@ export default function SignupPage() {
                   placeholder="name@beispiel.de"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-9 text-[13px]"
+                  className="h-10 text-[13px]"
                   required
                 />
               </div>
@@ -216,12 +215,12 @@ export default function SignupPage() {
                   placeholder="Mindestens 10 Zeichen"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-9 text-[13px]"
+                  className="h-10 text-[13px]"
                   minLength={10}
                   required
                 />
               </div>
-              <Button type="submit" size="sm" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -232,9 +231,9 @@ export default function SignupPage() {
                 )}
               </Button>
             </form>
-            <p className="mt-4 text-center text-[12px] text-muted-foreground">
+            <p className="mt-5 text-center text-[13px] text-muted-foreground">
               Bereits ein Konto?{' '}
-              <Link href="/login" className="text-primary hover:underline">
+              <Link href="/login" className="font-medium text-primary hover:underline">
                 Anmelden
               </Link>
             </p>

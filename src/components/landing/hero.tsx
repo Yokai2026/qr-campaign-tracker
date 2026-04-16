@@ -14,13 +14,20 @@ const TRUST = [
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* Subtle dot-grid only — no aura, no violet */}
+      {/* Dot grid + subtle radial glow for depth */}
       <GridBackdrop variant="dots" className="h-[560px] opacity-50" fade />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse 60% 50% at 50% 20%, oklch(0.28 0.06 265 / 0.06), transparent 70%)',
+        }}
+      />
 
-      <div className="relative mx-auto max-w-5xl px-4 pt-20 pb-12 text-center sm:px-6 sm:pt-28 sm:pb-20">
+      <div className="relative mx-auto max-w-5xl px-4 pt-24 pb-14 text-center sm:px-6 sm:pt-32 sm:pb-22">
         {/* Announcement */}
-        <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card py-1 pl-1 pr-3 text-[12px] font-medium text-muted-foreground shadow-sm">
-          <span className="inline-flex items-center gap-1 rounded-full bg-foreground px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-background">
+        <div className="mx-auto mb-8 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.04] py-1.5 pl-1.5 pr-4 text-[12px] font-medium text-foreground shadow-[var(--shadow-sm)] backdrop-blur">
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-primary-foreground">
             <Sparkles className="h-2.5 w-2.5" />
             Neu
           </span>
@@ -30,11 +37,11 @@ export function Hero() {
           <span className="sm:hidden">DSGVO-konform · Einführungspreis</span>
         </div>
 
-        {/* Headline — sans only, pure weight hierarchy */}
-        <h1 className="text-balance text-[40px] font-semibold leading-[1.02] tracking-[-0.03em] sm:text-[58px] md:text-[72px]">
+        {/* Headline */}
+        <h1 className="text-balance text-[42px] font-bold leading-[1.02] tracking-[-0.035em] sm:text-[60px] md:text-[74px]">
           QR-Codes, die zeigen,
           <br />
-          <span className="text-muted-foreground">was wirklich funktioniert.</span>
+          <span className="bg-gradient-to-r from-muted-foreground to-muted-foreground/70 bg-clip-text text-transparent">was wirklich funktioniert.</span>
         </h1>
 
         {/* Subline — outcome-first, short */}
@@ -44,20 +51,20 @@ export function Hero() {
         </p>
 
         {/* CTAs */}
-        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Button
             size="lg"
             render={<Link href="/signup" />}
-            className="group min-w-[220px] shadow-[var(--shadow-md)]"
+            className="group min-w-[240px] shadow-[var(--shadow-lg)]"
           >
             14 Tage kostenlos testen
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Button>
           <Button
             size="lg"
-            variant="ghost"
+            variant="outline"
             render={<Link href="#so-funktioniert" />}
-            className="min-w-[180px] text-muted-foreground hover:text-foreground"
+            className="min-w-[200px]"
           >
             So funktioniert&apos;s
           </Button>

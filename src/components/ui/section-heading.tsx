@@ -31,7 +31,7 @@ export function SectionHeading({
   return (
     <Tag
       className={cn(
-        'font-sans font-semibold tracking-[-0.02em] text-foreground',
+        'font-sans font-bold tracking-[-0.025em] text-foreground',
         SIZES[Tag],
         balance && 'text-balance',
         align === 'center' && 'text-center',

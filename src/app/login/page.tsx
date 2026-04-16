@@ -54,12 +54,12 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-in-page">
-        <Card className="border border-border">
+        <Card className="border border-border shadow-[var(--shadow-lg)]">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-[var(--shadow-sm)]">
               <QrCode className="h-5 w-5 text-primary-foreground" />
             </div>
-            <CardTitle className="text-lg font-semibold tracking-tight">Spurig</CardTitle>
+            <CardTitle className="text-xl font-semibold tracking-tight">Spurig</CardTitle>
             <CardDescription className="text-[13px]">
               Melde dich an, um deine Kampagnen zu verwalten
             </CardDescription>
@@ -67,7 +67,7 @@ export default function LoginPage() {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               {error && (
-                <div className="rounded-md border border-red-200 bg-red-50 p-2.5 text-[13px] font-medium text-red-600 dark:border-red-900 dark:bg-red-950/50 dark:text-red-400">
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-[13px] font-medium text-red-600 dark:border-red-900 dark:bg-red-950/50 dark:text-red-400">
                   {error}
                 </div>
               )}
@@ -79,7 +79,7 @@ export default function LoginPage() {
                   placeholder="name@beispiel.de oder benutzername"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  className="h-9 text-[13px]"
+                  className="h-10 text-[13px]"
                   required
                 />
               </div>
@@ -90,11 +90,11 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-9 text-[13px]"
+                  className="h-10 text-[13px]"
                   required
                 />
               </div>
-              <Button type="submit" size="sm" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -105,16 +105,16 @@ export default function LoginPage() {
                 )}
               </Button>
             </form>
-            <p className="mt-4 text-center text-[12px] text-muted-foreground">
+            <p className="mt-5 text-center text-[13px] text-muted-foreground">
               Noch kein Konto?{' '}
-              <Link href="/signup" className="text-primary hover:underline">
+              <Link href="/signup" className="font-medium text-primary hover:underline">
                 Registrieren
               </Link>
             </p>
           </CardContent>
         </Card>
 
-        <p className="mt-4 text-center text-[11px] text-muted-foreground/50">
+        <p className="mt-5 text-center text-[11px] text-muted-foreground/50">
           Spurig &middot; Multi-Channel Kampagnen-Tracking
         </p>
       </div>

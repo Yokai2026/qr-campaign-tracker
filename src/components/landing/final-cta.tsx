@@ -54,18 +54,18 @@ export function FinalCTA() {
                 Account schläft ein.
               </p>
 
-              <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+              <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <Button
                   size="lg"
                   render={<Link href="/signup" />}
-                  className="group min-w-[220px] bg-white text-neutral-900 shadow-lg hover:bg-white/95"
+                  className="group min-w-[240px] bg-white text-neutral-900 shadow-lg hover:bg-white/95 hover:shadow-xl"
                 >
                   Kostenlos starten
-                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Button>
                 <Link
                   href="/pricing"
-                  className="text-[13px] font-medium text-white/70 transition-colors hover:text-white"
+                  className="text-[14px] font-medium text-white/70 transition-colors hover:text-white"
                 >
                   Erst die Preise ansehen →
                 </Link>

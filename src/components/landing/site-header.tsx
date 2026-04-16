@@ -66,20 +66,20 @@ export function SiteHeader() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {/* Hide "Anmelden" below 360px to prevent header overflow on iPhone SE 1 / iPhone 5 */}
           <Button
             variant="ghost"
             size="sm"
             render={<Link href="/login" />}
-            className="hidden text-[13px] min-[360px]:inline-flex"
+            className="hidden min-[360px]:inline-flex"
           >
             Anmelden
           </Button>
           <Button
             size="sm"
             render={<Link href="/signup" />}
-            className="group text-[13px] shadow-sm"
+            className="group"
           >
             Kostenlos testen
             <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />

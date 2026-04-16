@@ -64,8 +64,8 @@ export function FeaturesBento() {
               <svg viewBox="0 0 400 100" className="h-20 w-full sm:h-24" aria-hidden>
                 <defs>
                   <linearGradient id="bento-area" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="oklch(0.25 0 0)" stopOpacity="0.30" />
-                    <stop offset="100%" stopColor="oklch(0.25 0 0)" stopOpacity="0" />
+                    <stop offset="0%" stopColor="oklch(0.28 0.06 265)" stopOpacity="0.30" />
+                    <stop offset="100%" stopColor="oklch(0.28 0.06 265)" stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 <g stroke="currentColor" strokeOpacity="0.08" strokeDasharray="2 3">
@@ -79,12 +79,12 @@ export function FeaturesBento() {
                 <path
                   d="M0,80 L25,75 L50,60 L75,62 L100,45 L125,55 L150,35 L175,42 L200,30 L225,38 L250,22 L275,30 L300,18 L325,25 L350,10 L400,6"
                   fill="none"
-                  stroke="oklch(0.25 0 0)"
+                  stroke="oklch(0.28 0.06 265)"
                   strokeWidth="1.75"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                <circle cx="350" cy="10" r="3" fill="oklch(0.25 0 0)" />
+                <circle cx="350" cy="10" r="3" fill="oklch(0.28 0.06 265)" />
               </svg>
               <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border/60 pt-3 text-[11px]">
                 <div>
