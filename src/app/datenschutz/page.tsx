@@ -18,11 +18,11 @@ export default function DatenschutzPage() {
         Zurück
       </Link>
 
-      <div className="flex items-center gap-3 mb-8">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-          <Shield className="h-4.5 w-4.5 text-primary" />
+      <div className="flex items-center gap-3 mb-10">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.18),var(--shadow-sm)]">
+          <Shield className="h-4.5 w-4.5" />
         </div>
-        <h1 className="text-xl font-semibold tracking-tight">Datenschutzerklärung</h1>
+        <h1 className="text-[22px] font-semibold tracking-[-0.015em] sm:text-[24px]">Datenschutzerklärung</h1>
       </div>
 
       <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none space-y-6 text-[14px] leading-relaxed text-muted-foreground">

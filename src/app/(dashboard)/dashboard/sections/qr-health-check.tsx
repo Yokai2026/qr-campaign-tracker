@@ -33,7 +33,7 @@ export async function QrHealthCheck() {
   if (dormant.length === 0) return null;
 
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/30">
+    <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3.5 dark:border-amber-800 dark:bg-amber-950/30">
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
       <div className="min-w-0">
         <p className="text-[13px] font-medium text-amber-800 dark:text-amber-300">

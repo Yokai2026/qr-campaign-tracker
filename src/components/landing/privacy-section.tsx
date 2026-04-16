@@ -30,7 +30,7 @@ export function PrivacySection() {
   return (
     <section
       id="dsgvo"
-      className="relative overflow-hidden border-y border-border bg-background py-20 sm:py-28"
+      className="relative overflow-hidden border-y border-border bg-background py-24 sm:py-32"
     >
       <div
         aria-hidden
@@ -112,7 +112,7 @@ export function PrivacySection() {
             {/* EU hosting card */}
             <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-subtle p-5">
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background text-[14px] font-bold tracking-wider text-foreground">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background text-[14px] font-semibold tracking-wider text-foreground shadow-[var(--shadow-xs)]">
                   EU
                 </div>
                 <div>
