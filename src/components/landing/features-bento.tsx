@@ -65,8 +65,8 @@ export function FeaturesBento() {
               <svg viewBox="0 0 400 100" className="h-20 w-full sm:h-24" aria-hidden>
                 <defs>
                   <linearGradient id="bento-area" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="oklch(0.28 0.06 265)" stopOpacity="0.30" />
-                    <stop offset="100%" stopColor="oklch(0.28 0.06 265)" stopOpacity="0" />
+                    <stop offset="0%" stopColor="var(--accent-warm)" stopOpacity="0.30" />
+                    <stop offset="100%" stopColor="var(--accent-warm)" stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 <g stroke="currentColor" strokeOpacity="0.08" strokeDasharray="2 3">
@@ -80,12 +80,12 @@ export function FeaturesBento() {
                 <path
                   d="M0,80 L25,75 L50,60 L75,62 L100,45 L125,55 L150,35 L175,42 L200,30 L225,38 L250,22 L275,30 L300,18 L325,25 L350,10 L400,6"
                   fill="none"
-                  stroke="oklch(0.28 0.06 265)"
+                  stroke="var(--accent-warm)"
                   strokeWidth="1.75"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                <circle cx="350" cy="10" r="3" fill="oklch(0.28 0.06 265)" />
+                <circle cx="350" cy="10" r="3" fill="var(--accent-warm)" />
               </svg>
               <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border/60 pt-3 text-[11px]">
                 <div>
@@ -106,7 +106,7 @@ export function FeaturesBento() {
 
           {/* Geo + Placement */}
           <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-warm/10 text-accent-warm">
               <MapPin className="h-4 w-4" />
             </span>
             <h3 className="text-[16px] font-semibold tracking-tight">
@@ -131,7 +131,7 @@ export function FeaturesBento() {
 
           {/* Devices */}
           <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-warm/10 text-accent-warm">
               <Smartphone className="h-4 w-4" />
             </span>
             <h3 className="text-[16px] font-semibold tracking-tight">
@@ -182,7 +182,7 @@ export function FeaturesBento() {
           {/* Exports */}
           <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-3">
             <div className="flex items-center justify-between">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-warm/10 text-accent-warm">
                 <FileDown className="h-4 w-4" />
               </span>
               <div className="flex items-center gap-1">

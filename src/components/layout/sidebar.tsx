@@ -22,7 +22,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { checkFeatureAccess } from '@/lib/billing/check-access';
 import type { EffectiveTier } from '@/lib/billing/gates';
 
@@ -46,6 +46,36 @@ export function Sidebar() {
   const supabase = createClient();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tier, setTier] = useState<EffectiveTier | null>(null);
+  const mobileSidebarRef = useRef<HTMLElement>(null);
+
+  const trapFocus = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setMobileOpen(false);
+      return;
+    }
+    if (e.key !== 'Tab' || !mobileSidebarRef.current) return;
+    const focusable = mobileSidebarRef.current.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    document.addEventListener('keydown', trapFocus);
+    const firstLink = mobileSidebarRef.current?.querySelector<HTMLElement>('a[href], button');
+    firstLink?.focus();
+    return () => document.removeEventListener('keydown', trapFocus);
+  }, [mobileOpen, trapFocus]);
 
   useEffect(() => {
     checkFeatureAccess('analytics').then(({ tier: t }) => setTier(t as EffectiveTier));
@@ -215,6 +245,7 @@ export function Sidebar() {
 
       {/* Mobile sidebar — below header, no duplicate brand */}
       <aside
+        ref={mobileSidebarRef}
         className={cn(
           'fixed top-12 bottom-0 left-0 z-30 flex w-[220px] flex-col bg-[#111] transition-transform duration-200 ease-out lg:hidden',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'

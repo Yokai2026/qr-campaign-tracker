@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { Crown, Globe, Lock, ShieldCheck, ArrowRight, QrCode } from 'lucide-react';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import { Globe, Lock, ShieldCheck, ArrowRight, QrCode, Crown } from 'lucide-react';
 import { SectionHeading } from '@/components/ui/section-heading';
 
 function PhoneFrame({
@@ -105,13 +104,14 @@ export function DomainShowcase() {
   return (
     <section className="relative py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow tone="amber" icon={<Crown className="h-3 w-3" />}>
+        <div className="max-w-2xl">
+          <p className="text-[13px] font-medium uppercase tracking-[0.08em] text-accent-warm">
             Pro-Feature
-          </SectionEyebrow>
+          </p>
           <SectionHeading
             as="h2"
-            className="mt-4"
+            align="left"
+            className="mt-3"
             accent={<>durch die Augen deiner Kunden.</>}
           >
             So sieht dein QR-Code aus
@@ -121,6 +121,7 @@ export function DomainShowcase() {
             wie deine Marke — und das Tracking bleibt für Nutzer unsichtbar.
           </p>
         </div>
+
 
         <div className="mt-14 grid items-center gap-10 md:grid-cols-[1fr_auto_1fr]">
           {/* Phone: Standard */}

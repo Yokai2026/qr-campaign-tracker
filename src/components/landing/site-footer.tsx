@@ -57,7 +57,7 @@ export function SiteFooter() {
                   <path d="M14 20h7" />
                 </svg>
               </span>
-              <span className="text-[15px] font-semibold tracking-[-0.01em]">
+              <span className="font-heading text-[15px] font-semibold tracking-[-0.01em]">
                 Spurig
               </span>
             </Link>

@@ -44,6 +44,8 @@ export function FormField<T extends FieldValues>({
 
   const error = errors[name];
   const errorMessage = error?.message as string | undefined;
+  const errorId = `${name}-error`;
+  const helpId = `${name}-help`;
 
   return (
     <div className={cn('space-y-2', className)}>
@@ -53,12 +55,12 @@ export function FormField<T extends FieldValues>({
       </Label>
       {children}
       {errorMessage && (
-        <p className="text-xs text-destructive" role="alert">
+        <p id={errorId} className="text-xs text-destructive" role="alert">
           {errorMessage}
         </p>
       )}
       {help && !errorMessage && (
-        <p className="text-xs text-muted-foreground">{help}</p>
+        <p id={helpId} className="text-xs text-muted-foreground">{help}</p>
       )}
     </div>
   );
@@ -89,6 +91,7 @@ export function InputField<T extends FieldValues>({
 }: InputFieldProps<T>) {
   const { register, formState: { errors } } = useFormContext<T>();
   const hasError = !!errors[name];
+  const describedBy = hasError ? `${name}-error` : help ? `${name}-help` : undefined;
 
   return (
     <FormField<T> name={name} label={label} help={help} required={required} className={className}>
@@ -98,6 +101,7 @@ export function InputField<T extends FieldValues>({
         placeholder={placeholder}
         disabled={disabled}
         aria-invalid={hasError}
+        aria-describedby={describedBy}
         {...register(name)}
       />
     </FormField>
@@ -125,6 +129,7 @@ export function TextareaField<T extends FieldValues>({
 }: TextareaFieldProps<T>) {
   const { register, formState: { errors } } = useFormContext<T>();
   const hasError = !!errors[name];
+  const describedBy = hasError ? `${name}-error` : help ? `${name}-help` : undefined;
 
   return (
     <FormField<T> name={name} label={label} help={help} required={required} className={className}>
@@ -133,6 +138,7 @@ export function TextareaField<T extends FieldValues>({
         placeholder={placeholder}
         rows={rows}
         aria-invalid={hasError}
+        aria-describedby={describedBy}
         {...register(name)}
       />
     </FormField>
