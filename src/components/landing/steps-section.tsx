@@ -1,5 +1,4 @@
 import { PencilRuler, Printer, LineChart } from 'lucide-react';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { SectionHeading } from '@/components/ui/section-heading';
 
 const STEPS = [
@@ -59,15 +58,14 @@ export function StepsSection() {
         </svg>
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow tone="primary">In drei Schritten</SectionEyebrow>
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
+        <div className="max-w-2xl">
           <SectionHeading
             as="h2"
-            className="mt-4"
-            accent={<>an einem Nachmittag.</>}
+            align="left"
+            className="mt-0"
           >
-            Vom Plakat zur Auswertung —
+            Vom Plakat zur Auswertung
           </SectionHeading>
           <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground sm:text-[16px]">
             Kein Wochenende für Excel. Kein Agentur-Ticket. Du klickst dich
@@ -75,42 +73,29 @@ export function StepsSection() {
           </p>
         </div>
 
-        <ol className="mt-14 grid gap-5 md:grid-cols-3">
-          {STEPS.map((step, i) => {
+        <ol className="mt-14 space-y-0 divide-y divide-border">
+          {STEPS.map((step) => {
             const Icon = step.icon;
             return (
-              <li key={step.number} className="relative">
-                {/* Connector */}
-                {i < STEPS.length - 1 && (
-                  <div
-                    aria-hidden
-                    className="absolute left-full top-16 hidden h-px w-5 -translate-x-2.5 bg-gradient-to-r from-border to-transparent md:block"
-                  />
-                )}
-                <article className="card-lift group relative flex h-full flex-col gap-5 rounded-2xl border border-border bg-background/90 p-6 shadow-sm backdrop-blur sm:p-7">
-                  <header className="flex items-start justify-between">
-                    <span className="tabular text-[48px] font-bold leading-none tracking-[-0.05em] text-primary/20">
-                      {step.number}
-                    </span>
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors group-hover:border-foreground/40">
-                      <Icon className="h-4 w-4" />
-                    </span>
-                  </header>
-                  <div>
-                    <h3 className="text-[17px] font-semibold tracking-tight">
+              <li key={step.number} className="grid items-start gap-4 py-10 md:grid-cols-[100px_1fr_240px]">
+                <span className="font-heading text-[72px] font-extrabold leading-none tracking-[-0.04em] text-accent-warm/20">
+                  {step.number}
+                </span>
+                <div>
+                  <div className="flex items-center gap-3">
+                    <Icon className="h-4 w-4 text-accent-warm" />
+                    <h3 className="font-heading text-[20px] font-semibold tracking-tight">
                       {step.title}
                     </h3>
-                    <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-                      {step.description}
-                    </p>
                   </div>
-                  <div className="mt-auto border-t border-dashed border-border pt-4">
-                    <div className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground">
-                      <span className="h-1.5 w-1.5 rounded-full bg-foreground/60" />
-                      {step.detail}
-                    </div>
-                  </div>
-                </article>
+                  <p className="mt-2 max-w-md text-[14px] leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground md:justify-end md:pt-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent-warm/60" />
+                  {step.detail}
+                </div>
               </li>
             );
           })}

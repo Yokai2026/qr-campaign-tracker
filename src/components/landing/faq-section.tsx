@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { ChevronDown, HelpCircle, Mail } from 'lucide-react';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import { ChevronDown, Mail } from 'lucide-react';
 import { SectionHeading } from '@/components/ui/section-heading';
 
 export const FAQ_ITEMS: { q: string; a: string }[] = [
@@ -46,15 +45,11 @@ export function FaqSection() {
     >
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow tone="muted" icon={<HelpCircle className="h-3 w-3" />}>
-            Häufige Fragen
-          </SectionEyebrow>
           <SectionHeading
             as="h2"
-            className="mt-4"
-            accent={<>solltest du wissen.</>}
+            className="mt-0"
           >
-            Alles, was du
+            Häufige Fragen
           </SectionHeading>
           <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground sm:text-[16px]">
             Kein Kleingedrucktes, keine Überraschungen. Hier stehen die Antworten

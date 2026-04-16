@@ -66,13 +66,13 @@ export function Sidebar() {
         className={cn(
           'group flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] transition-colors duration-75',
           isActive
-            ? 'bg-white/[0.08] text-white font-medium border-l-2 border-white/60 pl-[6px]'
-            : 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
+            ? 'bg-white/[0.08] text-white font-medium border-l-2 border-white/70 pl-[6px]'
+            : 'text-white/60 hover:bg-white/[0.06] hover:text-white/85'
         )}
       >
         <item.icon className={cn(
           'h-[15px] w-[15px] shrink-0',
-          isActive ? 'text-white/90' : 'text-white/25'
+          isActive ? 'text-white/90' : 'text-white/50'
         )} />
         <span>{item.name}</span>
       </Link>
@@ -89,7 +89,7 @@ export function Sidebar() {
           'group flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] transition-colors duration-75',
           isActive
             ? 'bg-white/[0.08] text-white font-medium'
-            : 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
+            : 'text-white/60 hover:bg-white/[0.06] hover:text-white/85'
         )}
       >
         <item.icon className="h-[15px] w-[15px] shrink-0 text-white/25" />
@@ -135,7 +135,7 @@ export function Sidebar() {
             setMobileOpen(false);
             window.dispatchEvent(new Event('open-command-palette'));
           }}
-          className="flex w-full items-center gap-2 rounded-[5px] bg-white/[0.04] px-2 py-[6px] text-[12px] text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white/60"
+          className="flex w-full items-center gap-2 rounded-[5px] bg-white/[0.04] px-2 py-[6px] text-[12px] text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/75"
         >
           <Search className="h-[13px] w-[13px]" />
           <span>Suchen…</span>
@@ -158,7 +158,7 @@ export function Sidebar() {
         <Link
           href="/datenschutz"
           target="_blank"
-          className="flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] text-white/30 transition-colors duration-75 hover:bg-white/[0.04] hover:text-white/50"
+          className="flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] text-white/50 transition-colors duration-75 hover:bg-white/[0.06] hover:text-white/75"
         >
           <Shield className="h-[15px] w-[15px]" />
           Datenschutz
@@ -167,7 +167,7 @@ export function Sidebar() {
         <Link
           href="/impressum"
           target="_blank"
-          className="flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] text-white/30 transition-colors duration-75 hover:bg-white/[0.04] hover:text-white/50"
+          className="flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] text-white/50 transition-colors duration-75 hover:bg-white/[0.06] hover:text-white/75"
         >
           <Scale className="h-[15px] w-[15px]" />
           Impressum
@@ -175,7 +175,7 @@ export function Sidebar() {
         </Link>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] text-white/30 transition-colors duration-75 hover:bg-white/[0.04] hover:text-red-400"
+          className="flex w-full items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] text-white/50 transition-colors duration-75 hover:bg-white/[0.06] hover:text-red-400"
         >
           <LogOut className="h-[15px] w-[15px]" />
           Abmelden

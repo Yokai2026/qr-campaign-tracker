@@ -8,21 +8,22 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import Link from 'next/link';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { SectionHeading } from '@/components/ui/section-heading';
 
 export function FeaturesBento() {
   return (
     <section id="features" className="relative py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow tone="primary">Was Spurig kann</SectionEyebrow>
+        <div className="max-w-2xl">
+          <p className="text-[13px] font-medium uppercase tracking-[0.08em] text-accent-warm">
+            Was Spurig kann
+          </p>
           <SectionHeading
             as="h2"
-            className="mt-4"
-            accent={<>— aufs Wesentliche reduziert.</>}
+            align="left"
+            className="mt-3"
           >
-            Kampagnen-Tracking
+            Kampagnen-Tracking, aufs Wesentliche reduziert.
           </SectionHeading>
           <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground sm:text-[16px]">
             Keine überladenen Dashboards, keine fünfseitigen Feature-Listen.

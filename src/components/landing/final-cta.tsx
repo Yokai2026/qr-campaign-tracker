@@ -42,7 +42,7 @@ export function FinalCTA() {
                 Jetzt startklar
               </div>
 
-              <h2 className="mt-5 text-balance text-[32px] font-semibold leading-[1.05] tracking-[-0.025em] sm:text-[44px]">
+              <h2 className="mt-5 font-heading text-balance text-[32px] font-bold leading-[1.05] tracking-[-0.025em] sm:text-[44px]">
                 Starte jetzt.{' '}
                 <span className="text-white/60 font-normal">
                   Zahlst du später.
@@ -74,7 +74,7 @@ export function FinalCTA() {
               <ul className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-white/60">
                 {REASSURANCE.map((r) => (
                   <li key={r} className="inline-flex items-center gap-1.5">
-                    <Check className="h-3 w-3 text-emerald-400" />
+                    <Check className="h-3 w-3 text-accent-warm" />
                     {r}
                   </li>
                 ))}
@@ -132,14 +132,6 @@ export function FinalCTA() {
                     <div className="tabular font-semibold text-white">184</div>
                   </div>
                 </div>
-              </div>
-              {/* Floating dot */}
-              <div
-                aria-hidden
-                className="absolute -right-3 -top-3 flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-1 text-[10px] text-white/80 backdrop-blur"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                Neuer Scan · Köln
               </div>
             </div>
           </div>

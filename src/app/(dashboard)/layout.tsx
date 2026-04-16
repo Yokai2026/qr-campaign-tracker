@@ -17,7 +17,7 @@ export default async function DashboardLayout({
     <Providers>
       <div className="min-h-screen bg-background">
         <Sidebar />
-        <main className="pt-12 lg:pl-[220px] lg:pt-0">
+        <main id="main-content" className="pt-12 lg:pl-[220px] lg:pt-0">
           <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6 lg:px-10">
             {children}
           </div>

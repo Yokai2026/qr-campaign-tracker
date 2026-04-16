@@ -21,7 +21,7 @@ export default function LandingPage() {
       <StructuredData id="ld-software-application" data={softwareApplicationLd} />
       <StructuredData id="ld-faq-page" data={faqPageLd(FAQ_ITEMS)} />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <Hero />
         <SectorStrip />
         <StepsSection />

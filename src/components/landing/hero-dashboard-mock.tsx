@@ -20,48 +20,16 @@ export function HeroDashboardMock() {
       <div className="relative rounded-[22px] border border-border/60 bg-card/80 p-1.5 shadow-[var(--shadow-glow)] ring-1 ring-primary/[0.04] backdrop-blur">
         {/* Inner bezel */}
         <div className="overflow-hidden rounded-[15px] border border-border/80 bg-background">
-          {/* Browser toolbar */}
-          <div className="flex items-center gap-2 border-b border-border/70 bg-muted/40 px-3.5 py-2.5">
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.78_0.15_25)]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.82_0.14_85)]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.78_0.14_145)]" />
-            </div>
-            <div className="ml-4 flex flex-1 items-center gap-1.5 rounded-md border border-border/60 bg-background px-2.5 py-1 text-[11px] text-muted-foreground">
-              <svg
-                viewBox="0 0 24 24"
-                className="h-3 w-3"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <rect x="3" y="11" width="18" height="11" rx="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-              <span className="font-mono">spurig.com</span>
-              <span className="text-muted-foreground/60">/dashboard</span>
-            </div>
-            <div className="hidden items-center gap-1 sm:flex">
-              <div className="h-5 w-5 rounded bg-muted" />
-            </div>
-          </div>
-
-          {/* Top bar inside app — breadcrumbs + filters */}
+          {/* Minimal app header */}
           <div className="flex items-center justify-between border-b border-border/60 bg-card/30 px-5 py-3">
             <div className="flex items-center gap-2 text-[12px]">
-              <span className="text-muted-foreground">Kampagnen</span>
+              <span className="font-heading font-semibold text-foreground">Kampagnen</span>
               <span className="text-muted-foreground/40">/</span>
-              <span className="font-medium text-foreground">Übersicht</span>
+              <span className="text-muted-foreground">Übersicht</span>
             </div>
             <div className="hidden items-center gap-1.5 sm:flex">
               <span className="rounded-md border border-border/80 bg-background px-2 py-1 text-[11px] font-medium">
                 Letzte 14 Tage
-              </span>
-              <span className="rounded-md border border-border/80 bg-background px-2 py-1 text-[11px] text-muted-foreground">
-                Alle Kampagnen
               </span>
             </div>
           </div>
@@ -225,31 +193,6 @@ export function HeroDashboardMock() {
         </div>
       </div>
 
-      {/* Subtle floating chips around the mock (desktop only) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-6 top-12 hidden rounded-xl border border-border/70 bg-card/90 px-3 py-2 text-[11px] shadow-md backdrop-blur lg:block"
-      >
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
-          <span className="text-muted-foreground">Neuer Scan</span>
-          <span className="font-medium">Köln · iPhone</span>
-        </div>
-      </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-4 bottom-16 hidden rounded-xl border border-border/70 bg-card/90 px-3 py-2 text-[11px] shadow-md backdrop-blur lg:block"
-      >
-        <div className="flex items-center gap-2">
-          <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-primary">
-            DSGVO
-          </span>
-          <span className="text-muted-foreground">0 Cookies gesetzt</span>
-        </div>
-      </div>
     </div>
   );
 }

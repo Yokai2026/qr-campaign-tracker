@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Check, ArrowRight } from 'lucide-react';
 import { BillingToggle } from '@/components/landing/billing-toggle';
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { SectionHeading } from '@/components/ui/section-heading';
 
 const INCLUDED = [
@@ -19,14 +18,16 @@ export function PricingTeaser() {
   return (
     <section className="relative overflow-hidden border-t border-border bg-muted/30 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow tone="primary">Ein Plan, alles drin</SectionEyebrow>
+        <div className="max-w-2xl">
+          <p className="font-mono text-[12px] font-medium uppercase tracking-[0.08em] text-accent-warm">
+            Ein Plan, alles drin
+          </p>
           <SectionHeading
             as="h2"
-            className="mt-4"
-            accent={<>keine Tier-Tricks.</>}
+            align="left"
+            className="mt-3"
           >
-            Faire Preise,
+            Faire Preise, keine Tier-Tricks.
           </SectionHeading>
           <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground sm:text-[16px]">
             Unbegrenzte Kampagnen, QR-Codes und Scans. Keine
@@ -53,7 +54,7 @@ export function PricingTeaser() {
               <ul className="grid grid-cols-1 gap-y-2.5 sm:grid-cols-2 sm:gap-x-6">
                 {INCLUDED.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-[13.5px]">
-                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-accent-warm/15 text-accent-warm">
                       <Check className="h-2.5 w-2.5" strokeWidth={3} />
                     </span>
                     <span className="leading-snug">{f}</span>
