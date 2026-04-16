@@ -32,15 +32,17 @@ export function FounderBlock() {
             <div className="flex items-center gap-3">
               <div
                 aria-hidden
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-brand to-warm text-[15px] font-semibold text-white shadow-[var(--shadow-md)]"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-brand to-warm text-[14px] font-semibold tracking-tight text-white shadow-[var(--shadow-md)]"
               >
-                D
+                DG
               </div>
               <div>
-                <div className="text-[14px] font-semibold text-foreground">David — Gründer</div>
+                <div className="text-[14px] font-semibold text-foreground">
+                  David da Silva Gornik
+                </div>
                 <div className="inline-flex items-center gap-1 text-[12px] text-muted-foreground">
                   <MapPin className="h-3 w-3" />
-                  Aus Deutschland · Server in Frankfurt
+                  Gründer · Server in Frankfurt
                 </div>
               </div>
             </div>
