@@ -79,6 +79,7 @@ export function SiteHeader() {
           </Button>
           <Button
             size="sm"
+            variant="brand"
             render={<Link href="/signup" />}
             className="group"
           >

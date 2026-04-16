@@ -6,25 +6,22 @@ const STEPS = [
     number: '01',
     icon: PencilRuler,
     title: 'Kampagne anlegen',
-    description:
-      'Name, Zielseite, Start- und Enddatum. In 30 Sekunden fertig — kein Onboarding, kein Setup-Assistent.',
-    detail: 'spurig.com/kampagnen/neu',
+    description: 'Name, Ziel-URL, Datum. In 30 Sekunden fertig.',
+    detail: '~30 Sekunden',
   },
   {
     number: '02',
     icon: Printer,
     title: 'QR-Codes drucken',
-    description:
-      'Pro Platzierung ein eindeutiger Code. SVG für Plakat und Flyer, PNG für Digital und Social.',
-    detail: '12 Codes · 4 Varianten',
+    description: 'Eindeutiger Code pro Platzierung. SVG fürs Plakat, PNG fürs Digitale.',
+    detail: 'SVG · PNG',
   },
   {
     number: '03',
     icon: LineChart,
-    title: 'Daten auswerten',
-    description:
-      'Scans laufen live ins Dashboard. Filter nach Kampagne, Ort, Gerät und Zeitraum — Export jederzeit.',
-    detail: 'Live · letzter Scan vor 12 s',
+    title: 'Live auswerten',
+    description: 'Scans laufen live ins Dashboard. Filter, Vergleiche, Export.',
+    detail: 'Realtime',
   },
 ];
 
@@ -32,7 +29,7 @@ export function StepsSection() {
   return (
     <section
       id="so-funktioniert"
-      className="relative overflow-hidden border-y border-border bg-subtle py-20 sm:py-28"
+      className="relative overflow-hidden border-y border-border bg-subtle py-24 sm:py-32"
     >
       <div
         aria-hidden
@@ -67,9 +64,8 @@ export function StepsSection() {
           >
             Vom Plakat zur Auswertung
           </SectionHeading>
-          <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground sm:text-[16px]">
-            Kein Wochenende für Excel. Kein Agentur-Ticket. Du klickst dich
-            durch, druckst, hängst auf — und siehst live, was ankommt.
+          <p className="mt-5 text-[16px] leading-relaxed text-muted-foreground sm:text-[17px]">
+            Drei Schritte. Kein Wochenende für Excel.
           </p>
         </div>
 

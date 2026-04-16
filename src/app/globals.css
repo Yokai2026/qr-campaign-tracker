@@ -46,6 +46,8 @@
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-muted: var(--brand-muted);
+  --color-warm: var(--warm);
+  --color-warm-foreground: var(--warm-foreground);
 
   --radius-sm: calc(var(--radius) * 0.625);
   --radius-md: calc(var(--radius) * 0.8125);
@@ -57,52 +59,56 @@
 }
 
 :root {
-  /* ── Neutrals — Zinc palette, near-neutral with whisper of cool */
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* ── Neutrals — slight cream undertone, feels human not sterile */
+  --background: oklch(0.992 0.004 80);
+  --foreground: oklch(0.155 0.005 80);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.155 0.005 80);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.155 0.005 80);
 
-  /* ── Subtle — alternating section bands */
-  --subtle: oklch(0.975 0 0);
+  /* ── Subtle — alternating section bands, warm whisper */
+  --subtle: oklch(0.975 0.006 80);
 
   /* ── Ink — deep near-black for inverted surfaces */
-  --ink: oklch(0.145 0 0);
+  --ink: oklch(0.155 0.005 80);
   --ink-foreground: oklch(0.985 0 0);
 
-  /* ── Primary — near-black, monochrome */
-  --primary: oklch(0.205 0 0);
+  /* ── Primary — near-black with warm soul */
+  --primary: oklch(0.21 0.005 80);
   --primary-foreground: oklch(0.985 0 0);
 
-  /* ── Secondary & Muted — zinc-50/100 territory */
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.50 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* ── Secondary & Muted — warm zinc */
+  --secondary: oklch(0.965 0.006 80);
+  --secondary-foreground: oklch(0.21 0.005 80);
+  --muted: oklch(0.965 0.006 80);
+  --muted-foreground: oklch(0.50 0.008 80);
+  --accent: oklch(0.965 0.006 80);
+  --accent-foreground: oklch(0.21 0.005 80);
 
   /* ── Semantic */
   --destructive: oklch(0.58 0.22 28);
 
-  /* ── Borders & Input — zinc-200 */
-  --border: oklch(0.92 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.66 0.115 195);
+  /* ── Borders & Input */
+  --border: oklch(0.918 0.006 80);
+  --input: oklch(0.918 0.006 80);
+  --ring: oklch(0.66 0.13 185);
 
-  /* ── Brand — Teal #0D9488 (Tailwind teal-600). Says: data, growth, tracking. */
-  --brand: oklch(0.66 0.115 195);
+  /* ── Brand — lebendiger Teal/Jade (warmer als pure Cyan) */
+  --brand: oklch(0.66 0.13 185);
   --brand-foreground: oklch(0.99 0 0);
-  --brand-muted: oklch(0.96 0.025 195);
+  --brand-muted: oklch(0.955 0.03 185);
 
-  /* ── Charts — Teal + neutrals + one accent for contrast */
-  --chart-1: oklch(0.66 0.115 195);  /* brand teal */
-  --chart-2: oklch(0.205 0 0);       /* near-black */
-  --chart-3: oklch(0.50 0 0);        /* zinc-500 */
-  --chart-4: oklch(0.78 0.085 195);  /* light teal */
-  --chart-5: oklch(0.65 0 0);        /* zinc-400 */
+  /* ── Warm — Coral, sehr sparsam für "Empfohlen" / Highlights */
+  --warm: oklch(0.74 0.13 38);
+  --warm-foreground: oklch(0.20 0.05 38);
+
+  /* ── Charts — Brand + Warm-Coral + Neutrals */
+  --chart-1: oklch(0.66 0.13 185);   /* brand teal */
+  --chart-2: oklch(0.74 0.13 38);    /* warm coral */
+  --chart-3: oklch(0.21 0.005 80);   /* near-black */
+  --chart-4: oklch(0.78 0.10 185);   /* light teal */
+  --chart-5: oklch(0.62 0.008 80);   /* warm zinc */
 
   /* ── Layout */
   --radius: 0.625rem;
@@ -115,14 +121,14 @@
   --sidebar-accent: oklch(0.21 0 0);
   --sidebar-accent-foreground: oklch(0.93 0 0);
   --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.66 0.115 195);
+  --sidebar-ring: oklch(0.66 0.13 185);
 
-  /* ── Elevation — neutral shadows */
-  --shadow-xs: 0 1px 2px 0 oklch(0 0 0 / 0.04);
-  --shadow-sm: 0 1px 3px 0 oklch(0 0 0 / 0.06), 0 1px 2px -1px oklch(0 0 0 / 0.04);
-  --shadow-md: 0 6px 16px -6px oklch(0 0 0 / 0.10), 0 2px 4px -2px oklch(0 0 0 / 0.05);
-  --shadow-lg: 0 18px 48px -12px oklch(0 0 0 / 0.18), 0 4px 10px -4px oklch(0 0 0 / 0.08);
-  --shadow-glow: 0 0 0 1px oklch(0 0 0 / 0.06), 0 24px 60px -20px oklch(0 0 0 / 0.18);
+  /* ── Elevation — warm-tinted shadows for depth without harshness */
+  --shadow-xs: 0 1px 2px 0 oklch(0.20 0.02 80 / 0.05);
+  --shadow-sm: 0 1px 3px 0 oklch(0.20 0.02 80 / 0.07), 0 1px 2px -1px oklch(0.20 0.02 80 / 0.05);
+  --shadow-md: 0 6px 16px -6px oklch(0.20 0.02 80 / 0.12), 0 2px 4px -2px oklch(0.20 0.02 80 / 0.06);
+  --shadow-lg: 0 18px 48px -12px oklch(0.20 0.02 80 / 0.20), 0 4px 10px -4px oklch(0.20 0.02 80 / 0.10);
+  --shadow-glow: 0 0 0 1px oklch(0.20 0.02 80 / 0.07), 0 24px 60px -20px oklch(0.20 0.02 80 / 0.20);
 }
 
 .dark {
@@ -146,15 +152,17 @@
   --destructive: oklch(0.70 0.19 22);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.72 0.10 195);
-  --brand: oklch(0.72 0.10 195);
+  --ring: oklch(0.72 0.115 185);
+  --brand: oklch(0.72 0.115 185);
   --brand-foreground: oklch(0.10 0 0);
-  --brand-muted: oklch(0.30 0.04 195);
-  --chart-1: oklch(0.72 0.10 195);
-  --chart-2: oklch(0.985 0 0);
-  --chart-3: oklch(0.65 0 0);
-  --chart-4: oklch(0.55 0.07 195);
-  --chart-5: oklch(0.45 0 0);
+  --brand-muted: oklch(0.30 0.04 185);
+  --warm: oklch(0.78 0.115 38);
+  --warm-foreground: oklch(0.18 0.04 38);
+  --chart-1: oklch(0.72 0.115 185);
+  --chart-2: oklch(0.78 0.115 38);
+  --chart-3: oklch(0.985 0 0);
+  --chart-4: oklch(0.55 0.085 185);
+  --chart-5: oklch(0.55 0 0);
   --sidebar: oklch(0.10 0 0);
   --sidebar-foreground: oklch(0.70 0 0);
   --sidebar-primary: oklch(0.93 0 0);

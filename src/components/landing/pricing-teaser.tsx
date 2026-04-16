@@ -15,14 +15,13 @@ const INCLUDED = [
 
 export function PricingTeaser() {
   return (
-    <section className="relative overflow-hidden border-t border-border bg-subtle py-24 sm:py-32">
+    <section className="relative overflow-hidden border-t border-border bg-subtle py-28 sm:py-36">
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-        <h2 className="text-balance text-[34px] font-semibold leading-[1.1] tracking-[-0.025em] sm:text-[44px]">
+        <h2 className="text-balance text-[36px] font-semibold leading-[1.08] tracking-[-0.025em] sm:text-[48px]">
           Ein Preis. Alles drin.
         </h2>
-        <p className="mx-auto mt-5 max-w-xl text-pretty text-[15px] leading-relaxed text-muted-foreground sm:text-[16.5px]">
-          Unbegrenzte Kampagnen, QR-Codes und Scans. Keine Tier-Tricks,
-          keine Feature-Paywall, keine überraschende Rechnung.
+        <p className="mx-auto mt-5 max-w-md text-pretty text-[16px] leading-relaxed text-muted-foreground sm:text-[17px]">
+          Unbegrenzt Kampagnen, QR-Codes, Scans. Keine Tier-Tricks.
         </p>
       </div>
 

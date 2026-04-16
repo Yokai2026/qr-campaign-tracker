@@ -11,8 +11,8 @@ type Billing = 'monthly' | 'yearly';
 type Props = {
   /** CTA-Ziel (Signup oder Pricing-Page). Plan wird als Query-Param angehängt. */
   href?: string;
-  /** Hervorgehobener CTA (voll ausgefüllt) oder sekundär (outline). */
-  ctaVariant?: 'default' | 'outline';
+  /** Hervorgehobener CTA (Brand-Teal, default) oder sekundär (outline). */
+  ctaVariant?: 'default' | 'brand' | 'outline';
   /** Optional: Mini-Feature-Liste unterhalb der Preis-Anzeige. */
   includedFeatures?: string[];
 };
@@ -36,7 +36,7 @@ const PLANS: Record<Billing, {
 
 const fmt = (n: number) => n.toFixed(2).replace('.', ',');
 
-export function BillingToggle({ href = '/signup', ctaVariant = 'default', includedFeatures }: Props) {
+export function BillingToggle({ href = '/signup', ctaVariant = 'brand', includedFeatures }: Props) {
   const [billing, setBilling] = useState<Billing>('yearly');
   const plan = PLANS[billing];
 
