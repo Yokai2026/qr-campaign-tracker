@@ -94,15 +94,15 @@ export function Sidebar() {
         href={item.href}
         onClick={() => setMobileOpen(false)}
         className={cn(
-          'group flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] transition-colors duration-75',
+          'group flex items-center gap-2.5 rounded-[6px] px-2 py-[7px] text-[13px] transition-colors duration-100',
           isActive
-            ? 'bg-white/[0.08] text-white font-medium border-l-2 border-white/70 pl-[6px]'
-            : 'text-white/60 hover:bg-white/[0.06] hover:text-white/85'
+            ? 'bg-white/[0.07] text-white font-medium border-l-2 border-brand pl-[6px] shadow-[inset_1px_0_0_oklch(0.66_0.13_185/0.25)]'
+            : 'text-white/60 hover:bg-white/[0.05] hover:text-white/90'
         )}
       >
         <item.icon className={cn(
-          'h-[15px] w-[15px] shrink-0',
-          isActive ? 'text-white/90' : 'text-white/50'
+          'h-[15px] w-[15px] shrink-0 transition-colors',
+          isActive ? 'text-brand' : 'text-white/45 group-hover:text-white/70'
         )} />
         <span>{item.name}</span>
       </Link>
@@ -116,13 +116,16 @@ export function Sidebar() {
         href={item.href}
         onClick={() => setMobileOpen(false)}
         className={cn(
-          'group flex items-center gap-2.5 rounded-[5px] px-2 py-[6px] text-[13px] transition-colors duration-75',
+          'group flex items-center gap-2.5 rounded-[6px] px-2 py-[7px] text-[13px] transition-colors duration-100',
           isActive
-            ? 'bg-white/[0.08] text-white font-medium'
-            : 'text-white/60 hover:bg-white/[0.06] hover:text-white/85'
+            ? 'bg-white/[0.07] text-white font-medium'
+            : 'text-white/60 hover:bg-white/[0.05] hover:text-white/90'
         )}
       >
-        <item.icon className="h-[15px] w-[15px] shrink-0 text-white/25" />
+        <item.icon className={cn(
+          'h-[15px] w-[15px] shrink-0 transition-colors',
+          isActive ? 'text-brand' : 'text-white/30 group-hover:text-white/50'
+        )} />
         {item.name}
       </Link>
     );
@@ -136,18 +139,18 @@ export function Sidebar() {
   };
 
   const brandBlock = (
-    <div className="flex h-12 items-center gap-2 px-3">
-      <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-white/10">
-        <QrCode className="h-3 w-3 text-white/70" />
+    <div className="flex h-14 items-center gap-2.5 px-3 border-b border-white/[0.06]">
+      <div className="flex h-[26px] w-[26px] items-center justify-center rounded-[6px] bg-brand text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.2)]">
+        <QrCode className="h-3.5 w-3.5" />
       </div>
-      <span className="text-[13px] font-semibold tracking-tight text-white/90">
+      <span className="text-[14px] font-semibold tracking-tight text-white/95">
         Spurig
       </span>
       {tier && (
         <span className={cn(
-          'ml-auto rounded px-1.5 py-0.5 text-[10px] font-medium',
+          'ml-auto rounded-full px-2 py-0.5 text-[10px] font-medium',
           tier === 'paid' ? 'bg-emerald-500/20 text-emerald-300' :
-          tier === 'trial' ? 'bg-amber-500/20 text-amber-300' :
+          tier === 'trial' ? 'bg-brand/20 text-brand' :
           'bg-white/10 text-white/40'
         )}>
           {tierLabel[tier] ?? tier}
@@ -228,8 +231,8 @@ export function Sidebar() {
           {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </Button>
         <div className="ml-2 flex items-center gap-2">
-          <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[4px] bg-neutral-900">
-            <QrCode className="h-3 w-3 text-white/70" />
+          <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[5px] bg-brand text-brand-foreground">
+            <QrCode className="h-3 w-3" />
           </div>
           <span className="text-[13px] font-semibold">Spurig</span>
         </div>
@@ -247,7 +250,7 @@ export function Sidebar() {
       <aside
         ref={mobileSidebarRef}
         className={cn(
-          'fixed top-12 bottom-0 left-0 z-30 flex w-[220px] flex-col bg-[#111] transition-transform duration-200 ease-out lg:hidden',
+          'fixed top-12 bottom-0 left-0 z-30 flex w-[220px] flex-col bg-sidebar transition-transform duration-200 ease-out lg:hidden',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -255,7 +258,7 @@ export function Sidebar() {
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-[220px] lg:flex-col lg:bg-[#111] lg:border-r lg:border-white/[0.06]">
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-[220px] lg:flex-col lg:bg-sidebar lg:border-r lg:border-white/[0.06]">
         {brandBlock}
         {navBody}
       </aside>
