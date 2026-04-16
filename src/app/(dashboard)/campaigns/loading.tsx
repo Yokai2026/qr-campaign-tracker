@@ -8,7 +8,7 @@ export default function CampaignsLoading() {
         </div>
         <div className="h-8 w-36 rounded-md bg-muted" />
       </div>
-      <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex gap-6 border-b border-border bg-muted/40 px-4 py-3">
           {[28, 20, 16, 16, 16, 12, 20].map((w, i) => (
             <div key={i} className={`h-3 rounded bg-muted`} style={{ width: `${w * 4}px` }} />

@@ -14,7 +14,7 @@ export default function LinksLoading() {
         <div className="h-7 w-36 rounded-lg bg-muted/60" />
       </div>
       {/* Table skeleton */}
-      <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex gap-6 border-b border-border bg-muted/40 px-4 py-3">
           {[24, 16, 40, 20, 16, 12, 14, 16].map((w, i) => (
             <div key={i} className="h-3 rounded bg-muted" style={{ width: `${w * 4}px` }} />

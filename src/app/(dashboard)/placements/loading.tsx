@@ -12,7 +12,7 @@ export default function PlacementsLoading() {
         <div className="h-8 w-40 rounded-md bg-muted/60" />
         <div className="h-8 w-32 rounded-md bg-muted/60" />
       </div>
-      <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex gap-6 border-b border-border bg-muted/40 px-4 py-3">
           {[20, 14, 24, 20, 12, 16, 20, 8].map((w, i) => (
             <div key={i} className="h-3 rounded bg-muted" style={{ width: `${w * 4}px` }} />
