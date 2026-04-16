@@ -105,31 +105,43 @@ export default function SignupPage() {
 
   if (trialEndsAt) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="w-full max-w-sm animate-in-page">
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 50% 50% at 50% 30%, oklch(0.66 0.13 185 / 0.10), transparent 65%)',
+          }}
+        />
+        <div className="relative w-full max-w-sm animate-in-page">
           <Card className="border border-border shadow-[var(--shadow-lg)]">
             <CardHeader className="text-center pb-2">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 shadow-[var(--shadow-sm)]">
                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
               </div>
-              <CardTitle className="text-xl font-semibold tracking-tight">Willkommen bei Spurig!</CardTitle>
+              <CardTitle className="text-xl font-semibold tracking-tight">
+                Willkommen bei Spurig!
+              </CardTitle>
               <CardDescription className="text-[13px]">
-                Dein Konto wurde erstellt.
+                Dein Konto ist startklar.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900 dark:bg-blue-950/30">
+              <div className="rounded-2xl border border-brand/20 bg-brand/[0.04] p-4">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-blue-600" />
-                  <span className="text-[13px] font-medium">14 Tage kostenlos testen</span>
+                  <Sparkles className="h-4 w-4 text-brand" />
+                  <span className="text-[13px] font-semibold">14 Tage kostenlos</span>
                 </div>
-                <p className="mt-2 text-[12px] text-muted-foreground">
+                <p className="mt-2 text-[12px] leading-relaxed text-muted-foreground">
                   Dein Testzeitraum endet am{' '}
                   <span className="font-semibold text-foreground">{formatDateDE(trialEndsAt)}</span>.
                   Bis dahin kannst du alle Funktionen unbegrenzt nutzen.
                 </p>
               </div>
               <Button
+                variant="brand"
+                size="lg"
                 className="mt-4 w-full"
                 onClick={() => {
                   router.push('/dashboard');
@@ -149,31 +161,42 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm animate-in-page">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-8">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 50% 50% at 50% 25%, oklch(0.66 0.13 185 / 0.08), transparent 65%), radial-gradient(ellipse 40% 40% at 50% 85%, oklch(0.74 0.13 38 / 0.05), transparent 70%)',
+        }}
+      />
+
+      <div className="relative w-full max-w-sm animate-in-page">
         <Card className="border border-border shadow-[var(--shadow-lg)]">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-[var(--shadow-sm)]">
-              <QrCode className="h-5 w-5 text-primary-foreground" />
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.18),var(--shadow-md)]">
+              <QrCode className="h-5 w-5" />
             </div>
-            <CardTitle className="text-xl font-semibold tracking-tight">Konto erstellen</CardTitle>
+            <CardTitle className="text-xl font-semibold tracking-tight">
+              Konto erstellen
+            </CardTitle>
             <CardDescription className="text-[13px]">
-              Registriere dich, um Kampagnen zu verwalten
+              14 Tage kostenlos. Keine Kreditkarte.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-5 rounded-md border border-blue-200 bg-blue-50/60 p-3 dark:border-blue-900 dark:bg-blue-950/30">
+            <div className="mb-5 rounded-2xl border border-brand/20 bg-brand/[0.04] p-3.5">
               <div className="flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-                <span className="text-[12px] font-semibold text-blue-900 dark:text-blue-300">
+                <Sparkles className="h-3.5 w-3.5 text-brand" />
+                <span className="text-[12px] font-semibold text-foreground">
                   14 Tage kostenlos testen
                 </span>
               </div>
-              <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                Kein Zahlungsmittel erforderlich. Danach Einführungspreis:{' '}
+              <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
+                Danach Einführungspreis{' '}
                 <span className="line-through">12,99 €/Mo</span>{' '}
                 <strong className="text-foreground">5,99 €/Mo</strong> (oder{' '}
-                <strong className="text-foreground">4,99 €/Mo</strong> im Jahresabo).
+                <strong className="text-foreground">4,99 €/Mo</strong> jährlich).
                 Kein Auto-Upgrade — du entscheidest selbst.
               </p>
             </div>
@@ -191,7 +214,7 @@ export default function SignupPage() {
                   placeholder="mein_name"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="h-10 text-[13px]"
+                  className="h-11 text-[14px]"
                   required
                 />
               </div>
@@ -203,7 +226,7 @@ export default function SignupPage() {
                   placeholder="name@beispiel.de"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-10 text-[13px]"
+                  className="h-11 text-[14px]"
                   required
                 />
               </div>
@@ -215,33 +238,33 @@ export default function SignupPage() {
                   placeholder="Mindestens 10 Zeichen"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 text-[13px]"
+                  className="h-11 text-[14px]"
                   minLength={10}
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" variant="brand" size="lg" className="w-full" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                    Wird erstellt...
+                    Wird erstellt…
                   </>
                 ) : (
-                  'Konto erstellen'
+                  'Kostenlos starten'
                 )}
               </Button>
             </form>
             <p className="mt-5 text-center text-[13px] text-muted-foreground">
               Bereits ein Konto?{' '}
-              <Link href="/login" className="font-medium text-primary hover:underline">
+              <Link href="/login" className="font-medium text-foreground transition-colors hover:text-brand">
                 Anmelden
               </Link>
             </p>
           </CardContent>
         </Card>
 
-        <p className="mt-4 text-center text-[11px] text-muted-foreground/50">
-          Spurig &middot; Multi-Channel Kampagnen-Tracking
+        <p className="mt-4 text-center text-[11px] text-muted-foreground/60">
+          <Link href="/" className="hover:text-foreground transition-colors">← Zurück zur Startseite</Link>
         </p>
       </div>
     </div>

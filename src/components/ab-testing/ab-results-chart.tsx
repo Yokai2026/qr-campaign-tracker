@@ -140,7 +140,7 @@ export function AbResultsChart({ variants, qrCodeId, shortLinkId }: Props) {
                 <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
               ))}
             </Bar>
-            <Bar dataKey="Besucher" radius={[0, 3, 3, 0]} fill="oklch(0.65 0.08 230)" />
+            <Bar dataKey="Besucher" radius={[0, 3, 3, 0]} fill="oklch(0.50 0.008 80)" />
           </BarChart>
         </ResponsiveContainer>
       </ChartCard>

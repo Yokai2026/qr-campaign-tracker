@@ -52,16 +52,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm animate-in-page">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
+      {/* Soft brand + warm glow for premium feel */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 50% 50% at 50% 30%, oklch(0.66 0.13 185 / 0.08), transparent 65%), radial-gradient(ellipse 40% 40% at 50% 80%, oklch(0.74 0.13 38 / 0.05), transparent 70%)',
+        }}
+      />
+
+      <div className="relative w-full max-w-sm animate-in-page">
         <Card className="border border-border shadow-[var(--shadow-lg)]">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-[var(--shadow-sm)]">
-              <QrCode className="h-5 w-5 text-primary-foreground" />
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.18),var(--shadow-md)]">
+              <QrCode className="h-5 w-5" />
             </div>
-            <CardTitle className="text-xl font-semibold tracking-tight">Spurig</CardTitle>
+            <CardTitle className="text-xl font-semibold tracking-tight">
+              Willkommen zurück
+            </CardTitle>
             <CardDescription className="text-[13px]">
-              Melde dich an, um deine Kampagnen zu verwalten
+              Melde dich an, um deine Kampagnen zu verwalten.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -79,7 +91,7 @@ export default function LoginPage() {
                   placeholder="name@beispiel.de oder benutzername"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  className="h-10 text-[13px]"
+                  className="h-11 text-[14px]"
                   required
                 />
               </div>
@@ -90,15 +102,15 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 text-[13px]"
+                  className="h-11 text-[14px]"
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" variant="brand" size="lg" className="w-full" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                    Wird angemeldet...
+                    Wird angemeldet…
                   </>
                 ) : (
                   'Anmelden'
@@ -107,15 +119,15 @@ export default function LoginPage() {
             </form>
             <p className="mt-5 text-center text-[13px] text-muted-foreground">
               Noch kein Konto?{' '}
-              <Link href="/signup" className="font-medium text-primary hover:underline">
-                Registrieren
+              <Link href="/signup" className="font-medium text-foreground transition-colors hover:text-brand">
+                14 Tage kostenlos testen
               </Link>
             </p>
           </CardContent>
         </Card>
 
-        <p className="mt-5 text-center text-[11px] text-muted-foreground/50">
-          Spurig &middot; Multi-Channel Kampagnen-Tracking
+        <p className="mt-5 text-center text-[11px] text-muted-foreground/60">
+          <Link href="/" className="hover:text-foreground transition-colors">← Zurück zur Startseite</Link>
         </p>
       </div>
     </div>

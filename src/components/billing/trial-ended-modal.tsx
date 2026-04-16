@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { AlertCircle, ArrowRight, Check, Download, LogOut, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 /**
  * Hard paywall shown when a user's trial has expired and no active subscription
@@ -46,11 +47,11 @@ export function TrialEndedModal() {
       aria-labelledby="trial-ended-title"
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
     >
-      <div className="w-full max-w-lg overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-lg)]">
         {/* Header */}
         <div className="flex flex-col items-center gap-3 px-6 pt-7 pb-5 text-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-500/15">
-            <AlertCircle className="h-5 w-5 text-amber-600" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-warm/15">
+            <AlertCircle className="h-5 w-5 text-warm-foreground" />
           </div>
           <div className="space-y-1">
             <h2 id="trial-ended-title" className="text-[17px] font-semibold tracking-tight">
@@ -70,14 +71,14 @@ export function TrialEndedModal() {
             role="radio"
             aria-checked={selectedPlan === 'yearly'}
             onClick={() => setSelectedPlan('yearly')}
-            className={`group relative block w-full rounded-lg border-2 p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            className={`group relative block w-full rounded-2xl border-2 p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
               selectedPlan === 'yearly'
-                ? 'border-primary bg-primary/[0.06]'
-                : 'border-border bg-card hover:border-primary/40 hover:bg-muted/30'
+                ? 'border-brand bg-brand/[0.06]'
+                : 'border-border bg-card hover:border-brand/40 hover:bg-muted/30'
             }`}
           >
             <div className="absolute -top-2.5 left-4 flex items-center gap-1.5">
-              <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
+              <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-foreground shadow-sm">
                 Beliebt · Spare 62 %
               </span>
             </div>
@@ -87,8 +88,8 @@ export function TrialEndedModal() {
                   <span className="text-[14px] font-semibold">Jährlich</span>
                   <span className="text-[11px] text-muted-foreground">im Voraus</span>
                 </div>
-                <div className="mt-1 flex items-baseline gap-1.5">
-                  <span className="text-[22px] font-bold tracking-tight">4,99 €</span>
+                <div className="mt-1 flex items-baseline gap-1.5 tabular-nums">
+                  <span className="text-[24px] font-semibold tracking-tight">4,99 €</span>
                   <span className="text-[12px] text-muted-foreground">/ Monat</span>
                 </div>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
@@ -98,8 +99,8 @@ export function TrialEndedModal() {
               <div
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all ${
                   selectedPlan === 'yearly'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'border border-border text-muted-foreground group-hover:border-primary/40 group-hover:text-primary'
+                    ? 'bg-brand text-brand-foreground'
+                    : 'border border-border text-muted-foreground group-hover:border-brand/40 group-hover:text-brand'
                 }`}
               >
                 <Check className="h-4 w-4" strokeWidth={selectedPlan === 'yearly' ? 3 : 2} />
@@ -113,10 +114,10 @@ export function TrialEndedModal() {
             role="radio"
             aria-checked={selectedPlan === 'monthly'}
             onClick={() => setSelectedPlan('monthly')}
-            className={`group block w-full rounded-lg border-2 p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            className={`group block w-full rounded-2xl border-2 p-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
               selectedPlan === 'monthly'
-                ? 'border-primary bg-primary/[0.06]'
-                : 'border-border bg-card hover:border-primary/40 hover:bg-muted/30'
+                ? 'border-brand bg-brand/[0.06]'
+                : 'border-border bg-card hover:border-brand/40 hover:bg-muted/30'
             }`}
           >
             <div className="flex items-start justify-between gap-4">
@@ -125,8 +126,8 @@ export function TrialEndedModal() {
                   <span className="text-[14px] font-semibold">Monatlich</span>
                   <span className="text-[11px] text-muted-foreground">flexibel</span>
                 </div>
-                <div className="mt-1 flex items-baseline gap-1.5">
-                  <span className="text-[22px] font-bold tracking-tight">5,99 €</span>
+                <div className="mt-1 flex items-baseline gap-1.5 tabular-nums">
+                  <span className="text-[24px] font-semibold tracking-tight">5,99 €</span>
                   <span className="text-[12px] text-muted-foreground">/ Monat</span>
                 </div>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
@@ -136,8 +137,8 @@ export function TrialEndedModal() {
               <div
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all ${
                   selectedPlan === 'monthly'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'border border-border text-muted-foreground group-hover:border-primary/40 group-hover:text-primary'
+                    ? 'bg-brand text-brand-foreground'
+                    : 'border border-border text-muted-foreground group-hover:border-brand/40 group-hover:text-brand'
                 }`}
               >
                 <Check className="h-4 w-4" strokeWidth={selectedPlan === 'monthly' ? 3 : 2} />
@@ -148,11 +149,12 @@ export function TrialEndedModal() {
 
         {/* Continue CTA */}
         <div className="px-6 pb-5">
-          <button
-            type="button"
+          <Button
+            variant="brand"
+            size="lg"
             onClick={handleContinue}
             disabled={isRedirecting}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-[14px] font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full"
           >
             {isRedirecting ? (
               <>
@@ -165,7 +167,7 @@ export function TrialEndedModal() {
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Footer */}

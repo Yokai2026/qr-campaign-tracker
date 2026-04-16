@@ -60,16 +60,17 @@ type FormData = {
   campaign_id: string;
 };
 
+// Brand-aligned palette: teal-led, then warm coral, neutrals, and complementary accents
 const DEFAULT_COLORS = [
-  '#6d28d9', '#2563eb', '#0891b2', '#059669',
-  '#ca8a04', '#ea580c', '#dc2626', '#db2777',
+  '#0D9488', '#0F766E', '#475569', '#1E293B',
+  '#D97757', '#CA8A04', '#059669', '#DC2626',
 ];
 
 const emptyForm: FormData = {
   name: '',
   slug: '',
   description: '',
-  color: '#6d28d9',
+  color: '#0D9488',
   campaign_id: '',
 };
 

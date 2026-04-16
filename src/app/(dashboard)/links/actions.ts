@@ -213,7 +213,7 @@ export async function createLinkGroup(input: Record<string, unknown>): Promise<{
       name: data.name,
       slug: data.slug,
       description: data.description || null,
-      color: data.color || '#6d28d9',
+      color: data.color || '#0D9488',
       campaign_id: data.campaign_id || null,
       created_by: user.id,
     })
@@ -245,7 +245,7 @@ export async function updateLinkGroup(
       name: data.name,
       slug: data.slug,
       description: data.description || null,
-      color: data.color || '#6d28d9',
+      color: data.color || '#0D9488',
       campaign_id: data.campaign_id || null,
       updated_at: new Date().toISOString(),
     })

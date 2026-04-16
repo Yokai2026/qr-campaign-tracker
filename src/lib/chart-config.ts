@@ -12,27 +12,27 @@ export const CHART_COLORS = {
 
 /**
  * Palette for pie/bar charts with multiple categories.
- * Neutral-first with semantic accents — no violet/brand-color dominance.
- * Order: near-black → mid-neutral → emerald → amber → rose → teal → indigo-grey → warm-grey.
+ * Brand-Teal first, then neutrals + warm accent for contrast.
+ * Order: brand-teal → near-black → warm-coral → mid-neutral → light-teal → muted-teal → warm-zinc → light-zinc.
  */
 export const CHART_PALETTE = [
-  'oklch(0.25 0 0)',
-  'oklch(0.55 0 0)',
-  'oklch(0.65 0.12 165)',
-  'oklch(0.70 0.12 70)',
-  'oklch(0.60 0.12 20)',
-  'oklch(0.60 0.10 200)',
-  'oklch(0.45 0 0)',
-  'oklch(0.75 0 0)',
+  'oklch(0.66 0.13 185)',  // brand teal
+  'oklch(0.21 0.005 80)',  // near-black
+  'oklch(0.74 0.13 38)',   // warm coral
+  'oklch(0.50 0.008 80)',  // mid neutral
+  'oklch(0.78 0.10 185)',  // light teal
+  'oklch(0.45 0.085 185)', // muted teal
+  'oklch(0.62 0.008 80)',  // warm zinc
+  'oklch(0.78 0.005 80)',  // light zinc
 ] as const;
 
-/** Named semantic colors for specific data series — neutral primary, semantic accents only */
+/** Named semantic colors for specific data series — brand teal primary, neutral secondaries */
 export const SERIES_COLORS = {
-  scans: 'oklch(0.25 0 0)',
-  clicks: 'oklch(0.65 0.12 165)',
-  forms: 'oklch(0.70 0.12 70)',
-  active: 'oklch(0.65 0.12 165)',
-  inactive: 'oklch(0.65 0 0)',
+  scans: 'oklch(0.66 0.13 185)',     // brand teal — primary metric
+  clicks: 'oklch(0.21 0.005 80)',    // near-black — comparison
+  forms: 'oklch(0.74 0.13 38)',      // warm coral — conversions
+  active: 'oklch(0.66 0.13 185)',    // brand teal
+  inactive: 'oklch(0.62 0.008 80)',  // warm zinc
 } as const;
 
 /** Shared axis/grid styling */
@@ -44,6 +44,6 @@ export const AXIS_STYLE = {
 
 export const GRID_STYLE = {
   strokeDasharray: '3 3',
-  stroke: 'oklch(0.90 0 0)',
-  strokeOpacity: 0.5,
+  stroke: 'oklch(0.918 0.006 80)',
+  strokeOpacity: 0.6,
 } as const;
