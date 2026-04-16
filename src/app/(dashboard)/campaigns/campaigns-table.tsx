@@ -26,7 +26,7 @@ const columns: ColumnDef<CampaignWithTagCount>[] = [
     cell: ({ row }) => (
       <Link
         href={`/campaigns/${row.original.id}`}
-        className="font-semibold text-foreground transition-colors hover:text-primary"
+        className="font-semibold text-foreground transition-colors hover:text-brand"
       >
         {row.original.name}
       </Link>

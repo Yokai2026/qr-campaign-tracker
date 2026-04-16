@@ -25,7 +25,7 @@ const columns: ColumnDef<Location>[] = [
       <div>
         <Link
           href={`/locations/${row.original.id}`}
-          className="font-semibold text-foreground transition-colors hover:text-primary"
+          className="font-semibold text-foreground transition-colors hover:text-brand"
         >
           {row.original.venue_name}
         </Link>

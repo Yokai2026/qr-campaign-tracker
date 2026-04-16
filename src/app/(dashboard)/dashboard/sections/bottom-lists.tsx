@@ -55,7 +55,7 @@ export async function BottomLists() {
       <LiveScanFeed />
 
       {/* Recent Campaigns */}
-      <div className="rounded-lg border border-border bg-card">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h3 className="text-[13px] font-medium">Aktuelle Kampagnen</h3>
           <Link href="/campaigns" className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -71,7 +71,7 @@ export async function BottomLists() {
                 className="group flex items-center justify-between px-4 py-3 transition-colors hover:bg-muted/30"
               >
                 <div className="min-w-0">
-                  <div className="text-[13px] font-medium group-hover:text-primary transition-colors truncate">{c.name as string}</div>
+                  <div className="text-[13px] font-medium group-hover:text-brand transition-colors truncate">{c.name as string}</div>
                   <div className="mt-0.5 text-[12px] text-muted-foreground font-mono">{c.slug as string}</div>
                 </div>
                 <StatusBadge
@@ -89,7 +89,7 @@ export async function BottomLists() {
       </div>
 
       {/* Top Placements */}
-      <div className="rounded-lg border border-border bg-card">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h3 className="text-[13px] font-medium">Top-Platzierungen</h3>
           <Link href="/placements" className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -104,11 +104,11 @@ export async function BottomLists() {
                 href={`/placements/${pid}`}
                 className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded text-[12px] font-medium text-muted-foreground bg-muted">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md text-[12px] font-semibold text-muted-foreground bg-muted">
                   {index + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-medium truncate group-hover:text-primary transition-colors">{info.name}</div>
+                  <div className="text-[13px] font-medium truncate group-hover:text-brand transition-colors">{info.name}</div>
                   <div className="mt-0.5 text-[12px] text-muted-foreground truncate">
                     {info.location} · <span className="font-mono">{info.code}</span>
                   </div>
@@ -128,7 +128,7 @@ export async function BottomLists() {
       </div>
 
       {/* Top Links */}
-      <div className="rounded-lg border border-border bg-card">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h3 className="text-[13px] font-medium">Top-Links</h3>
           <Link href="/links" className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -143,11 +143,11 @@ export async function BottomLists() {
                 href={`/links/${link.id}`}
                 className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30"
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded text-[12px] font-medium text-muted-foreground bg-muted">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md text-[12px] font-semibold text-muted-foreground bg-muted">
                   {index + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-medium truncate group-hover:text-primary transition-colors">
+                  <div className="text-[13px] font-medium truncate group-hover:text-brand transition-colors">
                     {(link.title as string) || (link.short_code as string)}
                   </div>
                   <div className="mt-0.5 text-[12px] text-muted-foreground truncate">

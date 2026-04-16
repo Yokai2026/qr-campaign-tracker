@@ -23,18 +23,21 @@ export function SectorStrip() {
       className="relative border-y border-border bg-subtle py-10 sm:py-12"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Geeignet für
         </p>
-        <ul className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-12">
+        <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-4 sm:gap-x-10">
           {SECTORS.map((s) => {
             const Icon = s.icon;
             return (
               <li
                 key={s.label}
-                className="inline-flex items-center gap-2 text-[13px] font-medium text-foreground/75 transition-colors hover:text-foreground sm:text-[14px]"
+                className="group inline-flex items-center gap-2 text-[13.5px] font-medium text-foreground/70 transition-colors hover:text-foreground sm:text-[14px]"
               >
-                <Icon className="h-4 w-4 text-muted-foreground" aria-hidden />
+                <Icon
+                  className="h-4 w-4 text-muted-foreground/80 transition-colors group-hover:text-brand"
+                  aria-hidden
+                />
                 {s.label}
               </li>
             );

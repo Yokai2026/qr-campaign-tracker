@@ -42,7 +42,7 @@ const columns: ColumnDef<PlacementRow>[] = [
     cell: ({ row }) => (
       <Link
         href={`/placements/${row.original.id}`}
-        className="font-semibold text-foreground transition-colors hover:text-primary"
+        className="font-semibold text-foreground transition-colors hover:text-brand"
       >
         {row.original.name}
       </Link>
@@ -63,7 +63,7 @@ const columns: ColumnDef<PlacementRow>[] = [
     cell: ({ row }) => (
       <Link
         href={`/campaigns/${row.original.campaign?.id}`}
-        className="transition-colors hover:text-primary"
+        className="transition-colors hover:text-brand"
       >
         {row.original.campaign?.name}
       </Link>

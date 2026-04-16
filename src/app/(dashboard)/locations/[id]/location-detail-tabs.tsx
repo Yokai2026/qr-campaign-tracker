@@ -306,7 +306,7 @@ export function LocationDetailTabs({
                       <TableCell>
                         <Link
                           href={`/placements/${p.id}`}
-                          className="font-medium hover:text-primary transition-colors"
+                          className="font-medium hover:text-brand transition-colors"
                         >
                           {p.name}
                         </Link>

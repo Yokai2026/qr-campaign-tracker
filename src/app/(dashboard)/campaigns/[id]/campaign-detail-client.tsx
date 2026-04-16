@@ -140,7 +140,7 @@ export function CampaignDetailClient({
                       <TableCell>
                         <Link
                           href={`/placements/${placement.id}`}
-                          className="font-medium hover:text-primary transition-colors"
+                          className="font-medium hover:text-brand transition-colors"
                         >
                           {placement.name}
                         </Link>
