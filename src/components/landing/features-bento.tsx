@@ -12,7 +12,7 @@ import { SectionHeading } from '@/components/ui/section-heading';
 
 export function FeaturesBento() {
   return (
-    <section id="features" className="relative py-20 sm:py-28">
+    <section id="features" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="max-w-2xl">
           <SectionHeading
@@ -21,7 +21,7 @@ export function FeaturesBento() {
           >
             Kampagnen-Tracking, aufs Wesentliche reduziert.
           </SectionHeading>
-          <p className="mt-5 text-[15px] leading-relaxed text-muted-foreground sm:text-[16px]">
+          <p className="mt-5 text-[16px] leading-relaxed text-muted-foreground sm:text-[17px]">
             Keine überladenen Dashboards, keine fünfseitigen Feature-Listen.
             Nur die Daten, die wirklich entscheiden, wo dein nächstes Plakat hängt.
           </p>
@@ -29,13 +29,19 @@ export function FeaturesBento() {
 
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-6 sm:grid-rows-[auto_auto] lg:grid-rows-2">
           {/* HERO — Analytics Preview (wide) */}
-          <article className="card-lift relative col-span-1 flex flex-col gap-5 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-6 lg:col-span-4 lg:row-span-2 lg:p-8">
-            <div className="flex items-start justify-between gap-4">
+          <article className="card-lift relative col-span-1 flex flex-col gap-5 overflow-hidden rounded-3xl border border-border bg-card p-6 sm:col-span-6 lg:col-span-4 lg:row-span-2 lg:p-8">
+            {/* Subtle brand gradient overlay */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-32 -right-32 h-64 w-64 rounded-full opacity-40 blur-3xl"
+              style={{ background: 'radial-gradient(circle, var(--brand), transparent 70%)' }}
+            />
+            <div className="relative flex items-start justify-between gap-4">
               <div>
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-[var(--shadow-sm)]">
                   <BarChart3 className="h-4 w-4" />
                 </span>
-                <h3 className="mt-3 text-[22px] font-semibold tracking-tight sm:text-[24px]">
+                <h3 className="mt-4 text-[24px] font-semibold tracking-tight sm:text-[26px]">
                   Echtzeit-Analytics, die du verstehst.
                 </h3>
                 <p className="mt-2 max-w-md text-[14px] leading-relaxed text-muted-foreground">
@@ -47,7 +53,7 @@ export function FeaturesBento() {
             </div>
 
             {/* Mini dashboard preview */}
-            <div className="relative mt-auto rounded-xl border border-border bg-background/70 p-4 shadow-sm">
+            <div className="relative mt-auto rounded-xl border border-border bg-background/85 p-4 shadow-[var(--shadow-sm)] backdrop-blur">
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[11px] font-medium">Scans · 14 Tage</span>
@@ -100,8 +106,13 @@ export function FeaturesBento() {
           </article>
 
           {/* Geo + Placement */}
-          <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+          <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-3xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-2">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-16 -left-16 h-40 w-40 rounded-full opacity-30 blur-2xl"
+              style={{ background: 'radial-gradient(circle, var(--warm), transparent 70%)' }}
+            />
+            <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand">
               <MapPin className="h-4 w-4" />
             </span>
             <h3 className="text-[16px] font-semibold tracking-tight">
@@ -125,8 +136,8 @@ export function FeaturesBento() {
           </article>
 
           {/* Devices */}
-          <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+          <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-3xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-2">
+            <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand">
               <Smartphone className="h-4 w-4" />
             </span>
             <h3 className="text-[16px] font-semibold tracking-tight">
@@ -149,10 +160,19 @@ export function FeaturesBento() {
           </article>
 
           {/* Alerts */}
-          <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-ink text-ink-foreground p-6 sm:col-span-3 lg:col-span-3">
-            <div className="absolute inset-0 opacity-40 bg-dot-grid mask-fade-y" aria-hidden />
+          <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-3xl border border-border bg-ink text-ink-foreground p-6 sm:col-span-3 lg:col-span-3">
+            <div className="absolute inset-0 opacity-30 bg-dot-grid mask-fade-y" aria-hidden />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -bottom-24 -right-24 h-48 w-48 rounded-full opacity-30 blur-3xl"
+              style={{ background: 'radial-gradient(circle, var(--brand), transparent 70%)' }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
+            />
             <div className="relative">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white shadow-[inset_0_1px_0_oklch(1_0_0/0.15)]">
                 <Bell className="h-4 w-4" />
               </span>
               <h3 className="mt-3 text-[16px] font-semibold tracking-tight">
@@ -175,9 +195,14 @@ export function FeaturesBento() {
           </article>
 
           {/* Exports */}
-          <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-3">
-            <div className="flex items-center justify-between">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+          <article className="card-lift relative col-span-1 flex flex-col gap-3 overflow-hidden rounded-3xl border border-border bg-card p-6 sm:col-span-3 lg:col-span-3">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full opacity-25 blur-2xl"
+              style={{ background: 'radial-gradient(circle, var(--brand), transparent 70%)' }}
+            />
+            <div className="relative flex items-center justify-between">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand">
                 <FileDown className="h-4 w-4" />
               </span>
               <div className="flex items-center gap-1">

@@ -11,7 +11,7 @@ import { StepsSection } from '@/components/landing/steps-section';
 import { FeaturesBento } from '@/components/landing/features-bento';
 import { PrivacySection } from '@/components/landing/privacy-section';
 import { DomainShowcase } from '@/components/landing/domain-showcase';
-import { FounderBlock } from '@/components/landing/founder-block';
+import { TrustStrip } from '@/components/landing/trust-strip';
 import { PricingTeaser } from '@/components/landing/pricing-teaser';
 import { FaqSection, FAQ_ITEMS } from '@/components/landing/faq-section';
 import { FinalCTA } from '@/components/landing/final-cta';
@@ -31,7 +31,7 @@ export default function LandingPage() {
         <FeaturesBento />
         <PrivacySection />
         <DomainShowcase />
-        <FounderBlock />
+        <TrustStrip />
         <PricingTeaser />
         <FaqSection />
         <FinalCTA />
