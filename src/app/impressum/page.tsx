@@ -29,7 +29,17 @@ export default function ImpressumPage() {
         <section>
           <h2 className="text-[15px] font-semibold text-foreground mb-2">Angaben gemäß § 5 DDG</h2>
           <p>
-            <strong>David da Silva Gornik</strong><br />
+            <strong>DSG Studio</strong><br />
+            Inhaber: David da Silva Gornik<br />
+            Rahel-Varnhagen-Promenade 2<br />
+            10969 Berlin<br />
+            Deutschland
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">Kontakt</h2>
+          <p>
             E-Mail: <a href="mailto:info@spurig.com" className="underline underline-offset-2">info@spurig.com</a>
           </p>
         </section>
@@ -37,7 +47,9 @@ export default function ImpressumPage() {
         <section>
           <h2 className="text-[15px] font-semibold text-foreground mb-2">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
           <p>
-            David da Silva Gornik
+            David da Silva Gornik<br />
+            Rahel-Varnhagen-Promenade 2<br />
+            10969 Berlin
           </p>
         </section>
 
