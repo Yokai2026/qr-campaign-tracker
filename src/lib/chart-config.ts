@@ -31,6 +31,7 @@ export const SERIES_COLORS = {
   scans: 'oklch(0.66 0.13 185)',     // brand teal — primary metric
   clicks: 'oklch(0.21 0.005 80)',    // near-black — comparison
   forms: 'oklch(0.74 0.13 38)',      // warm coral — conversions
+  forecast: 'oklch(0.62 0.008 80)',  // warm zinc — subordinate (dashed)
   active: 'oklch(0.66 0.13 185)',    // brand teal
   inactive: 'oklch(0.62 0.008 80)',  // warm zinc
 } as const;
@@ -40,6 +41,7 @@ export const AXIS_STYLE = {
   fontSize: 11,
   tickLine: false,
   axisLine: false,
+  stroke: 'oklch(0.50 0.008 80)',
 } as const;
 
 export const GRID_STYLE = {
@@ -47,3 +49,17 @@ export const GRID_STYLE = {
   stroke: 'oklch(0.918 0.006 80)',
   strokeOpacity: 0.6,
 } as const;
+
+/** Shared tooltip styling — referenced by all charts for consistency */
+export const TOOLTIP_STYLE = {
+  fontSize: 12,
+  borderRadius: 12,
+  border: '1px solid oklch(0.918 0.006 80)',
+  background: 'oklch(1 0 0)',
+  boxShadow:
+    '0 6px 16px -6px oklch(0.20 0.02 80 / 0.12), 0 2px 4px -2px oklch(0.20 0.02 80 / 0.06)',
+  padding: '8px 12px',
+} as const;
+
+/** Default max bar size — keeps bar charts elegant when data is sparse */
+export const BAR_MAX_SIZE = 32;

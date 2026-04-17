@@ -7,16 +7,9 @@ import {
   ResponsiveContainer, Legend, Cell,
 } from 'recharts';
 import { ChartCard } from '@/components/shared/chart-card';
-import { CHART_PALETTE, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
+import { CHART_PALETTE, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
 import { Trophy, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { AbVariant } from '@/types';
-
-const TOOLTIP_STYLE = {
-  fontSize: 12,
-  borderRadius: 6,
-  border: '1px solid oklch(0.92 0 0)',
-  boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
-};
 
 type VariantResult = {
   id: string;
@@ -122,32 +115,33 @@ export function AbResultsChart({ variants, qrCodeId, shortLinkId }: Props) {
     <div className="space-y-4">
       <ChartCard title="A/B-Testergebnisse">
         <ResponsiveContainer width="100%" height={Math.max(180, data.length * 60)}>
-          <BarChart data={chartData} layout="vertical">
-            <CartesianGrid {...GRID_STYLE} />
+          <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+            <CartesianGrid {...GRID_STYLE} horizontal={false} />
             <XAxis type="number" {...AXIS_STYLE} allowDecimals={false} />
             <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={120} />
             <Tooltip
               contentStyle={TOOLTIP_STYLE}
+              cursor={{ fill: 'oklch(0.965 0.006 80)' }}
               formatter={(value, name, props) => {
                 const payload = props?.payload as Record<string, unknown> | undefined;
                 if (name === 'Klicks' && payload?.anteil) return [`${value} (${payload.anteil}%)`, name];
                 return [value, String(name)];
               }}
             />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="Klicks" radius={[0, 3, 3, 0]}>
+            <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+            <Bar dataKey="Klicks" radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE}>
               {chartData.map((_, idx) => (
                 <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
               ))}
             </Bar>
-            <Bar dataKey="Besucher" radius={[0, 3, 3, 0]} fill="oklch(0.50 0.008 80)" />
+            <Bar dataKey="Besucher" radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} fill="oklch(0.50 0.008 80)" />
           </BarChart>
         </ResponsiveContainer>
       </ChartCard>
 
       {/* Winner summary */}
       {totalClicks > 0 && (
-        <div className="rounded-lg border border-border bg-muted/20 p-4">
+        <div className="rounded-2xl border border-border bg-muted/20 p-4">
           <div className="flex items-start gap-3">
             <Trophy className="h-4 w-4 mt-0.5 shrink-0 text-amber-500" />
             <div className="space-y-1">

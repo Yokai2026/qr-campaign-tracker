@@ -3,7 +3,7 @@
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import { SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
+import { SERIES_COLORS, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
 
 const COUNTRY_NAMES: Record<string, string> = {
   DE: 'Deutschland', AT: 'Oesterreich', CH: 'Schweiz', NL: 'Niederlande',
@@ -34,20 +34,13 @@ export function CountryChart({ data }: CountryChartProps) {
   if (chartData.length === 0) return null;
 
   return (
-    <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 36)}>
-      <BarChart data={chartData} layout="vertical">
-        <CartesianGrid {...GRID_STYLE} />
+    <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 38)}>
+      <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+        <CartesianGrid {...GRID_STYLE} horizontal={false} />
         <XAxis type="number" {...AXIS_STYLE} />
         <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={120} />
-        <Tooltip
-          contentStyle={{
-            fontSize: 12,
-            borderRadius: 6,
-            border: '1px solid oklch(0.92 0 0)',
-            boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
-          }}
-        />
-        <Bar dataKey="scans" name="Scans" fill={SERIES_COLORS.scans} radius={[0, 3, 3, 0]} />
+        <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+        <Bar dataKey="scans" name="Scans" fill={SERIES_COLORS.scans} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
       </BarChart>
     </ResponsiveContainer>
   );

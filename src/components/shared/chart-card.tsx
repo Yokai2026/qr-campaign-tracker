@@ -18,14 +18,14 @@ export function ChartCard({
   className,
 }: ChartCardProps) {
   return (
-    <div className={cn('rounded-lg border border-border bg-card', className)}>
-      <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h3 className="text-[13px] font-medium">{title}</h3>
+    <div className={cn('overflow-hidden rounded-2xl border border-border bg-card', className)}>
+      <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+        <h3 className="text-[13.5px] font-semibold tracking-tight text-foreground">{title}</h3>
         {action}
       </div>
-      <div className="p-4">
+      <div className="p-4 sm:p-5">
         {empty ? (
-          <p className="py-8 text-center text-[13px] text-muted-foreground">
+          <p className="py-10 text-center text-[13px] text-muted-foreground">
             {emptyText}
           </p>
         ) : (

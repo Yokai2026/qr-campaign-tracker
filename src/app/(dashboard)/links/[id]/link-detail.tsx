@@ -21,7 +21,7 @@ import type { ShortLink, LinkGroup, RedirectRule, AbVariant } from '@/types';
 import type { EffectiveTier } from '@/lib/billing/gates';
 import { deleteShortLink, toggleShortLink, updateShortLink, getLinkGroups } from '../actions';
 import { formatDate, formatDateTime } from '@/lib/format';
-import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
+import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
 import { generateForecast } from '@/lib/forecast';
 import { ChartTransition } from '@/components/shared/chart-transition';
 import { RedirectRulesEditor } from '@/components/redirect-rules/redirect-rules-editor';
@@ -38,13 +38,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CountryChart } from '@/components/shared/country-chart';
-
-const TOOLTIP_STYLE = {
-  fontSize: 12,
-  borderRadius: 6,
-  border: '1px solid oklch(0.92 0 0)',
-  boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
-};
 
 type Props = {
   link: ShortLink;
@@ -559,14 +552,15 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
       {/* Charts */}
       <ChartTransition transitionKey={link.id}>
       <ChartCard title="Klicks ueber Zeit" empty={stats.timeSeriesData.length === 0} emptyText="Keine Klicks im Zeitraum">
-        <ResponsiveContainer width="100%" height={260}>
-          <LineChart data={timeSeriesWithForecast}>
+        <ResponsiveContainer width="100%" height={280}>
+          <LineChart data={timeSeriesWithForecast} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
             <CartesianGrid {...GRID_STYLE} />
             <XAxis dataKey="date" {...AXIS_STYLE} />
             <YAxis {...AXIS_STYLE} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} />
-            <Line type="monotone" dataKey="clicks" name="Klicks" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} connectNulls={false} />
-            <Line type="monotone" dataKey="forecast" name="Prognose" stroke={SERIES_COLORS.scans} strokeWidth={1.5} strokeDasharray="6 3" dot={false} connectNulls={false} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ stroke: 'oklch(0.918 0.006 80)', strokeWidth: 1 }} />
+            <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+            <Line type="monotone" dataKey="clicks" name="Klicks" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls={false} />
+            <Line type="monotone" dataKey="forecast" name="Prognose" stroke={SERIES_COLORS.forecast} strokeWidth={1.5} strokeDasharray="5 4" dot={false} connectNulls={false} />
           </LineChart>
         </ResponsiveContainer>
       </ChartCard>
@@ -576,25 +570,25 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
         <ChartCard title="Gerätetypen" empty={stats.deviceData.length === 0}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
-              <Pie data={stats.deviceData} cx="50%" cy="50%" outerRadius={85} innerRadius={48} dataKey="value" nameKey="name" label={{ fontSize: 11 }} strokeWidth={1}>
+              <Pie data={stats.deviceData} cx="50%" cy="50%" outerRadius={88} innerRadius={54} dataKey="value" nameKey="name" label={false} stroke="oklch(1 0 0)" strokeWidth={2} paddingAngle={1.5}>
                 {stats.deviceData.map((_, idx) => (
                   <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                 ))}
               </Pie>
               <Tooltip contentStyle={TOOLTIP_STYLE} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </ChartCard>
 
         <ChartCard title="Top-Referrer" empty={stats.referrerData.length === 0} emptyText="Keine Referrer-Daten">
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={stats.referrerData} layout="vertical">
-              <CartesianGrid {...GRID_STYLE} />
+            <BarChart data={stats.referrerData} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+              <CartesianGrid {...GRID_STYLE} horizontal={false} />
               <XAxis type="number" {...AXIS_STYLE} />
               <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={120} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
-              <Bar dataKey="value" name="Klicks" fill={SERIES_COLORS.clicks} radius={[0, 3, 3, 0]} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+              <Bar dataKey="value" name="Klicks" fill={SERIES_COLORS.clicks} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>

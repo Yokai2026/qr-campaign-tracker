@@ -16,7 +16,7 @@ import {
   ResponsiveContainer, Legend,
 } from 'recharts';
 import { KPIStatCard } from '@/components/shared/kpi-stat-card';
-import { SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
+import { SERIES_COLORS, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
 import {
   TrendingUp, TrendingDown, Equal, ArrowRight,
 } from 'lucide-react';
@@ -244,22 +244,15 @@ export function CompareClient() {
               <CardTitle>Vergleichs-Übersicht</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={comparisonChart}>
-                  <CartesianGrid {...GRID_STYLE} />
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={comparisonChart} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid {...GRID_STYLE} vertical={false} />
                   <XAxis dataKey="metric" {...AXIS_STYLE} />
                   <YAxis {...AXIS_STYLE} />
-                  <Tooltip
-                    contentStyle={{
-                      fontSize: 12,
-                      borderRadius: 6,
-                      border: '1px solid oklch(0.92 0 0)',
-                      boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey={dataA.name} fill={SERIES_COLORS.scans} radius={[3, 3, 0, 0]} />
-                  <Bar dataKey={dataB.name} fill={SERIES_COLORS.clicks} radius={[3, 3, 0, 0]} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+                  <Bar dataKey={dataA.name} fill={SERIES_COLORS.scans} radius={[6, 6, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
+                  <Bar dataKey={dataB.name} fill={SERIES_COLORS.clicks} radius={[6, 6, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>

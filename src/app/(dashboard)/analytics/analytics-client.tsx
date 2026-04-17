@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, subDays } from 'date-fns';
-import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE } from '@/lib/chart-config';
+import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
 import { generateAnalyticsPdf } from '@/lib/pdf/generate';
 import { generateForecast } from '@/lib/forecast';
 import { CountryChart } from '@/components/shared/country-chart';
@@ -406,7 +406,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       />
 
       {/* Filters */}
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-xs)]">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Von</Label>
@@ -561,43 +561,29 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             </div>
           <ChartTransition transitionKey={chartTransitionKey}>
           <div className="grid gap-4 lg:grid-cols-2">
-            <ChartCard title="QR-Scans & Link-Klicks ueber Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewaehlten Zeitraum" className="lg:col-span-2">
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={timeSeriesWithForecast}>
+            <ChartCard title="QR-Scans & Link-Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={timeSeriesWithForecast} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                   <CartesianGrid {...GRID_STYLE} />
                   <XAxis dataKey="date" {...AXIS_STYLE} />
                   <YAxis {...AXIS_STYLE} allowDecimals={false} />
-                  <Tooltip
-                    contentStyle={{
-                      fontSize: 12,
-                      borderRadius: 6,
-                      border: '1px solid oklch(0.92 0 0)',
-                      boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={1.5} dot={false} connectNulls={false} />
-                  <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={1.5} dot={false} connectNulls={false} />
-                  <Line type="monotone" dataKey="forecast" name="Prognose" stroke={SERIES_COLORS.scans} strokeWidth={1.5} strokeDasharray="6 3" dot={false} connectNulls={false} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ stroke: 'oklch(0.918 0.006 80)', strokeWidth: 1 }} />
+                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+                  <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls={false} />
+                  <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls={false} />
+                  <Line type="monotone" dataKey="forecast" name="Prognose" stroke={SERIES_COLORS.forecast} strokeWidth={1.5} strokeDasharray="5 4" dot={false} connectNulls={false} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
 
             <ChartCard title="Aufrufe pro Kampagne" empty={campaignData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={campaignData} layout="vertical">
-                  <CartesianGrid {...GRID_STYLE} />
+                <BarChart data={campaignData} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid {...GRID_STYLE} horizontal={false} />
                   <XAxis type="number" {...AXIS_STYLE} allowDecimals={false} />
-                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={80} />
-                  <Tooltip
-                    contentStyle={{
-                      fontSize: 12,
-                      borderRadius: 6,
-                      border: '1px solid oklch(0.92 0 0)',
-                      boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
-                    }}
-                  />
-                  <Bar dataKey="opens" name="Aufrufe" fill={SERIES_COLORS.scans} radius={[0, 3, 3, 0]} />
+                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={90} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+                  <Bar dataKey="opens" name="Aufrufe" fill={SERIES_COLORS.scans} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -605,20 +591,13 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <ChartCard title="Gerätetypen" empty={deviceData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={deviceData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={false} strokeWidth={1}>
+                  <Pie data={deviceData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="oklch(1 0 0)" strokeWidth={2} paddingAngle={1.5}>
                     {deviceData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      fontSize: 12,
-                      borderRadius: 6,
-                      border: '1px solid oklch(0.92 0 0)',
-                      boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} />
+                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -636,13 +615,13 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <ChartCard title="Browser" empty={browserData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={browserData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={false} strokeWidth={1}>
+                  <Pie data={browserData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="oklch(1 0 0)" strokeWidth={2} paddingAngle={1.5}>
                     {browserData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6, border: '1px solid oklch(0.92 0 0)', boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)' }} />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} />
+                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -650,13 +629,13 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <ChartCard title="Betriebssystem" empty={osData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={osData} cx="50%" cy="50%" outerRadius={90} innerRadius={50} dataKey="value" nameKey="name" label={false} strokeWidth={1}>
+                  <Pie data={osData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="oklch(1 0 0)" strokeWidth={2} paddingAngle={1.5}>
                     {osData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6, border: '1px solid oklch(0.92 0 0)', boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)' }} />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} />
+                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
                 </PieChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -685,9 +664,9 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                   </ChartCard>
                 </div>
               ) : (
-                <div className="rounded-lg border border-dashed border-border bg-muted/20 p-5 text-center">
+                <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-6 text-center">
                   <Globe className="mx-auto h-6 w-6 text-muted-foreground/60" />
-                  <p className="mt-2 text-[13px] font-medium">Noch keine Länder-Daten</p>
+                  <p className="mt-2 text-[13.5px] font-semibold">Noch keine Länder-Daten</p>
                   <p className="mt-1 text-[12px] text-muted-foreground max-w-md mx-auto">
                     Sobald Scans von echten Besuchern über das Internet eingehen, erscheinen hier Weltkarte und Länder-Statistik.
                   </p>
@@ -695,7 +674,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               )}
 
               {unknownCountryCount > 0 && (
-                <div className="rounded-lg border border-border bg-muted/20 px-4 py-2.5 flex items-start gap-2.5">
+                <div className="rounded-2xl border border-border bg-muted/20 px-4 py-3 flex items-start gap-2.5">
                   <Globe className="h-3.5 w-3.5 mt-0.5 shrink-0 text-muted-foreground" />
                   <p className="text-[12px] text-muted-foreground leading-relaxed">
                     <span className="font-medium text-foreground">{unknownCountryCount} Scan{unknownCountryCount !== 1 ? 's' : ''} ohne Länder-Zuordnung.</span>{' '}
@@ -714,20 +693,13 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 <ArrowUpRight className="h-3.5 w-3.5" />
                 Woher die Besucher kommen
               </div>
-              <ResponsiveContainer width="100%" height={Math.max(200, referrerData.length * 36)}>
-                <BarChart data={referrerData} layout="vertical">
-                  <CartesianGrid {...GRID_STYLE} />
+              <ResponsiveContainer width="100%" height={Math.max(200, referrerData.length * 38)}>
+                <BarChart data={referrerData} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+                  <CartesianGrid {...GRID_STYLE} horizontal={false} />
                   <XAxis type="number" {...AXIS_STYLE} />
-                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={100} />
-                  <Tooltip
-                    contentStyle={{
-                      fontSize: 12,
-                      borderRadius: 6,
-                      border: '1px solid oklch(0.92 0 0)',
-                      boxShadow: '0 4px 12px oklch(0 0 0 / 0.08)',
-                    }}
-                  />
-                  <Bar dataKey="value" name="Klicks" fill={SERIES_COLORS.clicks} radius={[0, 3, 3, 0]} />
+                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={110} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+                  <Bar dataKey="value" name="Klicks" fill={SERIES_COLORS.clicks} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
