@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { User, Shield, Code, Loader2, Trash2, Download, ScrollText, Copy, Check } from 'lucide-react';
+import { User, Shield, Code, Loader2, Trash2, Download, ScrollText, Copy, Check, UserCog, Plug, Zap, ShieldAlert } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { deleteAccount } from './account-actions';
 import { ReportSchedules } from '@/components/settings/report-schedules';
 import { ScanAlerts } from '@/components/settings/scan-alerts';
@@ -107,75 +108,103 @@ export default function SettingsPage() {
         }}
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="border border-border">
-          <CardHeader>
-            <div className="flex items-center gap-2.5">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <CardTitle className="text-[14px]">Profil</CardTitle>
-                <CardDescription className="text-[12px]">Deine persönlichen Informationen</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="settings-email" className="text-[12px] text-muted-foreground">E-Mail</Label>
-                <Input id="settings-email" value={profile.email} disabled className="h-8 text-[13px] bg-muted/30" />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="username" className="text-[12px] text-muted-foreground">Benutzername</Label>
-                <Input
-                  id="username"
-                  {...register('username')}
-                  placeholder="mein_name"
-                  className="h-8 text-[13px]"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="display_name" className="text-[12px] text-muted-foreground">Anzeigename</Label>
-                <Input
-                  id="display_name"
-                  {...register('display_name')}
-                  placeholder="Dein Name"
-                  className="h-8 text-[13px]"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="settings-role" className="text-[12px] text-muted-foreground">Rolle</Label>
-                <Input id="settings-role" value={profile.role === 'admin' ? 'Administrator' : 'Editor'} disabled className="h-8 text-[13px] bg-muted/30" />
-              </div>
-              <Button type="submit" variant="brand" size="sm" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                    Wird gespeichert…
-                  </>
-                ) : 'Speichern'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="account">
+        <TabsList className="flex w-full flex-wrap justify-start gap-1 bg-muted/40">
+          <TabsTrigger value="account" className="gap-1.5">
+            <UserCog className="h-3.5 w-3.5" />
+            Konto
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className="gap-1.5">
+            <Plug className="h-3.5 w-3.5" />
+            Integrationen
+          </TabsTrigger>
+          <TabsTrigger value="automations" className="gap-1.5">
+            <Zap className="h-3.5 w-3.5" />
+            Automatisierung
+          </TabsTrigger>
+          <TabsTrigger value="privacy" className="gap-1.5">
+            <ShieldAlert className="h-3.5 w-3.5" />
+            Datenschutz
+          </TabsTrigger>
+        </TabsList>
 
-        <div className="space-y-4">
-          <Card className="border border-border">
-            <CardHeader>
-              <div className="flex items-center gap-2.5">
-                <Shield className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <CardTitle className="text-[14px]">Sicherheit</CardTitle>
-                  <CardDescription className="text-[12px]">Passwort und Zugangsdaten</CardDescription>
+        {/* KONTO */}
+        <TabsContent value="account" className="mt-5 space-y-4">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card className="border border-border">
+              <CardHeader>
+                <div className="flex items-center gap-2.5">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <CardTitle className="text-[14px]">Profil</CardTitle>
+                    <CardDescription className="text-[12px]">Deine persönlichen Informationen</CardDescription>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" size="sm" onClick={handlePasswordReset}>
-                Passwort zurücksetzen
-              </Button>
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="settings-email" className="text-[12px] text-muted-foreground">E-Mail</Label>
+                    <Input id="settings-email" value={profile.email} disabled className="h-8 text-[13px] bg-muted/30" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="username" className="text-[12px] text-muted-foreground">Benutzername</Label>
+                    <Input
+                      id="username"
+                      {...register('username')}
+                      placeholder="mein_name"
+                      className="h-8 text-[13px]"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="display_name" className="text-[12px] text-muted-foreground">Anzeigename</Label>
+                    <Input
+                      id="display_name"
+                      {...register('display_name')}
+                      placeholder="Dein Name"
+                      className="h-8 text-[13px]"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="settings-role" className="text-[12px] text-muted-foreground">Rolle</Label>
+                    <Input id="settings-role" value={profile.role === 'admin' ? 'Administrator' : 'Editor'} disabled className="h-8 text-[13px] bg-muted/30" />
+                  </div>
+                  <Button type="submit" variant="brand" size="sm" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                        Wird gespeichert…
+                      </>
+                    ) : 'Speichern'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
 
+            <Card className="border border-border">
+              <CardHeader>
+                <div className="flex items-center gap-2.5">
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <CardTitle className="text-[14px]">Sicherheit</CardTitle>
+                    <CardDescription className="text-[12px]">Passwort und Zugangsdaten</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" size="sm" onClick={handlePasswordReset}>
+                  Passwort zurücksetzen
+                </Button>
+                <p className="mt-2 text-[12px] text-muted-foreground">
+                  Du bekommst einen Link per E-Mail.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* INTEGRATIONEN */}
+        <TabsContent value="integrations" className="mt-5 space-y-4">
           <Card className="border border-border">
             <CardHeader>
               <div className="flex items-center gap-2.5">
@@ -195,97 +224,98 @@ export default function SettingsPage() {
               </p>
             </CardContent>
           </Card>
-        </div>
-      </div>
-      {/* Custom Domains */}
-      <CustomDomains />
 
-      {/* Report Schedules */}
-      <ReportSchedules />
+          <CustomDomains />
+          <UtmTemplates />
+        </TabsContent>
 
-      {/* Scan Alerts */}
-      <ScanAlerts />
+        {/* AUTOMATISIERUNG */}
+        <TabsContent value="automations" className="mt-5 space-y-4">
+          <ReportSchedules />
+          <ScanAlerts />
+        </TabsContent>
 
-      {/* UTM Templates */}
-      <UtmTemplates />
-
-      {/* Datenexport (DSGVO Art. 20) */}
-      <Card className="border border-border">
-        <CardHeader>
-          <div className="flex items-center gap-2.5">
-            <Download className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <CardTitle className="text-[14px]">Meine Daten exportieren</CardTitle>
-              <CardDescription className="text-[12px]">
-                Alle deine personenbezogenen Daten als JSON herunterladen (Art. 20 DSGVO — Datenportabilität)
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-[12px] text-muted-foreground mb-3">
-            Der Export enthält dein Profil, Kampagnen, Platzierungen, QR-Codes, Kurzlinks, Report-Einstellungen
-            und Custom Domains. Anonymisierte Tracking-Daten (Scans) sind nicht enthalten, da sie keinen
-            direkten Personenbezug haben.
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              window.location.href = '/api/export/my-data';
-            }}
-          >
-            <Download className="mr-1.5 h-3.5 w-3.5" />
-            Daten herunterladen
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Audit-Log — nur für Admins */}
-      {profile.role === 'admin' && (
-        <Card className="border border-border">
-          <CardHeader>
-            <div className="flex items-center gap-2.5">
-              <ScrollText className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <CardTitle className="text-[14px]">Audit-Log</CardTitle>
-                <CardDescription className="text-[12px]">
-                  Sicherheitsrelevante Aktionen im System einsehen
-                </CardDescription>
+        {/* DATENSCHUTZ */}
+        <TabsContent value="privacy" className="mt-5 space-y-4">
+          {/* Datenexport (DSGVO Art. 20) */}
+          <Card className="border border-border">
+            <CardHeader>
+              <div className="flex items-center gap-2.5">
+                <Download className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <CardTitle className="text-[14px]">Meine Daten exportieren</CardTitle>
+                  <CardDescription className="text-[12px]">
+                    Alle deine personenbezogenen Daten als JSON herunterladen (Art. 20 DSGVO — Datenportabilität)
+                  </CardDescription>
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" size="sm" render={<a href="/settings/audit-log" />}>
-              <ScrollText className="mr-1.5 h-3.5 w-3.5" />
-              Audit-Log öffnen
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+            </CardHeader>
+            <CardContent>
+              <p className="text-[12px] text-muted-foreground mb-3">
+                Der Export enthält dein Profil, Kampagnen, Platzierungen, QR-Codes, Kurzlinks, Report-Einstellungen
+                und Custom Domains. Anonymisierte Tracking-Daten (Scans) sind nicht enthalten, da sie keinen
+                direkten Personenbezug haben.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  window.location.href = '/api/export/my-data';
+                }}
+              >
+                <Download className="mr-1.5 h-3.5 w-3.5" />
+                Daten herunterladen
+              </Button>
+            </CardContent>
+          </Card>
 
-      {/* Gefahrenzone */}
-      <Card className="border border-destructive/30">
-        <CardHeader>
-          <div className="flex items-center gap-2.5">
-            <Trash2 className="h-4 w-4 text-destructive" />
-            <div>
-              <CardTitle className="text-[14px] text-destructive">Gefahrenzone</CardTitle>
-              <CardDescription className="text-[12px]">
-                Konto und alle zugehörigen Daten unwiderruflich löschen
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-[12px] text-muted-foreground mb-3">
-            Diese Aktion löscht dein Konto, dein Profil und alle damit verbundenen Daten.
-            Anonymisierte Tracking-Daten (Scans) bleiben erhalten, da sie keinen Personenbezug haben.
-            Dieser Vorgang kann nicht rückgängig gemacht werden.
-          </p>
-          <DeleteAccountButton />
-        </CardContent>
-      </Card>
+          {/* Audit-Log — nur für Admins */}
+          {profile.role === 'admin' && (
+            <Card className="border border-border">
+              <CardHeader>
+                <div className="flex items-center gap-2.5">
+                  <ScrollText className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <CardTitle className="text-[14px]">Audit-Log</CardTitle>
+                    <CardDescription className="text-[12px]">
+                      Sicherheitsrelevante Aktionen im System einsehen
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" size="sm" render={<a href="/settings/audit-log" />}>
+                  <ScrollText className="mr-1.5 h-3.5 w-3.5" />
+                  Audit-Log öffnen
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Gefahrenzone */}
+          <Card className="border border-destructive/30">
+            <CardHeader>
+              <div className="flex items-center gap-2.5">
+                <Trash2 className="h-4 w-4 text-destructive" />
+                <div>
+                  <CardTitle className="text-[14px] text-destructive">Gefahrenzone</CardTitle>
+                  <CardDescription className="text-[12px]">
+                    Konto und alle zugehörigen Daten unwiderruflich löschen
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-[12px] text-muted-foreground mb-3">
+                Diese Aktion löscht dein Konto, dein Profil und alle damit verbundenen Daten.
+                Anonymisierte Tracking-Daten (Scans) bleiben erhalten, da sie keinen Personenbezug haben.
+                Dieser Vorgang kann nicht rückgängig gemacht werden.
+              </p>
+              <DeleteAccountButton />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
