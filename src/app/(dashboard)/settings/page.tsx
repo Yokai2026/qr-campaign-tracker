@@ -38,22 +38,43 @@ export default function SettingsPage() {
   useEffect(() => {
     setOrigin(window.location.origin);
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-      if (data) {
-        setProfile(data as Profile);
-        reset({ username: data.username || '', display_name: data.display_name || '' });
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profileData, error: profileErr } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profileErr) {
+          console.error('Profile load failed:', profileErr);
+          toast.error('Konnte Profil nicht laden');
+          return;
+        }
+
+        if (profileData) {
+          setProfile(profileData as Profile);
+          reset({
+            username: profileData.username || '',
+            display_name: profileData.display_name || '',
+          });
+        }
+
+        const { data: subData } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (subData) setSubscription(subData as Subscription);
+      } catch (err) {
+        console.error('Settings load failed:', err);
+        toast.error('Konnte Einstellungen nicht laden');
       }
-      // Load subscription
-      const { data: subData } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (subData) setSubscription(subData as Subscription);
     }
     load();
   }, [supabase, reset]);

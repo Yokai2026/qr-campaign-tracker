@@ -64,11 +64,19 @@ export function CustomDomains() {
 
   useEffect(() => {
     let mounted = true;
-    getCustomDomains().then((data) => {
-      if (!mounted) return;
-      setDomains(data);
-      setLoading(false);
-    });
+    getCustomDomains()
+      .then((data) => {
+        if (!mounted) return;
+        setDomains(data);
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        console.error('CustomDomains load failed:', err);
+        toast.error('Konnte Custom-Domains nicht laden');
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
     return () => {
       mounted = false;
     };

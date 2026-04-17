@@ -46,26 +46,33 @@ export function ReportSchedules() {
   const [campaignId, setCampaignId] = useState<string>('all');
 
   const loadData = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-    const [schedulesRes, campaignsRes, profileRes] = await Promise.all([
-      supabase
-        .from('report_schedules')
-        .select('*, campaign:campaigns(id, name)')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false }),
-      supabase.from('campaigns').select('id, name').order('name'),
-      supabase.from('profiles').select('email').eq('id', user.id).single(),
-    ]);
+      const [schedulesRes, campaignsRes, profileRes] = await Promise.all([
+        supabase
+          .from('report_schedules')
+          .select('*, campaign:campaigns(id, name)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase.from('campaigns').select('id, name').order('name'),
+        supabase.from('profiles').select('email').eq('id', user.id).single(),
+      ]);
 
-    setSchedules((schedulesRes.data || []) as Schedule[]);
-    setCampaigns((campaignsRes.data || []) as Campaign[]);
-    if (profileRes.data?.email && !email) {
-      setEmail(profileRes.data.email);
+      setSchedules((schedulesRes.data || []) as Schedule[]);
+      setCampaigns((campaignsRes.data || []) as Campaign[]);
+      setEmail((prev) => prev || profileRes.data?.email || '');
+    } catch (err) {
+      console.error('ReportSchedules load failed:', err);
+      toast.error('Konnte Report-Zeitpläne nicht laden');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, [supabase, email]);
+  }, [supabase]);
 
   useEffect(() => { loadData(); }, [loadData]);
 

@@ -30,10 +30,15 @@ export function UtmTemplates() {
   const [utmId, setUtmId] = useState('');
 
   useEffect(() => {
-    getUtmTemplates().then((data) => {
-      setTemplates(data);
-      setLoading(false);
-    });
+    getUtmTemplates()
+      .then((data) => {
+        setTemplates(data);
+      })
+      .catch((err) => {
+        console.error('UtmTemplates load failed:', err);
+        toast.error('Konnte UTM-Vorlagen nicht laden');
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   function handleCreate() {
