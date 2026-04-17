@@ -366,7 +366,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   }
 
   return (
-    <div className="space-y-6 animate-in-card">
+    <div className="space-y-8 animate-in-card">
       <PageHeader
         title="Analytik"
         description="Auswertung aller QR-Scans und Link-Klicks"
@@ -479,8 +479,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           {/* Reichweite — wie viele Aufrufe, wie viele echte Besucher */}
           <section className="space-y-3">
             <div>
-              <h2 className="text-[13px] font-semibold tracking-tight">Reichweite</h2>
-              <p className="text-[12px] text-muted-foreground">Wie oft wurden deine Codes und Links aufgerufen</p>
+              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Reichweite</h2>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">Wie oft wurden deine Codes und Links aufgerufen</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
               <KPIStatCard
@@ -524,8 +524,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           {(kpis.ctaClicks > 0 || kpis.formSubmits > 0) && (
             <section className="space-y-3">
               <div>
-                <h2 className="text-[13px] font-semibold tracking-tight">Engagement</h2>
-                <p className="text-[12px] text-muted-foreground">Was die Besucher auf der Zielseite tun</p>
+                <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Engagement</h2>
+                <p className="mt-0.5 text-[13px] text-muted-foreground">Was die Besucher auf der Zielseite tun</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
                 <KPIStatCard
@@ -556,8 +556,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           {/* Analyse — Charts */}
           <section className="space-y-3">
             <div>
-              <h2 className="text-[13px] font-semibold tracking-tight">Analyse</h2>
-              <p className="text-[12px] text-muted-foreground">Zeitverlauf, Kampagnen und Geräteverteilung</p>
+              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Analyse</h2>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">Zeitverlauf, Kampagnen und Geräteverteilung</p>
             </div>
           <ChartTransition transitionKey={chartTransitionKey}>
           <div className="grid gap-4 lg:grid-cols-2">
@@ -608,8 +608,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           {/* Technik — Browser & Betriebssystem */}
           <section className="space-y-3">
             <div>
-              <h2 className="text-[13px] font-semibold tracking-tight">Technik</h2>
-              <p className="text-[12px] text-muted-foreground">Welche Browser und Betriebssysteme deine Besucher nutzen</p>
+              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Technik</h2>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">Welche Browser und Betriebssysteme deine Besucher nutzen</p>
             </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard title="Browser" empty={browserData.length === 0}>
@@ -646,8 +646,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           {(countryData.length > 0 || unknownCountryCount > 0) && (
             <section className="space-y-3">
               <div>
-                <h2 className="text-[13px] font-semibold tracking-tight">Geografie</h2>
-                <p className="text-[12px] text-muted-foreground">Woher deine Besucher kommen</p>
+                <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Geografie</h2>
+                <p className="mt-0.5 text-[13px] text-muted-foreground">Woher deine Besucher kommen</p>
               </div>
 
               {countryData.length > 0 ? (

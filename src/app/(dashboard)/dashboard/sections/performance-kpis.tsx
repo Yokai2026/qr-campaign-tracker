@@ -155,12 +155,12 @@ export async function PerformanceKPIs() {
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-[13px] font-semibold tracking-tight">Leistung</h2>
-            <p className="text-[12px] text-muted-foreground">So performen deine Kampagnen aktuell</p>
+            <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Leistung</h2>
+            <p className="mt-0.5 text-[13px] text-muted-foreground">So performen deine Kampagnen aktuell</p>
           </div>
           <Link
             href="/analytics"
-            className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-1 text-[12.5px] font-medium text-muted-foreground transition-colors hover:text-brand"
           >
             Zur Analytik <ArrowRight className="h-3 w-3" />
           </Link>

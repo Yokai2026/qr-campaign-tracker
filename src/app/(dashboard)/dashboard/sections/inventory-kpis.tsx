@@ -23,8 +23,8 @@ export async function InventoryKPIs() {
   return (
     <section className="space-y-3">
       <div>
-        <h2 className="text-[14px] font-semibold tracking-tight">Bestand</h2>
-        <p className="text-[12.5px] text-muted-foreground">Was du bereits angelegt hast</p>
+        <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Bestand</h2>
+        <p className="mt-0.5 text-[13px] text-muted-foreground">Was du bereits angelegt hast</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
         <Link href="/campaigns" className="group">

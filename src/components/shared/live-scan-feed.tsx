@@ -68,7 +68,7 @@ export function LiveScanFeed() {
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h3 className="text-[13px] font-medium">Live Scans</h3>
+        <h3 className="text-[13.5px] font-semibold tracking-tight">Live Scans</h3>
         <div className="flex items-center gap-1.5">
           {connected ? (
             <span className="relative flex h-1.5 w-1.5">

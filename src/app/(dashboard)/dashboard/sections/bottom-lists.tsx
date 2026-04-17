@@ -57,7 +57,7 @@ export async function BottomLists() {
       {/* Recent Campaigns */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h3 className="text-[13px] font-medium">Aktuelle Kampagnen</h3>
+          <h3 className="text-[13.5px] font-semibold tracking-tight">Aktuelle Kampagnen</h3>
           <Link href="/campaigns" className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors">
             Alle anzeigen <ArrowRight className="h-3 w-3" />
           </Link>
@@ -91,7 +91,7 @@ export async function BottomLists() {
       {/* Top Placements */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h3 className="text-[13px] font-medium">Top-Platzierungen</h3>
+          <h3 className="text-[13.5px] font-semibold tracking-tight">Top-Platzierungen</h3>
           <Link href="/placements" className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors">
             Alle anzeigen <ArrowRight className="h-3 w-3" />
           </Link>
@@ -130,7 +130,7 @@ export async function BottomLists() {
       {/* Top Links */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h3 className="text-[13px] font-medium">Top-Links</h3>
+          <h3 className="text-[13.5px] font-semibold tracking-tight">Top-Links</h3>
           <Link href="/links" className="flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors">
             Alle anzeigen <ArrowRight className="h-3 w-3" />
           </Link>
