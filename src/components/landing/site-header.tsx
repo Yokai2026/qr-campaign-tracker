@@ -40,30 +40,24 @@ export function SiteHeader() {
             className="hidden items-center gap-6 md:flex"
             aria-label="Hauptnavigation"
           >
-            <Link
-              href="#features"
-              className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Features
-            </Link>
-            <Link
-              href="#dsgvo"
-              className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Datenschutz
-            </Link>
-            <Link
-              href="#so-funktioniert"
-              className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-            >
-              So funktioniert&apos;s
-            </Link>
-            <Link
-              href="/pricing"
-              className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Preise
-            </Link>
+            {[
+              { href: '#features', label: 'Features' },
+              { href: '#dsgvo', label: 'Datenschutz' },
+              { href: '#so-funktioniert', label: "So funktioniert's" },
+              { href: '/pricing', label: 'Preise' },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group relative text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {item.label}
+                <span
+                  aria-hidden
+                  className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-brand transition-transform duration-200 ease-out group-hover:scale-x-100"
+                />
+              </Link>
+            ))}
           </nav>
         </div>
 

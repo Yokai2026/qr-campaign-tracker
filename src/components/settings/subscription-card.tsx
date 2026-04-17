@@ -20,7 +20,7 @@ const STATUS_CONFIG: Record<StatusKey, { label: string; icon: typeof CheckCircle
     label: 'Aktiv',
     icon: CheckCircle,
     pill: 'bg-emerald-500/10 text-emerald-700 ring-1 ring-inset ring-emerald-500/20 dark:text-emerald-400',
-    dot: 'bg-emerald-500',
+    dot: 'bg-emerald-400',
   },
   on_trial: {
     label: 'Testversion',
@@ -215,9 +215,9 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
                 </Button>
               </a>
               <a href={checkoutUrls.yearly}>
-                <Button size="sm" className="w-full justify-between">
+                <Button variant="brand" size="sm" className="w-full justify-between">
                   <span>Jährlich — 4,99 €</span>
-                  <span className="rounded bg-white/20 px-1 py-0.5 text-[9px] font-semibold">−62 %</span>
+                  <span className="rounded bg-white/25 px-1 py-0.5 text-[9px] font-semibold">−62 %</span>
                 </Button>
               </a>
             </div>
@@ -253,9 +253,9 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
                 </Button>
               </a>
               <a href={checkoutUrls.yearly}>
-                <Button size="sm" className="w-full justify-between">
+                <Button variant="brand" size="sm" className="w-full justify-between">
                   <span>Jährlich — 4,99 €</span>
-                  <span className="rounded bg-white/20 px-1 py-0.5 text-[9px] font-semibold">−62 %</span>
+                  <span className="rounded bg-white/25 px-1 py-0.5 text-[9px] font-semibold">−62 %</span>
                 </Button>
               </a>
             </div>

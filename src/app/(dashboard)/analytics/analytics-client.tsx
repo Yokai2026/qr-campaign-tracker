@@ -371,8 +371,14 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         title="Analytik"
         description="Auswertung aller QR-Scans und Link-Klicks"
         badge={isLive ? (
-          <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span
+            className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400"
+            title="Realtime — Daten aktualisieren sich sobald Scans eintreffen"
+          >
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            </span>
             Live
           </span>
         ) : undefined}
@@ -407,7 +413,15 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
       {/* Filters */}
       <div className="rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-xs)]">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {/* Date-Preset Chips */}
+        <DatePresetRow
+          dateFrom={dateFrom}
+          onApply={(from, to) => {
+            setDateFrom(from);
+            setDateTo(to);
+          }}
+        />
+        <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Von</Label>
             <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-9 text-[13px]" />
@@ -732,6 +746,76 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           </ChartCard>
         </>
       )}
+    </div>
+  );
+}
+
+/** Date-Range Preset Chips — schnelle Quick-Picks ohne Calendar */
+const DATE_PRESETS = [
+  { label: 'Heute', days: 0 },
+  { label: '7 Tage', days: 6 },
+  { label: '30 Tage', days: 29 },
+  { label: '90 Tage', days: 89 },
+  { label: 'YTD', ytd: true },
+] as const;
+
+function DatePresetRow({
+  dateFrom,
+  onApply,
+}: {
+  dateFrom: string;
+  onApply: (from: string, to: string) => void;
+}) {
+  function handleClick(preset: (typeof DATE_PRESETS)[number]) {
+    const today = new Date();
+    const to = format(today, 'yyyy-MM-dd');
+    let from: string;
+    if ('ytd' in preset && preset.ytd) {
+      from = format(new Date(today.getFullYear(), 0, 1), 'yyyy-MM-dd');
+    } else {
+      const days = 'days' in preset ? preset.days : 0;
+      from = format(subDays(today, days), 'yyyy-MM-dd');
+    }
+    onApply(from, to);
+  }
+
+  function isActive(preset: (typeof DATE_PRESETS)[number]): boolean {
+    const today = new Date();
+    const expectedTo = format(today, 'yyyy-MM-dd');
+    let expectedFrom: string;
+    if ('ytd' in preset && preset.ytd) {
+      expectedFrom = format(new Date(today.getFullYear(), 0, 1), 'yyyy-MM-dd');
+    } else {
+      const days = 'days' in preset ? preset.days : 0;
+      expectedFrom = format(subDays(today, days), 'yyyy-MM-dd');
+    }
+    return dateFrom === expectedFrom;
+    // Note: we only check `from` — `to` is always "today" when a preset is active
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="mr-1 text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+        Zeitraum
+      </span>
+      {DATE_PRESETS.map((preset) => {
+        const active = isActive(preset);
+        return (
+          <button
+            key={preset.label}
+            type="button"
+            onClick={() => handleClick(preset)}
+            className={
+              'rounded-full border px-2.5 py-1 text-[12px] font-medium transition-colors ' +
+              (active
+                ? 'border-brand bg-brand/10 text-brand'
+                : 'border-border bg-card text-muted-foreground hover:border-brand/30 hover:bg-brand/[0.04] hover:text-foreground')
+            }
+          >
+            {preset.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

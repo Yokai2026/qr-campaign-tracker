@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { User, Shield, Code, Loader2, Trash2, Download, ScrollText } from 'lucide-react';
+import { User, Shield, Code, Loader2, Trash2, Download, ScrollText, Copy, Check } from 'lucide-react';
 import { deleteAccount } from './account-actions';
 import { ReportSchedules } from '@/components/settings/report-schedules';
 import { ScanAlerts } from '@/components/settings/scan-alerts';
@@ -189,9 +189,7 @@ export default function SettingsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md bg-neutral-900 p-3 font-mono text-[12px] text-neutral-300">
-                {`<script src="${origin}/tracker.js"></script>`}
-              </div>
+              <TrackingScriptBlock origin={origin} />
               <p className="mt-2 text-[12px] text-muted-foreground">
                 Das Script erkennt QR-Attributionsparameter automatisch aus der URL.
               </p>
@@ -288,6 +286,42 @@ export default function SettingsPage() {
           <DeleteAccountButton />
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function TrackingScriptBlock({ origin }: { origin: string }) {
+  const [copied, setCopied] = useState(false);
+  const snippet = `<script src="${origin}/tracker.js"></script>`;
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(snippet);
+      setCopied(true);
+      toast.success('In Zwischenablage kopiert');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Konnte nicht kopieren');
+    }
+  }
+
+  return (
+    <div className="group relative">
+      <pre className="overflow-x-auto rounded-md bg-neutral-900 p-3 pr-11 font-mono text-[12px] text-neutral-300">
+        <code>{snippet}</code>
+      </pre>
+      <button
+        type="button"
+        onClick={handleCopy}
+        aria-label="Script kopieren"
+        className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-md border border-white/10 bg-white/[0.05] text-neutral-300 transition-colors hover:bg-white/[0.10] hover:text-white"
+      >
+        {copied ? (
+          <Check className="h-3.5 w-3.5 text-emerald-400" />
+        ) : (
+          <Copy className="h-3.5 w-3.5" />
+        )}
+      </button>
     </div>
   );
 }
