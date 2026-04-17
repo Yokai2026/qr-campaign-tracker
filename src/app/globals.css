@@ -335,6 +335,30 @@
   50% { opacity: 0.5; transform: scale(0.85); }
 }
 
+/* Horizontal bar growth — used for campaign progress bars, device-share bars, etc. */
+@keyframes barGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Subtle pulse for hero-chart highlight dots */
+@keyframes heroPulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%      { transform: scale(1.8); opacity: 0; }
+}
+
+/* Shimmer along a horizontal line — for timeline connectors */
+@keyframes shimmerLine {
+  0%   { background-position: -120% 0; }
+  100% { background-position: 220% 0; }
+}
+
+/* Gentle lift that breathes — for emphasized buttons */
+@keyframes breathe {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+
 /* ── Reduced motion — respect user preferences ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -1,29 +1,61 @@
 import { Zap, Cookie, Globe2, Infinity as InfinityIcon } from 'lucide-react';
+import { AnimatedNumber } from '@/components/shared/animated-number';
 
-const STATS = [
+type Stat = {
+  icon: React.ComponentType<{ className?: string }>;
+  /** Renderer für die Kennzahl — kann statischer Node oder AnimatedNumber sein. */
+  render: () => React.ReactNode;
+  label: string;
+  note: string;
+};
+
+const STATS: Stat[] = [
   {
     icon: Zap,
-    value: '<100ms',
+    render: () => (
+      <>
+        &lt;
+        <AnimatedNumber
+          value={100}
+          triggerOnView
+          duration={1400}
+          delay={0}
+          formatFn={(n) => Math.round(n).toString()}
+        />
+        ms
+      </>
+    ),
     label: 'Redirect-Antwortzeit',
     note: 'Scan zu Zielseite — kaum spürbar',
   },
   {
     icon: Cookie,
-    value: '0',
+    render: () => <>0</>,
     label: 'Cookies fürs Tracking',
     note: 'Kein Banner-Zwang, kein Consent-Theater',
   },
   {
     icon: Globe2,
-    value: '100%',
+    render: () => (
+      <>
+        <AnimatedNumber
+          value={100}
+          triggerOnView
+          duration={1400}
+          delay={160}
+          formatFn={(n) => Math.round(n).toString()}
+        />
+        %
+      </>
+    ),
     label: 'EU-Hosting',
     note: 'Frankfurt & Falkenstein. Keine US-Provider.',
   },
   {
     icon: InfinityIcon,
-    value: 'Unbegrenzt',
+    render: () => <>&infin;</>,
     label: 'Kampagnen, Codes & Scans',
-    note: 'Keine Volumen-Tarife, keine Drosselung',
+    note: 'Unbegrenzt, keine Volumen-Tarife',
   },
 ];
 
@@ -73,7 +105,7 @@ export function StatsMoment() {
           {STATS.map((s, i) => (
             <li
               key={s.label}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:bg-white/[0.06] sm:p-6"
+              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:bg-white/[0.07] hover:shadow-[0_18px_48px_-16px_oklch(0_0_0/0.5)] sm:p-6"
               style={{
                 animationDelay: `${i * 80}ms`,
               }}
@@ -86,11 +118,11 @@ export function StatsMoment() {
               />
 
               <div className="relative">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.06] text-white/70 transition-colors group-hover:bg-brand/15 group-hover:text-brand">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.06] text-white/70 transition-all duration-300 group-hover:scale-110 group-hover:bg-brand/15 group-hover:text-brand">
                   <s.icon className="h-4 w-4" />
                 </span>
                 <div className="mt-5 tabular-nums text-[40px] font-semibold leading-none tracking-[-0.02em] text-white sm:text-[48px]">
-                  {s.value}
+                  {s.render()}
                 </div>
                 <div className="mt-3 text-[13.5px] font-semibold tracking-tight text-white/90">
                   {s.label}

@@ -1,10 +1,14 @@
+'use client';
+
 import { ArrowUpRight, MapPin, Smartphone, TrendingUp } from 'lucide-react';
+import { AnimatedNumber } from '@/components/shared/animated-number';
+import { AnimatedPath } from '@/components/shared/animated-path';
 
 const KPIS = [
-  { label: 'Scans heute', value: '2.847', trend: '+12 %', positive: true },
-  { label: 'Unique', value: '1.912', trend: '+8 %', positive: true },
-  { label: 'CTR', value: '67 %', trend: '+2,1 %', positive: true },
-  { label: 'Conversions', value: '184', trend: '+24 %', positive: true },
+  { label: 'Scans heute', value: 2847, trend: '+12 %', positive: true, delay: 0 },
+  { label: 'Unique', value: 1912, trend: '+8 %', positive: true, delay: 120 },
+  { label: 'CTR', value: 67, trend: '+2,1 %', positive: true, suffix: ' %', delay: 240 },
+  { label: 'Conversions', value: 184, trend: '+24 %', positive: true, delay: 360 },
 ];
 
 const CAMPAIGNS = [
@@ -12,6 +16,8 @@ const CAMPAIGNS = [
   { name: 'Flyer Café-Route', scans: 896, pct: 62, tag: 'Flyer' },
   { name: 'Visitenkarte Messe', scans: 412, pct: 28, tag: 'B2B' },
 ];
+
+const SPARKLINE_PATH = 'M0,16 L10,14 L20,15 L30,10 L40,11 L50,7 L60,8 L70,4 L80,5';
 
 export function HeroDashboardMock() {
   return (
@@ -28,7 +34,11 @@ export function HeroDashboardMock() {
               <span className="text-muted-foreground">Übersicht</span>
             </div>
             <div className="hidden items-center gap-1.5 sm:flex">
-              <span className="rounded-md border border-border/80 bg-background px-2 py-1 text-[11px] font-medium">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-background px-2 py-1 text-[11px] font-medium">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                </span>
                 Letzte 14 Tage
               </span>
             </div>
@@ -39,14 +49,22 @@ export function HeroDashboardMock() {
             {KPIS.map((m) => (
               <div
                 key={m.label}
-                className="rounded-lg border border-border/70 bg-card p-3 sm:p-3.5"
+                className="group rounded-lg border border-border/70 bg-card p-3 transition-colors hover:border-brand/30 sm:p-3.5"
               >
                 <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
                   {m.label}
                 </div>
                 <div className="mt-1.5 flex items-baseline gap-1.5">
                   <span className="tabular text-[22px] font-semibold tracking-tight sm:text-[26px]">
-                    {m.value}
+                    <AnimatedNumber
+                      value={m.value}
+                      triggerOnView
+                      duration={1400}
+                      delay={m.delay}
+                      formatFn={(n) =>
+                        `${Math.round(n).toLocaleString('de-DE')}${m.suffix ?? ''}`
+                      }
+                    />
                   </span>
                   <span
                     className={
@@ -59,15 +77,17 @@ export function HeroDashboardMock() {
                     {m.trend}
                   </span>
                 </div>
-                {/* Sparkline */}
+                {/* Sparkline — draws in on reveal */}
                 <svg viewBox="0 0 80 20" className="mt-2 h-5 w-full" aria-hidden>
-                  <polyline
-                    points="0,16 10,14 20,15 30,10 40,11 50,7 60,8 70,4 80,5"
+                  <AnimatedPath
+                    d={SPARKLINE_PATH}
                     fill="none"
                     stroke="var(--brand)"
                     strokeWidth="1.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    duration={1100}
+                    delay={m.delay + 200}
                   />
                 </svg>
               </div>
@@ -109,31 +129,46 @@ export function HeroDashboardMock() {
                   <line x1="0" y1="70" x2="400" y2="70" />
                   <line x1="0" y1="110" x2="400" y2="110" />
                 </g>
-                {/* comparison (prev period) */}
-                <path
+                {/* comparison (prev period) — draws in subtly */}
+                <AnimatedPath
                   d="M0,100 L30,95 L60,92 L90,98 L120,80 L150,88 L180,72 L210,78 L240,64 L270,72 L300,58 L330,65 L360,52 L400,48"
                   fill="none"
                   stroke="currentColor"
                   strokeOpacity="0.25"
                   strokeWidth="1.2"
                   strokeDasharray="3 3"
+                  duration={1800}
+                  delay={200}
                 />
-                {/* main area */}
+                {/* main area (no draw-in on fill — that would look weird) */}
                 <path
                   d="M0,110 L30,100 L60,82 L90,90 L120,60 L150,70 L180,40 L210,50 L240,30 L270,44 L300,22 L330,34 L360,14 L400,8 L400,140 L0,140 Z"
                   fill="url(#lp-area)"
+                  className="opacity-0 animate-[fadeIn_700ms_ease-out_600ms_forwards]"
                 />
-                <path
+                <AnimatedPath
                   d="M0,110 L30,100 L60,82 L90,90 L120,60 L150,70 L180,40 L210,50 L240,30 L270,44 L300,22 L330,34 L360,14 L400,8"
                   fill="none"
                   stroke="var(--brand)"
                   strokeWidth="1.75"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  duration={1800}
+                  delay={300}
                 />
-                {/* highlight dot */}
-                <circle cx="360" cy="14" r="3.5" fill="var(--brand)" />
-                <circle cx="360" cy="14" r="6" fill="var(--brand)" fillOpacity="0.15" />
+                {/* highlight dot with pulsing ring */}
+                <g className="opacity-0 animate-[fadeIn_500ms_ease-out_1800ms_forwards]">
+                  <circle cx="360" cy="14" r="3.5" fill="var(--brand)" />
+                  <circle
+                    cx="360"
+                    cy="14"
+                    r="6"
+                    fill="var(--brand)"
+                    fillOpacity="0.15"
+                    className="motion-safe:animate-[heroPulse_2s_ease-in-out_infinite]"
+                    style={{ transformOrigin: '360px 14px' }}
+                  />
+                </g>
               </svg>
             </div>
 
@@ -144,7 +179,7 @@ export function HeroDashboardMock() {
                 <span className="text-[11px] text-muted-foreground">diese Woche</span>
               </div>
               <ul className="space-y-2.5">
-                {CAMPAIGNS.map((c) => (
+                {CAMPAIGNS.map((c, i) => (
                   <li key={c.name} className="group">
                     <div className="mb-1 flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
@@ -152,14 +187,24 @@ export function HeroDashboardMock() {
                         <span className="text-[12px] font-medium">{c.name}</span>
                       </div>
                       <span className="tabular text-[11px] font-semibold">
-                        {c.scans.toLocaleString('de-DE')}
+                        <AnimatedNumber
+                          value={c.scans}
+                          triggerOnView
+                          duration={1400}
+                          delay={400 + i * 120}
+                        />
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="h-1 flex-1 overflow-hidden rounded-full bg-muted">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-primary/70 to-primary"
-                          style={{ width: `${c.pct}%` }}
+                          className="h-full rounded-full bg-gradient-to-r from-primary/70 to-primary motion-safe:[transform:scaleX(0)] motion-safe:[transform-origin:left] motion-safe:animate-[barGrow_1200ms_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                          style={
+                            {
+                              width: `${c.pct}%`,
+                              animationDelay: `${500 + i * 140}ms`,
+                            } as React.CSSProperties
+                          }
                         />
                       </div>
                       <span className="rounded border border-border/60 bg-muted/40 px-1.5 py-[1px] text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
