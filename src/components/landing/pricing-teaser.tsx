@@ -40,13 +40,13 @@ export function PricingTeaser() {
         className="pointer-events-none absolute inset-0 opacity-50"
         style={{
           background:
-            'radial-gradient(ellipse 50% 40% at 50% 0%, oklch(0.74 0.10 38 / 0.05), transparent 65%), radial-gradient(ellipse 60% 50% at 50% 100%, oklch(0.64 0.10 185 / 0.05), transparent 60%)',
+            'radial-gradient(ellipse 60% 50% at 50% 100%, oklch(0.64 0.10 185 / 0.06), transparent 60%)',
         }}
       />
 
       <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
         {/* Urgency pill */}
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-warm/30 bg-warm/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-warm-foreground">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-brand">
           <Sparkles className="h-3 w-3" />
           Einführungspreis · gilt bis Ende 2026
         </span>
@@ -69,7 +69,7 @@ export function PricingTeaser() {
           {REASSURANCE.map((r) => (
             <li
               key={r.title}
-              className="group flex items-start gap-3 rounded-2xl border border-border bg-card/60 p-4 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/30 hover:bg-card hover:shadow-[var(--shadow-sm)]"
+              className="group flex items-start gap-3 rounded-2xl border border-border bg-card p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[var(--shadow-sm)]"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand transition-all duration-300 group-hover:scale-110 group-hover:bg-brand/15">
                 <r.icon className="h-4 w-4" />

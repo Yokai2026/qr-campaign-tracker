@@ -23,7 +23,7 @@ export function HeroDashboardMock() {
   return (
     <div className="relative mx-auto max-w-6xl px-4 pb-24 sm:px-6">
       {/* Frame — simulates macOS / browser chrome with depth */}
-      <div className="relative rounded-[22px] border border-border/60 bg-card/80 p-1.5 shadow-[var(--shadow-glow)] ring-1 ring-primary/[0.04] backdrop-blur">
+      <div className="relative rounded-[22px] border border-border/60 bg-card p-1.5 shadow-[var(--shadow-glow)] ring-1 ring-primary/[0.04]">
         {/* Inner bezel */}
         <div className="overflow-hidden rounded-[15px] border border-border/80 bg-background">
           {/* Minimal app header */}

@@ -55,7 +55,7 @@ export function FeaturesBento() {
             </div>
 
             {/* Mini dashboard preview */}
-            <div className="relative mt-auto rounded-xl border border-border bg-background/85 p-4 shadow-[var(--shadow-sm)] backdrop-blur">
+            <div className="relative mt-auto rounded-xl border border-border bg-background p-4 shadow-[var(--shadow-sm)]">
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[11px] font-medium">Scans · 14 Tage</span>
@@ -139,7 +139,7 @@ export function FeaturesBento() {
             <div
               aria-hidden
               className="pointer-events-none absolute -top-16 -left-16 h-40 w-40 rounded-full opacity-30 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
-              style={{ background: 'radial-gradient(circle, var(--warm), transparent 70%)' }}
+              style={{ background: 'radial-gradient(circle, var(--brand), transparent 70%)' }}
             />
             <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand transition-all duration-300 group-hover:scale-110 group-hover:bg-brand/15">
               <MapPin className="h-4 w-4" />

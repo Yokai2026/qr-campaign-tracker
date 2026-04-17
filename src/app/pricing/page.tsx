@@ -63,7 +63,7 @@ export default function PricingPage() {
           />
 
           <div className="relative mx-auto max-w-5xl px-4 pt-24 pb-12 text-center sm:px-6 sm:pt-32 sm:pb-16">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-warm/30 bg-warm/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-warm-foreground">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-brand">
               Einführungspreis · über 50 % günstiger
             </span>
             <h1 className="mt-6 text-balance font-heading text-[40px] font-semibold leading-[1.05] tracking-[-0.03em] sm:text-[56px] md:text-[64px]">

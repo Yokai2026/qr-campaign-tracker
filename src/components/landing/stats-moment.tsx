@@ -71,7 +71,7 @@ export function StatsMoment() {
         className="pointer-events-none absolute inset-0 opacity-50"
         style={{
           background:
-            'radial-gradient(ellipse 60% 70% at 30% 20%, oklch(0.64 0.10 185 / 0.12), transparent 60%), radial-gradient(ellipse 50% 60% at 80% 90%, oklch(0.74 0.10 38 / 0.07), transparent 65%)',
+            'radial-gradient(ellipse 60% 70% at 30% 20%, oklch(0.64 0.10 185 / 0.12), transparent 60%), radial-gradient(ellipse 50% 60% at 80% 90%, oklch(0.64 0.10 185 / 0.06), transparent 65%)',
         }}
       />
       <div
@@ -85,7 +85,7 @@ export function StatsMoment() {
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/85 backdrop-blur">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/85">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -105,7 +105,7 @@ export function StatsMoment() {
           {STATS.map((s, i) => (
             <li
               key={s.label}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:bg-white/[0.07] hover:shadow-[0_18px_48px_-16px_oklch(0_0_0/0.5)] sm:p-6"
+              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:bg-white/[0.07] hover:shadow-[0_18px_48px_-16px_oklch(0_0_0/0.5)] sm:p-6"
               style={{
                 animationDelay: `${i * 80}ms`,
               }}

@@ -36,7 +36,7 @@ export function FinalCTA() {
 
           <div className="relative grid items-center gap-10 lg:grid-cols-[1.3fr_1fr]">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/80 backdrop-blur">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/80">
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -85,7 +85,7 @@ export function FinalCTA() {
 
             {/* Mini preview card */}
             <div className="relative hidden lg:block">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.06]">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.06]">
                 <div className="flex items-center justify-between text-[11px] text-white/50">
                   <span>Scan-Verlauf · live</span>
                   <span className="inline-flex items-center gap-1">
