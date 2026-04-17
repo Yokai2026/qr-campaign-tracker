@@ -18,6 +18,7 @@ import { PricingTeaser } from '@/components/landing/pricing-teaser';
 import { FaqSection, FAQ_ITEMS } from '@/components/landing/faq-section';
 import { FinalCTA } from '@/components/landing/final-cta';
 import { SiteFooter } from '@/components/landing/site-footer';
+import { Reveal } from '@/components/shared/reveal';
 
 export default function LandingPage() {
   return (
@@ -27,18 +28,18 @@ export default function LandingPage() {
       <SiteHeader />
       <main id="main-content">
         <Hero />
-        <QuickWinsStrip />
-        <SectorStrip />
-        <StepsSection />
-        <FeaturesBento />
-        <StatsMoment />
-        <PrivacySection />
-        <DomainShowcase />
-        <CompareSection />
-        <TrustStrip />
-        <PricingTeaser />
-        <FaqSection />
-        <FinalCTA />
+        <Reveal><QuickWinsStrip /></Reveal>
+        <Reveal><SectorStrip /></Reveal>
+        <Reveal><StepsSection /></Reveal>
+        <Reveal><FeaturesBento /></Reveal>
+        <Reveal><StatsMoment /></Reveal>
+        <Reveal><PrivacySection /></Reveal>
+        <Reveal><DomainShowcase /></Reveal>
+        <Reveal><CompareSection /></Reveal>
+        <Reveal><TrustStrip /></Reveal>
+        <Reveal><PricingTeaser /></Reveal>
+        <Reveal><FaqSection /></Reveal>
+        <Reveal><FinalCTA /></Reveal>
       </main>
       <SiteFooter />
     </div>
