@@ -410,16 +410,16 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Von</Label>
-            <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-8 text-[13px]" />
+            <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-9 text-[13px]" />
           </div>
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Bis</Label>
-            <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-8 text-[13px]" />
+            <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-9 text-[13px]" />
           </div>
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Quelle</Label>
             <Select value={source} onValueChange={(v) => setSource((v ?? 'all') as SourceFilter)}>
-              <SelectTrigger className="h-8 text-[13px]">
+              <SelectTrigger className="h-9 text-[13px]">
                 <SelectValue>
                   {source === 'all' ? 'Alle Quellen' : source === 'qr' ? 'QR-Codes' : 'Kurzlinks'}
                 </SelectValue>
@@ -434,7 +434,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Kampagne</Label>
             <Select value={campaignId} onValueChange={(v) => setCampaignId(v ?? 'all')}>
-              <SelectTrigger className="h-8 text-[13px]">
+              <SelectTrigger className="h-9 text-[13px]">
                 <SelectValue placeholder="Alle Kampagnen">
                   {campaignId === 'all'
                     ? 'Alle Kampagnen'
@@ -450,7 +450,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Bezirk</Label>
             <Select value={district} onValueChange={(v) => setDistrict(v ?? 'all')}>
-              <SelectTrigger className="h-8 text-[13px]">
+              <SelectTrigger className="h-9 text-[13px]">
                 <SelectValue placeholder="Alle Bezirke">
                   {district === 'all' ? 'Alle Bezirke' : district}
                 </SelectValue>
