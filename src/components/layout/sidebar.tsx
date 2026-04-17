@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { checkFeatureAccess } from '@/lib/billing/check-access';
 import type { EffectiveTier } from '@/lib/billing/gates';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const mainNav = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -213,6 +214,11 @@ export function Sidebar() {
           <LogOut className="h-[15px] w-[15px]" />
           Abmelden
         </button>
+        {/* Theme toggle */}
+        <div className="mt-2 flex items-center justify-between px-2 pt-2 border-t border-white/[0.06]">
+          <span className="text-[11px] uppercase tracking-[0.08em] text-white/35">Theme</span>
+          <ThemeToggle variant="pill" className="!border-white/10 !bg-white/[0.04]" />
+        </div>
       </div>
     </>
   );

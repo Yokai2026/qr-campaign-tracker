@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function SiteHeader() {
   return (
@@ -62,6 +63,7 @@ export function SiteHeader() {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle variant="icon" className="hidden sm:flex" />
           {/* Hide "Anmelden" below 360px to prevent header overflow on iPhone SE 1 / iPhone 5 */}
           <Button
             variant="ghost"
