@@ -114,7 +114,7 @@ function WorldMapInner({ data }: WorldMapProps) {
                     key={geo.rsmKey}
                     geography={geo}
                     fill={fill}
-                    stroke="oklch(1 0 0)"
+                    stroke="var(--background)"
                     strokeWidth={0.5}
                     onMouseEnter={(e) => handleMouseEnter(geo, e)}
                     onMouseLeave={handleMouseLeave}

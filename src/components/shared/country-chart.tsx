@@ -39,7 +39,7 @@ export function CountryChart({ data }: CountryChartProps) {
         <CartesianGrid {...GRID_STYLE} horizontal={false} />
         <XAxis type="number" {...AXIS_STYLE} />
         <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={120} />
-        <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+        <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--muted)' }} />
         <Bar dataKey="scans" name="Scans" fill={SERIES_COLORS.scans} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
       </BarChart>
     </ResponsiveContainer>

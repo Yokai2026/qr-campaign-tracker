@@ -557,7 +557,7 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
             <CartesianGrid {...GRID_STYLE} />
             <XAxis dataKey="date" {...AXIS_STYLE} />
             <YAxis {...AXIS_STYLE} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ stroke: 'oklch(0.918 0.006 80)', strokeWidth: 1 }} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ stroke: 'var(--border)', strokeWidth: 1 }} />
             <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
             <Line type="monotone" dataKey="clicks" name="Klicks" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls={false} />
             <Line type="monotone" dataKey="forecast" name="Prognose" stroke={SERIES_COLORS.forecast} strokeWidth={1.5} strokeDasharray="5 4" dot={false} connectNulls={false} />
@@ -570,7 +570,7 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
         <ChartCard title="Gerätetypen" empty={stats.deviceData.length === 0}>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
-              <Pie data={stats.deviceData} cx="50%" cy="50%" outerRadius={88} innerRadius={54} dataKey="value" nameKey="name" label={false} stroke="oklch(1 0 0)" strokeWidth={2} paddingAngle={1.5}>
+              <Pie data={stats.deviceData} cx="50%" cy="50%" outerRadius={88} innerRadius={54} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
                 {stats.deviceData.map((_, idx) => (
                   <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                 ))}
@@ -587,7 +587,7 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
               <CartesianGrid {...GRID_STYLE} horizontal={false} />
               <XAxis type="number" {...AXIS_STYLE} />
               <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={120} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--muted)' }} />
               <Bar dataKey="value" name="Klicks" fill={SERIES_COLORS.clicks} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
             </BarChart>
           </ResponsiveContainer>

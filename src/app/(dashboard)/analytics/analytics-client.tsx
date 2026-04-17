@@ -592,7 +592,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                   <CartesianGrid {...GRID_STYLE} />
                   <XAxis dataKey="date" {...AXIS_STYLE} />
                   <YAxis {...AXIS_STYLE} allowDecimals={false} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ stroke: 'oklch(0.918 0.006 80)', strokeWidth: 1 }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ stroke: 'var(--border)', strokeWidth: 1 }} />
                   <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
                   <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls={false} />
                   <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls={false} />
@@ -607,7 +607,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                   <CartesianGrid {...GRID_STYLE} horizontal={false} />
                   <XAxis type="number" {...AXIS_STYLE} allowDecimals={false} />
                   <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={90} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--muted)' }} />
                   <Bar dataKey="opens" name="Aufrufe" fill={SERIES_COLORS.scans} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
                 </BarChart>
               </ResponsiveContainer>
@@ -616,7 +616,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <ChartCard title="Gerätetypen" empty={deviceData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={deviceData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="oklch(1 0 0)" strokeWidth={2} paddingAngle={1.5}>
+                  <Pie data={deviceData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
                     {deviceData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
@@ -640,7 +640,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <ChartCard title="Browser" empty={browserData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={browserData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="oklch(1 0 0)" strokeWidth={2} paddingAngle={1.5}>
+                  <Pie data={browserData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
                     {browserData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
@@ -654,7 +654,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <ChartCard title="Betriebssystem" empty={osData.length === 0}>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={osData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="oklch(1 0 0)" strokeWidth={2} paddingAngle={1.5}>
+                  <Pie data={osData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
                     {osData.map((_, idx) => (
                       <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
                     ))}
@@ -723,7 +723,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                   <CartesianGrid {...GRID_STYLE} horizontal={false} />
                   <XAxis type="number" {...AXIS_STYLE} />
                   <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={110} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--muted)' }} />
                   <Bar dataKey="value" name="Klicks" fill={SERIES_COLORS.clicks} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
                 </BarChart>
               </ResponsiveContainer>

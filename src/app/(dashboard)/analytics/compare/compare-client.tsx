@@ -249,7 +249,7 @@ export function CompareClient() {
                   <CartesianGrid {...GRID_STYLE} vertical={false} />
                   <XAxis dataKey="metric" {...AXIS_STYLE} />
                   <YAxis {...AXIS_STYLE} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'oklch(0.965 0.006 80)' }} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--muted)' }} />
                   <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
                   <Bar dataKey={dataA.name} fill={SERIES_COLORS.scans} radius={[6, 6, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
                   <Bar dataKey={dataB.name} fill={SERIES_COLORS.clicks} radius={[6, 6, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
