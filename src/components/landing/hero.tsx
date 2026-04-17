@@ -3,6 +3,7 @@ import { ArrowRight, Check, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GridBackdrop } from '@/components/ui/grid-backdrop';
 import { HeroDashboardMock } from './hero-dashboard-mock';
+import { Magnetic } from '@/components/shared/magnetic-button';
 
 const TRUST = [
   'Keine Kreditkarte',
@@ -55,15 +56,17 @@ export function Hero() {
 
         {/* CTAs */}
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-3">
-          <Button
-            size="lg"
-            variant="brand"
-            render={<Link href="/signup" />}
-            className="group min-w-[260px]"
-          >
-            Jetzt 14 Tage gratis starten
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Button>
+          <Magnetic strength={10}>
+            <Button
+              size="lg"
+              variant="brand"
+              render={<Link href="/signup" />}
+              className="group min-w-[260px]"
+            >
+              Jetzt 14 Tage gratis starten
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Button>
+          </Magnetic>
           <Button
             size="lg"
             variant="outline"

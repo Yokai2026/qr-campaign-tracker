@@ -64,6 +64,7 @@ export function AnimatedNumber({
   const rafId = useRef<number>(0);
   const spanRef = useRef<HTMLSpanElement>(null);
   const startedRef = useRef(false);
+  const lastAnimatedValue = useRef<number>(from ?? 0);
 
   useEffect(() => {
     if (triggerOnView) return; // handled in separate effect
@@ -115,11 +116,8 @@ export function AnimatedNumber({
       return;
     }
 
-    const run = () => {
-      if (startedRef.current) return;
-      startedRef.current = true;
-
-      const begin = performance.now() + delay;
+    const run = (startFrom: number, effectiveDelay: number) => {
+      const begin = performance.now() + effectiveDelay;
       const tick = (now: number) => {
         if (now < begin) {
           rafId.current = requestAnimationFrame(tick);
@@ -127,18 +125,30 @@ export function AnimatedNumber({
         }
         const progress = Math.min((now - begin) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        const current = Math.round(viewStart + (value - viewStart) * eased);
+        const current = Math.round(startFrom + (value - startFrom) * eased);
         setDisplay(format(current));
         if (progress < 1) rafId.current = requestAnimationFrame(tick);
-        else setDisplay(format(value));
+        else {
+          setDisplay(format(value));
+          lastAnimatedValue.current = value;
+        }
       };
       rafId.current = requestAnimationFrame(tick);
     };
 
+    // Bereits initial animiert? Dann direkt re-animieren ohne erneute Viewport-Wartezeit.
+    if (startedRef.current) {
+      if (value !== lastAnimatedValue.current) {
+        run(lastAnimatedValue.current, 0);
+      }
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
-          run();
+          startedRef.current = true;
+          run(viewStart, delay);
           observer.disconnect();
         }
       },

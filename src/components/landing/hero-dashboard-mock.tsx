@@ -1,15 +1,75 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, MapPin, Smartphone, TrendingUp } from 'lucide-react';
 import { AnimatedNumber } from '@/components/shared/animated-number';
 import { AnimatedPath } from '@/components/shared/animated-path';
 
-const KPIS = [
-  { label: 'Scans heute', value: 2847, trend: '+12 %', positive: true, delay: 0 },
-  { label: 'Unique', value: 1912, trend: '+8 %', positive: true, delay: 120 },
-  { label: 'CTR', value: 67, trend: '+2,1 %', positive: true, suffix: ' %', delay: 240 },
-  { label: 'Conversions', value: 184, trend: '+24 %', positive: true, delay: 360 },
+type KpiBase = {
+  key: string;
+  label: string;
+  base: number;
+  trend: string;
+  positive: boolean;
+  suffix?: string;
+  delay: number;
+};
+const KPIS_BASE: KpiBase[] = [
+  { key: 'scans', label: 'Scans heute', base: 2847, trend: '+12 %', positive: true, delay: 0 },
+  { key: 'unique', label: 'Unique', base: 1912, trend: '+8 %', positive: true, delay: 120 },
+  { key: 'ctr', label: 'CTR', base: 67, trend: '+2,1 %', positive: true, suffix: ' %', delay: 240 },
+  { key: 'conv', label: 'Conversions', base: 184, trend: '+24 %', positive: true, delay: 360 },
 ];
+
+/** Simuliert live eintreffende Scans — inkrementiert jeden Tick um 1-3. */
+function useLiveTick() {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return;
+    const id = setInterval(() => setTick((t) => t + 1), 3200);
+    return () => clearInterval(id);
+  }, []);
+  return tick;
+}
+
+/** Soft parallax — verschiebt das Mock-Frame ~12px beim Scroll. */
+function useParallax(strength = 12) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return;
+
+    let rafId: number | null = null;
+    function update() {
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const vh = window.innerHeight || 1;
+      const center = rect.top + rect.height / 2;
+      const progress = (center - vh / 2) / vh;
+      const offset = Math.max(-strength, Math.min(strength, progress * strength));
+      node.style.transform = `translate3d(0, ${offset}px, 0)`;
+      rafId = null;
+    }
+    function onScroll() {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(update);
+    }
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [strength]);
+  return ref;
+}
 
 const CAMPAIGNS = [
   { name: 'Sommer-Plakate Berlin', scans: 1243, pct: 84, tag: 'Plakat' },
@@ -20,10 +80,25 @@ const CAMPAIGNS = [
 const SPARKLINE_PATH = 'M0,16 L10,14 L20,15 L30,10 L40,11 L50,7 L60,8 L70,4 L80,5';
 
 export function HeroDashboardMock() {
+  const tick = useLiveTick();
+  const parallaxRef = useParallax(10);
+
+  // Live-tick: KPIs nudgen um +1-3 Scans pro Tick (außer CTR)
+  const KPIS = KPIS_BASE.map((k) => {
+    let value = k.base;
+    if (k.key === 'scans') value = k.base + tick * 2;
+    else if (k.key === 'unique') value = k.base + Math.floor(tick * 1.3);
+    else if (k.key === 'conv') value = k.base + Math.floor(tick * 0.2);
+    return { ...k, value };
+  });
+
   return (
     <div className="relative mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-      {/* Frame — simulates macOS / browser chrome with depth */}
-      <div className="relative rounded-[22px] border border-border/60 bg-card p-1.5 shadow-[var(--shadow-glow)] ring-1 ring-primary/[0.04]">
+      {/* Frame — simulates macOS / browser chrome with depth; parallax on scroll */}
+      <div
+        ref={parallaxRef}
+        className="relative rounded-[22px] border border-border/60 bg-card p-1.5 shadow-[var(--shadow-glow)] ring-1 ring-primary/[0.04] will-change-transform"
+      >
         {/* Inner bezel */}
         <div className="overflow-hidden rounded-[15px] border border-border/80 bg-background">
           {/* Minimal app header */}

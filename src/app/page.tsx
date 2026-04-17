@@ -19,12 +19,14 @@ import { FaqSection, FAQ_ITEMS } from '@/components/landing/faq-section';
 import { FinalCTA } from '@/components/landing/final-cta';
 import { SiteFooter } from '@/components/landing/site-footer';
 import { Reveal } from '@/components/shared/reveal';
+import { ScrollProgress } from '@/components/shared/scroll-progress';
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       <StructuredData id="ld-software-application" data={softwareApplicationLd} />
       <StructuredData id="ld-faq-page" data={faqPageLd(FAQ_ITEMS)} />
+      <ScrollProgress />
       <SiteHeader />
       <main id="main-content">
         <Hero />
