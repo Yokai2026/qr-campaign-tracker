@@ -189,11 +189,13 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "cv11", "ss01", "ss03";
+    /* Inter stylistic sets: ss01 = single-storey a, cv11 = curved tail l */
+    font-feature-settings: "cv11", "ss01";
     font-optical-sizing: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.011em;
+    text-rendering: optimizeLegibility;
   }
   /* Headings — tighter tracking, optical sizing for display sizes */
   h1, h2, h3, h4 {
