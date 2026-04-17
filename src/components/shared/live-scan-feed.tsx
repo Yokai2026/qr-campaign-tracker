@@ -66,15 +66,20 @@ export function LiveScanFeed() {
   }, []);
 
   return (
-    <div className="rounded-lg border border-border bg-card">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <h3 className="text-[13px] font-medium">Live Scans</h3>
         <div className="flex items-center gap-1.5">
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${connected ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground/30'}`}
-          />
+          {connected ? (
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            </span>
+          ) : (
+            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
+          )}
           <span className="text-[11px] text-muted-foreground">
-            {connected ? 'Live' : 'Verbinden...'}
+            {connected ? 'Live' : 'Verbindet…'}
           </span>
         </div>
       </div>
