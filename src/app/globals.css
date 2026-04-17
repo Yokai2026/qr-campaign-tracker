@@ -132,37 +132,43 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.18 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.18 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --subtle: oklch(0.18 0.005 80);
-  --ink: oklch(0.12 0.005 80);
+  /* ── Neutrals — klare Hierarchie: bg < subtle < card < muted */
+  --background: oklch(0.135 0.005 80);
+  --foreground: oklch(0.97 0.003 80);
+  --card: oklch(0.185 0.006 80);
+  --card-foreground: oklch(0.97 0.003 80);
+  --popover: oklch(0.195 0.006 80);
+  --popover-foreground: oklch(0.97 0.003 80);
+  --subtle: oklch(0.16 0.005 80);
+  --ink: oklch(0.11 0.005 80);
   --ink-foreground: oklch(0.97 0.003 80);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.22 0.005 80);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.22 0.005 80);
-  --muted-foreground: oklch(0.70 0.005 80);
-  --accent: oklch(0.22 0.005 80);
-  --accent-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.97 0 0);
+  --primary-foreground: oklch(0.20 0.005 80);
+  --secondary: oklch(0.23 0.006 80);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.23 0.006 80);
+  --muted-foreground: oklch(0.76 0.006 80);
+  --accent: oklch(0.23 0.006 80);
+  --accent-foreground: oklch(0.97 0 0);
   --destructive: oklch(0.70 0.15 22);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.74 0.09 185);
-  --brand: oklch(0.74 0.09 185);
+  --border: oklch(1 0 0 / 0.13);
+  --input: oklch(1 0 0 / 0.13);
+  --ring: oklch(0.74 0.12 185);
+
+  /* ── Brand — Dark-Mode darf etwas mehr Chroma als Light, sonst wirkt's pastell */
+  --brand: oklch(0.74 0.115 185);
   --brand-foreground: oklch(0.12 0 0);
-  --brand-muted: oklch(0.30 0.035 185);
-  --warm: oklch(0.78 0.09 38);
-  --warm-foreground: oklch(0.18 0.035 38);
-  --chart-1: oklch(0.74 0.09 185);
-  --chart-2: oklch(0.78 0.09 38);
-  --chart-3: oklch(0.985 0 0);
-  --chart-4: oklch(0.58 0.065 185);
-  --chart-5: oklch(0.55 0.003 80);
+  --brand-muted: oklch(0.28 0.055 185);
+
+  /* ── Warm — auch etwas lebendiger in Dark */
+  --warm: oklch(0.78 0.11 38);
+  --warm-foreground: oklch(0.18 0.04 38);
+
+  --chart-1: oklch(0.74 0.115 185);
+  --chart-2: oklch(0.78 0.11 38);
+  --chart-3: oklch(0.97 0 0);
+  --chart-4: oklch(0.60 0.08 185);
+  --chart-5: oklch(0.60 0.006 80);
   --sidebar: oklch(0.10 0 0);
   --sidebar-foreground: oklch(0.70 0 0);
   --sidebar-primary: oklch(0.93 0 0);

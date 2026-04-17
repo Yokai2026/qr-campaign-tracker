@@ -60,7 +60,7 @@ export function Hero() {
         {/* Headline — größer, dominanter */}
         <h1 className="font-heading text-balance text-[46px] font-semibold leading-[1.0] tracking-[-0.035em] sm:text-[68px] md:text-[84px]">
           QR-Codes, die zeigen,{' '}
-          <span className="text-muted-foreground font-normal">
+          <span className="font-normal text-foreground/55 dark:text-foreground/50">
             was wirklich funktioniert.
           </span>
         </h1>

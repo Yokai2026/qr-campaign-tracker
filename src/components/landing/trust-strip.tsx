@@ -50,7 +50,7 @@ export function TrustStrip() {
             className="text-balance text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] sm:text-[36px]"
           >
             Unabhängig.{' '}
-            <span className="text-muted-foreground font-normal">
+            <span className="font-normal text-foreground/55 dark:text-foreground/50">
               Aus Prinzip.
             </span>
           </h2>

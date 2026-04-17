@@ -93,7 +93,7 @@ export function CompareSection() {
             className="text-balance font-heading text-[34px] font-semibold leading-[1.08] tracking-[-0.025em] sm:text-[44px]"
           >
             Statt drei Tools.{' '}
-            <span className="text-muted-foreground font-normal">
+            <span className="font-normal text-foreground/55 dark:text-foreground/50">
               Eines, das passt.
             </span>
           </h2>

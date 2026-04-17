@@ -42,7 +42,7 @@ export function SectionHeading({
       {accent && (
         <>
           {' '}
-          <span className="font-normal text-muted-foreground">
+          <span className="font-normal text-foreground/55 dark:text-foreground/50">
             {accent}
           </span>
         </>
