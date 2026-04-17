@@ -53,10 +53,12 @@ type TooltipState = {
 } | null;
 
 function getColor(value: number, max: number): string {
-  if (value === 0) return 'oklch(0.95 0 0)';
+  if (value === 0) return 'oklch(0.96 0.005 80)';
   const ratio = Math.min(value / max, 1);
-  const l = 0.85 - ratio * 0.55;
-  return `oklch(${l} 0 0)`;
+  // Brand-teal heat: light at low values, deeper teal at high values
+  const l = 0.88 - ratio * 0.32; // 0.88 -> 0.56
+  const c = 0.04 + ratio * 0.10; // 0.04 -> 0.14
+  return `oklch(${l} ${c} 185)`;
 }
 
 function WorldMapInner({ data }: WorldMapProps) {
@@ -112,14 +114,14 @@ function WorldMapInner({ data }: WorldMapProps) {
                     key={geo.rsmKey}
                     geography={geo}
                     fill={fill}
-                    stroke="oklch(0.85 0 0)"
-                    strokeWidth={0.4}
+                    stroke="oklch(1 0 0)"
+                    strokeWidth={0.5}
                     onMouseEnter={(e) => handleMouseEnter(geo, e)}
                     onMouseLeave={handleMouseLeave}
                     style={{
-                      default: { outline: 'none' },
+                      default: { outline: 'none', transition: 'fill 200ms ease' },
                       hover: {
-                        fill: value > 0 ? 'oklch(0.20 0 0)' : 'oklch(0.90 0 0)',
+                        fill: value > 0 ? 'oklch(0.45 0.13 185)' : 'oklch(0.92 0.01 80)',
                         outline: 'none',
                         cursor: value > 0 ? 'pointer' : 'default',
                       },
@@ -136,18 +138,18 @@ function WorldMapInner({ data }: WorldMapProps) {
       {/* Custom tooltip */}
       {tooltip && (
         <div
-          className="pointer-events-none absolute z-10 rounded-md border border-border bg-popover px-2.5 py-1.5 text-xs shadow-md"
+          className="pointer-events-none absolute z-10 rounded-xl border border-border bg-popover px-3 py-2 text-xs shadow-[var(--shadow-md)]"
           style={{ left: tooltip.x, top: tooltip.y, transform: 'translate(-50%, -100%)' }}
         >
-          <span className="font-medium">{tooltip.name}</span>
-          <span className="ml-1.5 tabular-nums text-muted-foreground">{tooltip.value} Scans</span>
+          <span className="font-semibold">{tooltip.name}</span>
+          <span className="ml-2 tabular-nums text-brand">{tooltip.value} Scans</span>
         </div>
       )}
 
       {/* Legend */}
-      <div className="mt-2 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+      <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-muted-foreground">
         <span>Wenig</span>
-        <div className="flex h-2.5 w-32 rounded-sm overflow-hidden">
+        <div className="flex h-2 w-36 rounded-full overflow-hidden ring-1 ring-border">
           {Array.from({ length: 8 }, (_, i) => (
             <div
               key={i}
