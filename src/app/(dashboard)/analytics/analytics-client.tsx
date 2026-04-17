@@ -5,8 +5,8 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DatePicker } from '@/components/shared/date-picker';
 import { Button } from '@/components/ui/button';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -424,11 +424,22 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Von</Label>
-            <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-9 text-[13px]" />
+            <DatePicker
+              value={dateFrom}
+              onChange={setDateFrom}
+              maxDate={dateTo}
+              ariaLabel="Startdatum"
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Bis</Label>
-            <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-9 text-[13px]" />
+            <DatePicker
+              value={dateTo}
+              onChange={setDateTo}
+              minDate={dateFrom}
+              maxDate={format(new Date(), 'yyyy-MM-dd')}
+              ariaLabel="Enddatum"
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Quelle</Label>
