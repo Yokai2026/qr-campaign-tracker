@@ -90,7 +90,7 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
     : false;
 
   return (
-    <div className="rounded-lg border border-border bg-card">
+    <div className="rounded-2xl border border-border bg-card">
       <div className="flex items-center gap-2 border-b border-border px-5 py-3">
         <CreditCard className="h-4 w-4 text-muted-foreground" />
         <h2 className="text-[14px] font-semibold">Abo & Abrechnung</h2>
@@ -134,7 +134,7 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
 
             {/* Meta row: next billing, trial end, cancel warning */}
             {mounted && (subscription.current_period_end || subscription.trial_ends_at || subscription.cancel_at) && (
-              <dl className="grid gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-[12px] sm:grid-cols-2">
+              <dl className="grid gap-2 rounded-xl border border-border bg-muted/30 px-3 py-2.5 text-[12px] sm:grid-cols-2">
                 {subscription.current_period_end && !subscription.cancel_at && (
                   <div className="flex items-center gap-2">
                     <Calendar className="h-3.5 w-3.5 text-muted-foreground" />

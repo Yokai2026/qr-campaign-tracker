@@ -71,7 +71,7 @@ export default function AuditLogPage() {
       />
 
       {/* Filters */}
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="rounded-2xl border border-border bg-card p-4">
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Von</Label>

@@ -162,7 +162,7 @@ export function ScanAlerts() {
       <CardContent className="space-y-4">
         {/* Create form */}
         {showForm && (
-          <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+          <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-3">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-1.5">
                 <Label className="text-[12px] text-muted-foreground">E-Mail</Label>
@@ -237,7 +237,7 @@ export function ScanAlerts() {
             {alerts.map((a) => (
               <div
                 key={a.id}
-                className="flex items-center justify-between rounded-lg border border-border px-3 py-2.5"
+                className="flex items-center justify-between rounded-xl border border-border px-3 py-2.5"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <Switch

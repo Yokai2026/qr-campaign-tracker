@@ -215,7 +215,7 @@ export function CustomDomains() {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Explainer: 3-Step Guide */}
-        <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-2.5">
+        <div className="rounded-xl border border-border bg-muted/20 p-3 space-y-2.5">
           <div className="flex items-center gap-1.5 text-[12px] font-medium">
             <Info className="h-3.5 w-3.5 text-muted-foreground" />
             So richtest du eine eigene Kurz-Domain ein
@@ -235,7 +235,7 @@ export function CustomDomains() {
 
         {/* Add form */}
         {showForm && (
-          <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+          <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-3">
             <div className="space-y-1.5">
               <Label htmlFor="custom-domain-host" className="text-[12px] text-muted-foreground">Hostname</Label>
               <Input
@@ -406,7 +406,7 @@ function DomainItem({
   }
 
   return (
-    <div className="rounded-lg border border-border">
+    <div className="rounded-xl border border-border">
       <div className="flex items-center justify-between px-3 py-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
           <Globe className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
