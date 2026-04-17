@@ -75,7 +75,7 @@ export function TrustStrip() {
 
               <div className="relative flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-brand/10 group-hover:text-brand">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-all duration-300 group-hover:scale-110 group-hover:bg-brand/10 group-hover:text-brand">
                     <s.icon className="h-4 w-4" />
                   </span>
                 </div>
@@ -83,7 +83,7 @@ export function TrustStrip() {
                   <div className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
                     {s.label}
                   </div>
-                  <div className="mt-1 text-[24px] font-semibold leading-tight tracking-tight text-foreground sm:text-[26px]">
+                  <div className="mt-1 text-[24px] font-semibold leading-tight tracking-tight text-foreground transition-colors duration-300 group-hover:text-brand sm:text-[26px]">
                     {s.value}
                   </div>
                 </div>

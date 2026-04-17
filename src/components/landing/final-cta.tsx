@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AnimatedNumber } from '@/components/shared/animated-number';
+import { AnimatedPath } from '@/components/shared/animated-path';
 
 const REASSURANCE = [
   'Keine Kreditkarte',
@@ -83,17 +85,20 @@ export function FinalCTA() {
 
             {/* Mini preview card */}
             <div className="relative hidden lg:block">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.06]">
                 <div className="flex items-center justify-between text-[11px] text-white/50">
                   <span>Scan-Verlauf · live</span>
                   <span className="inline-flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    </span>
                     live
                   </span>
                 </div>
                 <div className="mt-3 flex items-baseline gap-1.5">
                   <span className="tabular text-[32px] font-semibold tracking-tight">
-                    2.847
+                    <AnimatedNumber value={2847} triggerOnView duration={1400} />
                   </span>
                   <span className="tabular text-[11px] font-semibold text-emerald-400">
                     +12 %
@@ -109,27 +114,42 @@ export function FinalCTA() {
                   <path
                     d="M0,45 L20,42 L40,35 L60,38 L80,25 L100,30 L120,18 L140,22 L160,10 L180,14 L200,4 L200,60 L0,60 Z"
                     fill="url(#cta-area)"
+                    className="opacity-0 animate-[fadeIn_700ms_ease-out_700ms_forwards]"
                   />
-                  <path
+                  <AnimatedPath
                     d="M0,45 L20,42 L40,35 L60,38 L80,25 L100,30 L120,18 L140,22 L160,10 L180,14 L200,4"
                     fill="none"
                     stroke="#fff"
                     strokeWidth="1.4"
                     strokeLinecap="round"
+                    duration={1500}
+                    delay={200}
                   />
                 </svg>
                 <div className="mt-2 grid grid-cols-3 gap-2 border-t border-white/10 pt-3 text-[10px] text-white/60">
                   <div>
                     <div>Unique</div>
-                    <div className="tabular font-semibold text-white">1.912</div>
+                    <div className="tabular font-semibold text-white">
+                      <AnimatedNumber value={1912} triggerOnView duration={1400} delay={200} />
+                    </div>
                   </div>
                   <div>
                     <div>CTR</div>
-                    <div className="tabular font-semibold text-white">67 %</div>
+                    <div className="tabular font-semibold text-white">
+                      <AnimatedNumber
+                        value={67}
+                        triggerOnView
+                        duration={1400}
+                        delay={300}
+                        formatFn={(n) => `${Math.round(n)} %`}
+                      />
+                    </div>
                   </div>
                   <div>
                     <div>Conv.</div>
-                    <div className="tabular font-semibold text-white">184</div>
+                    <div className="tabular font-semibold text-white">
+                      <AnimatedNumber value={184} triggerOnView duration={1400} delay={400} />
+                    </div>
                   </div>
                 </div>
               </div>

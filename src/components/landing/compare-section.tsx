@@ -120,11 +120,16 @@ export function CompareSection() {
               </div>
               <div className="mt-1 text-[11px] text-muted-foreground">Cookies</div>
             </div>
-            <div className="-mx-1 -mb-5 rounded-t-2xl bg-brand px-2 pb-5 pt-3 text-center text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.18)]">
-              <div className="text-[12px] font-semibold uppercase tracking-[0.08em]">
+            <div className="relative -mx-1 -mb-5 overflow-hidden rounded-t-2xl bg-brand px-2 pb-5 pt-3 text-center text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.18)]">
+              {/* Subtle light sweep */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 [background:linear-gradient(120deg,transparent_20%,oklch(1_0_0/0.15)_50%,transparent_80%)] [background-size:200%_100%] motion-safe:animate-[shimmerLine_3.5s_ease-in-out_infinite] motion-safe:opacity-100"
+              />
+              <div className="relative text-[12px] font-semibold uppercase tracking-[0.08em]">
                 Spurig
               </div>
-              <div className="mt-1 text-[11px] opacity-80">ab 4,99 €/Mo</div>
+              <div className="relative mt-1 text-[11px] opacity-80">ab 4,99 €/Mo</div>
             </div>
           </div>
 
@@ -133,12 +138,12 @@ export function CompareSection() {
             {ROWS.map((row) => (
               <div
                 key={row.label}
-                className="grid grid-cols-[1.4fr_repeat(3,1fr)] items-center gap-2 px-4 py-3.5 transition-colors hover:bg-muted/20 sm:px-6"
+                className="group grid grid-cols-[1.4fr_repeat(3,1fr)] items-center gap-2 px-4 py-3.5 transition-all duration-200 hover:bg-muted/30 sm:px-6"
               >
-                <div className="text-[13.5px] font-medium text-foreground">
+                <div className="text-[13.5px] font-medium text-foreground transition-colors duration-200 group-hover:text-foreground">
                   {row.label}
                 </div>
-                <div className="flex flex-col items-center gap-1 text-center">
+                <div className="flex flex-col items-center gap-1 text-center opacity-70 transition-opacity duration-200 group-hover:opacity-100">
                   <StatusIcon status={row.bitly} />
                   {row.bitlyNote && (
                     <span className="text-[10px] text-muted-foreground">
@@ -146,7 +151,7 @@ export function CompareSection() {
                     </span>
                   )}
                 </div>
-                <div className="flex flex-col items-center gap-1 text-center">
+                <div className="flex flex-col items-center gap-1 text-center opacity-70 transition-opacity duration-200 group-hover:opacity-100">
                   <StatusIcon status={row.ga4} />
                   {row.ga4Note && (
                     <span className="text-[10px] text-muted-foreground">
@@ -154,7 +159,7 @@ export function CompareSection() {
                     </span>
                   )}
                 </div>
-                <div className="flex flex-col items-center gap-1 bg-brand/[0.04] py-1 text-center">
+                <div className="flex flex-col items-center gap-1 bg-brand/[0.04] py-1 text-center transition-all duration-200 group-hover:bg-brand/[0.08]">
                   <StatusIcon status={row.spurig} />
                   {row.spurigNote && (
                     <span className="text-[10px] font-medium text-brand">

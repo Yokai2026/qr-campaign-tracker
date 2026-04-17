@@ -73,13 +73,18 @@ export function StepsSection() {
           {STEPS.map((step) => {
             const Icon = step.icon;
             return (
-              <li key={step.number} className="grid items-start gap-4 py-10 md:grid-cols-[100px_1fr_240px]">
-                <span className="tabular-nums font-mono text-[64px] font-light leading-none tracking-[-0.04em] text-foreground/15">
+              <li
+                key={step.number}
+                className="group grid items-start gap-4 py-10 transition-all duration-300 md:grid-cols-[100px_1fr_240px]"
+              >
+                <span className="tabular-nums font-mono text-[64px] font-light leading-none tracking-[-0.04em] text-foreground/15 transition-colors duration-300 group-hover:text-brand/50">
                   {step.number}
                 </span>
                 <div>
                   <div className="flex items-center gap-3">
-                    <Icon className="h-4 w-4 text-brand" />
+                    <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10 text-brand transition-all duration-300 group-hover:scale-110 group-hover:bg-brand/15">
+                      <Icon className="h-4 w-4" />
+                    </span>
                     <h3 className="font-heading text-[20px] font-semibold tracking-tight">
                       {step.title}
                     </h3>
@@ -89,7 +94,10 @@ export function StepsSection() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground md:justify-end md:pt-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-brand/60" />
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-brand opacity-0 transition-opacity duration-300 group-hover:opacity-60 group-hover:animate-[pulseDot_1.4s_ease-in-out_infinite]" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand/60" />
+                  </span>
                   {step.detail}
                 </div>
               </li>

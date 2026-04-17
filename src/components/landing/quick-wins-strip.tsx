@@ -34,15 +34,20 @@ export function QuickWinsStrip() {
           {WINS.map((w) => (
             <li
               key={w.title}
-              className="group flex flex-col gap-2 rounded-2xl border border-border bg-card/60 p-4 transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:bg-card hover:shadow-[var(--shadow-sm)] sm:p-5"
+              className="group relative flex flex-col gap-2 overflow-hidden rounded-2xl border border-border bg-card/60 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:bg-card hover:shadow-[var(--shadow-md)] sm:p-5"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10 text-brand transition-colors group-hover:bg-brand/15">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-10 -right-10 h-20 w-20 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                style={{ background: 'radial-gradient(circle, var(--brand), transparent 70%)' }}
+              />
+              <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10 text-brand transition-all duration-300 group-hover:scale-110 group-hover:bg-brand/15">
                 <w.icon className="h-4 w-4" />
               </span>
-              <div className="text-[14px] font-semibold tracking-tight text-foreground sm:text-[15px]">
+              <div className="relative text-[14px] font-semibold tracking-tight text-foreground sm:text-[15px]">
                 {w.title}
               </div>
-              <p className="text-[12.5px] leading-relaxed text-muted-foreground sm:text-[13px]">
+              <p className="relative text-[12.5px] leading-relaxed text-muted-foreground sm:text-[13px]">
                 {w.body}
               </p>
             </li>

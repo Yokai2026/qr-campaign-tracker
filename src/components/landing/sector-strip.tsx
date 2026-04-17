@@ -32,10 +32,10 @@ export function SectorStrip() {
             return (
               <li
                 key={s.label}
-                className="group inline-flex items-center gap-2 text-[13.5px] font-medium text-foreground/70 transition-colors hover:text-foreground sm:text-[14px]"
+                className="group inline-flex items-center gap-2 text-[13.5px] font-medium text-foreground/70 transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground sm:text-[14px]"
               >
                 <Icon
-                  className="h-4 w-4 text-muted-foreground/80 transition-colors group-hover:text-brand"
+                  className="h-4 w-4 text-muted-foreground/80 transition-all duration-200 group-hover:scale-110 group-hover:text-brand"
                   aria-hidden
                 />
                 {s.label}

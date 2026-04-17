@@ -69,9 +69,9 @@ export function PricingTeaser() {
           {REASSURANCE.map((r) => (
             <li
               key={r.title}
-              className="flex items-start gap-3 rounded-2xl border border-border bg-card/60 p-4 backdrop-blur"
+              className="group flex items-start gap-3 rounded-2xl border border-border bg-card/60 p-4 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/30 hover:bg-card hover:shadow-[var(--shadow-sm)]"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand transition-all duration-300 group-hover:scale-110 group-hover:bg-brand/15">
                 <r.icon className="h-4 w-4" />
               </span>
               <div>

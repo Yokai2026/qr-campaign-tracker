@@ -40,6 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .claude/worktrees/
+.claude/tmp-screens/
+.claude/scheduled_tasks.lock
 
 # playwright
 /test-results/
