@@ -189,8 +189,8 @@ export default function NewLocationPage() {
 
             {/* Actions */}
             <div className="flex items-center gap-3 pt-2">
-              <Button type="submit" disabled={isPending}>
-                {isPending ? 'Wird erstellt...' : 'Standort erstellen'}
+              <Button type="submit" variant="brand" disabled={isPending}>
+                {isPending ? 'Wird erstellt…' : 'Standort erstellen'}
               </Button>
               <Button
                 type="button"

@@ -265,8 +265,8 @@ export function LocationDetailTabs({
                 />
 
                 <div className="flex items-center gap-3 border-t pt-4">
-                  <Button type="submit" disabled={isPending}>
-                    {isPending ? 'Wird gespeichert...' : 'Änderungen speichern'}
+                  <Button type="submit" variant="brand" disabled={isPending}>
+                    {isPending ? 'Wird gespeichert…' : 'Änderungen speichern'}
                   </Button>
                   <Button
                     type="button"

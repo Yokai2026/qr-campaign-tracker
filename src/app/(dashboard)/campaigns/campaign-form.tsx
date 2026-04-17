@@ -289,12 +289,12 @@ export function CampaignForm({ campaignId, defaultValues }: CampaignFormProps) {
           >
             Abbrechen
           </Button>
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" variant="brand" disabled={isPending}>
             {isPending
-              ? 'Wird gespeichert...'
+              ? 'Wird gespeichert…'
               : isEditing
                 ? 'Speichern'
-                : 'Erstellen'}
+                : 'Kampagne erstellen'}
           </Button>
         </CardFooter>
       </Card>

@@ -859,7 +859,7 @@ function EditForm({ form, onSave, onCancel, isPending }: EditFormProps) {
 
       {/* Actions */}
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" variant="brand" disabled={isPending}>
           {isPending && (
             <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
           )}

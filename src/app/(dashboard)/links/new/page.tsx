@@ -153,7 +153,7 @@ export default function NewLinkPage() {
                 <button
                   type="button"
                   onClick={() => { setUseCustomCode(!useCustomCode); if (useCustomCode) setShortCode(''); }}
-                  className="text-[11px] text-primary hover:underline flex items-center gap-1"
+                  className="text-[11px] text-foreground hover:text-brand transition-colors flex items-center gap-1"
                 >
                   <Crown className="h-2.5 w-2.5" />
                   {useCustomCode ? 'Auto-generieren' : 'Eigenen Code verwenden'}
@@ -354,12 +354,12 @@ export default function NewLinkPage() {
       </Card>
 
       <div className="flex justify-end gap-2">
-        <Button variant="outline" size="sm" onClick={() => router.back()}>
+        <Button variant="outline" onClick={() => router.back()}>
           Abbrechen
         </Button>
-        <Button size="sm" onClick={handleSubmit} disabled={isPending}>
+        <Button variant="brand" onClick={handleSubmit} disabled={isPending}>
           {isPending ? (
-            <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Wird erstellt...</>
+            <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Wird erstellt…</>
           ) : 'Link erstellen'}
         </Button>
       </div>

@@ -146,11 +146,11 @@ export default function SettingsPage() {
                 <Label htmlFor="settings-role" className="text-[12px] text-muted-foreground">Rolle</Label>
                 <Input id="settings-role" value={profile.role === 'admin' ? 'Administrator' : 'Editor'} disabled className="h-8 text-[13px] bg-muted/30" />
               </div>
-              <Button type="submit" size="sm" disabled={loading}>
+              <Button type="submit" variant="brand" size="sm" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                    Wird gespeichert...
+                    Wird gespeichert…
                   </>
                 ) : 'Speichern'}
               </Button>

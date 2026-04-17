@@ -484,11 +484,11 @@ export function PlacementForm({ campaigns, locations, placement }: PlacementForm
           >
             Abbrechen
           </Button>
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" variant="brand" disabled={isPending}>
             {isPending
               ? isEditing
-                ? 'Wird gespeichert...'
-                : 'Wird erstellt...'
+                ? 'Wird gespeichert…'
+                : 'Wird erstellt…'
               : isEditing
                 ? 'Speichern'
                 : 'Platzierung erstellen'}

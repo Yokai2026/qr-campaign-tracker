@@ -766,7 +766,7 @@ export default function NewQrCodePage() {
 
         {/* Submit */}
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" variant="brand" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             QR-Code erstellen
           </Button>
