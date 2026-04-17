@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import { Moon, Sun, Monitor } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ThemeToggleProps = {
@@ -21,24 +21,21 @@ export function ThemeToggle({ variant = 'pill', className }: ThemeToggleProps) {
 
   useEffect(() => setMounted(true), []);
 
-  if (variant === 'icon') {
-    // Single icon toggle — cycles light → dark → system
-    const current = mounted ? theme : 'system';
-    const Icon =
-      current === 'dark' ? Moon : current === 'light' ? Sun : Monitor;
+  // Resolve to current effective theme (light/dark only — system sync via resolvedTheme)
+  const effective = mounted ? resolvedTheme ?? 'dark' : 'dark';
 
-    function cycle() {
+  if (variant === 'icon') {
+    const Icon = effective === 'dark' ? Sun : Moon;
+    function toggle() {
       if (!mounted) return;
-      const next =
-        theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
-      setTheme(next);
+      setTheme(effective === 'dark' ? 'light' : 'dark');
     }
 
     return (
       <button
         type="button"
-        onClick={cycle}
-        aria-label={`Theme wechseln — aktuell ${current}`}
+        onClick={toggle}
+        aria-label={`Zu ${effective === 'dark' ? 'hell' : 'dunkel'} wechseln`}
         className={cn(
           'flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-all duration-200 hover:border-brand/30 hover:bg-brand/[0.04] hover:text-foreground',
           className,
@@ -50,13 +47,12 @@ export function ThemeToggle({ variant = 'pill', className }: ThemeToggleProps) {
   }
 
   // Segmented pill (sidebar, settings)
-  const options: { value: 'light' | 'dark' | 'system'; icon: typeof Sun; label: string }[] = [
+  const options: { value: 'light' | 'dark'; icon: typeof Sun; label: string }[] = [
     { value: 'light', icon: Sun, label: 'Hell' },
     { value: 'dark', icon: Moon, label: 'Dunkel' },
-    { value: 'system', icon: Monitor, label: 'System' },
   ];
 
-  const currentValue = mounted ? (theme as 'light' | 'dark' | 'system' | undefined) ?? 'system' : 'system';
+  const currentValue = effective;
 
   return (
     <div
