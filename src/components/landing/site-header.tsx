@@ -5,7 +5,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 transform-gpu border-b border-border/60 bg-background/85 backdrop-blur-md [will-change:transform]">
       <div className="mx-auto flex max-w-6xl items-center px-4 py-3 sm:px-6">
         <div className="flex items-center gap-8">
           <Link

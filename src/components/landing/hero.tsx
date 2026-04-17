@@ -16,28 +16,26 @@ export function Hero() {
       {/* Layered backdrop — Stripe/Vercel-style gradient orbs */}
       <GridBackdrop variant="dots" className="h-[680px] opacity-30" fade />
 
-      {/* Animated brand orb — top-center */}
+      {/* Layered gradient orbs — GPU-composited to prevent scroll-flicker */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full opacity-45 blur-3xl motion-safe:animate-[heroOrb1_18s_ease-in-out_infinite]"
+        className="pointer-events-none absolute -top-24 left-1/2 h-[520px] w-[820px] -translate-x-1/2 transform-gpu rounded-full opacity-45 blur-3xl [will-change:transform]"
         style={{
           background:
             'radial-gradient(circle at 50% 50%, oklch(0.64 0.10 185 / 0.12), transparent 70%)',
         }}
       />
-      {/* Warm orb — bottom-left */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-[420px] -left-32 h-[420px] w-[520px] rounded-full opacity-40 blur-3xl motion-safe:animate-[heroOrb2_22s_ease-in-out_infinite]"
+        className="pointer-events-none absolute top-[420px] -left-32 h-[420px] w-[520px] transform-gpu rounded-full opacity-40 blur-3xl [will-change:transform]"
         style={{
           background:
             'radial-gradient(circle, oklch(0.74 0.10 38 / 0.12), transparent 70%)',
         }}
       />
-      {/* Cool orb — bottom-right */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-[460px] -right-32 h-[420px] w-[520px] rounded-full opacity-32 blur-3xl motion-safe:animate-[heroOrb3_25s_ease-in-out_infinite]"
+        className="pointer-events-none absolute top-[460px] -right-32 h-[420px] w-[520px] transform-gpu rounded-full opacity-32 blur-3xl [will-change:transform]"
         style={{
           background:
             'radial-gradient(circle, oklch(0.72 0.07 200 / 0.10), transparent 70%)',
@@ -47,7 +45,7 @@ export function Hero() {
       <div className="relative mx-auto max-w-5xl px-4 pt-28 pb-16 text-center sm:px-6 sm:pt-36 sm:pb-24">
         {/* Announcement */}
         <div className="mx-auto mb-10 inline-flex items-center gap-2.5 rounded-full border border-border bg-card/80 py-1.5 pl-2 pr-4 text-[12.5px] font-medium text-foreground shadow-[var(--shadow-sm)] backdrop-blur">
-          <span className="inline-flex items-center gap-1 rounded-full bg-warm/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-warm-foreground">
+          <span className="inline-flex items-center gap-1 rounded-full bg-warm/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-warm dark:bg-warm/25 dark:text-warm">
             <Sparkles className="h-2.5 w-2.5" />
             Neu
           </span>
@@ -109,21 +107,6 @@ export function Hero() {
       </div>
 
       <HeroDashboardMock />
-
-      <style>{`
-        @keyframes heroOrb1 {
-          0%, 100% { transform: translate(-50%, 0) scale(1); }
-          50% { transform: translate(-50%, 20px) scale(1.04); }
-        }
-        @keyframes heroOrb2 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(30px, -30px) scale(1.06); }
-        }
-        @keyframes heroOrb3 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(-30px, -20px) scale(1.05); }
-        }
-      `}</style>
     </section>
   );
 }

@@ -56,15 +56,17 @@ export function Reveal({
     <Tag
       ref={ref as React.RefObject<HTMLDivElement>}
       className={cn(
-        'transition-all duration-700 ease-out motion-reduce:transition-none',
+        'transform-gpu transition-opacity duration-700 ease-out motion-reduce:transition-none',
         visible
-          ? 'opacity-100 translate-y-0'
+          ? 'opacity-100'
           : 'opacity-0 motion-reduce:opacity-100',
         className,
       )}
       style={{
         transitionDelay: visible ? `${delay}ms` : '0ms',
-        transform: visible ? 'translateY(0)' : `translateY(${distance}px)`,
+        transform: visible ? 'translate3d(0,0,0)' : `translate3d(0,${distance}px,0)`,
+        transition: `opacity 700ms ease-out ${visible ? delay : 0}ms, transform 700ms cubic-bezier(0.16,1,0.3,1) ${visible ? delay : 0}ms`,
+        willChange: visible ? 'auto' : 'transform, opacity',
       }}
     >
       {children}
