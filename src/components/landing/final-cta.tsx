@@ -42,32 +42,32 @@ export function FinalCTA() {
                 Jetzt startklar
               </div>
 
-              <h2 className="mt-5 font-heading text-balance text-[32px] font-semibold leading-[1.07] tracking-[-0.025em] sm:text-[42px]">
-                Starte jetzt.{' '}
+              <h2 className="mt-5 font-heading text-balance text-[34px] font-semibold leading-[1.05] tracking-[-0.025em] sm:text-[46px]">
+                Dein nächstes Plakat{' '}
                 <span className="text-white/55 font-normal">
-                  Zahlst du später.
+                  verdient ehrliche Zahlen.
                 </span>
               </h2>
               <p className="mt-4 max-w-md text-[14.5px] leading-relaxed text-white/70">
-                14 Tage volle Funktionalität. Wenn du überzeugt bist, zahlst du
-                4,99&nbsp;€ im Monat. Nicht überzeugt? Einfach nichts tun — der
-                Account schläft ein.
+                14 Tage volle Funktionalität, ohne Karte. Wenn dich Spurig
+                überzeugt, zahlst du 4,99&nbsp;€ im Monat. Wenn nicht — nichts
+                passiert. Der Account schläft einfach ein.
               </p>
 
               <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <Button
                   size="lg"
                   render={<Link href="/signup" />}
-                  className="group min-w-[240px] bg-white text-neutral-900 shadow-lg hover:bg-white/95 hover:shadow-xl"
+                  className="group min-w-[240px] bg-white text-neutral-900 shadow-[inset_0_1px_0_oklch(1_0_0/0.5),0_4px_14px_oklch(0_0_0/0.40)] hover:-translate-y-px hover:bg-white hover:shadow-[inset_0_1px_0_oklch(1_0_0/0.6),0_8px_22px_oklch(0_0_0/0.50)]"
                 >
-                  Kostenlos starten
+                  Jetzt 14 Tage gratis starten
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Button>
                 <Link
                   href="/pricing"
                   className="text-[14px] font-medium text-white/70 transition-colors hover:text-white"
                 >
-                  Erst die Preise ansehen →
+                  Preise ansehen →
                 </Link>
               </div>
 
