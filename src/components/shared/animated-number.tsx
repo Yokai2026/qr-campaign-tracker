@@ -1,11 +1,20 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type AnimatedNumberProps = {
   value: number;
   duration?: number;
+  /** Custom formatter — ONLY from client components. Server components should use `suffix`/`prefix` instead. */
   formatFn?: (n: number) => string;
+  /** Text prefix (e.g. "$"). Serializable, safe from server components. */
+  prefix?: string;
+  /** Text suffix (e.g. " %"). Serializable, safe from server components. */
+  suffix?: string;
+  /** Number of decimals to render (default 0). */
+  decimals?: number;
+  /** Locale for thousands separator (default 'de-DE'). */
+  locale?: string;
   /** Start value for the animation (default 0 when `triggerOnView`, else tracked previous value). */
   from?: number;
   /** If true, waits until the element scrolls into view before starting. Starts from `from` (default 0). */
@@ -25,15 +34,31 @@ type AnimatedNumberProps = {
 export function AnimatedNumber({
   value,
   duration = 800,
-  formatFn = (n) => n.toLocaleString('de-DE'),
+  formatFn,
+  prefix,
+  suffix,
+  decimals = 0,
+  locale = 'de-DE',
   from,
   triggerOnView = false,
   delay = 0,
   className,
 }: AnimatedNumberProps) {
+  const format = useCallback(
+    (n: number): string => {
+      if (formatFn) return formatFn(n);
+      const rounded = decimals > 0 ? n : Math.round(n);
+      const num = rounded.toLocaleString(locale, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      });
+      return `${prefix ?? ''}${num}${suffix ?? ''}`;
+    },
+    [formatFn, decimals, locale, prefix, suffix],
+  );
   const viewStart = from ?? 0;
   const [display, setDisplay] = useState(() =>
-    formatFn(triggerOnView ? viewStart : 0),
+    format(triggerOnView ? viewStart : 0),
   );
   const prevValue = useRef(0);
   const rafId = useRef<number>(0);
@@ -48,7 +73,7 @@ export function AnimatedNumber({
 
     // Skip animation for small values — rounding makes them flicker
     if (end <= 10 || start === end) {
-      setDisplay(formatFn(end));
+      setDisplay(format(end));
       prevValue.current = end;
       return;
     }
@@ -60,7 +85,7 @@ export function AnimatedNumber({
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = Math.round(start + (end - start) * eased);
-      setDisplay(formatFn(current));
+      setDisplay(format(current));
 
       if (progress < 1) {
         rafId.current = requestAnimationFrame(tick);
@@ -74,7 +99,7 @@ export function AnimatedNumber({
     return () => {
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
-  }, [value, duration, formatFn, triggerOnView]);
+  }, [value, duration, format, triggerOnView]);
 
   useEffect(() => {
     if (!triggerOnView) return;
@@ -86,7 +111,7 @@ export function AnimatedNumber({
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
     if (reduced) {
-      setDisplay(formatFn(value));
+      setDisplay(format(value));
       return;
     }
 
@@ -103,9 +128,9 @@ export function AnimatedNumber({
         const progress = Math.min((now - begin) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
         const current = Math.round(viewStart + (value - viewStart) * eased);
-        setDisplay(formatFn(current));
+        setDisplay(format(current));
         if (progress < 1) rafId.current = requestAnimationFrame(tick);
-        else setDisplay(formatFn(value));
+        else setDisplay(format(value));
       };
       rafId.current = requestAnimationFrame(tick);
     };
@@ -125,7 +150,7 @@ export function AnimatedNumber({
       observer.disconnect();
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
-  }, [triggerOnView, value, duration, delay, formatFn, viewStart]);
+  }, [triggerOnView, value, duration, delay, format, viewStart]);
 
   return (
     <span ref={spanRef} className={className}>

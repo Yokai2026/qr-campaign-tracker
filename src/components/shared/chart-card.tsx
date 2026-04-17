@@ -18,7 +18,12 @@ export function ChartCard({
   className,
 }: ChartCardProps) {
   return (
-    <div className={cn('overflow-hidden rounded-2xl border border-border bg-card', className)}>
+    <div
+      className={cn(
+        'overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:border-brand/20 hover:shadow-[var(--shadow-sm)]',
+        className,
+      )}
+    >
       <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
         <h3 className="text-[13.5px] font-semibold tracking-tight text-foreground">{title}</h3>
         {action}

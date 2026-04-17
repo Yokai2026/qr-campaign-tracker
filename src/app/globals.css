@@ -359,6 +359,12 @@
   50%      { transform: translateY(-2px); }
 }
 
+/* Brief flash for newly-arrived items (live feed) */
+@keyframes scanFlash {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ── Reduced motion — respect user preferences ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

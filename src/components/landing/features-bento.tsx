@@ -126,7 +126,7 @@ export function FeaturesBento() {
                       triggerOnView
                       duration={1400}
                       delay={400}
-                      formatFn={(n) => `${Math.round(n)} %`}
+                      suffix=" %"
                     />
                   </div>
                 </div>

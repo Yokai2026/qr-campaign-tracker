@@ -85,21 +85,28 @@ export function LiveScanFeed() {
       </div>
       <div className="divide-y divide-border/60">
         {events.length > 0 ? (
-          events.map((event) => {
+          events.map((event, i) => {
             const DeviceIcon = DEVICE_ICONS[event.device_type || ''] || Radio;
             const isLink = event.event_type === 'link_open';
             const SourceIcon = isLink ? Link2 : QrCode;
+            const isNewest = i === 0;
             return (
               <div
                 key={event.id}
-                className="flex items-center gap-3 px-4 py-2.5 animate-in fade-in slide-in-from-top-1 duration-300"
+                className="relative flex items-center gap-3 px-4 py-2.5 animate-in fade-in slide-in-from-top-1 duration-300"
               >
-                <SourceIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
-                <code className="text-[12px] font-mono font-medium">
+                {isNewest && (
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-brand/[0.06] opacity-0 motion-safe:animate-[scanFlash_1.6s_ease-out_forwards]"
+                  />
+                )}
+                <SourceIcon className="relative h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+                <code className="relative text-[12px] font-mono font-medium">
                   {event.short_code}
                 </code>
-                <DeviceIcon className="h-3 w-3 shrink-0 text-muted-foreground/30" />
-                <span className="ml-auto text-[11px] text-muted-foreground tabular-nums">
+                <DeviceIcon className="relative h-3 w-3 shrink-0 text-muted-foreground/30" />
+                <span className="relative ml-auto text-[11px] text-muted-foreground tabular-nums">
                   {formatDistanceToNow(new Date(event.created_at), {
                     addSuffix: true,
                     locale: de,

@@ -141,7 +141,7 @@ export function FinalCTA() {
                         triggerOnView
                         duration={1400}
                         delay={300}
-                        formatFn={(n) => `${Math.round(n)} %`}
+                        suffix=" %"
                       />
                     </div>
                   </div>

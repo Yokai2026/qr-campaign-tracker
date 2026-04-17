@@ -20,9 +20,9 @@ const STATS: Stat[] = [
           triggerOnView
           duration={1400}
           delay={0}
-          formatFn={(n) => Math.round(n).toString()}
+          suffix="ms"
+          locale="en-US"
         />
-        ms
       </>
     ),
     label: 'Redirect-Antwortzeit',
@@ -43,9 +43,9 @@ const STATS: Stat[] = [
           triggerOnView
           duration={1400}
           delay={160}
-          formatFn={(n) => Math.round(n).toString()}
+          suffix="%"
+          locale="en-US"
         />
-        %
       </>
     ),
     label: 'EU-Hosting',
