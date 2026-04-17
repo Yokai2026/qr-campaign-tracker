@@ -132,23 +132,23 @@
 }
 
 .dark {
-  /* ── Neutrals — klare Hierarchie: bg < subtle < card < muted */
-  --background: oklch(0.135 0.005 80);
-  --foreground: oklch(0.97 0.003 80);
-  --card: oklch(0.185 0.006 80);
-  --card-foreground: oklch(0.97 0.003 80);
-  --popover: oklch(0.195 0.006 80);
-  --popover-foreground: oklch(0.97 0.003 80);
-  --subtle: oklch(0.16 0.005 80);
-  --ink: oklch(0.11 0.005 80);
-  --ink-foreground: oklch(0.97 0.003 80);
+  /* ── Neutrals — PURE neutrals (kein warmer Undertone im Dark-Mode) */
+  --background: oklch(0.135 0 0);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.185 0 0);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.195 0 0);
+  --popover-foreground: oklch(0.97 0 0);
+  --subtle: oklch(0.16 0 0);
+  --ink: oklch(0.11 0 0);
+  --ink-foreground: oklch(0.97 0 0);
   --primary: oklch(0.97 0 0);
-  --primary-foreground: oklch(0.20 0.005 80);
-  --secondary: oklch(0.23 0.006 80);
+  --primary-foreground: oklch(0.20 0 0);
+  --secondary: oklch(0.23 0 0);
   --secondary-foreground: oklch(0.97 0 0);
-  --muted: oklch(0.23 0.006 80);
-  --muted-foreground: oklch(0.76 0.006 80);
-  --accent: oklch(0.23 0.006 80);
+  --muted: oklch(0.23 0 0);
+  --muted-foreground: oklch(0.76 0 0);
+  --accent: oklch(0.23 0 0);
   --accent-foreground: oklch(0.97 0 0);
   --destructive: oklch(0.70 0.15 22);
   --border: oklch(1 0 0 / 0.13);
@@ -168,7 +168,7 @@
   --chart-2: oklch(0.78 0.11 38);
   --chart-3: oklch(0.97 0 0);
   --chart-4: oklch(0.60 0.08 185);
-  --chart-5: oklch(0.60 0.006 80);
+  --chart-5: oklch(0.60 0 0);
   --sidebar: oklch(0.10 0 0);
   --sidebar-foreground: oklch(0.70 0 0);
   --sidebar-primary: oklch(0.93 0 0);
@@ -182,6 +182,11 @@
   --shadow-md: 0 6px 16px -6px oklch(0 0 0 / 0.55), 0 2px 4px -2px oklch(0 0 0 / 0.40);
   --shadow-lg: 0 18px 48px -12px oklch(0 0 0 / 0.70), 0 4px 10px -4px oklch(0 0 0 / 0.50);
   --shadow-glow: 0 0 0 1px oklch(1 0 0 / 0.10), 0 24px 60px -20px oklch(0 0 0 / 0.45);
+}
+
+/* Pure-neutral shadows in dark mode — no warm tint */
+.dark {
+  color-scheme: dark;
 }
 
 @layer base {
