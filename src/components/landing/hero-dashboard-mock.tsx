@@ -36,8 +36,8 @@ export function HeroDashboardMock() {
             <div className="hidden items-center gap-1.5 sm:flex">
               <span className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-background px-2 py-1 text-[11px] font-medium">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 </span>
                 Letzte 14 Tage
               </span>

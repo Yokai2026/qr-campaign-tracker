@@ -72,8 +72,8 @@ export function LiveScanFeed() {
         <div className="flex items-center gap-1.5">
           {connected ? (
             <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
             </span>
           ) : (
             <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />

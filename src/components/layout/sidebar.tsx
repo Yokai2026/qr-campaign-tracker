@@ -96,7 +96,7 @@ export function Sidebar() {
         className={cn(
           'group flex items-center gap-2.5 rounded-[6px] px-2 py-[7px] text-[13px] transition-colors duration-100',
           isActive
-            ? 'bg-white/[0.07] text-white font-medium border-l-2 border-brand pl-[6px] shadow-[inset_1px_0_0_oklch(0.66_0.13_185/0.25)]'
+            ? 'bg-white/[0.07] text-white font-medium border-l-2 border-brand pl-[6px] shadow-[inset_1px_0_0_oklch(0.64_0.10_185/0.20)]'
             : 'text-white/60 hover:bg-white/[0.05] hover:text-white/90'
         )}
       >

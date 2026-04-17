@@ -71,7 +71,7 @@ export function StatsMoment() {
         className="pointer-events-none absolute inset-0 opacity-50"
         style={{
           background:
-            'radial-gradient(ellipse 60% 70% at 30% 20%, oklch(0.66 0.13 185 / 0.18), transparent 60%), radial-gradient(ellipse 50% 60% at 80% 90%, oklch(0.74 0.13 38 / 0.10), transparent 65%)',
+            'radial-gradient(ellipse 60% 70% at 30% 20%, oklch(0.64 0.10 185 / 0.12), transparent 60%), radial-gradient(ellipse 50% 60% at 80% 90%, oklch(0.74 0.10 38 / 0.07), transparent 65%)',
         }}
       />
       <div
@@ -87,8 +87,8 @@ export function StatsMoment() {
         <div className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/85 backdrop-blur">
             <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
             </span>
             In Zahlen
           </span>

@@ -19,28 +19,28 @@ export function Hero() {
       {/* Animated brand orb — top-center */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full opacity-60 blur-3xl motion-safe:animate-[heroOrb1_18s_ease-in-out_infinite]"
+        className="pointer-events-none absolute -top-24 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full opacity-45 blur-3xl motion-safe:animate-[heroOrb1_18s_ease-in-out_infinite]"
         style={{
           background:
-            'radial-gradient(circle at 50% 50%, oklch(0.66 0.13 185 / 0.18), transparent 70%)',
+            'radial-gradient(circle at 50% 50%, oklch(0.64 0.10 185 / 0.12), transparent 70%)',
         }}
       />
       {/* Warm orb — bottom-left */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-[420px] -left-32 h-[420px] w-[520px] rounded-full opacity-50 blur-3xl motion-safe:animate-[heroOrb2_22s_ease-in-out_infinite]"
+        className="pointer-events-none absolute top-[420px] -left-32 h-[420px] w-[520px] rounded-full opacity-40 blur-3xl motion-safe:animate-[heroOrb2_22s_ease-in-out_infinite]"
         style={{
           background:
-            'radial-gradient(circle, oklch(0.74 0.13 38 / 0.18), transparent 70%)',
+            'radial-gradient(circle, oklch(0.74 0.10 38 / 0.12), transparent 70%)',
         }}
       />
       {/* Cool orb — bottom-right */}
       <div
         aria-hidden
-        className="pointer-events-none absolute top-[460px] -right-32 h-[420px] w-[520px] rounded-full opacity-40 blur-3xl motion-safe:animate-[heroOrb3_25s_ease-in-out_infinite]"
+        className="pointer-events-none absolute top-[460px] -right-32 h-[420px] w-[520px] rounded-full opacity-32 blur-3xl motion-safe:animate-[heroOrb3_25s_ease-in-out_infinite]"
         style={{
           background:
-            'radial-gradient(circle, oklch(0.72 0.10 200 / 0.16), transparent 70%)',
+            'radial-gradient(circle, oklch(0.72 0.07 200 / 0.10), transparent 70%)',
         }}
       />
 

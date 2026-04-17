@@ -39,7 +39,7 @@ export function TrustStrip() {
         className="pointer-events-none absolute inset-0 opacity-50"
         style={{
           background:
-            'radial-gradient(ellipse 50% 60% at 20% 30%, oklch(0.66 0.13 185 / 0.06), transparent 60%), radial-gradient(ellipse 40% 50% at 85% 70%, oklch(0.74 0.13 38 / 0.05), transparent 65%)',
+            'radial-gradient(ellipse 50% 60% at 20% 30%, oklch(0.64 0.10 185 / 0.05), transparent 60%), radial-gradient(ellipse 40% 50% at 85% 70%, oklch(0.74 0.10 38 / 0.04), transparent 65%)',
         }}
       />
 

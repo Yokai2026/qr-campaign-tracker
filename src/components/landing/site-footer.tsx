@@ -66,8 +66,8 @@ export function SiteFooter() {
             </p>
             <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-[11px] text-muted-foreground">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
               </span>
               Alle Systeme funktional
             </div>

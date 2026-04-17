@@ -38,8 +38,8 @@ export function FinalCTA() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/80 backdrop-blur">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 </span>
                 Jetzt startklar
               </div>
@@ -90,8 +90,8 @@ export function FinalCTA() {
                   <span>Scan-Verlauf · live</span>
                   <span className="inline-flex items-center gap-1">
                     <span className="relative flex h-1.5 w-1.5">
-                      <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400" />
-                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
                     </span>
                     live
                   </span>

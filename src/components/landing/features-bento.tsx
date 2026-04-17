@@ -65,8 +65,8 @@ export function FeaturesBento() {
                 </div>
                 <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
                   <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
                   </span>
                   Live
                 </span>
@@ -222,8 +222,8 @@ export function FeaturesBento() {
               </p>
               <div className="mt-4 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 transition-colors group-hover:border-brand/30 group-hover:bg-white/[0.06]">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                  <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                 </span>
                 <span className="text-[11px] text-white/80">
                   Spike erkannt · Flyer Café-Route · +38 Scans / Std

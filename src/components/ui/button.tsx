@@ -11,7 +11,7 @@ const buttonVariants = cva(
         default:
           "bg-primary text-primary-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.18),0_1px_2px_oklch(0_0_0/0.06),0_4px_12px_-4px_oklch(0_0_0/0.20)] hover:-translate-y-px hover:brightness-110 hover:shadow-[inset_0_1px_0_oklch(1_0_0/0.22),0_2px_4px_oklch(0_0_0/0.08),0_8px_20px_-6px_oklch(0_0_0/0.28)] dark:shadow-[inset_0_1px_0_oklch(0_0_0/0.20),0_1px_2px_oklch(0_0_0/0.30)]",
         brand:
-          "text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.22),0_1px_2px_oklch(0.20_0.05_185/0.10),0_6px_18px_-6px_oklch(0.40_0.13_185/0.45)] hover:-translate-y-px hover:brightness-105 hover:shadow-[inset_0_1px_0_oklch(1_0_0/0.26),0_2px_4px_oklch(0.20_0.05_185/0.14),0_10px_24px_-6px_oklch(0.40_0.13_185/0.55)] [background:linear-gradient(180deg,oklch(0.70_0.13_185)_0%,var(--brand)_100%)]",
+          "text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.22),0_1px_2px_oklch(0.20_0.04_185/0.08),0_6px_18px_-6px_oklch(0.40_0.10_185/0.38)] hover:-translate-y-px hover:brightness-105 hover:shadow-[inset_0_1px_0_oklch(1_0_0/0.26),0_2px_4px_oklch(0.20_0.04_185/0.12),0_10px_24px_-6px_oklch(0.40_0.10_185/0.48)] [background:linear-gradient(180deg,oklch(0.68_0.10_185)_0%,var(--brand)_100%)]",
         outline:
           "border-border bg-background shadow-[var(--shadow-xs)] hover:-translate-y-px hover:border-foreground/20 hover:bg-muted hover:text-foreground hover:shadow-[var(--shadow-sm)] aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:

@@ -16,23 +16,23 @@ export const CHART_COLORS = {
  * Order: brand-teal → near-black → warm-coral → mid-neutral → light-teal → muted-teal → warm-zinc → light-zinc.
  */
 export const CHART_PALETTE = [
-  'oklch(0.66 0.13 185)',  // brand teal
+  'oklch(0.64 0.10 185)',  // brand teal (soft)
   'oklch(0.21 0.005 80)',  // near-black
-  'oklch(0.74 0.13 38)',   // warm coral
+  'oklch(0.74 0.10 38)',   // warm coral (soft)
   'oklch(0.50 0.008 80)',  // mid neutral
-  'oklch(0.78 0.10 185)',  // light teal
-  'oklch(0.45 0.085 185)', // muted teal
+  'oklch(0.78 0.07 185)',  // pale teal
+  'oklch(0.48 0.07 185)',  // muted teal
   'oklch(0.62 0.008 80)',  // warm zinc
   'oklch(0.78 0.005 80)',  // light zinc
 ] as const;
 
 /** Named semantic colors for specific data series — brand teal primary, neutral secondaries */
 export const SERIES_COLORS = {
-  scans: 'oklch(0.66 0.13 185)',     // brand teal — primary metric
+  scans: 'oklch(0.64 0.10 185)',     // brand teal — primary metric
   clicks: 'oklch(0.21 0.005 80)',    // near-black — comparison
-  forms: 'oklch(0.74 0.13 38)',      // warm coral — conversions
+  forms: 'oklch(0.74 0.10 38)',      // warm coral — conversions
   forecast: 'oklch(0.62 0.008 80)',  // warm zinc — subordinate (dashed)
-  active: 'oklch(0.66 0.13 185)',    // brand teal
+  active: 'oklch(0.64 0.10 185)',    // brand teal
   inactive: 'oklch(0.62 0.008 80)',  // warm zinc
 } as const;
 

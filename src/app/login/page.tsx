@@ -59,7 +59,7 @@ export default function LoginPage() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 50% 50% at 50% 30%, oklch(0.66 0.13 185 / 0.08), transparent 65%), radial-gradient(ellipse 40% 40% at 50% 80%, oklch(0.74 0.13 38 / 0.05), transparent 70%)',
+            'radial-gradient(ellipse 50% 50% at 50% 30%, oklch(0.64 0.10 185 / 0.06), transparent 65%), radial-gradient(ellipse 40% 40% at 50% 80%, oklch(0.74 0.10 38 / 0.04), transparent 70%)',
         }}
       />
 
