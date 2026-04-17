@@ -65,22 +65,21 @@ export function Hero() {
           </span>
         </h1>
 
-        {/* Subline */}
-        <p className="mx-auto mt-7 max-w-xl text-pretty text-[17px] leading-[1.55] text-muted-foreground sm:text-[19px]">
-          Sieh live, welches Plakat, welcher Flyer oder welche Visitenkarte dir
-          wirklich Kunden bringt. Ohne Cookies, ohne Banner, gehostet in
-          Frankfurt.
+        {/* Subline — kürzer, konkret, mit Wirkung */}
+        <p className="mx-auto mt-6 max-w-xl text-pretty text-[18px] leading-[1.5] text-muted-foreground sm:text-[20px]">
+          Tracke jeden Scan in Echtzeit. Ohne Cookies, ohne Banner,
+          ohne Datenabfluss in die USA.
         </p>
 
         {/* CTAs */}
-        <div className="mt-11 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-3">
+        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-3">
           <Button
             size="lg"
             variant="brand"
             render={<Link href="/signup" />}
             className="group min-w-[260px]"
           >
-            14 Tage kostenlos testen
+            Jetzt 14 Tage gratis starten
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Button>
           <Button
@@ -93,8 +92,13 @@ export function Hero() {
           </Button>
         </div>
 
+        {/* Inline-Hint statt Trust-Row */}
+        <p className="mt-5 text-[12.5px] text-muted-foreground">
+          Erste Scans in unter <span className="font-semibold text-foreground">30 Sekunden</span> · Kein Zahlungsmittel nötig
+        </p>
+
         {/* Trust row */}
-        <ul className="mx-auto mt-9 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12.5px] text-muted-foreground">
+        <ul className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12.5px] text-muted-foreground">
           {TRUST.map((t) => (
             <li key={t} className="inline-flex items-center gap-1.5">
               <Check className="h-3 w-3 text-brand" aria-hidden />

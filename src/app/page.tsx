@@ -9,8 +9,10 @@ import { QuickWinsStrip } from '@/components/landing/quick-wins-strip';
 import { SectorStrip } from '@/components/landing/sector-strip';
 import { StepsSection } from '@/components/landing/steps-section';
 import { FeaturesBento } from '@/components/landing/features-bento';
+import { StatsMoment } from '@/components/landing/stats-moment';
 import { PrivacySection } from '@/components/landing/privacy-section';
 import { DomainShowcase } from '@/components/landing/domain-showcase';
+import { CompareSection } from '@/components/landing/compare-section';
 import { TrustStrip } from '@/components/landing/trust-strip';
 import { PricingTeaser } from '@/components/landing/pricing-teaser';
 import { FaqSection, FAQ_ITEMS } from '@/components/landing/faq-section';
@@ -29,8 +31,10 @@ export default function LandingPage() {
         <SectorStrip />
         <StepsSection />
         <FeaturesBento />
+        <StatsMoment />
         <PrivacySection />
         <DomainShowcase />
+        <CompareSection />
         <TrustStrip />
         <PricingTeaser />
         <FaqSection />
