@@ -21,7 +21,7 @@ import {
 } from 'recharts';
 import {
   TrendingUp, MousePointerClick, FileText, QrCode, Download, Users, FileDown, Globe,
-  Link2, ArrowUpRight,
+  Link2, ArrowUpRight, ShieldCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, subDays } from 'date-fns';
@@ -40,6 +40,16 @@ type Props = {
 
 type BreakdownEntry = { name: string; value: number };
 
+type KpiDeltas = {
+  totalOpens: number | null;
+  qrScans: number | null;
+  linkClicks: number | null;
+  uniqueScans: number | null;
+  ctaClicks: number | null;
+  formSubmits: number | null;
+  conversionRate: number | null;
+};
+
 type AnalyticsData = {
   kpis: {
     totalOpens: number;
@@ -50,6 +60,8 @@ type AnalyticsData = {
     ctaClicks: number;
     formSubmits: number;
   };
+  deltas: KpiDeltas;
+  botCount: number;
   timeSeriesData: { date: string; qr: number; link: number }[];
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; opens: number; location: string }[];
@@ -60,6 +72,12 @@ type AnalyticsData = {
   unknownCountryCount: number;
   referrerData: BreakdownEntry[];
 };
+
+/** Percent change vs. previous value. null when previous had no data AND current is also zero. */
+function pctChange(current: number, previous: number): number | null {
+  if (previous === 0) return current > 0 ? 100 : null;
+  return ((current - previous) / previous) * 100;
+}
 
 type SourceFilter = 'all' | 'qr' | 'link';
 
@@ -166,6 +184,71 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         formSubmits,
       };
 
+      // =========================================================
+      // Period-over-Period — fetch same-duration previous window
+      // =========================================================
+      const fromMs = new Date(from).getTime();
+      const toMs = new Date(to).getTime();
+      const periodMs = toMs - fromMs;
+      const prevFromIso = new Date(fromMs - periodMs - 1000).toISOString();
+      const prevToIso = new Date(fromMs - 1000).toISOString();
+
+      let prevQuery = supabase
+        .from('redirect_events')
+        .select('event_type, ip_hash, campaign_id, placement_id, placements(location:locations(district))')
+        .in('event_type', eventTypes)
+        .eq('is_bot', false)
+        .gte('created_at', prevFromIso)
+        .lte('created_at', prevToIso);
+      if (campaignId !== 'all') prevQuery = prevQuery.eq('campaign_id', campaignId);
+      const { data: prevRedirect } = await prevQuery;
+
+      let prevFiltered = prevRedirect || [];
+      if (district !== 'all') {
+        prevFiltered = prevFiltered.filter((e: Record<string, unknown>) => {
+          const p = e.placements as { location: { district: string | null } | null } | null;
+          return p?.location?.district === district;
+        });
+      }
+
+      let prevPageQuery = supabase
+        .from('page_events')
+        .select('event_type, campaign_id')
+        .gte('created_at', prevFromIso)
+        .lte('created_at', prevToIso);
+      if (campaignId !== 'all') prevPageQuery = prevPageQuery.eq('campaign_id', campaignId);
+      const { data: prevPage } = await prevPageQuery;
+
+      const prevTotalOpens = prevFiltered.length;
+      const prevQrScans = prevFiltered.filter((e: { event_type: string }) => e.event_type === 'qr_open').length;
+      const prevLinkClicks = prevFiltered.filter((e: { event_type: string }) => e.event_type === 'link_open').length;
+      const prevUniqueIps = new Set(prevFiltered.map((e: { ip_hash: string | null }) => e.ip_hash).filter(Boolean)).size;
+      const prevCtaClicks = (prevPage || []).filter((e: { event_type: string }) => e.event_type === 'cta_click').length;
+      const prevFormSubmits = (prevPage || []).filter((e: { event_type: string }) => e.event_type === 'form_submit').length;
+      const prevConversionRate = prevTotalOpens > 0 ? (prevCtaClicks / prevTotalOpens) * 100 : 0;
+      const currConversionRate = kpis.totalOpens > 0 ? (kpis.ctaClicks / kpis.totalOpens) * 100 : 0;
+
+      const deltas: KpiDeltas = {
+        totalOpens: pctChange(kpis.totalOpens, prevTotalOpens),
+        qrScans: pctChange(kpis.qrScans, prevQrScans),
+        linkClicks: pctChange(kpis.linkClicks, prevLinkClicks),
+        uniqueScans: pctChange(kpis.uniqueScans, prevUniqueIps),
+        ctaClicks: pctChange(kpis.ctaClicks, prevCtaClicks),
+        formSubmits: pctChange(kpis.formSubmits, prevFormSubmits),
+        conversionRate: pctChange(currConversionRate, prevConversionRate),
+      };
+
+      // Bot count (same window, is_bot=true) — shown as transparency indicator
+      let botQuery = supabase
+        .from('redirect_events')
+        .select('id', { count: 'exact', head: true })
+        .in('event_type', eventTypes)
+        .eq('is_bot', true)
+        .gte('created_at', from)
+        .lte('created_at', to);
+      if (campaignId !== 'all') botQuery = botQuery.eq('campaign_id', campaignId);
+      const { count: botCount } = await botQuery;
+
       // Time series — QR vs Link per day
       const dayMap: Record<string, { qr: number; link: number }> = {};
       filteredEvents.forEach((e: Record<string, unknown>) => {
@@ -264,11 +347,13 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         .sort((a, b) => b.value - a.value)
         .slice(0, 10);
 
-      return { kpis, timeSeriesData, campaignData, placementData, deviceData, browserData, osData, countryData, unknownCountryCount, referrerData };
+      return { kpis, deltas, botCount: botCount ?? 0, timeSeriesData, campaignData, placementData, deviceData, browserData, osData, countryData, unknownCountryCount, referrerData };
     },
   });
 
   const kpis = data?.kpis ?? { totalOpens: 0, qrScans: 0, linkClicks: 0, uniqueScans: 0, uniqueQrCodes: 0, ctaClicks: 0, formSubmits: 0 };
+  const deltas = data?.deltas ?? { totalOpens: null, qrScans: null, linkClicks: null, uniqueScans: null, ctaClicks: null, formSubmits: null, conversionRate: null };
+  const botCount = data?.botCount ?? 0;
   const timeSeriesData = data?.timeSeriesData ?? [];
   const campaignData = data?.campaignData ?? [];
   const placementData = data?.placementData ?? [];
@@ -514,6 +599,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 icon={TrendingUp}
                 subtext={kpis.totalOpens ? `${kpis.qrScans} QR · ${kpis.linkClicks} Link` : 'Noch keine Aufrufe'}
                 hint="Summe aller QR-Scans und Kurzlink-Klicks im gewählten Zeitraum (ohne Bots)."
+                delta={deltas.totalOpens}
+                deltaLabel="vs. Vorperiode"
               />
               <KPIStatCard
                 label="QR-Scans"
@@ -521,6 +608,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 icon={QrCode}
                 subtext={kpis.qrScans ? `${kpis.uniqueQrCodes} aktive Codes` : 'Noch keine Scans'}
                 hint="Wie oft physische QR-Codes gescannt wurden."
+                delta={deltas.qrScans}
+                deltaLabel="vs. Vorperiode"
               />
               <KPIStatCard
                 label="Link-Klicks"
@@ -528,6 +617,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 icon={Link2}
                 subtext="Aufrufe über Kurzlinks"
                 hint="Klicks auf deine trackbaren Kurzlinks (z. B. für Social Media, E-Mail)."
+                delta={deltas.linkClicks}
+                deltaLabel="vs. Vorperiode"
               />
               <KPIStatCard
                 label="Eindeutige Besucher"
@@ -541,8 +632,16 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                       : 'Noch keine Daten'
                 }
                 hint="Verschiedene Besucher, erkannt über anonymisierten IP-Hash. Funktioniert erst mit echtem Traffic in Produktion (nicht lokal)."
+                delta={deltas.uniqueScans}
+                deltaLabel="vs. Vorperiode"
               />
             </div>
+            {botCount > 0 && (
+              <p className="flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
+                <ShieldCheck className="h-3 w-3 text-brand/70" />
+                {botCount.toLocaleString('de-DE')} Bot-Zugriff{botCount === 1 ? '' : 'e'} erkannt und ausgefiltert
+              </p>
+            )}
           </section>
 
           {/* Engagement — nur anzeigen wenn Landing-Page-Tracking aktiv */}
@@ -559,6 +658,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                   icon={MousePointerClick}
                   subtext="Klicks auf der Zielseite"
                   hint="Klicks auf Buttons/Links auf deiner Zielseite (via Tracking-Script)."
+                  delta={deltas.ctaClicks}
+                  deltaLabel="vs. Vorperiode"
                 />
                 <KPIStatCard
                   label="Formular-Abschlüsse"
@@ -566,6 +667,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                   icon={FileText}
                   subtext={kpis.formSubmits ? `${formRate}% der Besucher` : 'Noch keine Abschlüsse'}
                   hint="Gesendete Formulare auf der Zielseite (z. B. Anmeldungen, Kontakte)."
+                  delta={deltas.formSubmits}
+                  deltaLabel="vs. Vorperiode"
                 />
                 <KPIStatCard
                   label="Conversion-Rate"
@@ -573,6 +676,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                   icon={ArrowUpRight}
                   subtext="CTA-Klicks ÷ Aufrufe"
                   hint="Anteil der Aufrufe, die zu einer CTA-Aktion geführt haben."
+                  delta={deltas.conversionRate}
+                  deltaLabel="vs. Vorperiode"
                 />
               </div>
             </section>
