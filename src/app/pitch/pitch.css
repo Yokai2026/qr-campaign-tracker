@@ -1,0 +1,74 @@
+.pitch-deck {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.pitch-slide {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: white !important;
+  }
+
+  .pitch-deck {
+    height: auto;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .pitch-slide {
+    page-break-after: always;
+    break-after: page;
+    min-height: 0;
+    height: 100vh;
+    width: 100vw;
+    scroll-snap-align: unset;
+  }
+
+  .pitch-slide:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  .pitch-no-print {
+    display: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .dark .pitch-deck,
+  html.dark .pitch-deck {
+    --background: oklch(0.992 0.004 80);
+    --foreground: oklch(0.155 0.005 80);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.155 0.005 80);
+    --muted: oklch(0.965 0.006 80);
+    --muted-foreground: oklch(0.50 0.008 80);
+    --border: oklch(0.918 0.006 80);
+    --brand: oklch(0.64 0.10 185);
+    --brand-foreground: oklch(0.99 0 0);
+    --brand-muted: oklch(0.955 0.025 185);
+    --warm: oklch(0.74 0.10 38);
+    --subtle: oklch(0.975 0.006 80);
+  }
+}

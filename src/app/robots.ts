@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/dashboard', '/settings', '/api/', '/r/', '/campaigns', '/placements', '/qr-codes', '/analytics', '/links', '/locations'],
+        disallow: ['/dashboard', '/settings', '/api/', '/r/', '/campaigns', '/placements', '/qr-codes', '/analytics', '/links', '/locations', '/pitch'],
       },
     ],
     sitemap: 'https://spurig.com/sitemap.xml',
