@@ -66,10 +66,26 @@ export const qrCodeSchema = z.object({
     .or(z.literal('')),
 });
 
+// Reserved short-codes — must never collide with app routes or middleware patterns.
+// Applied when users pick a custom short_code on a Pro plan.
+export const RESERVED_SHORT_CODES = new Set([
+  'r', 'api', '_next', 'favicon', 'robots', 'sitemap',
+  'signup', 'login', 'logout', 'auth',
+  'dashboard', 'settings', 'admin', 'account',
+  'campaigns', 'placements', 'qr-codes', 'qr', 'links', 'locations', 'analytics',
+  'pitch', 'pricing', 'impressum', 'agb', 'datenschutz', 'kontakt', 'help', 'docs', 'blog',
+  'www', 'mail', 'ftp', 'static', 'assets', 'public',
+  'opengraph-image', 'twitter-image', 'icon', 'apple-icon',
+]);
+
 export const shortLinkSchema = z.object({
   target_url: z.string().url('Gültige URL erforderlich').max(2000),
   short_code: z.string().min(3, 'Mindestens 3 Zeichen').max(50)
     .regex(/^[a-zA-Z0-9_-]+$/, 'Nur Buchstaben, Zahlen, Bindestrich und Unterstrich')
+    .refine(
+      (v) => !RESERVED_SHORT_CODES.has(v.toLowerCase()),
+      'Dieser Kurzcode ist reserviert. Bitte wähle einen anderen.',
+    )
     .optional()
     .or(z.literal('')),
   link_mode: z.enum(['short', 'direct']).optional(),
