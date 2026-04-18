@@ -121,10 +121,12 @@ export function LinkList({ links, groups }: LinkListProps) {
 
   const hasActiveFilter = groupFilter !== 'all' || campaignFilter !== 'all';
 
-  function handleCopy(shortCode: string, id: string) {
-    const url = `${window.location.origin}/r/${shortCode}`;
+  function handleCopy(sl: ShortLink) {
+    const url = sl.short_host
+      ? `https://${sl.short_host}/${sl.short_code}`
+      : `${window.location.origin}/r/${sl.short_code}`;
     navigator.clipboard.writeText(url);
-    setCopiedId(id);
+    setCopiedId(sl.id);
     toast.success('Link kopiert');
     setTimeout(() => setCopiedId(null), 2000);
   }
@@ -158,17 +160,21 @@ export function LinkList({ links, groups }: LinkListProps) {
       cell: ({ row }) => {
         const sl = row.original;
         const isCopied = copiedId === sl.id;
+        const displayPath = sl.short_host
+          ? `${sl.short_host}/${sl.short_code}`
+          : `/r/${sl.short_code}`;
         return (
           <div className="flex items-center gap-2">
             <Link
               href={`/links/${sl.id}`}
               className="flex items-center gap-1.5 font-medium text-[13px] hover:underline"
+              title={sl.short_host ? `Eigene Domain: ${sl.short_host}` : undefined}
             >
               <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
-              /r/{sl.short_code}
+              {displayPath}
             </Link>
             <button
-              onClick={() => handleCopy(sl.short_code, sl.id)}
+              onClick={() => handleCopy(sl)}
               className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
             >
               {isCopied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}

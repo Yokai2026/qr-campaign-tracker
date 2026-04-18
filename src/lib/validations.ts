@@ -100,6 +100,17 @@ export const shortLinkSchema = z.object({
   utm_campaign: z.string().max(200).optional().or(z.literal('')),
   utm_content: z.string().max(200).optional().or(z.literal('')),
   utm_id: z.string().max(200).optional().or(z.literal('')),
+  // Optional per-link custom host (e.g. go.kunde.de). Must be a valid hostname
+  // of a verified custom_domain; empty/undefined means default app host.
+  short_host: z
+    .string()
+    .max(253)
+    .regex(
+      /^(?=.{1,253}$)(?!-)[a-zA-Z0-9-]{1,63}(?<!-)(\.(?!-)[a-zA-Z0-9-]{1,63}(?<!-))+$/,
+      'Ungültiger Hostname',
+    )
+    .optional()
+    .or(z.literal('')),
 });
 
 export const linkGroupSchema = z.object({

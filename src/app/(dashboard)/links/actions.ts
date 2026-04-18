@@ -86,6 +86,20 @@ export async function createShortLink(input: Record<string, unknown>): Promise<{
     shortCode = nanoid(7);
   }
 
+  // Verify the chosen short_host is an actually verified custom domain.
+  // Silently drop unverified hosts — we never want a bad host in the DB.
+  let verifiedShortHost: string | null = null;
+  if (data.short_host) {
+    const host = data.short_host.toLowerCase();
+    const { data: domainRow } = await supabase
+      .from('custom_domains')
+      .select('host')
+      .eq('host', host)
+      .eq('verified', true)
+      .maybeSingle();
+    if (domainRow) verifiedShortHost = host;
+  }
+
   const { data: created, error } = await supabase
     .from('short_links')
     .insert({
@@ -103,6 +117,7 @@ export async function createShortLink(input: Record<string, unknown>): Promise<{
       utm_campaign: data.utm_campaign || null,
       utm_content: data.utm_content || null,
       utm_id: data.utm_id || null,
+      short_host: verifiedShortHost,
       created_by: user.id,
     })
     .select('id')
@@ -127,6 +142,18 @@ export async function updateShortLink(
 
   const data = parsed.data;
 
+  let verifiedShortHost: string | null = null;
+  if (data.short_host) {
+    const host = data.short_host.toLowerCase();
+    const { data: domainRow } = await supabase
+      .from('custom_domains')
+      .select('host')
+      .eq('host', host)
+      .eq('verified', true)
+      .maybeSingle();
+    if (domainRow) verifiedShortHost = host;
+  }
+
   const { error } = await supabase
     .from('short_links')
     .update({
@@ -142,6 +169,7 @@ export async function updateShortLink(
       utm_campaign: data.utm_campaign || null,
       utm_content: data.utm_content || null,
       utm_id: data.utm_id || null,
+      short_host: verifiedShortHost,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id);

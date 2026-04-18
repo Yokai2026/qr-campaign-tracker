@@ -230,6 +230,7 @@ export interface ShortLink {
   utm_campaign: string | null;
   utm_content: string | null;
   utm_id: string | null;
+  short_host: string | null;
   click_count: number;
   last_clicked_at: string | null;
   created_by: string | null;

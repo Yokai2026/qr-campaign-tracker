@@ -9,7 +9,7 @@ import { createShortLink, getLinkGroups } from '../actions';
 import { checkFeatureAccess } from '@/lib/billing/check-access';
 import { UpgradeBanner } from '@/components/shared/upgrade-banner';
 import { UtmTemplatePicker } from '@/components/shared/utm-template-picker';
-import { getPrimaryDomainHost } from '@/app/(dashboard)/settings/domains-actions';
+import { getVerifiedDomains } from '@/app/(dashboard)/settings/domains-actions';
 import { createClient } from '@/lib/supabase/client';
 
 import { PageHeader } from '@/components/shared/page-header';
@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 type Campaign = { id: string; name: string };
 type Group = { id: string; name: string; color: string };
+type Domain = { id: string; host: string; is_primary: boolean };
 
 export default function NewLinkPage() {
   const router = useRouter();
@@ -55,21 +56,26 @@ export default function NewLinkPage() {
   const [utmCampaign, setUtmCampaign] = useState('');
   const [utmContent, setUtmContent] = useState('');
 
-  const [customDomainHost, setCustomDomainHost] = useState<string | null>(null);
+  const [domains, setDomains] = useState<Domain[]>([]);
+  // shortHost === '' means default (spurig.com/r/), otherwise it's the verified custom host.
+  const [shortHost, setShortHost] = useState('');
 
   useEffect(() => {
     setOrigin(window.location.origin);
     const supabase = createClient();
 
     async function load() {
-      const [campaignsRes, groupsRes, primaryHost] = await Promise.all([
+      const [campaignsRes, groupsRes, domainsRes] = await Promise.all([
         supabase.from('campaigns').select('id, name').order('name'),
         getLinkGroups(),
-        getPrimaryDomainHost(),
+        getVerifiedDomains(),
       ]);
       setCampaigns((campaignsRes.data || []) as Campaign[]);
       setGroups(groupsRes as Group[]);
-      setCustomDomainHost(primaryHost);
+      setDomains(domainsRes as Domain[]);
+      // Default selection: primary domain if one exists, else default app host
+      const primary = (domainsRes as Domain[]).find((d) => d.is_primary);
+      if (primary) setShortHost(primary.host);
     }
     load();
   }, []);
@@ -94,6 +100,7 @@ export default function NewLinkPage() {
         utm_medium: utmMedium || undefined,
         utm_campaign: utmCampaign || undefined,
         utm_content: utmContent || undefined,
+        short_host: shortHost || undefined,
       });
 
       if (result.success) {
@@ -146,6 +153,43 @@ export default function NewLinkPage() {
             />
           </div>
 
+          {/* Domain-Selector — nur sichtbar wenn verifizierte Custom-Domains existieren */}
+          {domains.length > 0 && (
+            <div className="space-y-1.5">
+              <Label className="text-[12px] text-muted-foreground">Domain</Label>
+              <Select value={shortHost || 'default'} onValueChange={(v) => setShortHost(!v || v === 'default' ? '' : v)}>
+                <SelectTrigger className="h-9 text-[13px]">
+                  <SelectValue>
+                    {shortHost ? shortHost : `${origin.replace(/^https?:\/\//, '')}/r`}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">
+                    <span className="flex items-center gap-1.5">
+                      {origin.replace(/^https?:\/\//, '')}/r
+                      <span className="text-[10px] text-muted-foreground">· Standard</span>
+                    </span>
+                  </SelectItem>
+                  {domains.map((d) => (
+                    <SelectItem key={d.id} value={d.host}>
+                      <span className="flex items-center gap-1.5">
+                        {d.host}
+                        {d.is_primary && (
+                          <span className="rounded-sm bg-brand/15 px-1 py-[1px] text-[9px] font-medium uppercase tracking-wider text-brand">
+                            Primär
+                          </span>
+                        )}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground">
+                Wähle unter welcher Domain der Kurzlink ausgeliefert wird.
+              </p>
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label className="text-[12px] text-muted-foreground">Kurzcode</Label>
@@ -167,7 +211,7 @@ export default function NewLinkPage() {
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-[13px] text-muted-foreground shrink-0">
-                {customDomainHost ? `https://${customDomainHost}/` : `${origin}/r/`}
+                {shortHost ? `https://${shortHost}/` : `${origin}/r/`}
               </span>
               <Input
                 placeholder="auto-generiert"
