@@ -7,6 +7,8 @@ import { PerformanceKPIs } from './sections/performance-kpis';
 import { InventoryKPIs } from './sections/inventory-kpis';
 import { BottomLists } from './sections/bottom-lists';
 import { QrHealthCheck } from './sections/qr-health-check';
+import { QuickActions } from './sections/quick-actions';
+import { BillingStatus } from './sections/billing-status';
 
 function ListSkeleton() {
   return (
@@ -35,6 +37,14 @@ export default async function DashboardPage() {
         </div>
         <PrivacyBadge />
       </div>
+
+      {/* Billing status — only renders when relevant (trial, renewal, past-due) */}
+      <Suspense fallback={null}>
+        <BillingStatus />
+      </Suspense>
+
+      {/* Quick Actions — direct access to the four creation flows */}
+      <QuickActions />
 
       {/* QR Health Alerts */}
       <Suspense fallback={null}>
