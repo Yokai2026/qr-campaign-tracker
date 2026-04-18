@@ -21,10 +21,14 @@ export async function getShortLinks(filters?: {
   await requireAuth();
   const supabase = await createClient();
 
+  // Server-side hard cap — mirrors QR-codes. UI paginates client-side (pageSize 15).
+  const SERVER_CAP = 1000;
+
   let query = supabase
     .from('short_links')
     .select('*, campaign:campaigns(id, name), link_group:link_groups(id, name, color)')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(SERVER_CAP);
 
   if (filters?.campaignId) query = query.eq('campaign_id', filters.campaignId);
   if (filters?.groupId) query = query.eq('link_group_id', filters.groupId);

@@ -63,6 +63,11 @@ export async function getQrCodes(
   await requireAuth();
   const supabase = await createClient();
 
+  // Server-side hard cap: prevents runaway result sets for users with huge
+  // QR-code inventories. UI has client-side pagination (pageSize 15) so the
+  // user never actually sees >15 at once — this just keeps the payload sane.
+  const SERVER_CAP = 1000;
+
   let query = supabase
     .from('qr_codes')
     .select(`
@@ -74,7 +79,8 @@ export async function getQrCodes(
         campaign:campaigns!campaign_id ( id, name, slug )
       )
     `)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(SERVER_CAP);
 
   if (filters?.placement_id) {
     query = query.eq('placement_id', filters.placement_id);
