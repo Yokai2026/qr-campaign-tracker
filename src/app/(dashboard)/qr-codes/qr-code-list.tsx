@@ -61,6 +61,12 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
   const [campaignFilter, setCampaignFilter] = useState<string>('all');
   const [placementFilter, setPlacementFilter] = useState<string>('all');
 
+  // Max 7d-scans in der aktuellen Liste — für relative Performance-Bars
+  const maxScans7d = useMemo(
+    () => qrCodes.reduce((max, q) => Math.max(max, q.scans_7d ?? 0), 0),
+    [qrCodes],
+  );
+
   // Sparkline data: map of qr_code_id -> last 7 days scan counts
   const [sparklines, setSparklines] = useState<Record<string, number[]>>({});
 
@@ -254,10 +260,12 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
         <ScanCount
           week={row.original.scans_7d ?? 0}
           total={row.original.scans_total ?? 0}
+          trend={row.original.scans_trend ?? null}
+          percentOfMax={maxScans7d > 0 ? (row.original.scans_7d ?? 0) / maxScans7d : null}
         />
       ),
       sortingFn: (a, b) => (a.original.scans_7d ?? 0) - (b.original.scans_7d ?? 0),
-      meta: { className: 'min-w-[140px]' },
+      meta: { className: 'min-w-[160px]' },
     },
     {
       id: 'trend',

@@ -6,21 +6,84 @@ import { requireAuth } from '@/lib/auth';
 import { locationSchema } from '@/lib/validations';
 import type { Location, LocationInput } from '@/types';
 
-// Fetch all locations ordered by venue_name
-export async function getLocations(): Promise<Location[]> {
+export type LocationWithStats = Location & {
+  /** Scans in den letzten 7 Tagen (aggregiert über alle Placements des Standorts). */
+  scans_7d: number;
+  /** Scans gesamt (aggregiert). */
+  scans_total: number;
+  /** Delta in % gegenüber Woche davor. null = keine Info, 'new' = vorher leer. */
+  scans_trend: number | 'new' | null;
+};
+
+// Fetch all locations with aggregated scan counts (across placements).
+export async function getLocations(): Promise<LocationWithStats[]> {
   await requireAuth();
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('locations')
-    .select('*')
-    .order('venue_name', { ascending: true });
+  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
 
-  if (error) {
-    throw new Error(`Standorte konnten nicht geladen werden: ${error.message}`);
+  const [locRes, placementsRes, eventsRes] = await Promise.all([
+    supabase.from('locations').select('*').order('venue_name', { ascending: true }),
+    supabase.from('placements').select('id, location_id'),
+    supabase
+      .from('redirect_events')
+      .select('placement_id, created_at')
+      .eq('event_type', 'qr_open')
+      .eq('is_bot', false)
+      .not('placement_id', 'is', null)
+      .limit(100_000),
+  ]);
+
+  if (locRes.error) {
+    throw new Error(`Standorte konnten nicht geladen werden: ${locRes.error.message}`);
   }
 
-  return data as Location[];
+  // placement_id → location_id Lookup
+  const placementToLocation: Record<string, string> = {};
+  (placementsRes.data ?? []).forEach((p: { id: string; location_id: string }) => {
+    placementToLocation[p.id] = p.location_id;
+  });
+
+  const scansTotal: Record<string, number> = {};
+  const scans7d: Record<string, number> = {};
+  const scansPrev7d: Record<string, number> = {};
+  (eventsRes.data ?? []).forEach((e: { placement_id: string | null; created_at: string }) => {
+    if (!e.placement_id) return;
+    const locId = placementToLocation[e.placement_id];
+    if (!locId) return;
+    scansTotal[locId] = (scansTotal[locId] ?? 0) + 1;
+    if (e.created_at >= weekAgoIso) {
+      scans7d[locId] = (scans7d[locId] ?? 0) + 1;
+    } else if (e.created_at >= twoWeeksAgoIso) {
+      scansPrev7d[locId] = (scansPrev7d[locId] ?? 0) + 1;
+    }
+  });
+
+  const rows = (locRes.data ?? []).map((loc: Location) => {
+    const curr = scans7d[loc.id] ?? 0;
+    const prev = scansPrev7d[loc.id] ?? 0;
+    return {
+      ...loc,
+      scans_7d: curr,
+      scans_total: scansTotal[loc.id] ?? 0,
+      scans_trend: computeTrend(curr, prev),
+    } as LocationWithStats;
+  });
+
+  // Default-Sort: Performance (7T DESC), Fallback auf venue_name alphabetisch.
+  rows.sort((a, b) => {
+    const diff = b.scans_7d - a.scans_7d;
+    if (diff !== 0) return diff;
+    return a.venue_name.localeCompare(b.venue_name);
+  });
+  return rows;
+}
+
+function computeTrend(current: number, previous: number): number | 'new' | null {
+  if (previous === 0 && current === 0) return null;
+  if (previous === 0) return 'new';
+  return ((current - previous) / previous) * 100;
 }
 
 // Fetch a single location with its placement count

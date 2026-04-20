@@ -53,6 +53,12 @@ export function LinkList({ links, groups }: LinkListProps) {
   const [groupFilter, setGroupFilter] = useState<string>('all');
   const [campaignFilter, setCampaignFilter] = useState<string>('all');
 
+  // Max 7d-clicks in der aktuellen Liste — für relative Performance-Bars
+  const maxClicks7d = useMemo(
+    () => links.reduce((max, l) => Math.max(max, l.clicks_7d ?? 0), 0),
+    [links],
+  );
+
   // Sparkline data: map of short_link_id -> last 7 days click counts
   const [sparklines, setSparklines] = useState<Record<string, number[]>>({});
 
@@ -242,14 +248,19 @@ export function LinkList({ links, groups }: LinkListProps) {
           {column.getIsSorted() === 'desc' && <span aria-hidden>↓</span>}
         </button>
       ),
-      cell: ({ row }) => (
-        <ScanCount
-          week={(row.original as ShortLinkWithStats).clicks_7d ?? 0}
-          total={row.original.click_count}
-        />
-      ),
+      cell: ({ row }) => {
+        const sl = row.original as ShortLinkWithStats;
+        return (
+          <ScanCount
+            week={sl.clicks_7d ?? 0}
+            total={sl.click_count}
+            trend={sl.clicks_trend ?? null}
+            percentOfMax={maxClicks7d > 0 ? (sl.clicks_7d ?? 0) / maxClicks7d : null}
+          />
+        );
+      },
       sortingFn: (a, b) => ((a.original as ShortLinkWithStats).clicks_7d ?? 0) - ((b.original as ShortLinkWithStats).clicks_7d ?? 0),
-      meta: { className: 'min-w-[140px]' },
+      meta: { className: 'min-w-[160px]' },
     },
     {
       id: 'trend',

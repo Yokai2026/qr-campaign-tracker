@@ -6,10 +6,12 @@ import { MapPin, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable, SortIcon } from '@/components/shared/data-table';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { ScanCount } from '@/components/shared/scan-count';
 import { LOCATION_TYPE_LABELS } from '@/lib/constants';
-import type { Location } from '@/types';
+import type { LocationWithStats } from './actions';
 
-const columns: ColumnDef<Location>[] = [
+function buildColumns(maxScans7d: number): ColumnDef<LocationWithStats>[] {
+  return [
   {
     accessorKey: 'venue_name',
     header: ({ column }) => (
@@ -56,6 +58,30 @@ const columns: ColumnDef<Location>[] = [
       </span>
     ),
     filterFn: 'equals',
+    meta: { className: 'hidden md:table-cell' },
+  },
+  {
+    id: 'scans',
+    accessorFn: (row) => row.scans_7d,
+    header: ({ column }) => (
+      <button
+        className="inline-flex items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Scans
+        <SortIcon column={column} />
+      </button>
+    ),
+    cell: ({ row }) => (
+      <ScanCount
+        week={row.original.scans_7d}
+        total={row.original.scans_total}
+        trend={row.original.scans_trend}
+        percentOfMax={maxScans7d > 0 ? row.original.scans_7d / maxScans7d : null}
+      />
+    ),
+    sortingFn: (a, b) => a.original.scans_7d - b.original.scans_7d,
+    meta: { className: 'min-w-[160px]' },
   },
   {
     accessorKey: 'active',
@@ -85,13 +111,16 @@ const columns: ColumnDef<Location>[] = [
     ),
     meta: { className: 'w-[60px]' },
   },
-];
+  ];
+}
 
 type LocationsTableProps = {
-  data: Location[];
+  data: LocationWithStats[];
 };
 
 export function LocationsTable({ data }: LocationsTableProps) {
+  const maxScans7d = data.reduce((max, l) => Math.max(max, l.scans_7d), 0);
+  const columns = buildColumns(maxScans7d);
   return (
     <DataTable
       columns={columns}

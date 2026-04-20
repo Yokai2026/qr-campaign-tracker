@@ -11,6 +11,8 @@ import type { ShortLink, LinkGroup } from '@/types';
 export type ShortLinkWithStats = ShortLink & {
   /** Klicks in den letzten 7 Tagen (aus redirect_events, ohne Bots). */
   clicks_7d?: number;
+  /** Delta in % gegenüber Woche davor. null = keine Info, 'new' = vorher leer. */
+  clicks_trend?: number | 'new' | null;
 };
 
 // =========================================
@@ -42,30 +44,52 @@ export async function getShortLinks(filters?: {
     query = query.or(`title.ilike.%${filters.search}%,short_code.ilike.%${filters.search}%,target_url.ilike.%${filters.search}%`);
   }
 
-  // 7-day click aggregation — "total" lives on short_links.click_count already.
+  // 7-day + previous-7-day click aggregation — "total" lives on short_links.click_count already.
   const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
-  const [{ data }, { data: weekEvents }] = await Promise.all([
+  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
+  const [{ data }, { data: events }] = await Promise.all([
     query,
     supabase
       .from('redirect_events')
-      .select('short_link_id')
+      .select('short_link_id, created_at')
       .eq('event_type', 'link_open')
       .eq('is_bot', false)
       .not('short_link_id', 'is', null)
-      .gte('created_at', weekAgoIso)
+      .gte('created_at', twoWeeksAgoIso)
       .limit(100_000),
   ]);
 
   const weekClicks: Record<string, number> = {};
-  (weekEvents ?? []).forEach((e: { short_link_id: string | null }) => {
+  const prevWeekClicks: Record<string, number> = {};
+  (events ?? []).forEach((e: { short_link_id: string | null; created_at: string }) => {
     if (!e.short_link_id) return;
-    weekClicks[e.short_link_id] = (weekClicks[e.short_link_id] ?? 0) + 1;
+    if (e.created_at >= weekAgoIso) {
+      weekClicks[e.short_link_id] = (weekClicks[e.short_link_id] ?? 0) + 1;
+    } else {
+      prevWeekClicks[e.short_link_id] = (prevWeekClicks[e.short_link_id] ?? 0) + 1;
+    }
   });
 
-  return (data ?? []).map((row: Record<string, unknown>) => ({
-    ...(row as unknown as ShortLink),
-    clicks_7d: weekClicks[row.id as string] ?? 0,
-  }));
+  const rows = (data ?? []).map((row: Record<string, unknown>) => {
+    const id = row.id as string;
+    const curr = weekClicks[id] ?? 0;
+    const prev = prevWeekClicks[id] ?? 0;
+    return {
+      ...(row as unknown as ShortLink),
+      clicks_7d: curr,
+      clicks_trend: computeTrend(curr, prev),
+    };
+  });
+
+  // Default-Sort: Performance (7T DESC) — Top-Performer oben.
+  rows.sort((a, b) => (b.clicks_7d ?? 0) - (a.clicks_7d ?? 0));
+  return rows;
+}
+
+function computeTrend(current: number, previous: number): number | 'new' | null {
+  if (previous === 0 && current === 0) return null;
+  if (previous === 0) return 'new';
+  return ((current - previous) / previous) * 100;
 }
 
 export async function getShortLink(id: string): Promise<ShortLink | null> {

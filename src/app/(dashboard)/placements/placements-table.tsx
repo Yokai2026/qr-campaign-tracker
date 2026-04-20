@@ -28,9 +28,11 @@ type PlacementRow = Placement & {
   qr_codes?: Pick<QrCodeType, 'id'>[];
   scans_7d?: number;
   scans_total?: number;
+  scans_trend?: number | 'new' | null;
 };
 
-const columns: ColumnDef<PlacementRow>[] = [
+function buildColumns(maxScans7d: number): ColumnDef<PlacementRow>[] {
+  return [
   {
     accessorKey: 'name',
     header: ({ column }) => (
@@ -111,10 +113,15 @@ const columns: ColumnDef<PlacementRow>[] = [
       </button>
     ),
     cell: ({ row }) => (
-      <ScanCount week={row.original.scans_7d ?? 0} total={row.original.scans_total ?? 0} />
+      <ScanCount
+        week={row.original.scans_7d ?? 0}
+        total={row.original.scans_total ?? 0}
+        trend={row.original.scans_trend ?? null}
+        percentOfMax={maxScans7d > 0 ? (row.original.scans_7d ?? 0) / maxScans7d : null}
+      />
     ),
     sortingFn: (a, b) => (a.original.scans_7d ?? 0) - (b.original.scans_7d ?? 0),
-    meta: { className: 'min-w-[140px]' },
+    meta: { className: 'min-w-[160px]' },
   },
   {
     accessorKey: 'status',
@@ -165,13 +172,16 @@ const columns: ColumnDef<PlacementRow>[] = [
     ),
     meta: { className: 'w-[60px]' },
   },
-];
+  ];
+}
 
 type PlacementsTableProps = {
   data: PlacementRow[];
 };
 
 export function PlacementsTable({ data }: PlacementsTableProps) {
+  const maxScans7d = data.reduce((max, p) => Math.max(max, p.scans_7d ?? 0), 0);
+  const columns = buildColumns(maxScans7d);
   return (
     <DataTable
       columns={columns}

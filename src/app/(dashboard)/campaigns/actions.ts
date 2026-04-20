@@ -17,6 +17,8 @@ export interface CampaignWithTagCount extends Campaign {
   scans_7d: number;
   /** Scans + Klicks gesamt. */
   scans_total: number;
+  /** Delta in % gegenüber Woche davor. null = keine Info, 'new' = vorher leer. */
+  scans_trend: number | 'new' | null;
 }
 
 export interface CampaignWithTags extends Campaign {
@@ -33,26 +35,19 @@ export async function getCampaigns(): Promise<CampaignWithTagCount[]> {
   const supabase = await createClient();
 
   const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
 
-  const [{ data, error }, allEventsRes, weekEventsRes] = await Promise.all([
+  const [{ data, error }, allEventsRes] = await Promise.all([
     supabase
       .from('campaigns')
       .select('*, campaign_tags(count)')
       .order('updated_at', { ascending: false }),
     supabase
       .from('redirect_events')
-      .select('campaign_id')
+      .select('campaign_id, created_at')
       .in('event_type', ['qr_open', 'link_open'])
       .eq('is_bot', false)
       .not('campaign_id', 'is', null)
-      .limit(100_000),
-    supabase
-      .from('redirect_events')
-      .select('campaign_id')
-      .in('event_type', ['qr_open', 'link_open'])
-      .eq('is_bot', false)
-      .not('campaign_id', 'is', null)
-      .gte('created_at', weekAgoIso)
       .limit(100_000),
   ]);
 
@@ -61,28 +56,47 @@ export async function getCampaigns(): Promise<CampaignWithTagCount[]> {
   }
 
   const scansTotal: Record<string, number> = {};
-  (allEventsRes.data ?? []).forEach((e: { campaign_id: string | null }) => {
+  const scans7d: Record<string, number> = {};
+  const scansPrev7d: Record<string, number> = {};
+  (allEventsRes.data ?? []).forEach((e: { campaign_id: string | null; created_at: string }) => {
     if (!e.campaign_id) return;
     scansTotal[e.campaign_id] = (scansTotal[e.campaign_id] ?? 0) + 1;
-  });
-  const scans7d: Record<string, number> = {};
-  (weekEventsRes.data ?? []).forEach((e: { campaign_id: string | null }) => {
-    if (!e.campaign_id) return;
-    scans7d[e.campaign_id] = (scans7d[e.campaign_id] ?? 0) + 1;
+    if (e.created_at >= weekAgoIso) {
+      scans7d[e.campaign_id] = (scans7d[e.campaign_id] ?? 0) + 1;
+    } else if (e.created_at >= twoWeeksAgoIso) {
+      scansPrev7d[e.campaign_id] = (scansPrev7d[e.campaign_id] ?? 0) + 1;
+    }
   });
 
   // Supabase returns `campaign_tags: [{ count: n }]` when using select count
-  return (data ?? []).map((row: Record<string, unknown>) => {
+  const rows = (data ?? []).map((row: Record<string, unknown>) => {
     const tags = row.campaign_tags as { count: number }[] | undefined;
     const { campaign_tags: _tags, ...campaign } = row;
     const id = row.id as string;
+    const curr = scans7d[id] ?? 0;
+    const prev = scansPrev7d[id] ?? 0;
     return {
       ...campaign,
       tag_count: tags?.[0]?.count ?? 0,
-      scans_7d: scans7d[id] ?? 0,
+      scans_7d: curr,
       scans_total: scansTotal[id] ?? 0,
+      scans_trend: computeTrend(curr, prev),
     } as CampaignWithTagCount;
   });
+
+  // Default-Sort: Performance (7T DESC). Fällt bei Gleichstand auf updated_at zurück.
+  rows.sort((a, b) => {
+    const diff = b.scans_7d - a.scans_7d;
+    if (diff !== 0) return diff;
+    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+  });
+  return rows;
+}
+
+function computeTrend(current: number, previous: number): number | 'new' | null {
+  if (previous === 0 && current === 0) return null;
+  if (previous === 0) return 'new';
+  return ((current - previous) / previous) * 100;
 }
 
 /** Fetch a single campaign by id including its tags. */

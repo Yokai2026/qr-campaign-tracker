@@ -58,23 +58,16 @@ export async function getPlacements(filters?: PlacementFilters) {
   }
 
   const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
 
-  const [{ data, error }, allEventsRes, weekEventsRes] = await Promise.all([
+  const [{ data, error }, allEventsRes] = await Promise.all([
     query,
     supabase
       .from('redirect_events')
-      .select('placement_id')
+      .select('placement_id, created_at')
       .eq('event_type', 'qr_open')
       .eq('is_bot', false)
       .not('placement_id', 'is', null)
-      .limit(100_000),
-    supabase
-      .from('redirect_events')
-      .select('placement_id')
-      .eq('event_type', 'qr_open')
-      .eq('is_bot', false)
-      .not('placement_id', 'is', null)
-      .gte('created_at', weekAgoIso)
       .limit(100_000),
   ]);
 
@@ -83,27 +76,46 @@ export async function getPlacements(filters?: PlacementFilters) {
   }
 
   const scansTotal: Record<string, number> = {};
-  (allEventsRes.data ?? []).forEach((e: { placement_id: string | null }) => {
+  const scans7d: Record<string, number> = {};
+  const scansPrev7d: Record<string, number> = {};
+  (allEventsRes.data ?? []).forEach((e: { placement_id: string | null; created_at: string }) => {
     if (!e.placement_id) return;
     scansTotal[e.placement_id] = (scansTotal[e.placement_id] ?? 0) + 1;
-  });
-  const scans7d: Record<string, number> = {};
-  (weekEventsRes.data ?? []).forEach((e: { placement_id: string | null }) => {
-    if (!e.placement_id) return;
-    scans7d[e.placement_id] = (scans7d[e.placement_id] ?? 0) + 1;
+    if (e.created_at >= weekAgoIso) {
+      scans7d[e.placement_id] = (scans7d[e.placement_id] ?? 0) + 1;
+    } else if (e.created_at >= twoWeeksAgoIso) {
+      scansPrev7d[e.placement_id] = (scansPrev7d[e.placement_id] ?? 0) + 1;
+    }
   });
 
-  return (data ?? []).map((row: Record<string, unknown>) => ({
-    ...row,
-    scans_7d: scans7d[row.id as string] ?? 0,
-    scans_total: scansTotal[row.id as string] ?? 0,
-  })) as (Placement & {
+  const rows = (data ?? []).map((row: Record<string, unknown>) => {
+    const id = row.id as string;
+    const curr = scans7d[id] ?? 0;
+    const prev = scansPrev7d[id] ?? 0;
+    return {
+      ...row,
+      scans_7d: curr,
+      scans_total: scansTotal[id] ?? 0,
+      scans_trend: computeTrend(curr, prev),
+    };
+  }) as (Placement & {
     campaign: Pick<Campaign, 'id' | 'name' | 'slug' | 'status'>;
     location: Pick<Location, 'id' | 'venue_name' | 'district'>;
     qr_codes: { id: string }[];
     scans_7d: number;
     scans_total: number;
+    scans_trend: number | 'new' | null;
   })[];
+
+  // Default-Sort: Performance (7T DESC). Top-Spot oben.
+  rows.sort((a, b) => b.scans_7d - a.scans_7d);
+  return rows;
+}
+
+function computeTrend(current: number, previous: number): number | 'new' | null {
+  if (previous === 0 && current === 0) return null;
+  if (previous === 0) return 'new';
+  return ((current - previous) / previous) * 100;
 }
 
 /**

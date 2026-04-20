@@ -56,6 +56,8 @@ export interface QrCodeWithMeta extends QrCode {
   scans_7d?: number;
   /** Scans gesamt (nur qr_open, ohne Bots). */
   scans_total?: number;
+  /** Delta in % gegenüber Woche davor. null = keine Info, 'new' = vorher leer. */
+  scans_trend?: number | 'new' | null;
 }
 
 /**
@@ -104,6 +106,7 @@ export async function getQrCodes(
   // Aggregate scan counts per qr_code_id — one query, group in-memory.
   // RLS scopes events to this user's resources, so no ownership filter needed.
   const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
   const { data: events } = await supabase
     .from('redirect_events')
     .select('qr_code_id, created_at')
@@ -113,28 +116,44 @@ export async function getQrCodes(
     .limit(100_000);
 
   const scans7d: Record<string, number> = {};
+  const scansPrev7d: Record<string, number> = {};
   const scansTotal: Record<string, number> = {};
   (events ?? []).forEach((e: { qr_code_id: string | null; created_at: string }) => {
     if (!e.qr_code_id) return;
     scansTotal[e.qr_code_id] = (scansTotal[e.qr_code_id] ?? 0) + 1;
     if (e.created_at >= weekAgoIso) {
       scans7d[e.qr_code_id] = (scans7d[e.qr_code_id] ?? 0) + 1;
+    } else if (e.created_at >= twoWeeksAgoIso) {
+      scansPrev7d[e.qr_code_id] = (scansPrev7d[e.qr_code_id] ?? 0) + 1;
     }
   });
 
-  // Flatten joined names for convenience
-  return (data ?? []).map((row: Record<string, unknown>) => {
+  const rows = (data ?? []).map((row: Record<string, unknown>) => {
     const placement = row.placement as Record<string, unknown> | null;
     const campaign = placement?.campaign as Record<string, unknown> | null;
     const id = row.id as string;
+    const curr = scans7d[id] ?? 0;
+    const prev = scansPrev7d[id] ?? 0;
+    const trend = computeTrend(curr, prev);
     return {
       ...row,
       placement_name: (placement?.name as string) ?? undefined,
       campaign_name: (campaign?.name as string) ?? undefined,
-      scans_7d: scans7d[id] ?? 0,
+      scans_7d: curr,
       scans_total: scansTotal[id] ?? 0,
+      scans_trend: trend,
     } as QrCodeWithMeta;
   });
+
+  // Default-Sort nach Performance (7T DESC), damit Top-Performer oben steht.
+  rows.sort((a, b) => (b.scans_7d ?? 0) - (a.scans_7d ?? 0));
+  return rows;
+}
+
+function computeTrend(current: number, previous: number): number | 'new' | null {
+  if (previous === 0 && current === 0) return null;
+  if (previous === 0) return 'new';
+  return ((current - previous) / previous) * 100;
 }
 
 /**

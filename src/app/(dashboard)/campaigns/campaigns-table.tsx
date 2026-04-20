@@ -12,7 +12,8 @@ import { formatDate } from '@/lib/format';
 import { DeleteCampaignButton } from './delete-button';
 import type { CampaignWithTagCount } from './actions';
 
-const columns: ColumnDef<CampaignWithTagCount>[] = [
+function buildColumns(maxScans7d: number): ColumnDef<CampaignWithTagCount>[] {
+  return [
   {
     accessorKey: 'name',
     header: ({ column }) => (
@@ -55,10 +56,15 @@ const columns: ColumnDef<CampaignWithTagCount>[] = [
       </button>
     ),
     cell: ({ row }) => (
-      <ScanCount week={row.original.scans_7d} total={row.original.scans_total} />
+      <ScanCount
+        week={row.original.scans_7d}
+        total={row.original.scans_total}
+        trend={row.original.scans_trend}
+        percentOfMax={maxScans7d > 0 ? row.original.scans_7d / maxScans7d : null}
+      />
     ),
     sortingFn: (a, b) => a.original.scans_7d - b.original.scans_7d,
-    meta: { className: 'min-w-[140px]' },
+    meta: { className: 'min-w-[160px]' },
   },
   {
     accessorKey: 'status',
@@ -132,13 +138,16 @@ const columns: ColumnDef<CampaignWithTagCount>[] = [
       </div>
     ),
   },
-];
+  ];
+}
 
 type CampaignsTableProps = {
   data: CampaignWithTagCount[];
 };
 
 export function CampaignsTable({ data }: CampaignsTableProps) {
+  const maxScans7d = data.reduce((max, c) => Math.max(max, c.scans_7d), 0);
+  const columns = buildColumns(maxScans7d);
   return (
     <DataTable
       columns={columns}
