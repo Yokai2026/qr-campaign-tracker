@@ -21,7 +21,7 @@ import {
 } from 'recharts';
 import {
   TrendingUp, MousePointerClick, FileText, QrCode, Download, Users, FileDown, Globe,
-  Link2, ArrowUpRight, ShieldCheck,
+  Link2, ArrowUpRight, ShieldCheck, ChevronDown, SlidersHorizontal,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, subDays } from 'date-fns';
@@ -94,6 +94,10 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const [district, setDistrict] = useState<string>(searchParams.get('district') || 'all');
   const [source, setSource] = useState<SourceFilter>((searchParams.get('source') as SourceFilter) || 'all');
   const [isLive, setIsLive] = useState(false);
+  // Mobile filter drawer — on desktop the filters are always inline (CSS handles it).
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const activeSecondaryFilters =
+    (source !== 'all' ? 1 : 0) + (campaignId !== 'all' ? 1 : 0) + (district !== 'all' ? 1 : 0);
 
   // Sync filters → URL (dates always included, 'all' values omitted)
   useEffect(() => {
@@ -498,7 +502,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
 
       {/* Filters */}
       <div className="rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-xs)]">
-        {/* Date-Preset Chips */}
+        {/* Date-Preset Chips — always visible */}
         <DatePresetRow
           dateFrom={dateFrom}
           onApply={(from, to) => {
@@ -506,15 +510,12 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             setDateTo(to);
           }}
         />
-        <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+
+        {/* Date range — always visible, compact 2-col */}
+        <div className="mt-3 grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Von</Label>
-            <DatePicker
-              value={dateFrom}
-              onChange={setDateFrom}
-              maxDate={dateTo}
-              ariaLabel="Startdatum"
-            />
+            <DatePicker value={dateFrom} onChange={setDateFrom} maxDate={dateTo} ariaLabel="Startdatum" />
           </div>
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Bis</Label>
@@ -526,6 +527,33 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               ariaLabel="Enddatum"
             />
           </div>
+        </div>
+
+        {/* Mobile toggle — hidden on lg+, where the filters stay inline */}
+        <button
+          type="button"
+          onClick={() => setMobileFiltersOpen((v) => !v)}
+          className="mt-3 flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-[13px] font-medium text-foreground transition-colors hover:border-brand/30 hover:bg-muted/40 lg:hidden"
+          aria-expanded={mobileFiltersOpen}
+        >
+          <span className="inline-flex items-center gap-2">
+            <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
+            Weitere Filter
+            {activeSecondaryFilters > 0 && (
+              <span className="rounded-full bg-brand/15 px-1.5 py-0.5 text-[10px] font-semibold text-brand">
+                {activeSecondaryFilters}
+              </span>
+            )}
+          </span>
+          <ChevronDown
+            className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${mobileFiltersOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+
+        {/* Secondary filters — always visible on lg, collapsible on mobile */}
+        <div
+          className={`mt-3 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:!grid ${mobileFiltersOpen ? 'grid grid-cols-1' : 'hidden'}`}
+        >
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Quelle</Label>
             <Select value={source} onValueChange={(v) => setSource((v ?? 'all') as SourceFilter)}>
@@ -835,30 +863,51 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             </ChartCard>
           )}
 
-          {/* Top Placements Table */}
+          {/* Top Placements — Table on desktop, Card-List on mobile */}
           <ChartCard title="Top-Platzierungen" empty={placementData.length === 0} emptyText="Noch keine Scan-Daten">
-            <DataTableShell>
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
-                    <TableHead className="text-[12px] font-medium text-muted-foreground">#</TableHead>
-                    <TableHead className="text-[12px] font-medium text-muted-foreground">Platzierung</TableHead>
-                    <TableHead className="text-[12px] font-medium text-muted-foreground">Standort</TableHead>
-                    <TableHead className="text-right text-[12px] font-medium text-muted-foreground">Scans</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {placementData.map((p, i) => (
-                    <TableRow key={i} className="border-b border-border/60 transition-colors">
-                      <TableCell className="text-[13px] text-muted-foreground">{i + 1}</TableCell>
-                      <TableCell className="text-[13px] font-medium">{p.name}</TableCell>
-                      <TableCell className="text-[13px] text-muted-foreground">{p.location}</TableCell>
-                      <TableCell className="text-right text-[13px] font-semibold tabular-nums">{p.opens}</TableCell>
+            {/* Desktop: table with 4 columns */}
+            <div className="hidden sm:block">
+              <DataTableShell>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
+                      <TableHead className="text-[12px] font-medium text-muted-foreground">#</TableHead>
+                      <TableHead className="text-[12px] font-medium text-muted-foreground">Platzierung</TableHead>
+                      <TableHead className="text-[12px] font-medium text-muted-foreground">Standort</TableHead>
+                      <TableHead className="text-right text-[12px] font-medium text-muted-foreground">Scans</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </DataTableShell>
+                  </TableHeader>
+                  <TableBody>
+                    {placementData.map((p, i) => (
+                      <TableRow key={i} className="border-b border-border/60 transition-colors">
+                        <TableCell className="text-[13px] text-muted-foreground">{i + 1}</TableCell>
+                        <TableCell className="text-[13px] font-medium">{p.name}</TableCell>
+                        <TableCell className="text-[13px] text-muted-foreground">{p.location}</TableCell>
+                        <TableCell className="text-right text-[13px] font-semibold tabular-nums">{p.opens}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </DataTableShell>
+            </div>
+
+            {/* Mobile: card-list — readable without horizontal scroll */}
+            <ul className="divide-y divide-border/60 sm:hidden">
+              {placementData.map((p, i) => (
+                <li key={i} className="flex items-center gap-3 py-3">
+                  <span className="tabular-nums flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-[12px] font-semibold text-muted-foreground">
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[13px] font-medium">{p.name}</div>
+                    {p.location && (
+                      <div className="mt-0.5 truncate text-[11.5px] text-muted-foreground">{p.location}</div>
+                    )}
+                  </div>
+                  <span className="tabular-nums text-[14px] font-semibold">{p.opens}</span>
+                </li>
+              ))}
+            </ul>
           </ChartCard>
         </>
       )}
