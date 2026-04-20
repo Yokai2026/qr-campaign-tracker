@@ -1,19 +1,24 @@
 import { Suspense } from 'react';
 import { requireAuth } from '@/lib/auth';
-import { KPISkeleton } from '@/components/shared/loading-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PrivacyBadge } from '@/components/shared/privacy-badge';
-import { PerformanceKPIs } from './sections/performance-kpis';
-import { InventoryKPIs } from './sections/inventory-kpis';
-import { BottomLists } from './sections/bottom-lists';
-import { QrHealthCheck } from './sections/qr-health-check';
+import { LiveScanFeed } from '@/components/shared/live-scan-feed';
 import { QuickActions } from './sections/quick-actions';
 import { BillingStatus } from './sections/billing-status';
+import { OnboardingCard } from './sections/onboarding-card';
+import { HeroKpi } from './sections/hero-kpi';
+import { Attention } from './sections/attention';
+import { TopPerformers } from './sections/top-performers';
+import { QrHealthCheck } from './sections/qr-health-check';
 
-function ListSkeleton() {
+function HeroSkeleton() {
+  return <Skeleton className="h-60 rounded-2xl" />;
+}
+
+function RanksSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      {Array.from({ length: 4 }).map((_, i) => (
+    <div className="grid gap-3 md:grid-cols-3">
+      {Array.from({ length: 3 }).map((_, i) => (
         <Skeleton key={i} className="h-64 rounded-2xl" />
       ))}
     </div>
@@ -24,7 +29,7 @@ export default async function DashboardPage() {
   const profile = await requireAuth();
 
   return (
-    <div className="space-y-8 animate-in-card">
+    <div className="space-y-6 animate-in-card">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div>
@@ -38,33 +43,41 @@ export default async function DashboardPage() {
         <PrivacyBadge />
       </div>
 
-      {/* Billing status — only renders when relevant (trial, renewal, past-due) */}
+      {/* Billing — only renders when relevant */}
       <Suspense fallback={null}>
         <BillingStatus />
       </Suspense>
 
-      {/* Quick Actions — direct access to the four creation flows */}
+      {/* Quick Actions */}
       <QuickActions />
 
-      {/* QR Health Alerts */}
+      {/* Onboarding — only for empty, non-dismissed accounts */}
+      <Suspense fallback={null}>
+        <OnboardingCard />
+      </Suspense>
+
+      {/* Hero KPI — the single most important thing above the fold */}
+      <Suspense fallback={<HeroSkeleton />}>
+        <HeroKpi />
+      </Suspense>
+
+      {/* Attention — conditional, invisible on healthy accounts */}
+      <Suspense fallback={null}>
+        <Attention />
+      </Suspense>
+
+      {/* Top Performers — what's actually moving this week */}
+      <Suspense fallback={<RanksSkeleton />}>
+        <TopPerformers />
+      </Suspense>
+
+      {/* QR Health — legacy, conditional */}
       <Suspense fallback={null}>
         <QrHealthCheck />
       </Suspense>
 
-      {/* Performance KPIs — streamed independently */}
-      <Suspense fallback={<KPISkeleton count={4} />}>
-        <PerformanceKPIs />
-      </Suspense>
-
-      {/* Inventory KPIs — streamed independently */}
-      <Suspense fallback={<KPISkeleton count={4} />}>
-        <InventoryKPIs />
-      </Suspense>
-
-      {/* Bottom lists — streamed independently */}
-      <Suspense fallback={<ListSkeleton />}>
-        <BottomLists />
-      </Suspense>
+      {/* Live Feed — compact, last */}
+      <LiveScanFeed />
     </div>
   );
 }
