@@ -57,16 +57,52 @@ export async function getPlacements(filters?: PlacementFilters) {
     query = query.eq('status', filters.status);
   }
 
-  const { data, error } = await query;
+  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+
+  const [{ data, error }, allEventsRes, weekEventsRes] = await Promise.all([
+    query,
+    supabase
+      .from('redirect_events')
+      .select('placement_id')
+      .eq('event_type', 'qr_open')
+      .eq('is_bot', false)
+      .not('placement_id', 'is', null)
+      .limit(100_000),
+    supabase
+      .from('redirect_events')
+      .select('placement_id')
+      .eq('event_type', 'qr_open')
+      .eq('is_bot', false)
+      .not('placement_id', 'is', null)
+      .gte('created_at', weekAgoIso)
+      .limit(100_000),
+  ]);
 
   if (error) {
     throw new Error(`Platzierungen konnten nicht geladen werden: ${error.message}`);
   }
 
-  return (data ?? []) as (Placement & {
+  const scansTotal: Record<string, number> = {};
+  (allEventsRes.data ?? []).forEach((e: { placement_id: string | null }) => {
+    if (!e.placement_id) return;
+    scansTotal[e.placement_id] = (scansTotal[e.placement_id] ?? 0) + 1;
+  });
+  const scans7d: Record<string, number> = {};
+  (weekEventsRes.data ?? []).forEach((e: { placement_id: string | null }) => {
+    if (!e.placement_id) return;
+    scans7d[e.placement_id] = (scans7d[e.placement_id] ?? 0) + 1;
+  });
+
+  return (data ?? []).map((row: Record<string, unknown>) => ({
+    ...row,
+    scans_7d: scans7d[row.id as string] ?? 0,
+    scans_total: scansTotal[row.id as string] ?? 0,
+  })) as (Placement & {
     campaign: Pick<Campaign, 'id' | 'name' | 'slug' | 'status'>;
     location: Pick<Location, 'id' | 'venue_name' | 'district'>;
     qr_codes: { id: string }[];
+    scans_7d: number;
+    scans_total: number;
   })[];
 }
 

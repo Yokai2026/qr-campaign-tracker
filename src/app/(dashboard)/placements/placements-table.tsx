@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { DataTable, SortIcon } from '@/components/shared/data-table';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { ScanCount } from '@/components/shared/scan-count';
 import {
   PLACEMENT_TYPE_LABELS,
   PLACEMENT_STATUS_LABELS,
@@ -25,6 +26,8 @@ type PlacementRow = Placement & {
   campaign?: Pick<Campaign, 'id' | 'name'>;
   location?: Pick<Location, 'id' | 'venue_name' | 'district'>;
   qr_codes?: Pick<QrCodeType, 'id'>[];
+  scans_7d?: number;
+  scans_total?: number;
 };
 
 const columns: ColumnDef<PlacementRow>[] = [
@@ -93,6 +96,25 @@ const columns: ColumnDef<PlacementRow>[] = [
         {PLACEMENT_TYPE_LABELS[row.original.placement_type] ?? row.original.placement_type}
       </span>
     ),
+    meta: { className: 'hidden md:table-cell' },
+  },
+  {
+    id: 'scans',
+    accessorFn: (row) => row.scans_7d ?? 0,
+    header: ({ column }) => (
+      <button
+        className="inline-flex items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Scans
+        <SortIcon column={column} />
+      </button>
+    ),
+    cell: ({ row }) => (
+      <ScanCount week={row.original.scans_7d ?? 0} total={row.original.scans_total ?? 0} />
+    ),
+    sortingFn: (a, b) => (a.original.scans_7d ?? 0) - (b.original.scans_7d ?? 0),
+    meta: { className: 'min-w-[140px]' },
   },
   {
     accessorKey: 'status',
@@ -114,6 +136,7 @@ const columns: ColumnDef<PlacementRow>[] = [
         </Badge>
       </span>
     ),
+    meta: { className: 'hidden lg:table-cell' },
   },
   {
     id: 'actions',

@@ -29,6 +29,7 @@ import { formatDate, truncateUrl } from '@/lib/format';
 import { DataTable } from '@/components/shared/data-table';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { ScanCount } from '@/components/shared/scan-count';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -237,14 +238,36 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
       accessorFn: (row) => row.placement_name ?? '',
     },
     {
+      id: 'scans',
+      accessorFn: (row) => row.scans_7d ?? 0,
+      header: ({ column }) => (
+        <button
+          className="inline-flex items-center gap-1"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Scans
+          {column.getIsSorted() === 'asc' && <span aria-hidden>↑</span>}
+          {column.getIsSorted() === 'desc' && <span aria-hidden>↓</span>}
+        </button>
+      ),
+      cell: ({ row }) => (
+        <ScanCount
+          week={row.original.scans_7d ?? 0}
+          total={row.original.scans_total ?? 0}
+        />
+      ),
+      sortingFn: (a, b) => (a.original.scans_7d ?? 0) - (b.original.scans_7d ?? 0),
+      meta: { className: 'min-w-[140px]' },
+    },
+    {
       id: 'trend',
-      header: '7-Tage',
+      header: '7-Tage-Verlauf',
       cell: ({ row }) => {
         const data = sparklines[row.original.id];
         if (!data || data.every((v) => v === 0)) return <span className="text-muted-foreground text-xs">-</span>;
         return <Sparkline data={data} width={56} height={20} />;
       },
-      meta: { className: 'hidden md:table-cell w-20' },
+      meta: { className: 'hidden lg:table-cell w-24' },
     },
     {
       id: 'status',

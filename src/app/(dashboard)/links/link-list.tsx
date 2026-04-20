@@ -21,7 +21,8 @@ import { subDays, format } from 'date-fns';
 import { Sparkline } from '@/components/shared/sparkline';
 
 import type { ShortLink, LinkGroup } from '@/types';
-import { deleteShortLink, toggleShortLink } from './actions';
+import { deleteShortLink, toggleShortLink, type ShortLinkWithStats } from './actions';
+import { ScanCount } from '@/components/shared/scan-count';
 import { formatDate, truncateUrl } from '@/lib/format';
 
 import { DataTable } from '@/components/shared/data-table';
@@ -42,7 +43,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 type LinkListProps = {
-  links: ShortLink[];
+  links: ShortLinkWithStats[];
   groups: LinkGroup[];
 };
 
@@ -229,22 +230,36 @@ export function LinkList({ links, groups }: LinkListProps) {
       },
     },
     {
-      accessorKey: 'click_count',
-      header: 'Klicks',
-      cell: ({ row }) => (
-        <span className="text-[13px] font-semibold tabular-nums">
-          {row.original.click_count.toLocaleString('de-DE')}
-        </span>
+      id: 'clicks',
+      accessorFn: (row) => (row as ShortLinkWithStats).clicks_7d ?? 0,
+      header: ({ column }) => (
+        <button
+          className="inline-flex items-center gap-1"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Klicks
+          {column.getIsSorted() === 'asc' && <span aria-hidden>↑</span>}
+          {column.getIsSorted() === 'desc' && <span aria-hidden>↓</span>}
+        </button>
       ),
+      cell: ({ row }) => (
+        <ScanCount
+          week={(row.original as ShortLinkWithStats).clicks_7d ?? 0}
+          total={row.original.click_count}
+        />
+      ),
+      sortingFn: (a, b) => ((a.original as ShortLinkWithStats).clicks_7d ?? 0) - ((b.original as ShortLinkWithStats).clicks_7d ?? 0),
+      meta: { className: 'min-w-[140px]' },
     },
     {
       id: 'trend',
-      header: '7-Tage',
+      header: '7-Tage-Verlauf',
       cell: ({ row }) => {
         const data = sparklines[row.original.id];
         if (!data || data.every((v) => v === 0)) return <span className="text-muted-foreground text-xs">-</span>;
         return <Sparkline data={data} width={56} height={20} color="oklch(0.60 0.10 165)" />;
       },
+      meta: { className: 'hidden lg:table-cell w-24' },
     },
     {
       accessorKey: 'active',

@@ -8,6 +8,11 @@ import { logAudit } from '@/lib/audit';
 import { nanoid } from 'nanoid';
 import type { ShortLink, LinkGroup } from '@/types';
 
+export type ShortLinkWithStats = ShortLink & {
+  /** Klicks in den letzten 7 Tagen (aus redirect_events, ohne Bots). */
+  clicks_7d?: number;
+};
+
 // =========================================
 // Short Links — Queries
 // =========================================
@@ -17,7 +22,7 @@ export async function getShortLinks(filters?: {
   groupId?: string;
   search?: string;
   archived?: boolean;
-}): Promise<ShortLink[]> {
+}): Promise<ShortLinkWithStats[]> {
   await requireAuth();
   const supabase = await createClient();
 
@@ -37,8 +42,30 @@ export async function getShortLinks(filters?: {
     query = query.or(`title.ilike.%${filters.search}%,short_code.ilike.%${filters.search}%,target_url.ilike.%${filters.search}%`);
   }
 
-  const { data } = await query;
-  return (data || []) as ShortLink[];
+  // 7-day click aggregation — "total" lives on short_links.click_count already.
+  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const [{ data }, { data: weekEvents }] = await Promise.all([
+    query,
+    supabase
+      .from('redirect_events')
+      .select('short_link_id')
+      .eq('event_type', 'link_open')
+      .eq('is_bot', false)
+      .not('short_link_id', 'is', null)
+      .gte('created_at', weekAgoIso)
+      .limit(100_000),
+  ]);
+
+  const weekClicks: Record<string, number> = {};
+  (weekEvents ?? []).forEach((e: { short_link_id: string | null }) => {
+    if (!e.short_link_id) return;
+    weekClicks[e.short_link_id] = (weekClicks[e.short_link_id] ?? 0) + 1;
+  });
+
+  return (data ?? []).map((row: Record<string, unknown>) => ({
+    ...(row as unknown as ShortLink),
+    clicks_7d: weekClicks[row.id as string] ?? 0,
+  }));
 }
 
 export async function getShortLink(id: string): Promise<ShortLink | null> {

@@ -52,6 +52,10 @@ export interface QrCodeWithMeta extends QrCode {
   placement_name?: string;
   campaign_name?: string;
   redirect_count?: number;
+  /** Scans in den letzten 7 Tagen (nur qr_open, ohne Bots). */
+  scans_7d?: number;
+  /** Scans gesamt (nur qr_open, ohne Bots). */
+  scans_total?: number;
 }
 
 /**
@@ -97,14 +101,38 @@ export async function getQrCodes(
   const { data, error } = await query;
   if (error) throw new Error(error.message);
 
+  // Aggregate scan counts per qr_code_id — one query, group in-memory.
+  // RLS scopes events to this user's resources, so no ownership filter needed.
+  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const { data: events } = await supabase
+    .from('redirect_events')
+    .select('qr_code_id, created_at')
+    .eq('event_type', 'qr_open')
+    .eq('is_bot', false)
+    .not('qr_code_id', 'is', null)
+    .limit(100_000);
+
+  const scans7d: Record<string, number> = {};
+  const scansTotal: Record<string, number> = {};
+  (events ?? []).forEach((e: { qr_code_id: string | null; created_at: string }) => {
+    if (!e.qr_code_id) return;
+    scansTotal[e.qr_code_id] = (scansTotal[e.qr_code_id] ?? 0) + 1;
+    if (e.created_at >= weekAgoIso) {
+      scans7d[e.qr_code_id] = (scans7d[e.qr_code_id] ?? 0) + 1;
+    }
+  });
+
   // Flatten joined names for convenience
   return (data ?? []).map((row: Record<string, unknown>) => {
     const placement = row.placement as Record<string, unknown> | null;
     const campaign = placement?.campaign as Record<string, unknown> | null;
+    const id = row.id as string;
     return {
       ...row,
       placement_name: (placement?.name as string) ?? undefined,
       campaign_name: (campaign?.name as string) ?? undefined,
+      scans_7d: scans7d[id] ?? 0,
+      scans_total: scansTotal[id] ?? 0,
     } as QrCodeWithMeta;
   });
 }

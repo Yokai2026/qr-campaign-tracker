@@ -6,6 +6,7 @@ import { Megaphone, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable, SortIcon } from '@/components/shared/data-table';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { ScanCount } from '@/components/shared/scan-count';
 import { CAMPAIGN_STATUS_LABELS } from '@/lib/constants';
 import { formatDate } from '@/lib/format';
 import { DeleteCampaignButton } from './delete-button';
@@ -42,6 +43,24 @@ const columns: ColumnDef<CampaignWithTagCount>[] = [
     ),
   },
   {
+    id: 'scans',
+    accessorFn: (row) => row.scans_7d,
+    header: ({ column }) => (
+      <button
+        className="inline-flex items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        Scans
+        <SortIcon column={column} />
+      </button>
+    ),
+    cell: ({ row }) => (
+      <ScanCount week={row.original.scans_7d} total={row.original.scans_total} />
+    ),
+    sortingFn: (a, b) => a.original.scans_7d - b.original.scans_7d,
+    meta: { className: 'min-w-[140px]' },
+  },
+  {
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => (
@@ -64,10 +83,11 @@ const columns: ColumnDef<CampaignWithTagCount>[] = [
       </button>
     ),
     cell: ({ row }) => (
-      <span className="text-muted-foreground">
+      <span className="hidden sm:inline text-muted-foreground">
         {formatDate(row.original.start_date)}
       </span>
     ),
+    meta: { className: 'hidden sm:table-cell' },
   },
   {
     accessorKey: 'end_date',
@@ -77,6 +97,7 @@ const columns: ColumnDef<CampaignWithTagCount>[] = [
         {formatDate(row.original.end_date)}
       </span>
     ),
+    meta: { className: 'hidden md:table-cell' },
   },
   {
     accessorKey: 'tag_count',
@@ -88,6 +109,7 @@ const columns: ColumnDef<CampaignWithTagCount>[] = [
         </span>
       </span>
     ),
+    meta: { className: 'hidden lg:table-cell' },
   },
   {
     id: 'actions',

@@ -13,6 +13,10 @@ import type { Campaign, CampaignInput, CampaignTag } from '@/types';
 
 export interface CampaignWithTagCount extends Campaign {
   tag_count: number;
+  /** Scans + Klicks in den letzten 7 Tagen (QR + Link, ohne Bots). */
+  scans_7d: number;
+  /** Scans + Klicks gesamt. */
+  scans_total: number;
 }
 
 export interface CampaignWithTags extends Campaign {
@@ -28,22 +32,55 @@ export async function getCampaigns(): Promise<CampaignWithTagCount[]> {
   await requireAuth();
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('campaigns')
-    .select('*, campaign_tags(count)')
-    .order('updated_at', { ascending: false });
+  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+
+  const [{ data, error }, allEventsRes, weekEventsRes] = await Promise.all([
+    supabase
+      .from('campaigns')
+      .select('*, campaign_tags(count)')
+      .order('updated_at', { ascending: false }),
+    supabase
+      .from('redirect_events')
+      .select('campaign_id')
+      .in('event_type', ['qr_open', 'link_open'])
+      .eq('is_bot', false)
+      .not('campaign_id', 'is', null)
+      .limit(100_000),
+    supabase
+      .from('redirect_events')
+      .select('campaign_id')
+      .in('event_type', ['qr_open', 'link_open'])
+      .eq('is_bot', false)
+      .not('campaign_id', 'is', null)
+      .gte('created_at', weekAgoIso)
+      .limit(100_000),
+  ]);
 
   if (error) {
     throw new Error(`Kampagnen konnten nicht geladen werden: ${error.message}`);
   }
 
+  const scansTotal: Record<string, number> = {};
+  (allEventsRes.data ?? []).forEach((e: { campaign_id: string | null }) => {
+    if (!e.campaign_id) return;
+    scansTotal[e.campaign_id] = (scansTotal[e.campaign_id] ?? 0) + 1;
+  });
+  const scans7d: Record<string, number> = {};
+  (weekEventsRes.data ?? []).forEach((e: { campaign_id: string | null }) => {
+    if (!e.campaign_id) return;
+    scans7d[e.campaign_id] = (scans7d[e.campaign_id] ?? 0) + 1;
+  });
+
   // Supabase returns `campaign_tags: [{ count: n }]` when using select count
   return (data ?? []).map((row: Record<string, unknown>) => {
     const tags = row.campaign_tags as { count: number }[] | undefined;
     const { campaign_tags: _tags, ...campaign } = row;
+    const id = row.id as string;
     return {
       ...campaign,
       tag_count: tags?.[0]?.count ?? 0,
+      scans_7d: scans7d[id] ?? 0,
+      scans_total: scansTotal[id] ?? 0,
     } as CampaignWithTagCount;
   });
 }
