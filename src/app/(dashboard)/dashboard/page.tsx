@@ -3,7 +3,6 @@ import { requireAuth } from '@/lib/auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PrivacyBadge } from '@/components/shared/privacy-badge';
 import { LiveScanFeed } from '@/components/shared/live-scan-feed';
-import { QuickActions } from './sections/quick-actions';
 import { BillingStatus } from './sections/billing-status';
 import { OnboardingCard } from './sections/onboarding-card';
 import { HeroKpi } from './sections/hero-kpi';
@@ -48,10 +47,7 @@ export default async function DashboardPage() {
         <BillingStatus />
       </Suspense>
 
-      {/* Quick Actions */}
-      <QuickActions />
-
-      {/* Onboarding — only for empty, non-dismissed accounts */}
+      {/* Onboarding — only for empty, non-dismissed accounts; one CTA */}
       <Suspense fallback={null}>
         <OnboardingCard />
       </Suspense>

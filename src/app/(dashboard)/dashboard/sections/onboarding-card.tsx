@@ -1,13 +1,13 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { Sparkles, Megaphone, MapPin, ClipboardList, QrCode } from 'lucide-react';
+import { Sparkles, ArrowRight } from 'lucide-react';
 import { DismissibleOnboarding } from './dismissible-onboarding';
 
 /**
- * Renders the four-step onboarding guide ONLY for accounts with no data yet.
- * Once the user has any campaign or any scan, the guide stops appearing
- * unless they re-open it via /help.
+ * Kompakte Onboarding-Karte für leere Accounts. Ein einziger CTA: erste
+ * Kampagne anlegen. Sobald der User eine Kampagne oder einen Scan hat
+ * (oder explizit dismisst) verschwindet die Karte dauerhaft.
  */
 export async function OnboardingCard() {
   noStore();
@@ -29,65 +29,26 @@ export async function OnboardingCard() {
 
   return (
     <DismissibleOnboarding>
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-sm)] sm:p-6">
-        <div className="mb-4 flex items-center gap-2.5">
+      <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-sm)] sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
+        <div className="flex items-start gap-3 sm:items-center">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.18),var(--shadow-sm)]">
             <Sparkles className="h-4 w-4" />
           </div>
-          <div>
-            <h3 className="text-[15px] font-semibold">So funktioniert Spurig</h3>
-            <p className="text-[12px] text-muted-foreground">In 4 einfachen Schritten zum trackbaren QR-Code</p>
+          <div className="min-w-0">
+            <h3 className="text-[15px] font-semibold">Willkommen bei Spurig</h3>
+            <p className="mt-0.5 text-[12.5px] text-muted-foreground">
+              Leg deine erste Kampagne an — QR-Codes und Kurzlinks baust du darauf auf.
+            </p>
           </div>
         </div>
-
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <OnboardingStep n="1" icon={Megaphone} title="Kampagne erstellen" href="/campaigns/new">
-            Dein Projekt — z.B. &quot;Sommerfest 2026&quot; oder &quot;Newsletter-Aktion&quot;. Alles wird hier gebündelt.
-          </OnboardingStep>
-          <OnboardingStep n="2" icon={MapPin} title="Standort anlegen" href="/locations/new">
-            Wo hängen deine QR-Codes? Z.B. Café, Schule, Büro. So siehst du welcher Ort am besten performt.
-          </OnboardingStep>
-          <OnboardingStep n="3" icon={ClipboardList} title="Platzierung erstellen" href="/placements/new">
-            Der genaue Spot — z.B. &quot;Poster am Eingang&quot;. Verknüpft Kampagne und Standort.
-          </OnboardingStep>
-          <OnboardingStep n="4" icon={QrCode} title="QR-Code generieren" href="/qr-codes/new">
-            Fertiger QR-Code — zum Ausdrucken oder digital teilen. Jeder Scan wird getrackt.
-          </OnboardingStep>
-        </div>
-
-        <div className="mt-4 rounded-xl border border-dashed border-border bg-subtle px-4 py-2.5">
-          <p className="text-[12px] text-muted-foreground">
-            <span className="font-medium text-foreground">Tipp:</span> Starte mit Schritt 1 — die anderen bauen darauf auf. Oder direkt einen{' '}
-            <Link href="/links/new" className="text-foreground hover:text-brand transition-colors">Kurzlink anlegen</Link> ohne Kampagne.
-          </p>
-        </div>
+        <Link
+          href="/campaigns/new"
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-[13px] font-semibold text-brand-foreground shadow-[var(--shadow-sm)] transition-all hover:-translate-y-px hover:brightness-105 sm:self-auto"
+        >
+          Erste Kampagne anlegen
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </DismissibleOnboarding>
-  );
-}
-
-function OnboardingStep({
-  n, icon: Icon, title, href, children,
-}: {
-  n: string;
-  icon: typeof Megaphone;
-  title: string;
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group relative rounded-2xl border border-border p-4 transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:bg-brand/[0.04] hover:shadow-[var(--shadow-sm)]"
-    >
-      <div className="mb-2 flex items-center gap-2">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-brand-foreground">
-          {n}
-        </span>
-        <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-      </div>
-      <h4 className="text-[13px] font-semibold transition-colors group-hover:text-brand">{title}</h4>
-      <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{children}</p>
-    </Link>
   );
 }
