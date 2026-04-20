@@ -1,9 +1,11 @@
+import { Suspense } from 'react';
 import { unstable_noStore as noStore } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { getCampaign } from '../actions';
 import { CampaignDetailClient } from './campaign-detail-client';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
+import { EntityStatsHeader } from '@/components/shared/entity-stats-header';
 
 interface CampaignStats {
   placementCount: number;
@@ -94,10 +96,15 @@ export default async function CampaignDetailPage({
   ]);
 
   return (
-    <CampaignDetailClient
-      campaign={campaign}
-      stats={stats}
-      placements={placements}
-    />
+    <>
+      <Suspense fallback={null}>
+        <EntityStatsHeader scope={{ kind: 'campaign', id }} label="Kampagne" />
+      </Suspense>
+      <CampaignDetailClient
+        campaign={campaign}
+        stats={stats}
+        placements={placements}
+      />
+    </>
   );
 }

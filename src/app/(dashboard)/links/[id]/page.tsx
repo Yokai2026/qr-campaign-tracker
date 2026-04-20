@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { unstable_noStore as noStore } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { getShortLink } from '../actions';
@@ -6,6 +7,7 @@ import { getSessionTier } from '@/lib/billing/gates';
 import dynamic from 'next/dynamic';
 import { PageSkeleton } from '@/components/shared/loading-skeleton';
 import { createClient } from '@/lib/supabase/server';
+import { EntityStatsHeader } from '@/components/shared/entity-stats-header';
 import type { AbVariant } from '@/types';
 
 const LinkDetail = dynamic(() => import('./link-detail').then((m) => m.LinkDetail), {
@@ -40,11 +42,16 @@ export default async function LinkDetailPage({ params }: Props) {
   ]);
 
   return (
-    <LinkDetail
-      link={link}
-      redirectRules={rulesResult}
-      abVariants={variantsResult}
-      userTier={session?.tier ?? 'expired'}
-    />
+    <>
+      <Suspense fallback={null}>
+        <EntityStatsHeader scope={{ kind: 'short_link', id }} label="Kurzlink" />
+      </Suspense>
+      <LinkDetail
+        link={link}
+        redirectRules={rulesResult}
+        abVariants={variantsResult}
+        userTier={session?.tier ?? 'expired'}
+      />
+    </>
   );
 }
