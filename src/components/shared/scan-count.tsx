@@ -5,22 +5,27 @@ type Props = {
   week: number;
   total: number;
   className?: string;
-  /** Label für die Gesamt-Zahl (Default: "gesamt"). */
+  /** Label unter der Wochenzahl (Default: "Scans"). */
+  weekLabel?: string;
+  /** Label für die Gesamt-Zahl (Default: "gesamt"). Nur angezeigt wenn compact=false. */
   totalLabel?: string;
   /** Delta in Prozent gegenüber Vorperiode. null = nicht verfügbar, 'new' = vorher leer. */
   trend?: number | 'new' | null;
-  /** Anteil am Maximum der aktuellen Liste (0–1). Zeichnet Mini-Bar unter der Zahl. */
+  /** Anteil am Maximum der aktuellen Liste (0–1). Zeichnet Mini-Bar. */
   percentOfMax?: number | null;
+  /** Compact-Modus für inline-Nutzung in Primary-Zellen: versteckt Gesamt-Text. */
+  compact?: boolean;
 };
 
 /**
  * Konsistente Scan/Klick-Zahl-Darstellung für Listen.
- * Zeigt 7-Tage-Wert prominent, Gesamt muted, optional Trend-Delta + Mini-Bar
- * als relative Performance-Einordnung.
+ * Compact-Modus: "47 Scans · ↑+12%" + Max-Bar — passt direkt unter einen
+ * Primary-Identifier (Short-Code, Name) in die selbe Tabellen-Zelle.
  */
 export function ScanCount({
-  week, total, className, totalLabel = 'gesamt',
-  trend, percentOfMax,
+  week, total, className,
+  weekLabel = 'Scans', totalLabel = 'gesamt',
+  trend, percentOfMax, compact = false,
 }: Props) {
   const hasAny = total > 0;
   return (
@@ -28,22 +33,22 @@ export function ScanCount({
       className={cn('flex flex-col gap-1', className)}
       aria-label={`${week} in den letzten 7 Tagen, ${total} ${totalLabel}`}
     >
-      <div className="inline-flex items-baseline gap-2 tabular-nums">
+      <div className="inline-flex items-baseline gap-1.5 tabular-nums">
         <span
           className={cn(
-            'text-[14px] font-semibold',
+            compact ? 'text-[12.5px] font-semibold' : 'text-[14px] font-semibold',
             hasAny ? 'text-foreground' : 'text-muted-foreground/60',
           )}
         >
           {week.toLocaleString('de-DE')}
         </span>
-        <span className="text-[11px] text-muted-foreground/70">
-          · {total.toLocaleString('de-DE')} {totalLabel}
+        <span className="text-[11.5px] text-muted-foreground">
+          {compact ? weekLabel : `· ${total.toLocaleString('de-DE')} ${totalLabel}`}
         </span>
         {trend !== null && trend !== undefined && <TrendBadge trend={trend} />}
       </div>
       {percentOfMax != null && percentOfMax > 0 && (
-        <div className="h-1 w-full max-w-[120px] overflow-hidden rounded-full bg-muted">
+        <div className={cn('h-[2px] overflow-hidden rounded-full bg-muted', compact ? 'w-full' : 'w-full max-w-[120px]')}>
           <div
             className="h-full rounded-full bg-brand/80"
             style={{ width: `${Math.round(Math.min(1, Math.max(0, percentOfMax)) * 100)}%` }}

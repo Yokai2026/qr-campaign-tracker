@@ -165,27 +165,37 @@ export function LinkList({ links, groups }: LinkListProps) {
       accessorKey: 'short_code',
       header: 'Kurzlink',
       cell: ({ row }) => {
-        const sl = row.original;
+        const sl = row.original as ShortLinkWithStats;
         const isCopied = copiedId === sl.id;
         const displayPath = sl.short_host
           ? `${sl.short_host}/${sl.short_code}`
           : `/r/${sl.short_code}`;
         return (
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/links/${sl.id}`}
-              className="flex items-center gap-1.5 font-medium text-[13px] hover:underline"
-              title={sl.short_host ? `Eigene Domain: ${sl.short_host}` : undefined}
-            >
-              <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
-              {displayPath}
-            </Link>
-            <button
-              onClick={() => handleCopy(sl)}
-              className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {isCopied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
-            </button>
+          <div className="flex flex-col gap-1 min-w-[180px]">
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/links/${sl.id}`}
+                className="flex items-center gap-1.5 font-medium text-[13px] hover:underline"
+                title={sl.short_host ? `Eigene Domain: ${sl.short_host}` : undefined}
+              >
+                <Link2 className="h-3.5 w-3.5 text-muted-foreground" />
+                {displayPath}
+              </Link>
+              <button
+                onClick={() => handleCopy(sl)}
+                className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {isCopied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+              </button>
+            </div>
+            <ScanCount
+              week={sl.clicks_7d ?? 0}
+              total={sl.click_count}
+              weekLabel="Klicks"
+              trend={sl.clicks_trend ?? null}
+              percentOfMax={maxClicks7d > 0 ? (sl.clicks_7d ?? 0) / maxClicks7d : null}
+              compact
+            />
           </div>
         );
       },
@@ -234,33 +244,6 @@ export function LinkList({ links, groups }: LinkListProps) {
           </span>
         );
       },
-    },
-    {
-      id: 'clicks',
-      accessorFn: (row) => (row as ShortLinkWithStats).clicks_7d ?? 0,
-      header: ({ column }) => (
-        <button
-          className="inline-flex items-center gap-1"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Klicks
-          {column.getIsSorted() === 'asc' && <span aria-hidden>↑</span>}
-          {column.getIsSorted() === 'desc' && <span aria-hidden>↓</span>}
-        </button>
-      ),
-      cell: ({ row }) => {
-        const sl = row.original as ShortLinkWithStats;
-        return (
-          <ScanCount
-            week={sl.clicks_7d ?? 0}
-            total={sl.click_count}
-            trend={sl.clicks_trend ?? null}
-            percentOfMax={maxClicks7d > 0 ? (sl.clicks_7d ?? 0) / maxClicks7d : null}
-          />
-        );
-      },
-      sortingFn: (a, b) => ((a.original as ShortLinkWithStats).clicks_7d ?? 0) - ((b.original as ShortLinkWithStats).clicks_7d ?? 0),
-      meta: { className: 'min-w-[160px]' },
     },
     {
       id: 'trend',

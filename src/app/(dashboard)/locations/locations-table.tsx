@@ -24,15 +24,22 @@ function buildColumns(maxScans7d: number): ColumnDef<LocationWithStats>[] {
       </button>
     ),
     cell: ({ row }) => (
-      <div>
+      <div className="flex flex-col gap-1 min-w-[180px]">
         <Link
           href={`/locations/${row.original.id}`}
-          className="font-semibold text-foreground transition-colors hover:text-brand"
+          className="font-semibold text-[13.5px] text-foreground transition-colors hover:text-brand"
         >
           {row.original.venue_name}
         </Link>
+        <ScanCount
+          week={row.original.scans_7d}
+          total={row.original.scans_total}
+          trend={row.original.scans_trend}
+          percentOfMax={maxScans7d > 0 ? row.original.scans_7d / maxScans7d : null}
+          compact
+        />
         {row.original.address && (
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className="truncate text-[11px] text-muted-foreground/80">
             {row.original.address}
           </p>
         )}
@@ -48,6 +55,7 @@ function buildColumns(maxScans7d: number): ColumnDef<LocationWithStats>[] {
       </span>
     ),
     filterFn: 'equals',
+    meta: { className: 'hidden sm:table-cell' },
   },
   {
     accessorKey: 'location_type',
@@ -59,29 +67,6 @@ function buildColumns(maxScans7d: number): ColumnDef<LocationWithStats>[] {
     ),
     filterFn: 'equals',
     meta: { className: 'hidden md:table-cell' },
-  },
-  {
-    id: 'scans',
-    accessorFn: (row) => row.scans_7d,
-    header: ({ column }) => (
-      <button
-        className="inline-flex items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Scans
-        <SortIcon column={column} />
-      </button>
-    ),
-    cell: ({ row }) => (
-      <ScanCount
-        week={row.original.scans_7d}
-        total={row.original.scans_total}
-        trend={row.original.scans_trend}
-        percentOfMax={maxScans7d > 0 ? row.original.scans_7d / maxScans7d : null}
-      />
-    ),
-    sortingFn: (a, b) => a.original.scans_7d - b.original.scans_7d,
-    meta: { className: 'min-w-[160px]' },
   },
   {
     accessorKey: 'active',

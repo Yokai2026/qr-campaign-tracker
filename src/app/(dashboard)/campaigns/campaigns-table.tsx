@@ -26,12 +26,21 @@ function buildColumns(maxScans7d: number): ColumnDef<CampaignWithTagCount>[] {
       </button>
     ),
     cell: ({ row }) => (
-      <Link
-        href={`/campaigns/${row.original.id}`}
-        className="font-semibold text-foreground transition-colors hover:text-brand"
-      >
-        {row.original.name}
-      </Link>
+      <div className="flex flex-col gap-1 min-w-[180px]">
+        <Link
+          href={`/campaigns/${row.original.id}`}
+          className="font-semibold text-[13.5px] text-foreground transition-colors hover:text-brand"
+        >
+          {row.original.name}
+        </Link>
+        <ScanCount
+          week={row.original.scans_7d}
+          total={row.original.scans_total}
+          trend={row.original.scans_trend}
+          percentOfMax={maxScans7d > 0 ? row.original.scans_7d / maxScans7d : null}
+          compact
+        />
+      </div>
     ),
   },
   {
@@ -42,29 +51,7 @@ function buildColumns(maxScans7d: number): ColumnDef<CampaignWithTagCount>[] {
         {row.original.slug}
       </code>
     ),
-  },
-  {
-    id: 'scans',
-    accessorFn: (row) => row.scans_7d,
-    header: ({ column }) => (
-      <button
-        className="inline-flex items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Scans
-        <SortIcon column={column} />
-      </button>
-    ),
-    cell: ({ row }) => (
-      <ScanCount
-        week={row.original.scans_7d}
-        total={row.original.scans_total}
-        trend={row.original.scans_trend}
-        percentOfMax={maxScans7d > 0 ? row.original.scans_7d / maxScans7d : null}
-      />
-    ),
-    sortingFn: (a, b) => a.original.scans_7d - b.original.scans_7d,
-    meta: { className: 'min-w-[160px]' },
+    meta: { className: 'hidden md:table-cell' },
   },
   {
     accessorKey: 'status',

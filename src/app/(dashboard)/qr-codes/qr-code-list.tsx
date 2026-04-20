@@ -203,15 +203,27 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
     },
     {
       accessorKey: 'short_code',
-      header: 'Short-Code',
-      cell: ({ row }) => (
-        <Link
-          href={`/qr-codes/${row.original.id}`}
-          className="font-mono text-sm font-medium hover:underline"
-        >
-          {row.original.short_code}
-        </Link>
-      ),
+      header: 'Code',
+      cell: ({ row }) => {
+        const qr = row.original;
+        return (
+          <div className="flex flex-col gap-1 min-w-[160px]">
+            <Link
+              href={`/qr-codes/${qr.id}`}
+              className="font-mono text-[13.5px] font-semibold hover:underline"
+            >
+              {qr.short_code}
+            </Link>
+            <ScanCount
+              week={qr.scans_7d ?? 0}
+              total={qr.scans_total ?? 0}
+              trend={qr.scans_trend ?? null}
+              percentOfMax={maxScans7d > 0 ? (qr.scans_7d ?? 0) / maxScans7d : null}
+              compact
+            />
+          </div>
+        );
+      },
     },
     {
       accessorKey: 'target_url',
@@ -242,30 +254,6 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
         </div>
       ),
       accessorFn: (row) => row.placement_name ?? '',
-    },
-    {
-      id: 'scans',
-      accessorFn: (row) => row.scans_7d ?? 0,
-      header: ({ column }) => (
-        <button
-          className="inline-flex items-center gap-1"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Scans
-          {column.getIsSorted() === 'asc' && <span aria-hidden>↑</span>}
-          {column.getIsSorted() === 'desc' && <span aria-hidden>↓</span>}
-        </button>
-      ),
-      cell: ({ row }) => (
-        <ScanCount
-          week={row.original.scans_7d ?? 0}
-          total={row.original.scans_total ?? 0}
-          trend={row.original.scans_trend ?? null}
-          percentOfMax={maxScans7d > 0 ? (row.original.scans_7d ?? 0) / maxScans7d : null}
-        />
-      ),
-      sortingFn: (a, b) => (a.original.scans_7d ?? 0) - (b.original.scans_7d ?? 0),
-      meta: { className: 'min-w-[160px]' },
     },
     {
       id: 'trend',

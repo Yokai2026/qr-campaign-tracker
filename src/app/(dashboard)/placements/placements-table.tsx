@@ -45,12 +45,21 @@ function buildColumns(maxScans7d: number): ColumnDef<PlacementRow>[] {
       </button>
     ),
     cell: ({ row }) => (
-      <Link
-        href={`/placements/${row.original.id}`}
-        className="font-semibold text-foreground transition-colors hover:text-brand"
-      >
-        {row.original.name}
-      </Link>
+      <div className="flex flex-col gap-1 min-w-[180px]">
+        <Link
+          href={`/placements/${row.original.id}`}
+          className="font-semibold text-[13.5px] text-foreground transition-colors hover:text-brand"
+        >
+          {row.original.name}
+        </Link>
+        <ScanCount
+          week={row.original.scans_7d ?? 0}
+          total={row.original.scans_total ?? 0}
+          trend={row.original.scans_trend ?? null}
+          percentOfMax={maxScans7d > 0 ? (row.original.scans_7d ?? 0) / maxScans7d : null}
+          compact
+        />
+      </div>
     ),
   },
   {
@@ -61,6 +70,7 @@ function buildColumns(maxScans7d: number): ColumnDef<PlacementRow>[] {
         {row.original.placement_code}
       </code>
     ),
+    meta: { className: 'hidden lg:table-cell' },
   },
   {
     id: 'campaign',
@@ -99,29 +109,6 @@ function buildColumns(maxScans7d: number): ColumnDef<PlacementRow>[] {
       </span>
     ),
     meta: { className: 'hidden md:table-cell' },
-  },
-  {
-    id: 'scans',
-    accessorFn: (row) => row.scans_7d ?? 0,
-    header: ({ column }) => (
-      <button
-        className="inline-flex items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Scans
-        <SortIcon column={column} />
-      </button>
-    ),
-    cell: ({ row }) => (
-      <ScanCount
-        week={row.original.scans_7d ?? 0}
-        total={row.original.scans_total ?? 0}
-        trend={row.original.scans_trend ?? null}
-        percentOfMax={maxScans7d > 0 ? (row.original.scans_7d ?? 0) / maxScans7d : null}
-      />
-    ),
-    sortingFn: (a, b) => (a.original.scans_7d ?? 0) - (b.original.scans_7d ?? 0),
-    meta: { className: 'min-w-[160px]' },
   },
   {
     accessorKey: 'status',
