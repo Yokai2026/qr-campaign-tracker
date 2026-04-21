@@ -45,11 +45,42 @@ export default function ImpressumPage() {
         </section>
 
         <section>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">Umsatzsteuer</h2>
+          <p>
+            Umsatzsteuer-Identifikationsnummer gemäß § 27 a UStG: <em>wird nach Zuteilung durch das Bundeszentralamt für Steuern ergänzt</em>.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-[15px] font-semibold text-foreground mb-2">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
           <p>
             David da Silva Gornik<br />
             Rahel-Varnhagen-Promenade 2<br />
             10969 Berlin
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">Online-Streitbeilegung</h2>
+          <p>
+            Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{' '}
+            <a
+              href="https://ec.europa.eu/consumers/odr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2"
+            >
+              https://ec.europa.eu/consumers/odr/
+            </a>
+            . Unsere E-Mail-Adresse findest du oben.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">Verbraucherstreitbeilegung</h2>
+          <p>
+            Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
+            Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG).
           </p>
         </section>
 
