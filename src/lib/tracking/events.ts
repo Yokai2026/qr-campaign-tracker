@@ -30,11 +30,15 @@ export function parseDevice(userAgent: string): string {
   return 'desktop';
 }
 
+// Bot-Patterns: bewusst eng gehalten, um false-positives bei QR-Scanner-Apps
+// (iOS Kamera, Google Lens, Samsung Bixby Vision) zu vermeiden. "preview"
+// und "fetch" sind draussen — diese matchten fälschlich iOS Link-Previews
+// und Visual-Intelligence-Previews die echte User-Intents sind.
 const BOT_PATTERNS = [
   'bot', 'crawl', 'spider', 'slurp', 'facebookexternalhit', 'facebot',
   'twitterbot', 'linkedinbot', 'whatsapp', 'telegrambot', 'discordbot',
   'slackbot', 'applebot', 'googlebot', 'bingbot', 'yandexbot',
-  'pinterestbot', 'preview', 'fetch', 'curl', 'wget', 'headless',
+  'pinterestbot', 'curl', 'wget', 'headless',
 ];
 
 export function isBot(userAgent: string): boolean {

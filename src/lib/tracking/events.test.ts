@@ -113,6 +113,16 @@ describe('isBot', () => {
     expect(isBot('GOOGLEBOT')).toBe(true);
     expect(isBot('Twitterbot/1.0')).toBe(true);
   });
+
+  // QR-Scanner-Apps dürfen NICHT als Bot fehlmarkiert werden — sonst zählen
+  // echte User-Scans nicht und die Liste zeigt fälschlich 0 Scans.
+  it('does not flag iOS Safari QR-scan (real user)', () => {
+    expect(isBot('Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1')).toBe(false);
+  });
+
+  it('does not flag Android Chrome QR-scan (real user)', () => {
+    expect(isBot('Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36')).toBe(false);
+  });
 });
 
 // ============================================
