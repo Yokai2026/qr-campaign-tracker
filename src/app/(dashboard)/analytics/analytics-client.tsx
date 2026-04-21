@@ -32,6 +32,7 @@ import { CountryChart } from '@/components/shared/country-chart';
 import { WorldMap } from '@/components/shared/world-map';
 import { PageHeader } from '@/components/shared/page-header';
 import { ChartTransition, StaggerContainer, StaggerItem } from '@/components/shared/chart-transition';
+import { ReachDetailDialog, type DrillDownScope } from './reach-detail-dialog';
 
 type Props = {
   campaigns: { id: string; name: string }[];
@@ -94,6 +95,9 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const [district, setDistrict] = useState<string>(searchParams.get('district') || 'all');
   const [source, setSource] = useState<SourceFilter>((searchParams.get('source') as SourceFilter) || 'all');
   const [isLive, setIsLive] = useState(false);
+  // Drill-Down-Modal — öffnet sich beim Klick auf eine KPI-Card mit
+  // granularer Pro-Item-Liste.
+  const [drillDown, setDrillDown] = useState<DrillDownScope | null>(null);
   // Mobile filter drawer — on desktop the filters are always inline (CSS handles it).
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const activeSecondaryFilters =
@@ -628,33 +632,30 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 value={kpis.totalOpens}
                 icon={TrendingUp}
                 subtext={kpis.totalOpens ? `${kpis.qrScans} QR · ${kpis.linkClicks} Link` : 'Noch keine Aufrufe'}
-                hint={'Klick setzt Quellen-Filter auf „Alle“. Summe aus QR-Scans und Kurzlink-Klicks (ohne Bots).'}
+                hint="Klick öffnet Liste aller QR-Codes und Kurzlinks mit Count."
                 delta={deltas.totalOpens}
                 deltaLabel="vs. Vorperiode"
-                onClick={() => setSource('all')}
-                active={source === 'all'}
+                onClick={() => setDrillDown('all')}
               />
               <KPIStatCard
                 label="QR-Scans"
                 value={kpis.qrScans}
                 icon={QrCode}
                 subtext={kpis.qrScans ? `${kpis.uniqueQrCodes} aktive Codes` : 'Noch keine Scans'}
-                hint="Klick filtert Analyse auf QR-Scans. Wie oft physische QR-Codes gescannt wurden."
+                hint="Klick öffnet Liste der QR-Codes mit Scan-Anzahl pro Code."
                 delta={deltas.qrScans}
                 deltaLabel="vs. Vorperiode"
-                onClick={() => setSource('qr')}
-                active={source === 'qr'}
+                onClick={() => setDrillDown('qr')}
               />
               <KPIStatCard
                 label="Link-Klicks"
                 value={kpis.linkClicks}
                 icon={Link2}
                 subtext="Aufrufe über Kurzlinks"
-                hint="Klick filtert Analyse auf Kurzlinks. Klicks auf trackbare Kurzlinks (Social Media, E-Mail)."
+                hint="Klick öffnet Liste der Kurzlinks mit Klick-Anzahl pro Link."
                 delta={deltas.linkClicks}
                 deltaLabel="vs. Vorperiode"
-                onClick={() => setSource('link')}
-                active={source === 'link'}
+                onClick={() => setDrillDown('link')}
               />
               <KPIStatCard
                 label="Eindeutige Besucher"
@@ -667,11 +668,20 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                       ? 'Wird in Produktion erfasst'
                       : 'Noch keine Daten'
                 }
-                hint="Verschiedene Besucher, erkannt über anonymisierten IP-Hash. Funktioniert erst mit echtem Traffic in Produktion (nicht lokal)."
+                hint="Klick öffnet Breakdown pro Besucher — wie viele Scans, QR vs. Link."
                 delta={deltas.uniqueScans}
                 deltaLabel="vs. Vorperiode"
+                onClick={() => setDrillDown('unique')}
               />
             </div>
+            <ReachDetailDialog
+              scope={drillDown}
+              dateFrom={dateFrom}
+              dateTo={dateTo}
+              campaignId={campaignId}
+              district={district}
+              onClose={() => setDrillDown(null)}
+            />
             {botCount > 0 && (
               <p className="flex items-center gap-1.5 text-[11.5px] text-muted-foreground">
                 <ShieldCheck className="h-3 w-3 text-brand/70" />
