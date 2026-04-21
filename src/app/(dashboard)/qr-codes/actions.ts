@@ -186,7 +186,8 @@ export async function getQrCode(id: string) {
       .from('redirect_events')
       .select('id', { count: 'exact', head: true })
       .eq('qr_code_id', id)
-      .eq('event_type', 'qr_open'),
+      .eq('event_type', 'qr_open')
+      .eq('is_bot', false),
     supabase
       .from('redirect_rules')
       .select('*')

@@ -305,9 +305,9 @@ export function QrCodeDetail({ qrCode, history, redirectCount, redirectRules, ab
                   <BarChart3 className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xl font-semibold">{redirectCount}</p>
+                  <p className="text-xl font-semibold tabular-nums">{redirectCount.toLocaleString('de-DE')}</p>
                   <p className="text-xs text-muted-foreground">
-                    Weiterleitungen gesamt
+                    Scans gesamt
                   </p>
                 </div>
               </div>
