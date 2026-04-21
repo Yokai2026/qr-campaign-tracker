@@ -14,6 +14,8 @@ import {
   MoreVertical,
   Filter,
   X,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
@@ -60,6 +62,24 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [campaignFilter, setCampaignFilter] = useState<string>('all');
   const [placementFilter, setPlacementFilter] = useState<string>('all');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  // Client-side host, nach Mount gesetzt — ohne window.origin zur SSR-Zeit.
+  const [origin, setOrigin] = useState('');
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  function handleCopyTestUrl(shortCode: string) {
+    const url = origin ? `${origin}/r/${shortCode}` : `/r/${shortCode}`;
+    navigator.clipboard.writeText(url).then(
+      () => {
+        setCopiedId(shortCode);
+        toast.success('Test-Link kopiert');
+        setTimeout(() => setCopiedId(null), 1800);
+      },
+      () => toast.error('Konnte Link nicht kopieren'),
+    );
+  }
 
   // Max 7d-scans in der aktuellen Liste — für relative Performance-Bars
   const maxScans7d = useMemo(
@@ -206,14 +226,26 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
       header: 'Code',
       cell: ({ row }) => {
         const qr = row.original;
+        const isCopied = copiedId === qr.short_code;
         return (
           <div className="flex flex-col gap-1 min-w-[160px]">
-            <Link
-              href={`/qr-codes/${qr.id}`}
-              className="font-mono text-[13.5px] font-semibold hover:underline"
-            >
-              {qr.short_code}
-            </Link>
+            <div className="flex items-center gap-1.5">
+              <Link
+                href={`/qr-codes/${qr.id}`}
+                className="font-mono text-[13.5px] font-semibold hover:underline"
+              >
+                {qr.short_code}
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleCopyTestUrl(qr.short_code)}
+                className="rounded p-0.5 text-muted-foreground/60 transition-colors hover:text-foreground"
+                aria-label="Test-Link kopieren"
+                title={`/r/${qr.short_code} kopieren — öffnet zählt als Scan`}
+              >
+                {isCopied ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+              </button>
+            </div>
             <ScanCount
               week={qr.scans_7d ?? 0}
               total={qr.scans_total ?? 0}

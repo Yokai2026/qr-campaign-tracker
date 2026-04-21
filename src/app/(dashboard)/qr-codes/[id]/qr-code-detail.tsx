@@ -249,9 +249,9 @@ export function QrCodeDetail({ qrCode, history, redirectCount, redirectRules, ab
               )}
 
               {/* Short link */}
-              <div className="w-full space-y-1">
+              <div className="w-full space-y-1.5">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Kurzlink
+                  Kurzlink · beim Scannen wird hierhin weitergeleitet
                 </p>
                 <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-2">
                   <code className="flex-1 text-sm font-mono break-all">
@@ -267,6 +267,15 @@ export function QrCodeDetail({ qrCode, history, redirectCount, redirectRules, ab
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  render={<a href={shortLink} target="_blank" rel="noopener noreferrer" />}
+                >
+                  <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                  Jetzt testen (zählt als Scan)
+                </Button>
               </div>
             </CardContent>
             <CardFooter className="flex gap-2">
