@@ -190,7 +190,7 @@ export function LinkList({ links, groups }: LinkListProps) {
             </div>
             <ScanCount
               week={sl.clicks_7d ?? 0}
-              total={sl.click_count}
+              total={sl.clicks_total ?? 0}
               weekLabel="Klicks"
               trend={sl.clicks_trend ?? null}
               percentOfMax={maxClicks7d > 0 ? (sl.clicks_7d ?? 0) / maxClicks7d : null}

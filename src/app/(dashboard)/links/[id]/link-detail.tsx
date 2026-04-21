@@ -19,7 +19,7 @@ import {
 
 import type { ShortLink, LinkGroup, RedirectRule, AbVariant } from '@/types';
 import type { EffectiveTier } from '@/lib/billing/gates';
-import { deleteShortLink, toggleShortLink, updateShortLink, getLinkGroups } from '../actions';
+import { deleteShortLink, toggleShortLink, updateShortLink, getLinkGroups, type ShortLinkWithStats } from '../actions';
 import { formatDate, formatDateTime } from '@/lib/format';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
 import { generateForecast } from '@/lib/forecast';
@@ -40,7 +40,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CountryChart } from '@/components/shared/country-chart';
 
 type Props = {
-  link: ShortLink;
+  link: ShortLinkWithStats;
   redirectRules?: RedirectRule[];
   abVariants?: AbVariant[];
   userTier?: EffectiveTier;
@@ -323,7 +323,7 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
             </div>
           </div>
           <div className="text-right shrink-0">
-            <div className="text-[20px] font-bold tabular-nums">{link.click_count.toLocaleString('de-DE')}</div>
+            <div className="text-[20px] font-bold tabular-nums">{(link.clicks_total ?? 0).toLocaleString('de-DE')}</div>
             <div className="text-[11px] text-muted-foreground">Klicks gesamt</div>
           </div>
         </CardContent>
@@ -340,7 +340,7 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
         )}
         <span>Erstellt: {formatDate(link.created_at)}</span>
         {link.expires_at && <span>Läuft ab: {formatDateTime(link.expires_at)}</span>}
-        {link.last_clicked_at && <span>Letzter Klick: {formatDateTime(link.last_clicked_at)}</span>}
+        {link.last_click_at && <span>Letzter Klick: {formatDateTime(link.last_click_at)}</span>}
       </div>
 
       {/* Edit form */}

@@ -11,6 +11,10 @@ import type { ShortLink, LinkGroup } from '@/types';
 export type ShortLinkWithStats = ShortLink & {
   /** Klicks in den letzten 7 Tagen (aus redirect_events, ohne Bots). */
   clicks_7d?: number;
+  /** Klicks gesamt (aus redirect_events, ohne Bots). Single source of truth. */
+  clicks_total?: number;
+  /** ISO-Zeitstempel des letzten Klicks (aus redirect_events, ohne Bots). */
+  last_click_at?: string | null;
   /** Delta in % gegenüber Woche davor. null = keine Info, 'new' = vorher leer. */
   clicks_trend?: number | 'new' | null;
 };
@@ -44,7 +48,9 @@ export async function getShortLinks(filters?: {
     query = query.or(`title.ilike.%${filters.search}%,short_code.ilike.%${filters.search}%,target_url.ilike.%${filters.search}%`);
   }
 
-  // 7-day + previous-7-day click aggregation — "total" lives on short_links.click_count already.
+  // Single source of truth for every click-stat: redirect_events.
+  // ALL-TIME fetch, ordered DESC so the first row per link_id is automatically
+  // the latest — used for last_click_at. 7T/Prev7T derived in-memory.
   const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
   const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
   const [{ data }, { data: events }] = await Promise.all([
@@ -55,28 +61,35 @@ export async function getShortLinks(filters?: {
       .eq('event_type', 'link_open')
       .eq('is_bot', false)
       .not('short_link_id', 'is', null)
-      .gte('created_at', twoWeeksAgoIso)
-      .limit(100_000),
+      .order('created_at', { ascending: false })
+      .limit(200_000),
   ]);
 
-  const weekClicks: Record<string, number> = {};
-  const prevWeekClicks: Record<string, number> = {};
+  const clicks7d: Record<string, number> = {};
+  const clicksPrev7d: Record<string, number> = {};
+  const clicksTotal: Record<string, number> = {};
+  const lastClickAt: Record<string, string> = {};
   (events ?? []).forEach((e: { short_link_id: string | null; created_at: string }) => {
     if (!e.short_link_id) return;
+    const id = e.short_link_id;
+    clicksTotal[id] = (clicksTotal[id] ?? 0) + 1;
+    if (!lastClickAt[id]) lastClickAt[id] = e.created_at;
     if (e.created_at >= weekAgoIso) {
-      weekClicks[e.short_link_id] = (weekClicks[e.short_link_id] ?? 0) + 1;
-    } else {
-      prevWeekClicks[e.short_link_id] = (prevWeekClicks[e.short_link_id] ?? 0) + 1;
+      clicks7d[id] = (clicks7d[id] ?? 0) + 1;
+    } else if (e.created_at >= twoWeeksAgoIso) {
+      clicksPrev7d[id] = (clicksPrev7d[id] ?? 0) + 1;
     }
   });
 
   const rows = (data ?? []).map((row: Record<string, unknown>) => {
     const id = row.id as string;
-    const curr = weekClicks[id] ?? 0;
-    const prev = prevWeekClicks[id] ?? 0;
+    const curr = clicks7d[id] ?? 0;
+    const prev = clicksPrev7d[id] ?? 0;
     return {
       ...(row as unknown as ShortLink),
       clicks_7d: curr,
+      clicks_total: clicksTotal[id] ?? 0,
+      last_click_at: lastClickAt[id] ?? null,
       clicks_trend: computeTrend(curr, prev),
     };
   });
@@ -92,17 +105,40 @@ function computeTrend(current: number, previous: number): number | 'new' | null 
   return ((current - previous) / previous) * 100;
 }
 
-export async function getShortLink(id: string): Promise<ShortLink | null> {
+export async function getShortLink(id: string): Promise<ShortLinkWithStats | null> {
   await requireAuth();
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from('short_links')
-    .select('*, campaign:campaigns(id, name), link_group:link_groups(id, name, color)')
-    .eq('id', id)
-    .single();
+  const [{ data }, { count: totalCount }, { data: latest }] = await Promise.all([
+    supabase
+      .from('short_links')
+      .select('*, campaign:campaigns(id, name), link_group:link_groups(id, name, color)')
+      .eq('id', id)
+      .single(),
+    supabase
+      .from('redirect_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('short_link_id', id)
+      .eq('event_type', 'link_open')
+      .eq('is_bot', false),
+    supabase
+      .from('redirect_events')
+      .select('created_at')
+      .eq('short_link_id', id)
+      .eq('event_type', 'link_open')
+      .eq('is_bot', false)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
-  return data as ShortLink | null;
+  if (!data) return null;
+
+  return {
+    ...(data as ShortLink),
+    clicks_total: totalCount ?? 0,
+    last_click_at: (latest as { created_at: string } | null)?.created_at ?? null,
+  };
 }
 
 // =========================================
