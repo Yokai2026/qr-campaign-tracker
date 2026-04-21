@@ -1,11 +1,13 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { QrCode as QrCodeIcon, Link2, Users, TrendingUp, ArrowRight } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { QrCode as QrCodeIcon, Link2, Users, TrendingUp, ArrowRight, Search, ArrowDownUp } from 'lucide-react';
 
 export type DrillDownScope = 'all' | 'qr' | 'link' | 'unique';
 
@@ -23,26 +25,36 @@ type LinkRow = { kind: 'link'; id: string; shortCode: string; label: string; cou
 type UniqueRow = { kind: 'unique'; ipHash: string; count: number; viaQr: number; viaLink: number };
 type Row = QrRow | LinkRow | UniqueRow;
 
-const SCOPE_META: Record<DrillDownScope, { title: string; description: string; Icon: typeof QrCodeIcon }> = {
+type SortMode = 'count-desc' | 'count-asc' | 'name-asc';
+
+/** Hard-Cap: wieviele Items im Modal maximal gerendert werden, bevor der
+ *  "X weitere verborgen — Suche eingrenzen"-Hinweis erscheint. */
+const RENDER_CAP = 100;
+
+const SCOPE_META: Record<DrillDownScope, { title: string; description: string; Icon: typeof QrCodeIcon; searchPlaceholder: string }> = {
   all: {
     title: 'Aufrufe gesamt',
     description: 'Alle QR-Scans und Kurzlink-Klicks im gewählten Zeitraum',
     Icon: TrendingUp,
+    searchPlaceholder: 'Suche nach Name oder Short-Code…',
   },
   qr: {
     title: 'QR-Scans',
     description: 'Wie oft jeder QR-Code gescannt wurde',
     Icon: QrCodeIcon,
+    searchPlaceholder: 'Suche QR-Code…',
   },
   link: {
     title: 'Link-Klicks',
     description: 'Wie oft jeder Kurzlink geklickt wurde',
     Icon: Link2,
+    searchPlaceholder: 'Suche Kurzlink…',
   },
   unique: {
     title: 'Eindeutige Besucher',
     description: 'Anonymisierte Besucher (IP-Hash) — ob QR, Link oder beides',
     Icon: Users,
+    searchPlaceholder: 'Suche IP-Hash…',
   },
 };
 
@@ -78,6 +90,8 @@ function DrillDownBody({
   const supabase = createClient();
   const meta = SCOPE_META[scope];
   const { Icon } = meta;
+  const [search, setSearch] = useState('');
+  const [sortMode, setSortMode] = useState<SortMode>('count-desc');
 
   const { data, isLoading } = useQuery<Row[]>({
     queryKey: ['reach-drilldown', scope, dateFrom, dateTo, campaignId, district],
@@ -114,13 +128,9 @@ function DrillDownBody({
           else b.viaLink++;
           byIp[e.ip_hash] = b;
         });
-        return Object.entries(byIp)
-          .map(([ipHash, v]) => ({ kind: 'unique' as const, ipHash, ...v }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 50);
+        return Object.entries(byIp).map(([ipHash, v]) => ({ kind: 'unique' as const, ipHash, ...v }));
       }
 
-      // Für QR + Link + All: nach FK gruppieren, dann Namen lookup
       const qrCounts: Record<string, number> = {};
       const linkCounts: Record<string, number> = {};
       filtered.forEach((e: { qr_code_id: string | null; short_link_id: string | null; event_type: string }) => {
@@ -143,29 +153,62 @@ function DrillDownBody({
           : Promise.resolve({ data: [] }),
       ]);
 
-      const qrRows: QrRow[] = ((qrs ?? []) as { id: string; short_code: string; note: string | null }[]).map((q) => ({
+      const qrRows: QrRow[] = ((qrs ?? []) as { id: string; short_code: string; note: string | null }[]).map((qr) => ({
         kind: 'qr',
-        id: q.id,
-        shortCode: q.short_code,
-        label: (q.note?.trim() || q.short_code),
-        count: qrCounts[q.id] ?? 0,
+        id: qr.id,
+        shortCode: qr.short_code,
+        label: qr.note?.trim() || qr.short_code,
+        count: qrCounts[qr.id] ?? 0,
       }));
       const linkRows: LinkRow[] = ((links ?? []) as { id: string; short_code: string; title: string | null }[]).map((l) => ({
         kind: 'link',
         id: l.id,
         shortCode: l.short_code,
-        label: (l.title?.trim() || l.short_code),
+        label: l.title?.trim() || l.short_code,
         count: linkCounts[l.id] ?? 0,
       }));
-
-      const rows: Row[] = scope === 'qr' ? qrRows : scope === 'link' ? linkRows : [...qrRows, ...linkRows];
-      return rows.sort((a, b) => ('count' in b ? b.count : 0) - ('count' in a ? a.count : 0));
+      return scope === 'qr' ? qrRows : scope === 'link' ? linkRows : [...qrRows, ...linkRows];
     },
-    enabled: true,
   });
 
-  const rows = data ?? [];
-  const totalCount = rows.reduce((sum, r) => sum + ('count' in r ? r.count : 0), 0);
+  const allRows = data ?? [];
+  const totalCount = allRows.reduce((sum, r) => sum + r.count, 0);
+
+  // Search + Sort pipeline (client-side — Daten sind schon komplett geladen)
+  const processedRows = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    let result = allRows;
+    if (term) {
+      result = result.filter((r) => {
+        if (r.kind === 'unique') return r.ipHash.toLowerCase().includes(term);
+        return r.label.toLowerCase().includes(term) || r.shortCode.toLowerCase().includes(term);
+      });
+    }
+    const sorted = [...result];
+    if (sortMode === 'count-desc') sorted.sort((a, b) => b.count - a.count);
+    else if (sortMode === 'count-asc') sorted.sort((a, b) => a.count - b.count);
+    else if (sortMode === 'name-asc') {
+      sorted.sort((a, b) => {
+        const la = a.kind === 'unique' ? a.ipHash : a.label;
+        const lb = b.kind === 'unique' ? b.ipHash : b.label;
+        return la.localeCompare(lb, 'de');
+      });
+    }
+    return sorted;
+  }, [allRows, search, sortMode]);
+
+  const visibleRows = processedRows.slice(0, RENDER_CAP);
+  const hiddenCount = processedRows.length - visibleRows.length;
+
+  function toggleSort() {
+    setSortMode((s) =>
+      s === 'count-desc' ? 'count-asc' : s === 'count-asc' ? 'name-asc' : 'count-desc',
+    );
+  }
+
+  const sortLabel =
+    sortMode === 'count-desc' ? 'Meiste zuerst' :
+    sortMode === 'count-asc' ? 'Wenigste zuerst' : 'Name A–Z';
 
   return (
     <>
@@ -175,12 +218,36 @@ function DrillDownBody({
           {meta.title}
           {!isLoading && (
             <span className="tabular-nums ml-auto text-[14px] font-normal text-muted-foreground">
-              {totalCount.toLocaleString('de-DE')} gesamt
+              {totalCount.toLocaleString('de-DE')} gesamt · {allRows.length} {allRows.length === 1 ? 'Eintrag' : 'Einträge'}
             </span>
           )}
         </DialogTitle>
         <DialogDescription>{meta.description}</DialogDescription>
       </DialogHeader>
+
+      {/* Toolbar: Suche + Sort */}
+      {!isLoading && allRows.length > 5 && (
+        <div className="mt-3 flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/70" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={meta.searchPlaceholder}
+              className="h-8 pl-8 text-[12.5px]"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={toggleSort}
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 text-[12px] font-medium text-muted-foreground transition-colors hover:border-brand/30 hover:text-foreground"
+            title="Sortierung wechseln"
+          >
+            <ArrowDownUp className="h-3 w-3" />
+            {sortLabel}
+          </button>
+        </div>
+      )}
 
       <div className="mt-2 max-h-[60vh] overflow-y-auto">
         {isLoading ? (
@@ -189,57 +256,68 @@ function DrillDownBody({
               <Skeleton key={i} className="h-10 w-full" />
             ))}
           </div>
-        ) : rows.length === 0 ? (
+        ) : allRows.length === 0 ? (
           <p className="py-8 text-center text-[13px] text-muted-foreground">
             Keine Daten im gewählten Zeitraum.
           </p>
+        ) : visibleRows.length === 0 ? (
+          <p className="py-8 text-center text-[13px] text-muted-foreground">
+            Kein Treffer für „{search}". Suche anpassen.
+          </p>
         ) : (
-          <ul className="divide-y divide-border/60">
-            {rows.map((r, i) => {
-              if (r.kind === 'unique') {
-                return (
-                  <li key={r.ipHash} className="flex items-center gap-3 py-2.5 px-1">
-                    <span className="tabular-nums flex h-6 w-6 shrink-0 items-center justify-center rounded bg-muted text-[11px] font-semibold text-muted-foreground">
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <code className="text-[12.5px] font-mono text-muted-foreground/90">
-                        {r.ipHash.slice(0, 10)}…
-                      </code>
-                      <div className="mt-0.5 flex items-center gap-2 text-[11.5px] text-muted-foreground">
-                        {r.viaQr > 0 && <span>{r.viaQr} QR-Scans</span>}
-                        {r.viaQr > 0 && r.viaLink > 0 && <span>·</span>}
-                        {r.viaLink > 0 && <span>{r.viaLink} Link-Klicks</span>}
+          <>
+            <ul className="divide-y divide-border/60">
+              {visibleRows.map((r, i) => {
+                if (r.kind === 'unique') {
+                  return (
+                    <li key={r.ipHash} className="flex items-center gap-3 py-2.5 px-1">
+                      <span className="tabular-nums flex h-6 w-6 shrink-0 items-center justify-center rounded bg-muted text-[11px] font-semibold text-muted-foreground">
+                        {i + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <code className="text-[12.5px] font-mono text-muted-foreground/90">
+                          {r.ipHash.slice(0, 10)}…
+                        </code>
+                        <div className="mt-0.5 flex items-center gap-2 text-[11.5px] text-muted-foreground">
+                          {r.viaQr > 0 && <span>{r.viaQr} QR-Scans</span>}
+                          {r.viaQr > 0 && r.viaLink > 0 && <span>·</span>}
+                          {r.viaLink > 0 && <span>{r.viaLink} Link-Klicks</span>}
+                        </div>
                       </div>
-                    </div>
-                    <span className="tabular-nums text-[14px] font-semibold">{r.count}</span>
+                      <span className="tabular-nums text-[14px] font-semibold">{r.count}</span>
+                    </li>
+                  );
+                }
+                const href = r.kind === 'qr' ? `/qr-codes/${r.id}` : `/links/${r.id}`;
+                const RowIcon = r.kind === 'qr' ? QrCodeIcon : Link2;
+                return (
+                  <li key={`${r.kind}-${r.id}`}>
+                    <Link href={href} className="group flex items-center gap-3 py-2.5 px-1 transition-colors hover:bg-muted/40 rounded-md">
+                      <span className="tabular-nums flex h-6 w-6 shrink-0 items-center justify-center rounded bg-muted text-[11px] font-semibold text-muted-foreground">
+                        {i + 1}
+                      </span>
+                      <RowIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-[13px] font-medium group-hover:text-brand transition-colors">
+                          {r.label}
+                        </div>
+                        <code className="text-[11px] font-mono text-muted-foreground/80">
+                          /r/{r.shortCode}
+                        </code>
+                      </div>
+                      <span className="tabular-nums text-[14px] font-semibold">{r.count.toLocaleString('de-DE')}</span>
+                      <ArrowRight className="h-3 w-3 text-muted-foreground/40 group-hover:text-brand transition-colors" />
+                    </Link>
                   </li>
                 );
-              }
-              const href = r.kind === 'qr' ? `/qr-codes/${r.id}` : `/links/${r.id}`;
-              const RowIcon = r.kind === 'qr' ? QrCodeIcon : Link2;
-              return (
-                <li key={`${r.kind}-${r.id}`}>
-                  <Link href={href} className="group flex items-center gap-3 py-2.5 px-1 transition-colors hover:bg-muted/40 rounded-md">
-                    <span className="tabular-nums flex h-6 w-6 shrink-0 items-center justify-center rounded bg-muted text-[11px] font-semibold text-muted-foreground">
-                      {i + 1}
-                    </span>
-                    <RowIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-[13px] font-medium group-hover:text-brand transition-colors">
-                        {r.label}
-                      </div>
-                      <code className="text-[11px] font-mono text-muted-foreground/80">
-                        /r/{r.shortCode}
-                      </code>
-                    </div>
-                    <span className="tabular-nums text-[14px] font-semibold">{r.count.toLocaleString('de-DE')}</span>
-                    <ArrowRight className="h-3 w-3 text-muted-foreground/40 group-hover:text-brand transition-colors" />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+              })}
+            </ul>
+            {hiddenCount > 0 && (
+              <p className="mt-3 rounded-lg bg-muted/40 px-3 py-2 text-center text-[12px] text-muted-foreground">
+                <strong className="text-foreground">{hiddenCount.toLocaleString('de-DE')}</strong> weitere Einträge ausgeblendet — nutze die Suche um einzugrenzen.
+              </p>
+            )}
+          </>
         )}
       </div>
     </>
