@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -18,4 +19,18 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry-Wrap — alle Sentry-Features greifen nur wenn DSN/Auth-Token gesetzt
+// sind (siehe sentry.*.config.ts). Ohne Envs ist der Wrap ein No-Op und der
+// Build bleibt clean.
+export default withSentryConfig(nextConfig, {
+  silent: !process.env.CI,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  // Source-Maps nach Upload löschen — minimaler Leak, nichts Öffentliches.
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+  // Logger-Statements in Prod rausstrippen.
+  disableLogger: true,
+});
