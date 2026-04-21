@@ -30,6 +30,15 @@ export function HeroKpiClient({ stats, sparklines, lastScanAt, windows }: Props)
   const spark = sparklines[range];
   const delta = current.delta;
 
+  // Details-Link übergibt den aktuell gewählten Range als Query-Param —
+  // sonst springt der User in den Analytics-Default (30d) statt zu sehen was
+  // er gerade im Dashboard hat.
+  const rangeDays = range === 'today' ? 0 : range === '7d' ? 6 : 29;
+  const today = new Date();
+  const from = new Date(today.getTime() - rangeDays * 86_400_000);
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+  const detailsHref = `/analytics?from=${fmt(from)}&to=${fmt(today)}`;
+
   const DeltaIcon = delta == null ? Minus : delta > 0 ? TrendingUp : delta < 0 ? TrendingDown : Minus;
   const deltaColor = delta == null
     ? 'text-muted-foreground'
@@ -119,7 +128,7 @@ export function HeroKpiClient({ stats, sparklines, lastScanAt, windows }: Props)
         ) : (
           <span>Noch keine Scans</span>
         )}
-        <Link href="/analytics" className="inline-flex items-center gap-1 font-medium hover:text-brand">
+        <Link href={detailsHref} className="inline-flex items-center gap-1 font-medium hover:text-brand">
           Details <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
