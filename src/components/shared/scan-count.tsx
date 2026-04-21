@@ -33,7 +33,7 @@ export function ScanCount({
       className={cn('flex flex-col gap-1', className)}
       aria-label={`${week} in den letzten 7 Tagen, ${total} ${totalLabel}`}
     >
-      <div className="inline-flex items-baseline gap-1.5 tabular-nums">
+      <div className="inline-flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 tabular-nums">
         <span
           className={cn(
             compact ? 'text-[12.5px] font-semibold' : 'text-[14px] font-semibold',
@@ -43,7 +43,13 @@ export function ScanCount({
           {week.toLocaleString('de-DE')}
         </span>
         <span className="text-[11.5px] text-muted-foreground">
-          {compact ? weekLabel : `· ${total.toLocaleString('de-DE')} ${totalLabel}`}
+          {weekLabel}
+          {' · '}
+          <span className={cn(hasAny && 'text-foreground/80 font-medium')}>
+            {total.toLocaleString('de-DE')}
+          </span>
+          {' '}
+          {totalLabel}
         </span>
         {trend !== null && trend !== undefined && <TrendBadge trend={trend} />}
       </div>

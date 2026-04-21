@@ -42,6 +42,12 @@ export default async function DashboardPage() {
         <PrivacyBadge />
       </div>
 
+      {/* Attention — conditional, nach ganz oben: wenn was brennt soll
+          man's VOR allem anderen sehen. Unsichtbar auf healthy accounts. */}
+      <Suspense fallback={null}>
+        <Attention />
+      </Suspense>
+
       {/* Billing — only renders when relevant */}
       <Suspense fallback={null}>
         <BillingStatus />
@@ -55,11 +61,6 @@ export default async function DashboardPage() {
       {/* Hero KPI — the single most important thing above the fold */}
       <Suspense fallback={<HeroSkeleton />}>
         <HeroKpi />
-      </Suspense>
-
-      {/* Attention — conditional, invisible on healthy accounts */}
-      <Suspense fallback={null}>
-        <Attention />
       </Suspense>
 
       {/* Top Performers — what's actually moving this week */}
