@@ -626,27 +626,33 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 value={kpis.totalOpens}
                 icon={TrendingUp}
                 subtext={kpis.totalOpens ? `${kpis.qrScans} QR · ${kpis.linkClicks} Link` : 'Noch keine Aufrufe'}
-                hint="Summe aller QR-Scans und Kurzlink-Klicks im gewählten Zeitraum (ohne Bots)."
+                hint={'Klick setzt Quellen-Filter auf „Alle“. Summe aus QR-Scans und Kurzlink-Klicks (ohne Bots).'}
                 delta={deltas.totalOpens}
                 deltaLabel="vs. Vorperiode"
+                onClick={() => setSource('all')}
+                active={source === 'all'}
               />
               <KPIStatCard
                 label="QR-Scans"
                 value={kpis.qrScans}
                 icon={QrCode}
                 subtext={kpis.qrScans ? `${kpis.uniqueQrCodes} aktive Codes` : 'Noch keine Scans'}
-                hint="Wie oft physische QR-Codes gescannt wurden."
+                hint="Klick filtert Analyse auf QR-Scans. Wie oft physische QR-Codes gescannt wurden."
                 delta={deltas.qrScans}
                 deltaLabel="vs. Vorperiode"
+                onClick={() => setSource('qr')}
+                active={source === 'qr'}
               />
               <KPIStatCard
                 label="Link-Klicks"
                 value={kpis.linkClicks}
                 icon={Link2}
                 subtext="Aufrufe über Kurzlinks"
-                hint="Klicks auf deine trackbaren Kurzlinks (z. B. für Social Media, E-Mail)."
+                hint="Klick filtert Analyse auf Kurzlinks. Klicks auf trackbare Kurzlinks (Social Media, E-Mail)."
                 delta={deltas.linkClicks}
                 deltaLabel="vs. Vorperiode"
+                onClick={() => setSource('link')}
+                active={source === 'link'}
               />
               <KPIStatCard
                 label="Eindeutige Besucher"

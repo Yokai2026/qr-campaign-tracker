@@ -15,6 +15,10 @@ type KPIStatCardProps = {
   deltaLabel?: string;
   /** Animate the number counting up */
   animate?: boolean;
+  /** Turns the card into a button that triggers this handler (e.g. filter set). */
+  onClick?: () => void;
+  /** When true, the card is visually highlighted (filter currently active). */
+  active?: boolean;
 };
 
 function DeltaBadge({ delta, label }: { delta: number; label?: string }) {
@@ -46,17 +50,26 @@ export function KPIStatCard({
   delta,
   deltaLabel,
   animate = false,
+  onClick,
+  active = false,
 }: KPIStatCardProps) {
   const numericValue = typeof value === 'number' ? value : null;
+  const clickable = typeof onClick === 'function';
 
-  return (
-    <div className={cn(
-      'rounded-2xl border border-border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[var(--shadow-md)] cursor-pointer',
-      className,
-    )}>
+  const cardClass = cn(
+    'rounded-2xl border bg-card p-4 transition-all duration-200',
+    clickable
+      ? 'cursor-pointer text-left hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-[var(--shadow-md)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40'
+      : 'hover:border-brand/20 hover:shadow-[var(--shadow-sm)]',
+    active ? 'border-brand bg-brand/5 ring-1 ring-brand/30' : 'border-border',
+    className,
+  );
+
+  const body = (
+    <>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
+          <p className={cn('text-[13px] font-medium', active ? 'text-brand' : 'text-muted-foreground')}>{label}</p>
           {hint && (
             <span
               title={hint}
@@ -67,7 +80,7 @@ export function KPIStatCard({
             </span>
           )}
         </div>
-        <Icon className="h-4 w-4 text-muted-foreground/50" />
+        <Icon className={cn('h-4 w-4', active ? 'text-brand' : 'text-muted-foreground/50')} />
       </div>
       <div className="mt-2">
         <div className="flex items-baseline gap-2">
@@ -84,6 +97,15 @@ export function KPIStatCard({
           <p className="mt-1 text-[12px] text-muted-foreground">{subtext}</p>
         )}
       </div>
-    </div>
+    </>
   );
+
+  if (clickable) {
+    return (
+      <button type="button" onClick={onClick} aria-pressed={active} className={cardClass}>
+        {body}
+      </button>
+    );
+  }
+  return <div className={cardClass}>{body}</div>;
 }
