@@ -370,7 +370,9 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
         <Select value={campaignFilter} onValueChange={(v) => setCampaignFilter(v ?? 'all')}>
           <SelectTrigger className="h-8 w-[160px] text-[12px]">
             <Filter className="mr-1.5 h-3 w-3 text-muted-foreground" />
-            <SelectValue placeholder="Kampagne" />
+            <SelectValue placeholder="Kampagne">
+              {campaignFilter === 'all' ? 'Alle Kampagnen' : campaignFilter === 'none' ? 'Ohne Kampagne' : campaignFilter}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle Kampagnen</SelectItem>
@@ -384,7 +386,9 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
       {placements.length > 0 && (
         <Select value={placementFilter} onValueChange={(v) => setPlacementFilter(v ?? 'all')}>
           <SelectTrigger className="h-8 w-[160px] text-[12px]">
-            <SelectValue placeholder="Platzierung" />
+            <SelectValue placeholder="Platzierung">
+              {placementFilter === 'all' ? 'Alle Platzierungen' : placementFilter}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle Platzierungen</SelectItem>

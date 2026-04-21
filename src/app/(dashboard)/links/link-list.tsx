@@ -314,7 +314,13 @@ export function LinkList({ links, groups }: LinkListProps) {
         <Select value={groupFilter} onValueChange={(v) => setGroupFilter(v ?? 'all')}>
           <SelectTrigger className="h-8 w-[160px] text-[12px]">
             <Filter className="mr-1.5 h-3 w-3 text-muted-foreground" />
-            <SelectValue placeholder="Sammlung" />
+            <SelectValue placeholder="Sammlung">
+              {groupFilter === 'all'
+                ? 'Alle Sammlungen'
+                : groupFilter === 'none'
+                  ? 'Ohne Sammlung'
+                  : groups.find((g) => g.id === groupFilter)?.name ?? 'Alle Sammlungen'}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle Sammlungen</SelectItem>
@@ -333,7 +339,13 @@ export function LinkList({ links, groups }: LinkListProps) {
       {campaigns.length > 0 && (
         <Select value={campaignFilter} onValueChange={(v) => setCampaignFilter(v ?? 'all')}>
           <SelectTrigger className="h-8 w-[160px] text-[12px]">
-            <SelectValue placeholder="Kampagne" />
+            <SelectValue placeholder="Kampagne">
+              {campaignFilter === 'all'
+                ? 'Alle Kampagnen'
+                : campaignFilter === 'none'
+                  ? 'Ohne Kampagne'
+                  : campaigns.find((c) => c.id === campaignFilter)?.name ?? 'Alle Kampagnen'}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle Kampagnen</SelectItem>
