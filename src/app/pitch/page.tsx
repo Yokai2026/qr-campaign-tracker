@@ -129,7 +129,7 @@ export default function PitchPage() {
       {/* ── 4 — Wie ── */}
       <section className="pitch-slide bg-subtle px-16 py-20">
         <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-center">
-          <Eyebrow>So geht's</Eyebrow>
+          <Eyebrow>So geht&rsquo;s</Eyebrow>
           <h2 className="font-heading text-[56px] font-semibold leading-[1.05] tracking-[-0.03em]">
             In drei Schritten live.
           </h2>

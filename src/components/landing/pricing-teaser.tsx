@@ -6,10 +6,10 @@ const INCLUDED = [
   'Unbegrenzt Kampagnen & QR-Codes',
   'Unbegrenzte Scans',
   'Realtime-Dashboard & Alerts',
-  'Eigene Domain (Pro)',
+  'Eigene Domain',
   'CSV / PDF / API-Export',
   'EU-Hosting & DSGVO',
-  'Team-Zugänge',
+  'Bot-Filterung inklusive',
   'Deutscher Support',
 ];
 

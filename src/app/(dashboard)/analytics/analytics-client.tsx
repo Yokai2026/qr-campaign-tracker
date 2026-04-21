@@ -405,9 +405,11 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         .order('created_at', { ascending: false });
 
       if (campaignId !== 'all') query = query.eq('campaign_id', campaignId);
-      let { data, error } = await query;
+      const { data: rawData, error } = await query;
 
       if (error) throw error;
+
+      let data = rawData;
 
       // Apply district filter client-side (matches chart logic)
       if (district !== 'all' && data) {
