@@ -74,13 +74,11 @@ export async function createCheckoutSession(opts: {
   // jede neue Subscription automatisch angehaengt. So sind Rechnungen
   // §14-UStG-konform: zeigen Netto + 19% MwSt + Brutto getrennt.
   const taxRateId = process.env.STRIPE_DEFAULT_TAX_RATE_ID;
-  const lineItem: Stripe.Checkout.SessionCreateParams.LineItem = {
+  const lineItem: NonNullable<Stripe.Checkout.SessionCreateParams['line_items']>[number] = {
     price: opts.priceId,
     quantity: 1,
+    ...(taxRateId ? { tax_rates: [taxRateId] } : {}),
   };
-  if (taxRateId) {
-    lineItem.tax_rates = [taxRateId];
-  }
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: 'subscription',
