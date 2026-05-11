@@ -19,18 +19,24 @@ type Props = {
 
 const PLANS: Record<Billing, {
   price: number;
+  /** Vergleichspreis (durchgestrichen). Bei Monatlich der reguläre Listenpreis,
+   *  bei Jährlich der Monatspreis — so wird der Yearly-Vorteil sichtbar. */
   strike: number;
+  /** Badge-Text neben dem Strike-Preis. */
+  strikeLabel: 'Einführungspreis' | 'Monatlich';
   monthlyHint: string;
 }> = {
   monthly: {
     price: 5.99,
     strike: 12.99,
+    strikeLabel: 'Einführungspreis',
     monthlyHint: 'Monatlich abgerechnet · jederzeit kündbar',
   },
   yearly: {
     price: 4.99,
-    strike: 12.99,
-    monthlyHint: '59,88 € jährlich · 16 % Ersparnis gegenüber Monatlich',
+    strike: 5.99,
+    strikeLabel: 'Monatlich',
+    monthlyHint: '59,88 € jährlich abgerechnet · 16 % Ersparnis gegenüber Monatlich',
   },
 };
 
@@ -118,7 +124,7 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'brand', included
             {fmt(plan.strike)}&nbsp;€
           </span>
           <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand">
-            Einführungspreis
+            {plan.strikeLabel}
           </span>
         </div>
 

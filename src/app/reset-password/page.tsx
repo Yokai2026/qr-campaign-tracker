@@ -9,6 +9,34 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+// Supabase-Fehlermeldungen sind Englisch — wir uebersetzen die haeufigsten
+// auf Deutsch. Fallback: Original-Message anzeigen.
+function translateAuthError(msg: string): string {
+  const m = msg.toLowerCase();
+  if (m.includes('different from the old password')) {
+    return 'Das neue Passwort muss sich vom alten unterscheiden.';
+  }
+  if (m.includes('password should be at least')) {
+    return 'Das Passwort ist zu kurz (mindestens 8 Zeichen).';
+  }
+  if (m.includes('weak password') || m.includes('password is too weak')) {
+    return 'Das Passwort ist zu schwach. Wähle eine stärkere Kombination.';
+  }
+  if (m.includes('rate limit') || m.includes('too many requests')) {
+    return 'Zu viele Versuche. Bitte warte ein paar Minuten und versuche es erneut.';
+  }
+  if (m.includes('jwt expired') || m.includes('token has expired') || m.includes('invalid_grant')) {
+    return 'Der Link ist abgelaufen. Fordere bitte einen neuen Reset-Link an.';
+  }
+  if (m.includes('user not found') || m.includes('no user found')) {
+    return 'Kein Konto zu dieser E-Mail-Adresse gefunden.';
+  }
+  if (m.includes('email rate limit')) {
+    return 'Zu viele E-Mails in kurzer Zeit. Bitte warte einen Moment.';
+  }
+  return msg || 'Konnte Passwort nicht setzen.';
+}
+
 export default function ResetPasswordPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -36,7 +64,7 @@ export default function ResetPasswordPage() {
     setLoading(false);
 
     if (updateErr) {
-      setError(updateErr.message || 'Konnte Passwort nicht setzen.');
+      setError(translateAuthError(updateErr.message));
       return;
     }
 
