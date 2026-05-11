@@ -123,7 +123,7 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'brand', included
 
         {/* Per-month + strike */}
         <div className="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[13px] text-muted-foreground">
-          <span>pro Monat</span>
+          <span>netto / pro Monat</span>
           <span className="h-1 w-1 rounded-full bg-border" aria-hidden />
           <span className="tabular-nums line-through decoration-[1px]">
             {fmt(plan.strike)}&nbsp;€{plan.strikeSuffix}
@@ -132,6 +132,15 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'brand', included
             {plan.strikeLabel}
           </span>
         </div>
+
+        {/* MwSt-Hinweis — gesetzlich Pflicht bei Netto-Darstellung */}
+        <p className="mt-2 text-center text-[12px] text-muted-foreground">
+          zzgl. 19 % MwSt · entspricht{' '}
+          <span className="tabular-nums font-medium text-foreground">
+            {fmt(plan.price * 1.19)}&nbsp;€
+          </span>{' '}
+          brutto / Monat
+        </p>
 
         <p
           key={billing + '-hint'}

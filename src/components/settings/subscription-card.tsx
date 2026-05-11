@@ -132,7 +132,7 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
                         {isYearly ? '4,99 €' : '5,99 €'}
                       </span>
                       <span className="text-[11px] text-muted-foreground">
-                        / Monat{isYearly ? ' · jährlich abgerechnet' : ''}
+                        netto / Monat{isYearly ? ' · jährlich abgerechnet' : ''} · zzgl. 19 % MwSt
                       </span>
                     </div>
                   </div>
