@@ -45,9 +45,10 @@ export default function ImpressumPage() {
         </section>
 
         <section>
-          <h2 className="text-[15px] font-semibold text-foreground mb-2">Umsatzsteuer</h2>
+          <h2 className="text-[15px] font-semibold text-foreground mb-2">Steuerliche Angaben</h2>
           <p>
-            Umsatzsteuer-Identifikationsnummer gemäß § 27 a UStG: <em>wird nach Zuteilung durch das Bundeszentralamt für Steuern ergänzt</em>.
+            Steuernummer: 14/313/04066<br />
+            Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: DE452790605
           </p>
         </section>
 
@@ -103,7 +104,7 @@ export default function ImpressumPage() {
         </section>
 
         <div className="pt-4 border-t border-border text-[12px] text-muted-foreground">
-          Stand: April 2026
+          Stand: Mai 2026
         </div>
       </div>
     </div>
