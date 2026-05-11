@@ -19,23 +19,28 @@ type Props = {
 
 const PLANS: Record<Billing, {
   price: number;
-  /** Vergleichspreis (durchgestrichen). Bei Monatlich der reguläre Listenpreis,
-   *  bei Jährlich der Monatspreis — so wird der Yearly-Vorteil sichtbar. */
+  /** Vergleichspreis (durchgestrichen). */
   strike: number;
+  /** Suffix nach dem Strike-Preis ('' bei Monatlich, '/Jahr' bei Yearly). */
+  strikeSuffix: string;
   /** Badge-Text neben dem Strike-Preis. */
-  strikeLabel: 'Einführungspreis' | 'Monatlich';
+  strikeLabel: string;
   monthlyHint: string;
 }> = {
   monthly: {
     price: 5.99,
     strike: 12.99,
+    strikeSuffix: '',
     strikeLabel: 'Einführungspreis',
     monthlyHint: 'Monatlich abgerechnet · jederzeit kündbar',
   },
   yearly: {
+    // Jährlich-Vergleich: 12,99 €/Mo × 12 = 155,88 € regulär.
+    // Yearly-Intro: 4,99 €/Mo × 12 = 59,88 € — sichtbarer Vorteil ggü. Listenpreis.
     price: 4.99,
-    strike: 5.99,
-    strikeLabel: 'Monatlich',
+    strike: 155.88,
+    strikeSuffix: '/Jahr',
+    strikeLabel: 'Einführungspreis',
     monthlyHint: '59,88 € jährlich abgerechnet · 16 % Ersparnis gegenüber Monatlich',
   },
 };
@@ -121,7 +126,7 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'brand', included
           <span>pro Monat</span>
           <span className="h-1 w-1 rounded-full bg-border" aria-hidden />
           <span className="tabular-nums line-through decoration-[1px]">
-            {fmt(plan.strike)}&nbsp;€
+            {fmt(plan.strike)}&nbsp;€{plan.strikeSuffix}
           </span>
           <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand">
             {plan.strikeLabel}
