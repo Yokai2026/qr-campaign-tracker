@@ -41,6 +41,7 @@ export const placementSchema = z.object({
 export const qrCodeSchema = z.object({
   placement_id: z.string().uuid().optional().or(z.literal('')),
   target_url: z.string().url('Gültige URL erforderlich').max(2000),
+  title: z.string().max(100, 'Titel zu lang (max 100 Zeichen)').optional().or(z.literal('')),
   note: z.string().max(500).optional().or(z.literal('')),
   valid_from: z.string().optional().or(z.literal('')),
   valid_until: z.string().optional().or(z.literal('')),

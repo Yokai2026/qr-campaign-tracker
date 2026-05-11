@@ -70,6 +70,7 @@ const formSchema = qrCodeSchema;
 type FormValues = {
   placement_id: string;
   target_url: string;
+  title: string;
   note: string;
   valid_from: string;
   valid_until: string;
@@ -123,6 +124,7 @@ export default function NewQrCodePage() {
     defaultValues: {
       placement_id: '',
       target_url: '',
+      title: '',
       note: '',
       valid_from: '',
       valid_until: '',
@@ -187,6 +189,7 @@ export default function NewQrCodePage() {
     const input: QrCodeInput = {
       placement_id: data.placement_id,
       target_url: data.target_url,
+      title: data.title || undefined,
       note: data.note || undefined,
       valid_from: data.valid_from || undefined,
       valid_until: data.valid_until || undefined,
@@ -450,6 +453,23 @@ export default function NewQrCodePage() {
               />
               {errors.target_url && (
                 <p className="text-sm text-destructive">{errors.target_url.message}</p>
+              )}
+            </div>
+
+            {/* Title */}
+            <div className="space-y-2">
+              <Label htmlFor="title">Titel (optional)</Label>
+              <Input
+                id="title"
+                placeholder="z.B. Tischaufsteller Café Mitte"
+                maxLength={100}
+                {...register('title')}
+              />
+              <p className="text-[12px] text-muted-foreground">
+                Damit du den QR-Code in der Liste leichter wiederfindest. Wird Kunden nicht angezeigt.
+              </p>
+              {errors.title && (
+                <p className="text-sm text-destructive">{errors.title.message}</p>
               )}
             </div>
 

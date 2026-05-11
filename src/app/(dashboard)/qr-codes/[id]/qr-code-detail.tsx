@@ -215,11 +215,15 @@ export function QrCodeDetail({ qrCode, history, redirectCount, redirectRules, ab
     <div className="space-y-6 animate-in-card">
       {/* Header */}
       <PageHeader
-        title={`QR-Code: ${qrCode.short_code}`}
-        description={placement?.name ?? 'Kein Platzierungsname'}
+        title={qrCode.title || `QR-Code: ${qrCode.short_code}`}
+        description={
+          qrCode.title
+            ? `${qrCode.short_code} · ${placement?.name ?? 'Kein Platzierungsname'}`
+            : (placement?.name ?? 'Kein Platzierungsname')
+        }
         breadcrumbs={[
           { label: 'QR-Codes', href: '/qr-codes' },
-          { label: qrCode.short_code },
+          { label: qrCode.title || qrCode.short_code },
         ]}
         badge={<StatusBadge status={status} label={STATUS_LABELS[status] ?? status} />}
       />

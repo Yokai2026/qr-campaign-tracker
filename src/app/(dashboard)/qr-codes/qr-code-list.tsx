@@ -229,10 +229,23 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
         const isCopied = copiedId === qr.short_code;
         return (
           <div className="flex flex-col gap-1 min-w-[160px]">
+            {qr.title && (
+              <Link
+                href={`/qr-codes/${qr.id}`}
+                className="text-[13.5px] font-semibold leading-tight hover:underline"
+                title={qr.title}
+              >
+                {qr.title}
+              </Link>
+            )}
             <div className="flex items-center gap-1.5">
               <Link
                 href={`/qr-codes/${qr.id}`}
-                className="font-mono text-[13.5px] font-semibold hover:underline"
+                className={
+                  qr.title
+                    ? 'font-mono text-[11.5px] text-muted-foreground hover:underline'
+                    : 'font-mono text-[13.5px] font-semibold hover:underline'
+                }
               >
                 {qr.short_code}
               </Link>

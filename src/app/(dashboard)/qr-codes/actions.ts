@@ -324,6 +324,7 @@ export async function createQrCode(input: QrCodeInput): Promise<QrCode> {
       active: true,
       valid_from: input.valid_from || null,
       valid_until: input.valid_until || null,
+      title: input.title || null,
       note: input.note || null,
       created_by: profile.id,
       qr_png_url: pngDataUrl,

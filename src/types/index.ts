@@ -124,6 +124,7 @@ export interface QrCode {
   active: boolean;
   valid_from: string | null;
   valid_until: string | null;
+  title: string | null;
   note: string | null;
   created_by: string | null;
   qr_png_url: string | null;
@@ -451,6 +452,7 @@ export interface PlacementInput {
 export interface QrCodeInput {
   placement_id?: string;
   target_url: string;
+  title?: string;
   note?: string;
   valid_from?: string;
   valid_until?: string;
