@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,12 +25,35 @@ type ProfileFormValues = {
   display_name: string;
 };
 
+const VALID_TABS = ['account', 'integrations', 'automations', 'privacy'] as const;
+
 export default function SettingsPage() {
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  // Tab via URL waehlen: /settings?tab=integrations springt direkt in den
+  // richtigen Bereich. Wird z.B. vom "Jetzt Domain hinzufuegen"-Link aus
+  // dem QR-Erstellungsflow gerufen.
+  const tabParam = searchParams.get('tab');
+  const initialTab = VALID_TABS.includes(tabParam as typeof VALID_TABS[number])
+    ? (tabParam as typeof VALID_TABS[number])
+    : 'account';
   const [profile, setProfile] = useState<Profile | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(false);
   const [origin, setOrigin] = useState('');
+
+  // Wenn die URL einen #anchor hat, einmal nach Mount scrollen.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    // Mini-Delay damit der Tab-Wechsel die Section gemounted hat.
+    const t = setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 350);
+    return () => clearTimeout(t);
+  }, []);
 
   const { register, handleSubmit, reset } = useForm<ProfileFormValues>({
     defaultValues: { username: '', display_name: '' },
@@ -136,7 +160,7 @@ export default function SettingsPage() {
         }}
       />
 
-      <Tabs defaultValue="account">
+      <Tabs defaultValue={initialTab}>
         <TabsList className="flex w-full flex-wrap justify-start gap-1 bg-muted/40">
           <TabsTrigger value="account" className="gap-1.5">
             <UserCog className="h-3.5 w-3.5" />
@@ -253,7 +277,9 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <CustomDomains />
+          <div id="custom-domains">
+            <CustomDomains />
+          </div>
           <UtmTemplates />
         </TabsContent>
 

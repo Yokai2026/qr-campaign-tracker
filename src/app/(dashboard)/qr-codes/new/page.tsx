@@ -308,7 +308,7 @@ export default function NewQrCodePage() {
                           {verifiedDomains.length === 0 ? (
                             <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-900 dark:text-amber-200">
                               Du hast noch keine verifizierte Domain.{' '}
-                              <Link href="/settings" className="underline font-medium">
+                              <Link href="/settings?tab=integrations#custom-domains" className="underline font-medium">
                                 Jetzt Domain hinzufügen
                               </Link>
                             </div>
