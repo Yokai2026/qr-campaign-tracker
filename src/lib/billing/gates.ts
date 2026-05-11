@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import type { PlanTier } from '@/types';
@@ -33,7 +34,8 @@ export type EffectiveTier = PlanTier | 'trial' | 'expired';
  * - No subscription but profile trial active → 'trial'
  * - No subscription and trial expired → 'expired'
  */
-export async function getUserTier(userId: string): Promise<EffectiveTier> {
+// react.cache(): innerhalb eines Renders zaehlt nur ein DB-Roundtrip pro userId.
+export const getUserTier = cache(async (userId: string): Promise<EffectiveTier> => {
   const supabase = await createClient();
 
   // Check for active subscription
@@ -64,7 +66,7 @@ export async function getUserTier(userId: string): Promise<EffectiveTier> {
   }
 
   return 'expired';
-}
+});
 
 /**
  * Check if a tier has access to a feature.
@@ -103,7 +105,9 @@ export async function requireSubscription(feature: Feature = 'create'): Promise<
 /**
  * Lightweight tier check for Server Components (no redirect, just returns tier).
  */
-export async function getSessionTier(): Promise<{ userId: string; tier: EffectiveTier } | null> {
+// Ebenfalls cached: TrialGate und sonstige Stellen rufen das pro Render
+// potenziell mehrfach auf — wir wollen aber nur einen Auth-Roundtrip.
+export const getSessionTier = cache(async (): Promise<{ userId: string; tier: EffectiveTier } | null> => {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -111,4 +115,4 @@ export async function getSessionTier(): Promise<{ userId: string; tier: Effectiv
 
   const tier = await getUserTier(user.id);
   return { userId: user.id, tier };
-}
+});

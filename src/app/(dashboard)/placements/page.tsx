@@ -1,12 +1,35 @@
 import { unstable_noStore as noStore } from 'next/cache';
+import { Suspense } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { FilterToolbar } from '@/components/shared/filter-toolbar';
+import { TableSkeleton } from '@/components/shared/loading-skeleton';
 import { PLACEMENT_STATUS_LABELS } from '@/lib/constants';
 import { getPlacements, getCampaignsForSelect } from './actions';
 import { PlacementsTable } from './placements-table';
 import type { PlacementStatus } from '@/types';
 
-export default async function PlacementsPage({
+// Shell streamt: PageHeader rendert sofort, Filter+Tabelle danach.
+export default function PlacementsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  return (
+    <div className="space-y-6 animate-in-card">
+      <PageHeader
+        title="Platzierungen"
+        description="Verwalte alle Platzierungen deiner Kampagnen"
+        actionLabel="Neue Platzierung"
+        actionHref="/placements/new"
+      />
+      <Suspense fallback={<TableSkeleton rows={6} cols={4} />}>
+        <PlacementsContent searchParams={searchParams} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function PlacementsContent({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -26,14 +49,7 @@ export default async function PlacementsPage({
   ]);
 
   return (
-    <div className="space-y-6 animate-in-card">
-      <PageHeader
-        title="Platzierungen"
-        description="Verwalte alle Platzierungen deiner Kampagnen"
-        actionLabel="Neue Platzierung"
-        actionHref="/placements/new"
-      />
-
+    <>
       <FilterToolbar
         filters={[
           {
@@ -52,8 +68,7 @@ export default async function PlacementsPage({
           },
         ]}
       />
-
       <PlacementsTable data={placements} />
-    </div>
+    </>
   );
 }

@@ -1,14 +1,18 @@
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import type { Profile } from '@/types';
 
-export async function getSession() {
+// react.cache() dedupliziert Aufrufe innerhalb eines RSC-Renders.
+// Wenn Page + Layout + getSessionTier alle requireAuth aufrufen, geht der
+// Supabase-Roundtrip trotzdem nur einmal raus.
+export const getSession = cache(async () => {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   return user;
-}
+});
 
-export async function requireAuth(): Promise<Profile> {
+export const requireAuth = cache(async (): Promise<Profile> => {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -27,7 +31,7 @@ export async function requireAuth(): Promise<Profile> {
   }
 
   return profile as Profile;
-}
+});
 
 export async function requireAdmin(): Promise<Profile> {
   const profile = await requireAuth();

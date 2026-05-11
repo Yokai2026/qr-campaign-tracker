@@ -1,11 +1,34 @@
 import { unstable_noStore as noStore } from 'next/cache';
+import { Suspense } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { FilterToolbar } from '@/components/shared/filter-toolbar';
+import { TableSkeleton } from '@/components/shared/loading-skeleton';
 import { LOCATION_TYPE_LABELS } from '@/lib/constants';
 import { getLocations } from './actions';
 import { LocationsTable } from './locations-table';
 
-export default async function LocationsPage({
+// Shell streamt: PageHeader rendert sofort, Filter+Tabelle nach Daten-Fetch.
+export default function LocationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ district?: string; type?: string }>;
+}) {
+  return (
+    <div className="space-y-6 animate-in-card">
+      <PageHeader
+        title="Standorte"
+        description="Alle Standorte und Orte verwalten"
+        actionLabel="Neuer Standort"
+        actionHref="/locations/new"
+      />
+      <Suspense fallback={<TableSkeleton rows={6} cols={4} />}>
+        <LocationsContent searchParams={searchParams} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function LocationsContent({
   searchParams,
 }: {
   searchParams: Promise<{ district?: string; type?: string }>;
@@ -31,14 +54,7 @@ export default async function LocationsPage({
   }
 
   return (
-    <div className="space-y-6 animate-in-card">
-      <PageHeader
-        title="Standorte"
-        description="Alle Standorte und Orte verwalten"
-        actionLabel="Neuer Standort"
-        actionHref="/locations/new"
-      />
-
+    <>
       <FilterToolbar
         filters={[
           {
@@ -58,8 +74,7 @@ export default async function LocationsPage({
           },
         ]}
       />
-
       <LocationsTable data={locations} />
-    </div>
+    </>
   );
 }
