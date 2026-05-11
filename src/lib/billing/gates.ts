@@ -1,6 +1,7 @@
 import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getSession } from '@/lib/auth';
 import type { PlanTier } from '@/types';
 
 export type Feature = 'create' | 'export' | 'reports' | 'custom_domains' | 'conditional_redirects' | 'analytics';
@@ -88,9 +89,9 @@ export function canAccessFeature(tier: EffectiveTier, feature: Feature): boolean
  * Use in Server Components and Server Actions.
  */
 export async function requireSubscription(feature: Feature = 'create'): Promise<EffectiveTier> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+  // Cached getSession — wenn ein Layout/Page-Render schon authentifiziert
+  // hat, kommt der User hier aus dem Request-Cache.
+  const user = await getSession();
   if (!user) redirect('/login');
 
   const tier = await getUserTier(user.id);
@@ -108,11 +109,8 @@ export async function requireSubscription(feature: Feature = 'create'): Promise<
 // Ebenfalls cached: TrialGate und sonstige Stellen rufen das pro Render
 // potenziell mehrfach auf — wir wollen aber nur einen Auth-Roundtrip.
 export const getSessionTier = cache(async (): Promise<{ userId: string; tier: EffectiveTier } | null> => {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+  const user = await getSession();
   if (!user) return null;
-
   const tier = await getUserTier(user.id);
   return { userId: user.id, tier };
 });

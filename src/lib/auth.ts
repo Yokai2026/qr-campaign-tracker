@@ -13,13 +13,15 @@ export const getSession = cache(async () => {
 });
 
 export const requireAuth = cache(async (): Promise<Profile> => {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+  // Nutze den cached getSession — wenn Layout schon einen auth.getUser()
+  // gemacht hat, kommt der hier aus dem Request-Cache zurueck (kein
+  // zweiter Roundtrip zur Supabase Auth-API).
+  const user = await getSession();
   if (!user) {
     redirect('/login');
   }
 
+  const supabase = await createClient();
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
