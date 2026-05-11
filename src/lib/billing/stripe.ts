@@ -69,15 +69,30 @@ export async function createCheckoutSession(opts: {
 
   // No trial_period_days here: the 14-day trial is owned by profiles.trial_ends_at
   // (set by DB trigger on signup). Adding a Stripe trial on top would double-count.
+  //
+  // Stripe-Tax-Rate fuer Deutschland (19% inklusive) — wird vom Checkout an
+  // jede neue Subscription automatisch angehaengt. So sind Rechnungen
+  // §14-UStG-konform: zeigen Netto + 19% MwSt + Brutto getrennt.
+  const taxRateId = process.env.STRIPE_DEFAULT_TAX_RATE_ID;
+  const lineItem: Stripe.Checkout.SessionCreateParams.LineItem = {
+    price: opts.priceId,
+    quantity: 1,
+  };
+  if (taxRateId) {
+    lineItem.tax_rates = [taxRateId];
+  }
+
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: 'subscription',
-    line_items: [{ price: opts.priceId, quantity: 1 }],
+    line_items: [lineItem],
     success_url: `${appUrl}/settings?upgraded=1`,
     cancel_url: `${appUrl}/pricing`,
     client_reference_id: opts.userId,
     customer_email: opts.customerId ? undefined : opts.email,
+    billing_address_collection: 'required',
     subscription_data: {
       metadata: { user_id: opts.userId },
+      ...(taxRateId ? { default_tax_rates: [taxRateId] } : {}),
     },
     metadata: { user_id: opts.userId },
   };
