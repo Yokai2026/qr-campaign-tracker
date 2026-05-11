@@ -81,6 +81,8 @@ const PUBLIC_PATHS = [
   '/api/webhooks/',
   '/login',
   '/signup',
+  '/auth/callback',
+  '/reset-password',
   '/datenschutz',
   '/impressum',
   '/pricing',

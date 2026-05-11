@@ -97,11 +97,18 @@ export default function SettingsPage() {
 
   async function handlePasswordReset() {
     if (!profile) return;
-    const { error } = await supabase.auth.resetPasswordForEmail(profile.email);
+    // redirectTo zeigt nach dem E-Mail-Klick auf unsere callback-Route,
+    // die den Token gegen eine Session tauscht und dann zur /reset-password
+    // weiterleitet. Ohne den Param landet der User auf der Supabase-URL
+    // und sieht nichts.
+    const redirectTo = `${window.location.origin}/auth/callback?next=/reset-password`;
+    const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
+      redirectTo,
+    });
     if (error) {
       toast.error('Fehler: ' + error.message);
     } else {
-      toast.success('Passwort-Reset E-Mail gesendet');
+      toast.success('Passwort-Reset E-Mail gesendet — schau in dein Postfach');
     }
   }
 
