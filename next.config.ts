@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // @tanstack/* aus der Liste entfernt — verursacht Compile-Hang mit Turbopack.
+    // recharts hat eigenes ESM-Setup; in der Liste lassen wir es weg.
+    optimizePackageImports: ['lucide-react', 'date-fns'],
+  },
   async headers() {
     return [
       {

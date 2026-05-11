@@ -26,10 +26,16 @@ import {
 import { toast } from 'sonner';
 import { format, subDays } from 'date-fns';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
-import { generateAnalyticsPdf } from '@/lib/pdf/generate';
 import { generateForecast } from '@/lib/forecast';
+import dynamic from 'next/dynamic';
 import { CountryChart } from '@/components/shared/country-chart';
-import { WorldMap } from '@/components/shared/world-map';
+
+// react-simple-maps zieht D3 + topojson nach (~250KB). Nur laden,
+// wenn der User wirklich bis zum Karten-Block gescrollt hat.
+const WorldMap = dynamic(
+  () => import('@/components/shared/world-map').then((m) => m.WorldMap),
+  { ssr: false, loading: () => <div className="h-[380px] rounded-2xl bg-muted/30" /> },
+);
 import { PageHeader } from '@/components/shared/page-header';
 import { ChartTransition, StaggerContainer, StaggerItem } from '@/components/shared/chart-transition';
 import { ReachDetailDialog, type DrillDownScope } from './reach-detail-dialog';
@@ -487,7 +493,10 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
+              onClick={async () => {
+                // jspdf + jspdf-autotable sind ~250KB — erst beim Klick laden,
+                // damit sie nicht im Initial-Analytics-Bundle stecken.
+                const { generateAnalyticsPdf } = await import('@/lib/pdf/generate');
                 generateAnalyticsPdf({
                   dateFrom, dateTo, kpis, campaignData, placementData, deviceData, browserData, osData, countryData,
                 });

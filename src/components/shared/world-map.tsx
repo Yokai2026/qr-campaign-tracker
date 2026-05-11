@@ -8,8 +8,9 @@ import {
   ZoomableGroup,
 } from 'react-simple-maps';
 
-const GEO_URL =
-  'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+// Lokal serviert (siehe public/geo/countries-110m.json).
+// Vermeidet Drittanbieter-CDN-Request (Privacy-first) + spart ~200ms TTFB.
+const GEO_URL = '/geo/countries-110m.json';
 
 /**
  * ISO 3166-1 numeric -> alpha-2 mapping for countries we track.

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { CommandPalette } from '@/components/layout/command-palette';
@@ -6,14 +7,19 @@ import { Providers } from '@/components/providers';
 import { TrialEndedModal } from '@/components/billing/trial-ended-modal';
 import { getSessionTier } from '@/lib/billing/gates';
 
-export default async function DashboardLayout({
+// Eigene async-Komponente: Tier-Lookup blockiert das Shell-Streaming nicht mehr.
+// Ohne aktiven Trial-Modal liefert sie null und kostet im Render nichts.
+async function TrialGate() {
+  const session = await getSessionTier();
+  if (session?.tier !== 'expired') return null;
+  return <TrialEndedModal />;
+}
+
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSessionTier();
-  const trialEnded = session?.tier === 'expired';
-
   return (
     <Providers>
       <div className="min-h-screen bg-background">
@@ -26,7 +32,9 @@ export default async function DashboardLayout({
         <MobileBottomNav />
         <CommandPalette />
         <Toaster />
-        {trialEnded && <TrialEndedModal />}
+        <Suspense fallback={null}>
+          <TrialGate />
+        </Suspense>
       </div>
     </Providers>
   );

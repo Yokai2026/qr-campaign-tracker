@@ -72,9 +72,36 @@ function handleCustomHost(request: NextRequest): NextResponse | null {
   return customHostNotFound();
 }
 
+// Pfade, die KEINE Session brauchen — Auth-Roundtrip wird gespart.
+// Reihenfolge nach Häufigkeit: /r/ und /api/track sind die heißesten Pfade.
+const PUBLIC_PATHS = [
+  '/r/',
+  '/api/track',
+  '/api/qr/image',
+  '/api/webhooks/',
+  '/login',
+  '/signup',
+  '/datenschutz',
+  '/impressum',
+  '/pricing',
+  '/opengraph-image',
+  '/twitter-image',
+  '/icon',
+  '/apple-icon',
+];
+
 export async function updateSession(request: NextRequest) {
   const customHostResponse = handleCustomHost(request);
   if (customHostResponse) return customHostResponse;
+
+  const path = request.nextUrl.pathname;
+  const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
+
+  // Public paths: kein Supabase-Auth-Call. Spart auf Hot Paths (/r/, /api/track)
+  // jeweils einen Roundtrip zum Auth-Server.
+  if (isPublic) {
+    return NextResponse.next({ request });
+  }
 
   let supabaseResponse = NextResponse.next({ request });
 
@@ -101,13 +128,7 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const path = request.nextUrl.pathname;
-
-  // Allow public routes: redirect handler, tracking API, login, static files
-  const publicPaths = ['/r/', '/api/track', '/login', '/signup', '/api/qr/image', '/api/webhooks/', '/datenschutz', '/impressum', '/pricing', '/opengraph-image', '/twitter-image', '/icon', '/apple-icon'];
-  const isPublic = publicPaths.some((p) => path.startsWith(p));
-
-  if (!user && !isPublic && path !== '/') {
+  if (!user && path !== '/') {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
