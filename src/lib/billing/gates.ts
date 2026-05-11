@@ -42,7 +42,7 @@ export const getUserTier = cache(async (userId: string): Promise<EffectiveTier> 
   // Check for active subscription
   const { data: sub } = await supabase
     .from('subscriptions')
-    .select('plan_tier, status')
+    .select('plan_tier, status, stripe_subscription_id')
     .eq('user_id', userId)
     .in('status', ['active', 'on_trial', 'past_due'])
     .order('created_at', { ascending: false })
@@ -51,6 +51,12 @@ export const getUserTier = cache(async (userId: string): Promise<EffectiveTier> 
 
   if (sub) {
     if (sub.status === 'on_trial') return 'trial';
+    // Robuste Tier-Bestimmung: wenn es eine echte Stripe-Sub gibt mit
+    // status='active' oder 'past_due', ist der User PAID — unabhaengig
+    // davon was plan_tier in der DB sagt. Schutz gegen Race Conditions
+    // beim Webhook (z.B. wenn priceToTier wegen veralteter ENV-Vars
+    // 'free' returned, obwohl die Sub real bezahlt wurde).
+    if (sub.stripe_subscription_id) return 'paid';
     return sub.plan_tier as PlanTier;
   }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
-import { getStripe, priceToTier, mapStripeStatus } from '@/lib/billing/stripe';
+import { getStripe, priceToTierViaProduct, mapStripeStatus } from '@/lib/billing/stripe';
 import type Stripe from 'stripe';
 
 /**
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
           stripe_subscription_id: subscription.id,
           stripe_customer_id: String(subscription.customer),
           stripe_price_id: priceId,
-          plan_tier: priceToTier(priceId),
+          plan_tier: await priceToTierViaProduct(priceId),
           status: mapStripeStatus(subscription.status),
           trial_ends_at: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
         .from('subscriptions')
         .update({
           stripe_price_id: priceId,
-          plan_tier: priceToTier(priceId),
+          plan_tier: await priceToTierViaProduct(priceId),
           status: mapStripeStatus(subscription.status),
           trial_ends_at: subscription.trial_end
             ? new Date(subscription.trial_end * 1000).toISOString()
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
         .from('subscriptions')
         .update({
           stripe_price_id: priceId,
-          plan_tier: priceToTier(priceId),
+          plan_tier: await priceToTierViaProduct(priceId),
           status: mapStripeStatus(subscription.status),
           current_period_end: getPeriodEnd(subscription),
         })

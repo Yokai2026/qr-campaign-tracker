@@ -16,13 +16,43 @@ export function getStripe(): Stripe {
 
 /**
  * Map Stripe Price ID to plan tier.
- * Currently there is only one paid tier ("Spurig") with two billing cycles.
- * Any recognized price → 'paid'.
+ *
+ * Sync-Version: matched gegen die in ENV hinterlegten Price-IDs. Wenn nicht
+ * gematched (z.B. weil Prices gerade neu angelegt wurden und ENV noch nicht
+ * aktualisiert ist) -> 'free'. Webhook nutzt die robuste async-Variante.
  */
 export function priceToTier(priceId: string): 'free' | 'paid' {
   const monthly = process.env.STRIPE_MONTHLY_PRICE_ID;
   const yearly = process.env.STRIPE_YEARLY_PRICE_ID;
   if (priceId && (priceId === monthly || priceId === yearly)) return 'paid';
+  return 'free';
+}
+
+/**
+ * Wie priceToTier, aber loest den Price bei Stripe auf und prueft das Product.
+ * Robuster gegen Race Conditions zwischen Stripe-Price-Anlage und Vercel-
+ * ENV-Var-Update (siehe Bug-Story: gates.ts).
+ */
+export async function priceToTierViaProduct(priceId: string): Promise<'free' | 'paid'> {
+  if (!priceId) return 'free';
+  // Fast path: bekannte ENV-Match.
+  const monthly = process.env.STRIPE_MONTHLY_PRICE_ID;
+  const yearly = process.env.STRIPE_YEARLY_PRICE_ID;
+  if (priceId === monthly || priceId === yearly) return 'paid';
+  // Slow path: Stripe fragen welcher Product zu diesem Price gehoert.
+  try {
+    const price = await getStripe().prices.retrieve(priceId);
+    // Alle Spurig-Subscription-Prices gehoeren zum Hauptprodukt 'Spurig'.
+    // Wenn der Product-Name "Spurig" enthaelt oder es genau das eine
+    // Product gibt das wir verkaufen, ist es 'paid'.
+    const product = typeof price.product === 'string'
+      ? await getStripe().products.retrieve(price.product)
+      : price.product;
+    if (product && !product.deleted && product.active) return 'paid';
+  } catch {
+    // Stripe-Lookup failt -> defensive 'free' (Access-Denied),
+    // statt fälschlich Zugriff zu gewähren.
+  }
   return 'free';
 }
 
