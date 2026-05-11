@@ -57,18 +57,10 @@ export async function getPlacements(filters?: PlacementFilters) {
     query = query.eq('status', filters.status);
   }
 
-  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
-  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
-
-  const [{ data, error }, allEventsRes] = await Promise.all([
+  const [{ data, error }, statsRes] = await Promise.all([
     query,
-    supabase
-      .from('redirect_events')
-      .select('placement_id, created_at')
-      .eq('event_type', 'qr_open')
-      .eq('is_bot', false)
-      .not('placement_id', 'is', null)
-      .limit(100_000),
+    // Fast path: SQL-aggregiert via 022_stats_rpcs.sql.
+    supabase.rpc('get_placement_stats'),
   ]);
 
   if (error) {
@@ -78,15 +70,35 @@ export async function getPlacements(filters?: PlacementFilters) {
   const scansTotal: Record<string, number> = {};
   const scans7d: Record<string, number> = {};
   const scansPrev7d: Record<string, number> = {};
-  (allEventsRes.data ?? []).forEach((e: { placement_id: string | null; created_at: string }) => {
-    if (!e.placement_id) return;
-    scansTotal[e.placement_id] = (scansTotal[e.placement_id] ?? 0) + 1;
-    if (e.created_at >= weekAgoIso) {
-      scans7d[e.placement_id] = (scans7d[e.placement_id] ?? 0) + 1;
-    } else if (e.created_at >= twoWeeksAgoIso) {
-      scansPrev7d[e.placement_id] = (scansPrev7d[e.placement_id] ?? 0) + 1;
+
+  if (!statsRes.error && Array.isArray(statsRes.data)) {
+    for (const r of statsRes.data as Array<{ placement_id: string; scans_total: number; scans_7d: number; scans_prev_7d: number }>) {
+      if (!r.placement_id) continue;
+      scansTotal[r.placement_id] = Number(r.scans_total) || 0;
+      scans7d[r.placement_id] = Number(r.scans_7d) || 0;
+      scansPrev7d[r.placement_id] = Number(r.scans_prev_7d) || 0;
     }
-  });
+  } else {
+    // Fallback: Migration 022 noch nicht applied.
+    const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+    const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
+    const { data: events } = await supabase
+      .from('redirect_events')
+      .select('placement_id, created_at')
+      .eq('event_type', 'qr_open')
+      .eq('is_bot', false)
+      .not('placement_id', 'is', null)
+      .limit(100_000);
+    (events ?? []).forEach((e: { placement_id: string | null; created_at: string }) => {
+      if (!e.placement_id) return;
+      scansTotal[e.placement_id] = (scansTotal[e.placement_id] ?? 0) + 1;
+      if (e.created_at >= weekAgoIso) {
+        scans7d[e.placement_id] = (scans7d[e.placement_id] ?? 0) + 1;
+      } else if (e.created_at >= twoWeeksAgoIso) {
+        scansPrev7d[e.placement_id] = (scansPrev7d[e.placement_id] ?? 0) + 1;
+      }
+    });
+  }
 
   const rows = (data ?? []).map((row: Record<string, unknown>) => {
     const id = row.id as string;

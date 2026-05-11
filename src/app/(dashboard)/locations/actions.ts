@@ -20,45 +20,57 @@ export async function getLocations(): Promise<LocationWithStats[]> {
   await requireAuth();
   const supabase = await createClient();
 
-  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
-  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
-
-  const [locRes, placementsRes, eventsRes] = await Promise.all([
+  const [locRes, statsRes] = await Promise.all([
     supabase.from('locations').select('*').order('venue_name', { ascending: true }),
-    supabase.from('placements').select('id, location_id'),
-    supabase
-      .from('redirect_events')
-      .select('placement_id, created_at')
-      .eq('event_type', 'qr_open')
-      .eq('is_bot', false)
-      .not('placement_id', 'is', null)
-      .limit(100_000),
+    // Fast path: SQL-aggregiert via 022_stats_rpcs.sql.
+    supabase.rpc('get_location_stats'),
   ]);
 
   if (locRes.error) {
     throw new Error(`Standorte konnten nicht geladen werden: ${locRes.error.message}`);
   }
 
-  // placement_id → location_id Lookup
-  const placementToLocation: Record<string, string> = {};
-  (placementsRes.data ?? []).forEach((p: { id: string; location_id: string }) => {
-    placementToLocation[p.id] = p.location_id;
-  });
-
   const scansTotal: Record<string, number> = {};
   const scans7d: Record<string, number> = {};
   const scansPrev7d: Record<string, number> = {};
-  (eventsRes.data ?? []).forEach((e: { placement_id: string | null; created_at: string }) => {
-    if (!e.placement_id) return;
-    const locId = placementToLocation[e.placement_id];
-    if (!locId) return;
-    scansTotal[locId] = (scansTotal[locId] ?? 0) + 1;
-    if (e.created_at >= weekAgoIso) {
-      scans7d[locId] = (scans7d[locId] ?? 0) + 1;
-    } else if (e.created_at >= twoWeeksAgoIso) {
-      scansPrev7d[locId] = (scansPrev7d[locId] ?? 0) + 1;
+
+  if (!statsRes.error && Array.isArray(statsRes.data)) {
+    for (const r of statsRes.data as Array<{ location_id: string; scans_total: number; scans_7d: number; scans_prev_7d: number }>) {
+      if (!r.location_id) continue;
+      scansTotal[r.location_id] = Number(r.scans_total) || 0;
+      scans7d[r.location_id] = Number(r.scans_7d) || 0;
+      scansPrev7d[r.location_id] = Number(r.scans_prev_7d) || 0;
     }
-  });
+  } else {
+    // Fallback: Migration 022 noch nicht applied — alte Aggregation.
+    const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+    const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
+    const [placementsRes, eventsRes] = await Promise.all([
+      supabase.from('placements').select('id, location_id'),
+      supabase
+        .from('redirect_events')
+        .select('placement_id, created_at')
+        .eq('event_type', 'qr_open')
+        .eq('is_bot', false)
+        .not('placement_id', 'is', null)
+        .limit(100_000),
+    ]);
+    const placementToLocation: Record<string, string> = {};
+    (placementsRes.data ?? []).forEach((p: { id: string; location_id: string }) => {
+      placementToLocation[p.id] = p.location_id;
+    });
+    (eventsRes.data ?? []).forEach((e: { placement_id: string | null; created_at: string }) => {
+      if (!e.placement_id) return;
+      const locId = placementToLocation[e.placement_id];
+      if (!locId) return;
+      scansTotal[locId] = (scansTotal[locId] ?? 0) + 1;
+      if (e.created_at >= weekAgoIso) {
+        scans7d[locId] = (scans7d[locId] ?? 0) + 1;
+      } else if (e.created_at >= twoWeeksAgoIso) {
+        scansPrev7d[locId] = (scansPrev7d[locId] ?? 0) + 1;
+      }
+    });
+  }
 
   const rows = (locRes.data ?? []).map((loc: Location) => {
     const curr = scans7d[loc.id] ?? 0;

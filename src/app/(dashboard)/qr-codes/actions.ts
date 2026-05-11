@@ -100,33 +100,46 @@ export async function getQrCodes(
     );
   }
 
-  const { data, error } = await query;
+  // Parallel: QR-Codes-Query + aggregierte Stats.
+  // Fast path nutzt RPC get_qr_code_stats (siehe 022_stats_rpcs.sql).
+  const [{ data, error }, statsRes] = await Promise.all([
+    query,
+    supabase.rpc('get_qr_code_stats'),
+  ]);
   if (error) throw new Error(error.message);
-
-  // Aggregate scan counts per qr_code_id — one query, group in-memory.
-  // RLS scopes events to this user's resources, so no ownership filter needed.
-  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
-  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
-  const { data: events } = await supabase
-    .from('redirect_events')
-    .select('qr_code_id, created_at')
-    .eq('event_type', 'qr_open')
-    .eq('is_bot', false)
-    .not('qr_code_id', 'is', null)
-    .limit(100_000);
 
   const scans7d: Record<string, number> = {};
   const scansPrev7d: Record<string, number> = {};
   const scansTotal: Record<string, number> = {};
-  (events ?? []).forEach((e: { qr_code_id: string | null; created_at: string }) => {
-    if (!e.qr_code_id) return;
-    scansTotal[e.qr_code_id] = (scansTotal[e.qr_code_id] ?? 0) + 1;
-    if (e.created_at >= weekAgoIso) {
-      scans7d[e.qr_code_id] = (scans7d[e.qr_code_id] ?? 0) + 1;
-    } else if (e.created_at >= twoWeeksAgoIso) {
-      scansPrev7d[e.qr_code_id] = (scansPrev7d[e.qr_code_id] ?? 0) + 1;
+
+  if (!statsRes.error && Array.isArray(statsRes.data)) {
+    for (const r of statsRes.data as Array<{ qr_code_id: string; scans_total: number; scans_7d: number; scans_prev_7d: number }>) {
+      if (!r.qr_code_id) continue;
+      scansTotal[r.qr_code_id] = Number(r.scans_total) || 0;
+      scans7d[r.qr_code_id] = Number(r.scans_7d) || 0;
+      scansPrev7d[r.qr_code_id] = Number(r.scans_prev_7d) || 0;
     }
-  });
+  } else {
+    // Fallback: Migration 022 noch nicht applied.
+    const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+    const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
+    const { data: events } = await supabase
+      .from('redirect_events')
+      .select('qr_code_id, created_at')
+      .eq('event_type', 'qr_open')
+      .eq('is_bot', false)
+      .not('qr_code_id', 'is', null)
+      .limit(100_000);
+    (events ?? []).forEach((e: { qr_code_id: string | null; created_at: string }) => {
+      if (!e.qr_code_id) return;
+      scansTotal[e.qr_code_id] = (scansTotal[e.qr_code_id] ?? 0) + 1;
+      if (e.created_at >= weekAgoIso) {
+        scans7d[e.qr_code_id] = (scans7d[e.qr_code_id] ?? 0) + 1;
+      } else if (e.created_at >= twoWeeksAgoIso) {
+        scansPrev7d[e.qr_code_id] = (scansPrev7d[e.qr_code_id] ?? 0) + 1;
+      }
+    });
+  }
 
   const rows = (data ?? []).map((row: Record<string, unknown>) => {
     const placement = row.placement as Record<string, unknown> | null;

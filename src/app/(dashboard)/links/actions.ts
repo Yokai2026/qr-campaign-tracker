@@ -48,38 +48,49 @@ export async function getShortLinks(filters?: {
     query = query.or(`title.ilike.%${filters.search}%,short_code.ilike.%${filters.search}%,target_url.ilike.%${filters.search}%`);
   }
 
-  // Single source of truth for every click-stat: redirect_events.
-  // ALL-TIME fetch, ordered DESC so the first row per link_id is automatically
-  // the latest — used for last_click_at. 7T/Prev7T derived in-memory.
-  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
-  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
-  const [{ data }, { data: events }] = await Promise.all([
+  // Parallel: Links + aggregierte Stats per RPC (siehe 022_stats_rpcs.sql).
+  const [{ data }, statsRes] = await Promise.all([
     query,
-    supabase
-      .from('redirect_events')
-      .select('short_link_id, created_at')
-      .eq('event_type', 'link_open')
-      .eq('is_bot', false)
-      .not('short_link_id', 'is', null)
-      .order('created_at', { ascending: false })
-      .limit(200_000),
+    supabase.rpc('get_short_link_stats'),
   ]);
 
   const clicks7d: Record<string, number> = {};
   const clicksPrev7d: Record<string, number> = {};
   const clicksTotal: Record<string, number> = {};
   const lastClickAt: Record<string, string> = {};
-  (events ?? []).forEach((e: { short_link_id: string | null; created_at: string }) => {
-    if (!e.short_link_id) return;
-    const id = e.short_link_id;
-    clicksTotal[id] = (clicksTotal[id] ?? 0) + 1;
-    if (!lastClickAt[id]) lastClickAt[id] = e.created_at;
-    if (e.created_at >= weekAgoIso) {
-      clicks7d[id] = (clicks7d[id] ?? 0) + 1;
-    } else if (e.created_at >= twoWeeksAgoIso) {
-      clicksPrev7d[id] = (clicksPrev7d[id] ?? 0) + 1;
+
+  if (!statsRes.error && Array.isArray(statsRes.data)) {
+    for (const r of statsRes.data as Array<{ short_link_id: string; clicks_total: number; clicks_7d: number; clicks_prev_7d: number; last_click_at: string | null }>) {
+      if (!r.short_link_id) continue;
+      clicksTotal[r.short_link_id] = Number(r.clicks_total) || 0;
+      clicks7d[r.short_link_id] = Number(r.clicks_7d) || 0;
+      clicksPrev7d[r.short_link_id] = Number(r.clicks_prev_7d) || 0;
+      if (r.last_click_at) lastClickAt[r.short_link_id] = r.last_click_at;
     }
-  });
+  } else {
+    // Fallback: Migration 022 noch nicht applied — alte Aggregation.
+    const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+    const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
+    const { data: events } = await supabase
+      .from('redirect_events')
+      .select('short_link_id, created_at')
+      .eq('event_type', 'link_open')
+      .eq('is_bot', false)
+      .not('short_link_id', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(200_000);
+    (events ?? []).forEach((e: { short_link_id: string | null; created_at: string }) => {
+      if (!e.short_link_id) return;
+      const id = e.short_link_id;
+      clicksTotal[id] = (clicksTotal[id] ?? 0) + 1;
+      if (!lastClickAt[id]) lastClickAt[id] = e.created_at;
+      if (e.created_at >= weekAgoIso) {
+        clicks7d[id] = (clicks7d[id] ?? 0) + 1;
+      } else if (e.created_at >= twoWeeksAgoIso) {
+        clicksPrev7d[id] = (clicksPrev7d[id] ?? 0) + 1;
+      }
+    });
+  }
 
   const rows = (data ?? []).map((row: Record<string, unknown>) => {
     const id = row.id as string;

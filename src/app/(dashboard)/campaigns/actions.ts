@@ -34,21 +34,14 @@ export async function getCampaigns(): Promise<CampaignWithTagCount[]> {
   await requireAuth();
   const supabase = await createClient();
 
-  const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
-  const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
-
-  const [{ data, error }, allEventsRes] = await Promise.all([
+  const [{ data, error }, statsRes] = await Promise.all([
     supabase
       .from('campaigns')
       .select('*, campaign_tags(count)')
       .order('updated_at', { ascending: false }),
-    supabase
-      .from('redirect_events')
-      .select('campaign_id, created_at')
-      .in('event_type', ['qr_open', 'link_open'])
-      .eq('is_bot', false)
-      .not('campaign_id', 'is', null)
-      .limit(100_000),
+    // Fast path: SQL-aggregierte Stats per RPC (siehe 022_stats_rpcs.sql).
+    // Spart bis zu 100k Row-Transfers pro Tab-Klick.
+    supabase.rpc('get_campaign_stats'),
   ]);
 
   if (error) {
@@ -58,15 +51,35 @@ export async function getCampaigns(): Promise<CampaignWithTagCount[]> {
   const scansTotal: Record<string, number> = {};
   const scans7d: Record<string, number> = {};
   const scansPrev7d: Record<string, number> = {};
-  (allEventsRes.data ?? []).forEach((e: { campaign_id: string | null; created_at: string }) => {
-    if (!e.campaign_id) return;
-    scansTotal[e.campaign_id] = (scansTotal[e.campaign_id] ?? 0) + 1;
-    if (e.created_at >= weekAgoIso) {
-      scans7d[e.campaign_id] = (scans7d[e.campaign_id] ?? 0) + 1;
-    } else if (e.created_at >= twoWeeksAgoIso) {
-      scansPrev7d[e.campaign_id] = (scansPrev7d[e.campaign_id] ?? 0) + 1;
+
+  if (!statsRes.error && Array.isArray(statsRes.data)) {
+    for (const r of statsRes.data as Array<{ campaign_id: string; scans_total: number; scans_7d: number; scans_prev_7d: number }>) {
+      if (!r.campaign_id) continue;
+      scansTotal[r.campaign_id] = Number(r.scans_total) || 0;
+      scans7d[r.campaign_id] = Number(r.scans_7d) || 0;
+      scansPrev7d[r.campaign_id] = Number(r.scans_prev_7d) || 0;
     }
-  });
+  } else {
+    // Fallback: Migration 022 noch nicht applied — alte in-memory Aggregation.
+    const weekAgoIso = new Date(Date.now() - 7 * 86_400_000).toISOString();
+    const twoWeeksAgoIso = new Date(Date.now() - 14 * 86_400_000).toISOString();
+    const { data: events } = await supabase
+      .from('redirect_events')
+      .select('campaign_id, created_at')
+      .in('event_type', ['qr_open', 'link_open'])
+      .eq('is_bot', false)
+      .not('campaign_id', 'is', null)
+      .limit(100_000);
+    (events ?? []).forEach((e: { campaign_id: string | null; created_at: string }) => {
+      if (!e.campaign_id) return;
+      scansTotal[e.campaign_id] = (scansTotal[e.campaign_id] ?? 0) + 1;
+      if (e.created_at >= weekAgoIso) {
+        scans7d[e.campaign_id] = (scans7d[e.campaign_id] ?? 0) + 1;
+      } else if (e.created_at >= twoWeeksAgoIso) {
+        scansPrev7d[e.campaign_id] = (scansPrev7d[e.campaign_id] ?? 0) + 1;
+      }
+    });
+  }
 
   // Supabase returns `campaign_tags: [{ count: n }]` when using select count
   const rows = (data ?? []).map((row: Record<string, unknown>) => {
