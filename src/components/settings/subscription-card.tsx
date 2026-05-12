@@ -190,8 +190,8 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
                   </p>
                   <p className="text-[11.5px] text-muted-foreground">
                     {isYearly
-                      ? '5,99 € / Monat — flexibel monatlich abgerechnet.'
-                      : '4,99 € / Monat — jährlich abgerechnet (59,88 € / Jahr).'}
+                      ? '5,99 € netto / Monat · zzgl. 19 % MwSt (7,13 € brutto) — flexibel monatlich abgerechnet.'
+                      : '4,99 € netto / Monat · zzgl. 19 % MwSt — jährlich 59,88 € netto + 11,38 € MwSt = 71,26 € brutto.'}
                   </p>
                 </div>
                 <Button
