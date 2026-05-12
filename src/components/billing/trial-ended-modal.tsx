@@ -90,10 +90,10 @@ export function TrialEndedModal() {
                 </div>
                 <div className="mt-1 flex items-baseline gap-1.5 tabular-nums">
                   <span className="text-[24px] font-semibold tracking-tight">4,99 €</span>
-                  <span className="text-[12px] text-muted-foreground">/ Monat</span>
+                  <span className="text-[12px] text-muted-foreground">netto / Monat</span>
                 </div>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  59,88 € jährlich · <span className="line-through">155,88 €</span> gespart
+                  zzgl. 19 % MwSt · 59,88 €/Jahr netto (71,26 € brutto) · <span className="line-through">155,88 €</span> gespart
                 </p>
               </div>
               <div
@@ -128,10 +128,10 @@ export function TrialEndedModal() {
                 </div>
                 <div className="mt-1 flex items-baseline gap-1.5 tabular-nums">
                   <span className="text-[24px] font-semibold tracking-tight">5,99 €</span>
-                  <span className="text-[12px] text-muted-foreground">/ Monat</span>
+                  <span className="text-[12px] text-muted-foreground">netto / Monat</span>
                 </div>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  Jederzeit kündbar · <span className="line-through">12,99 €</span> spare 54 %
+                  zzgl. 19 % MwSt (7,13 € brutto) · jederzeit kündbar · <span className="line-through">12,99 €</span> spare 54 %
                 </p>
               </div>
               <div

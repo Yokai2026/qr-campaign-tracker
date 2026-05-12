@@ -8,7 +8,7 @@ import { Magnetic } from '@/components/shared/magnetic-button';
 const TRUST = [
   'Keine Kreditkarte',
   'DSGVO · EU-Hosting',
-  'Ab 4,99 € / Monat',
+  'Ab 4,99 € netto / Monat',
 ];
 
 export function Hero() {

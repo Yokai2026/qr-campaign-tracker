@@ -195,8 +195,8 @@ export default function SignupPage() {
               <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
                 Danach Einführungspreis{' '}
                 <span className="line-through">12,99 €/Mo</span>{' '}
-                <strong className="text-foreground">5,99 €/Mo</strong> (oder{' '}
-                <strong className="text-foreground">4,99 €/Mo</strong> jährlich).
+                <strong className="text-foreground">5,99 €/Mo netto</strong> (oder{' '}
+                <strong className="text-foreground">4,99 €/Mo netto</strong> jährlich), zzgl. 19 % MwSt.
                 Kein Auto-Upgrade — du entscheidest selbst.
               </p>
             </div>
