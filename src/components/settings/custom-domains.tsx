@@ -229,10 +229,14 @@ export function CustomDomains() {
             So richtest du eine eigene Kurz-Domain ein
           </div>
           <ol className="space-y-1.5 text-[11px] text-muted-foreground pl-1">
-            <li><span className="font-medium text-foreground">1.</span> Domain hier eintragen (z.B. <code className="font-mono">go.deine-marke.de</code>)</li>
-            <li><span className="font-medium text-foreground">2.</span> Zwei DNS-Records bei deinem Domain-Anbieter anlegen (Anleitung wird angezeigt)</li>
-            <li><span className="font-medium text-foreground">3.</span> „Verifizieren&quot; klicken — fertig. Deine QR-Codes zeigen beim Scan deine Domain statt spurig.com.</li>
+            <li><span className="font-medium text-foreground">1.</span> <span className="text-foreground">Subdomain</span> empfohlen (z.B. <code className="font-mono">go.deine-marke.de</code>, <code className="font-mono">s.deine-marke.de</code>) — Hauptdomain nicht überschreiben, falls dort schon eine Website läuft</li>
+            <li><span className="font-medium text-foreground">2.</span> Zwei DNS-Records bei deinem Domain-Anbieter anlegen — Anleitung wird automatisch angezeigt sobald du auf „Domain hinzufügen" klickst</li>
+            <li><span className="font-medium text-foreground">3.</span> Wir prüfen alle 15 Sek. automatisch — sobald die Records aktiv sind, ist deine Domain verifiziert</li>
           </ol>
+          <p className="text-[11px] text-muted-foreground border-t border-border/60 pt-2">
+            <span className="font-medium text-foreground">Mehrere Domains möglich:</span> Du kannst beliebig viele eigene Domains hinzufügen.
+            Beim QR-Code- oder Kurzlink-Erstellen wählst du dann, welche genutzt werden soll. Eine kannst du als „Primär" markieren — die wird default genutzt.
+          </p>
           <div className="flex items-center gap-3 pt-1 text-[11px]">
             <Link href="/qr-codes/new" className="inline-flex items-center gap-1 text-primary hover:underline">
               <QrCode className="h-3 w-3" />
