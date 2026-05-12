@@ -35,9 +35,20 @@ export async function POST(req: NextRequest) {
   if (!name) return apiError(400, 'Field "name" is required');
   if (name.length > 200) return apiError(400, 'Field "name" must be <= 200 chars');
 
+  // Slug auto-generieren wenn nicht angegeben (lowercase + dashes,
+  // Suffix mit short random gegen Kollision)
+  const autoSlug = name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .slice(0, 50);
+  const slug = (typeof body.slug === 'string' && body.slug.trim()) || `${autoSlug}-${Math.random().toString(36).slice(2, 8)}`;
+
   const insert: Record<string, unknown> = {
     name,
-    slug: typeof body.slug === 'string' ? body.slug : null,
+    slug,
     description: typeof body.description === 'string' ? body.description : null,
     status: typeof body.status === 'string' ? body.status : 'active',
     start_date: typeof body.start_date === 'string' ? body.start_date : null,
