@@ -26,7 +26,6 @@ import {
 import { toast } from 'sonner';
 import { format, subDays } from 'date-fns';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
-import { generateForecast } from '@/lib/forecast';
 import dynamic from 'next/dynamic';
 import { CountryChart } from '@/components/shared/country-chart';
 
@@ -263,8 +262,16 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
       if (campaignId !== 'all') botQuery = botQuery.eq('campaign_id', campaignId);
       const { count: botCount } = await botQuery;
 
-      // Time series — QR vs Link per day
+      // Time series — QR vs Link pro Tag. ALLE Tage im gewaehlten Zeitraum
+      // werden gefuellt (auch wenn 0 Events) damit die Kurve sauber von links
+      // nach rechts durchgeht und nicht ploetzlich auftaucht.
       const dayMap: Record<string, { qr: number; link: number }> = {};
+      const startDate = new Date(`${dateFrom}T00:00:00`);
+      const endDate = new Date(`${dateTo}T00:00:00`);
+      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        const key = d.toISOString().slice(0, 10);
+        dayMap[key] = { qr: 0, link: 0 };
+      }
       filteredEvents.forEach((e: Record<string, unknown>) => {
         const day = (e.created_at as string).slice(0, 10);
         if (!dayMap[day]) dayMap[day] = { qr: 0, link: 0 };
@@ -377,22 +384,6 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const countryData = data?.countryData ?? [];
   const unknownCountryCount = data?.unknownCountryCount ?? 0;
   const referrerData = data?.referrerData ?? [];
-
-  // Forecast: combine QR + Link into total, then predict 7 days
-  const forecastData = generateForecast(
-    timeSeriesData.map((d) => ({ date: d.date, value: d.qr + d.link })),
-    7,
-  );
-  // Merge forecast back with QR/Link split for combined chart
-  const timeSeriesWithForecast = forecastData.map((f) => {
-    const original = timeSeriesData.find((d) => d.date === f.date);
-    return {
-      date: f.date,
-      qr: original?.qr ?? null,
-      link: original?.link ?? null,
-      forecast: f.forecast,
-    };
-  });
 
   const conversionRate = kpis.totalOpens > 0 ? ((kpis.ctaClicks / kpis.totalOpens) * 100).toFixed(1) : '0.0';
   const formRate = kpis.totalOpens > 0 ? ((kpis.formSubmits / kpis.totalOpens) * 100).toFixed(1) : '0.0';
@@ -748,15 +739,30 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           <div className="grid gap-4 lg:grid-cols-2">
             <ChartCard title="QR-Scans & Link-Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={timeSeriesWithForecast} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+                <LineChart data={timeSeriesData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                   <CartesianGrid {...GRID_STYLE} />
-                  <XAxis dataKey="date" {...AXIS_STYLE} />
+                  <XAxis
+                    dataKey="date"
+                    {...AXIS_STYLE}
+                    tickFormatter={(d: string) => {
+                      const date = new Date(d);
+                      return date.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+                    }}
+                    minTickGap={24}
+                  />
                   <YAxis {...AXIS_STYLE} allowDecimals={false} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ stroke: 'var(--border)', strokeWidth: 1 }} />
+                  <Tooltip
+                    contentStyle={TOOLTIP_STYLE}
+                    cursor={{ stroke: 'var(--border)', strokeWidth: 1 }}
+                    labelFormatter={(d) =>
+                      typeof d === 'string'
+                        ? new Date(d).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long', year: 'numeric' })
+                        : String(d ?? '')
+                    }
+                  />
                   <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
-                  <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls={false} />
-                  <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls={false} />
-                  <Line type="monotone" dataKey="forecast" name="Prognose" stroke={SERIES_COLORS.forecast} strokeWidth={1.5} strokeDasharray="5 4" dot={false} connectNulls={false} />
+                  <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartCard>
