@@ -38,11 +38,11 @@ export const softwareApplicationLd = {
     {
       '@type': 'Offer',
       name: 'Spurig Monatsabo',
-      price: '5.99',
+      price: '12.99',
       priceCurrency: 'EUR',
       priceSpecification: {
         '@type': 'UnitPriceSpecification',
-        price: '5.99',
+        price: '12.99',
         priceCurrency: 'EUR',
         referenceQuantity: {
           '@type': 'QuantitativeValue',
@@ -56,11 +56,11 @@ export const softwareApplicationLd = {
     {
       '@type': 'Offer',
       name: 'Spurig Jahresabo',
-      price: '59.88',
+      price: '107.88',
       priceCurrency: 'EUR',
       priceSpecification: {
         '@type': 'UnitPriceSpecification',
-        price: '4.99',
+        price: '8.99',
         priceCurrency: 'EUR',
         referenceQuantity: {
           '@type': 'QuantitativeValue',

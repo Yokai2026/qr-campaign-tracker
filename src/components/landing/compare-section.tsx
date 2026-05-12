@@ -129,7 +129,7 @@ export function CompareSection() {
               <div className="relative text-[12px] font-semibold uppercase tracking-[0.08em]">
                 Spurig
               </div>
-              <div className="relative mt-1 text-[11px] opacity-80">ab 4,99 €/Mo netto*</div>
+              <div className="relative mt-1 text-[11px] opacity-80">ab 8,99 €/Mo netto*</div>
             </div>
           </div>
 

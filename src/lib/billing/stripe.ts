@@ -93,6 +93,7 @@ export async function createCheckoutSession(opts: {
   userId: string;
   email: string;
   customerId?: string;
+  couponId?: string;
 }): Promise<string> {
   const stripe = getStripe();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://spurig.com';
@@ -123,6 +124,9 @@ export async function createCheckoutSession(opts: {
       ...(taxRateId ? { default_tax_rates: [taxRateId] } : {}),
     },
     metadata: { user_id: opts.userId },
+    // Intro-Coupon (z.B. erste 3 Monate -7 €). Stripe wendet ihn auf die
+    // ersten N Rechnungen an und entfernt ihn automatisch.
+    ...(opts.couponId ? { discounts: [{ coupon: opts.couponId }] } : {}),
   };
 
   if (opts.customerId) {

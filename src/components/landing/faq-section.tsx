@@ -17,7 +17,7 @@ export const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: 'Was passiert nach den 14 Tagen Trial?',
-    a: 'Wenn du während der Trial nichts tust, schläft dein Account ein — keine automatische Abbuchung. Erst wenn du aktiv „Weiter“ klickst, wird der Plan (5,99 € netto monatlich oder 4,99 € netto bei Jahresbuchung, jeweils zzgl. 19 % MwSt) aktiviert. Keine Kreditkarte im Voraus.',
+    a: 'Wenn du während der Trial nichts tust, schläft dein Account ein — keine automatische Abbuchung. Erst wenn du aktiv „Weiter" klickst, wird der Plan aktiviert: 12,99 € netto/Monat (die ersten 3 Monate nur 5,99 €) oder 8,99 € netto/Monat bei Jahresbuchung (107,88 €/Jahr, 31 % günstiger). Jeweils zzgl. 19 % MwSt. Keine Kreditkarte im Voraus.',
   },
   {
     q: 'Kann ich jederzeit kündigen?',

@@ -52,7 +52,7 @@ export function FinalCTA() {
               </h2>
               <p className="mt-4 max-w-md text-[14.5px] leading-relaxed text-white/70">
                 14 Tage volle Funktionalität, ohne Karte. Wenn dich Spurig
-                überzeugt, zahlst du ab 4,99&nbsp;€ netto / Monat (zzgl. 19 % MwSt).
+                überzeugt, zahlst du ab 8,99&nbsp;€ netto / Monat (zzgl. 19 % MwSt).
                 Wenn nicht — nichts passiert. Der Account schläft einfach ein.
               </p>
 

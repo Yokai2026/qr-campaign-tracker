@@ -129,7 +129,7 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
                     </div>
                     <div className="mt-0.5 flex items-baseline gap-1.5">
                       <span className="text-[13px] font-medium tabular-nums">
-                        {isYearly ? '4,99 €' : '5,99 €'}
+                        {isYearly ? '8,99 €' : '12,99 €'}
                       </span>
                       <span className="text-[11px] text-muted-foreground">
                         netto / Monat{isYearly ? ' · jährlich abgerechnet' : ''} · zzgl. 19 % MwSt
@@ -202,9 +202,9 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
               <div className="rounded-xl border border-dashed border-border bg-muted/20 p-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
-                    <p className="text-[12.5px] font-medium">Auf Jährlich wechseln · spar 16 %</p>
+                    <p className="text-[12.5px] font-medium">Auf Jährlich wechseln · spar 31 %</p>
                     <p className="text-[11.5px] text-muted-foreground">
-                      4,99 € netto / Monat · zzgl. 19 % MwSt — jährlich 59,88 € netto + 11,38 € MwSt = 71,26 € brutto.
+                      8,99 € netto / Monat · zzgl. 19 % MwSt — jährlich 107,88 € netto + 20,50 € MwSt = 128,38 € brutto.
                     </p>
                   </div>
                   <Button
@@ -270,27 +270,28 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
             </div>
             <div className="rounded-md border border-amber-200 bg-amber-50/50 px-3 py-2 dark:border-amber-900/50 dark:bg-amber-950/20">
               <p className="text-[11px] text-amber-900 dark:text-amber-300">
-                <span className="font-semibold">Einführungspreis:</span> Monatlich für{' '}
-                <span className="font-semibold">5,99 € netto</span> statt <span className="line-through">12,99 €</span>{' '}
-                · jährlich nur <span className="font-semibold">4,99 € netto / Monat</span> (16 % günstiger). Alle Preise zzgl. 19 % MwSt.
+                <span className="font-semibold">Monatlich:</span> 12,99 € netto/Mo — erste 3 Monate nur{' '}
+                <span className="font-semibold">5,99 €</span>.{' '}
+                <span className="font-semibold">Jährlich:</span> 8,99 € netto/Mo (107,88 €/Jahr, 31 % günstiger).
+                Alle Preise zzgl. 19 % MwSt.
               </p>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
               <a href={checkoutUrls.monthly}>
                 <Button variant="outline" size="sm" className="w-full justify-between">
-                  <span>Monatlich — 5,99 € netto</span>
+                  <span>Monatlich — 12,99 € netto</span>
                   <span className="text-[10px] text-muted-foreground">+ MwSt</span>
                 </Button>
               </a>
               <a href={checkoutUrls.yearly}>
                 <Button variant="brand" size="sm" className="w-full justify-between">
-                  <span>Jährlich — 4,99 € netto</span>
+                  <span>Jährlich — 8,99 € netto</span>
                   <span className="rounded bg-white/25 px-1 py-0.5 text-[9px] font-semibold">+ MwSt</span>
                 </Button>
               </a>
             </div>
             <p className="text-center text-[11px] text-muted-foreground">
-              Jährlich spart 16 % (59,88 €/Jahr statt 71,88 €)
+              Jährlich spart 31 % (107,88 €/Jahr statt 155,88 €)
             </p>
           </>
         ) : (
@@ -308,21 +309,22 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
             </div>
             <div className="rounded-md border border-amber-200 bg-amber-50/50 px-3 py-2 dark:border-amber-900/50 dark:bg-amber-950/20">
               <p className="text-[11px] text-amber-900 dark:text-amber-300">
-                <span className="font-semibold">Einführungspreis:</span> Monatlich für{' '}
-                <span className="font-semibold">5,99 € netto</span> statt <span className="line-through">12,99 €</span>{' '}
-                · jährlich nur <span className="font-semibold">4,99 € netto / Monat</span> (16 % günstiger). Alle Preise zzgl. 19 % MwSt.
+                <span className="font-semibold">Monatlich:</span> 12,99 € netto/Mo — erste 3 Monate nur{' '}
+                <span className="font-semibold">5,99 €</span>.{' '}
+                <span className="font-semibold">Jährlich:</span> 8,99 € netto/Mo (107,88 €/Jahr, 31 % günstiger).
+                Alle Preise zzgl. 19 % MwSt.
               </p>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
               <a href={checkoutUrls.monthly}>
                 <Button variant="outline" size="sm" className="w-full justify-between">
-                  <span>Monatlich — 5,99 € netto</span>
+                  <span>Monatlich — 12,99 € netto</span>
                   <span className="text-[10px] text-muted-foreground">+ MwSt</span>
                 </Button>
               </a>
               <a href={checkoutUrls.yearly}>
                 <Button variant="brand" size="sm" className="w-full justify-between">
-                  <span>Jährlich — 4,99 € netto</span>
+                  <span>Jährlich — 8,99 € netto</span>
                   <span className="rounded bg-white/25 px-1 py-0.5 text-[9px] font-semibold">+ MwSt</span>
                 </Button>
               </a>

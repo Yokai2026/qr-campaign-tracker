@@ -229,24 +229,24 @@ export default function PitchPage() {
               <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-brand">Monatlich</div>
               <div className="mt-5 flex items-baseline gap-2">
                 <span className="tabular font-heading text-[92px] font-semibold leading-none tracking-[-0.035em]">
-                  5,99
+                  12,99
                 </span>
                 <span className="text-[22px] font-medium text-muted-foreground">€ / Mo</span>
               </div>
-              <p className="mt-5 text-[15px] text-muted-foreground">Flexibel. Monatlich kündbar.</p>
+              <p className="mt-5 text-[15px] text-muted-foreground">Erste 3 Monate nur 5,99 €. Monatlich kündbar.</p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-10">
               <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 Jährlich —{' '}
-                <span className="font-semibold text-warm">spare 17 %</span>
+                <span className="font-semibold text-warm">spare 31 %</span>
               </div>
               <div className="mt-5 flex items-baseline gap-2">
                 <span className="tabular font-heading text-[92px] font-semibold leading-none tracking-[-0.035em]">
-                  4,99
+                  8,99
                 </span>
                 <span className="text-[22px] font-medium text-muted-foreground">€ / Mo</span>
               </div>
-              <p className="mt-5 text-[15px] text-muted-foreground">Jährliche Abrechnung — 59,88 € / Jahr.</p>
+              <p className="mt-5 text-[15px] text-muted-foreground">Jährliche Abrechnung — 107,88 € / Jahr.</p>
             </div>
           </div>
           <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-[15px] text-muted-foreground">

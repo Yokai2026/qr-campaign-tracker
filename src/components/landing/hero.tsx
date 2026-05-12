@@ -8,7 +8,7 @@ import { Magnetic } from '@/components/shared/magnetic-button';
 const TRUST = [
   'Keine Kreditkarte',
   'DSGVO · EU-Hosting',
-  'Ab 4,99 € netto / Monat',
+  'Ab 8,99 € netto / Monat',
 ];
 
 export function Hero() {
@@ -51,7 +51,7 @@ export function Hero() {
         {/* Subline — kürzer, konkret, mit Wirkung */}
         <p className="mx-auto mt-6 max-w-xl text-pretty text-[18px] leading-[1.5] text-muted-foreground sm:text-[20px]">
           Unbegrenzte QR-Codes & Kurzlinks, Live-Analytics, eigene Domain —{' '}
-          <span className="font-semibold text-foreground">alles ab 4,99 € im Monat</span>.
+          <span className="font-semibold text-foreground">alles ab 8,99 € im Monat</span>.
           DSGVO-konform, EU-Hosting, ohne Cookie-Banner.
         </p>
 
