@@ -116,10 +116,14 @@ function SignupVerifyInner() {
       return;
     }
 
+    // Welcome-Mail im Hintergrund anstossen (fire-and-forget).
+    // Cookies sind nach verifyOtp gesetzt, die Server Action erbt sie.
     void triggerWelcomeEmail();
 
-    router.push('/dashboard');
-    router.refresh();
+    // Harte Navigation statt router.push: Browser uebernimmt das
+    // Lade-Indikator, die Verify-Page unmountet sofort, Dashboard
+    // wird fresh geladen — keine haengenden "Wird bestaetigt..."-States.
+    window.location.assign('/dashboard');
   }
 
   function handleSubmit(e: React.FormEvent) {
