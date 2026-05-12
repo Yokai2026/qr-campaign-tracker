@@ -22,7 +22,6 @@ import type { EffectiveTier } from '@/lib/billing/gates';
 import { deleteShortLink, toggleShortLink, updateShortLink, getLinkGroups, type ShortLinkWithStats } from '../actions';
 import { formatDate, formatDateTime } from '@/lib/format';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
-import { generateForecast } from '@/lib/forecast';
 import { ChartTransition } from '@/components/shared/chart-transition';
 import { RedirectRulesEditor } from '@/components/redirect-rules/redirect-rules-editor';
 import { AbVariantsEditor } from '@/components/ab-testing/ab-variants-editor';
@@ -192,11 +191,19 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
       const uniqueVisitors = new Set(humanEvents.map((e) => e.ip_hash).filter(Boolean)).size;
       const botClicks = allEvents.length - humanEvents.length;
 
-      // Time series
+      // Time series — alle Tage im Zeitraum mit 0 vorbefuellen, damit die
+      // Kurve sauber von links nach rechts laeuft statt nur dort Punkte
+      // zu zeigen wo Daten sind.
       const dayMap: Record<string, number> = {};
+      const startD = new Date(`${dateFrom}T00:00:00`);
+      const endD = new Date(`${dateTo}T00:00:00`);
+      for (let d = new Date(startD); d <= endD; d.setDate(d.getDate() + 1)) {
+        dayMap[d.toISOString().slice(0, 10)] = 0;
+      }
       humanEvents.forEach((e) => {
         const day = e.created_at.slice(0, 10);
-        dayMap[day] = (dayMap[day] || 0) + 1;
+        if (!(day in dayMap)) dayMap[day] = 0;
+        dayMap[day]++;
       });
       const timeSeriesData = Object.entries(dayMap)
         .sort(([a], [b]) => a.localeCompare(b))
@@ -245,19 +252,6 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
     timeSeriesData: [], deviceData: [], countryData: [], referrerData: [],
   };
 
-  // Forecast for link clicks
-  const forecastData = generateForecast(
-    stats.timeSeriesData.map((d) => ({ date: d.date, value: d.clicks })),
-    7,
-  );
-  const timeSeriesWithForecast = forecastData.map((f) => {
-    const original = stats.timeSeriesData.find((d) => d.date === f.date);
-    return {
-      date: f.date,
-      clicks: original?.clicks ?? null,
-      forecast: f.forecast,
-    };
-  });
 
   return (
     <div className="space-y-6 animate-in-card">
@@ -516,24 +510,15 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
         </Card>
       )}
 
-      {/* Conditional Redirect Rules */}
-      <RedirectRulesEditor
+      {/* Erweiterte Funktionen — defaults zu eingeklappt wenn nichts
+          konfiguriert ist (frische Links sollen nicht von 2 leeren
+          Cards erschlagen werden). Bei Bedarf aufklappen. */}
+      <AdvancedFeatures
+        defaultOpen={redirectRules.length > 0 || abVariants.length > 0}
         rules={redirectRules}
-        shortLinkId={link.id}
-        userTier={userTier}
-      />
-
-      {/* A/B Testing */}
-      <AbVariantsEditor
         variants={abVariants}
         shortLinkId={link.id}
         userTier={userTier}
-      />
-
-      {/* A/B Test Results */}
-      <AbResultsChart
-        variants={abVariants}
-        shortLinkId={link.id}
       />
 
       {/* KPIs */}
@@ -551,16 +536,27 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
 
       {/* Charts */}
       <ChartTransition transitionKey={link.id}>
-      <ChartCard title="Klicks ueber Zeit" empty={stats.timeSeriesData.length === 0} emptyText="Keine Klicks im Zeitraum">
+      <ChartCard title="Klicks über Zeit" empty={stats.timeSeriesData.length === 0} emptyText="Keine Klicks im Zeitraum">
         <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={timeSeriesWithForecast} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+          <LineChart data={stats.timeSeriesData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
             <CartesianGrid {...GRID_STYLE} />
-            <XAxis dataKey="date" {...AXIS_STYLE} />
-            <YAxis {...AXIS_STYLE} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ stroke: 'var(--border)', strokeWidth: 1 }} />
-            <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
-            <Line type="monotone" dataKey="clicks" name="Klicks" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls={false} />
-            <Line type="monotone" dataKey="forecast" name="Prognose" stroke={SERIES_COLORS.forecast} strokeWidth={1.5} strokeDasharray="5 4" dot={false} connectNulls={false} />
+            <XAxis
+              dataKey="date"
+              {...AXIS_STYLE}
+              tickFormatter={(d: string) => new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: 'short' })}
+              minTickGap={24}
+            />
+            <YAxis {...AXIS_STYLE} allowDecimals={false} />
+            <Tooltip
+              contentStyle={TOOLTIP_STYLE}
+              cursor={{ stroke: 'var(--border)', strokeWidth: 1 }}
+              labelFormatter={(d) =>
+                typeof d === 'string'
+                  ? new Date(d).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long', year: 'numeric' })
+                  : String(d ?? '')
+              }
+            />
+            <Line type="monotone" dataKey="clicks" name="Klicks" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
           </LineChart>
         </ResponsiveContainer>
       </ChartCard>
@@ -598,6 +594,55 @@ export function LinkDetail({ link, redirectRules = [], abVariants = [], userTier
         <ChartCard title="Klicks nach Land">
           <CountryChart data={stats.countryData} />
         </ChartCard>
+      )}
+    </div>
+  );
+}
+
+// Eingeklappter Container fuer fortgeschrittene Features (Conditional
+// Redirects + A/B-Testing). Defaults zu eingeklappt fuer frische Links
+// damit die Detail-Page nicht von 2 leeren "+"-Cards dominiert wird.
+function AdvancedFeatures({
+  defaultOpen,
+  rules,
+  variants,
+  shortLinkId,
+  userTier,
+}: {
+  defaultOpen: boolean;
+  rules: RedirectRule[];
+  variants: AbVariant[];
+  shortLinkId: string;
+  userTier: EffectiveTier;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="rounded-2xl border border-border bg-card">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+        aria-expanded={open}
+      >
+        <div>
+          <div className="text-[14px] font-semibold">Erweiterte Funktionen</div>
+          <p className="mt-0.5 text-[12px] text-muted-foreground">
+            Bedingte Weiterleitungen (nach Gerät, Land, Uhrzeit) und A/B-Testing — optional
+          </p>
+        </div>
+        {open ? (
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        )}
+      </button>
+      {open && (
+        <div className="space-y-4 border-t border-border p-5">
+          <RedirectRulesEditor rules={rules} shortLinkId={shortLinkId} userTier={userTier} />
+          <AbVariantsEditor variants={variants} shortLinkId={shortLinkId} userTier={userTier} />
+          <AbResultsChart variants={variants} shortLinkId={shortLinkId} />
+        </div>
       )}
     </div>
   );
