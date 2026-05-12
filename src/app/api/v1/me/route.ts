@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   const sb = serviceRoleClient();
   const { data: profile } = await sb
     .from('profiles')
-    .select('id, email, username, display_name, role, plan_tier, trial_ends_at, created_at')
+    .select('id, email, username, display_name, role, trial_ends_at, created_at')
     .eq('id', auth.userId)
     .maybeSingle();
   if (!profile) return apiOk({ error: 'User not found' }, 404);
