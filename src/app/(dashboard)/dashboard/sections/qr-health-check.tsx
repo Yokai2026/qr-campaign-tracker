@@ -10,14 +10,19 @@ export async function QrHealthCheck() {
   noStore();
   const supabase = await createClient();
 
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
+
+  // Nur QRs die schon mindestens 7 Tage existieren in den Check einbeziehen.
+  // Frisch erstellte QR-Codes haben naturgemaess keine 7d-Scans und sollen
+  // nicht sofort als "dormant" markiert werden.
   const { data: activeQrs } = await supabase
     .from('qr_codes')
     .select('id, short_code, placement:placements(name)')
-    .eq('active', true);
+    .eq('active', true)
+    .lte('created_at', sevenDaysAgo);
 
   if (!activeQrs || activeQrs.length === 0) return null;
 
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
   const { data: recentScans } = await supabase
     .from('redirect_events')
     .select('qr_code_id')
