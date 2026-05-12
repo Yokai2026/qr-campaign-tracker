@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -12,6 +12,22 @@ import { triggerWelcomeEmail } from '@/lib/auth/welcome-action';
 const PIN_LENGTH = 6;
 
 export default function SignupVerifyPage() {
+  return (
+    <Suspense fallback={<VerifyLoadingFallback />}>
+      <SignupVerifyInner />
+    </Suspense>
+  );
+}
+
+function VerifyLoadingFallback() {
+  return (
+    <div className="relative flex min-h-screen items-center justify-center bg-background px-4">
+      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+    </div>
+  );
+}
+
+function SignupVerifyInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
