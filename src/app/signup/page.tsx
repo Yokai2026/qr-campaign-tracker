@@ -14,6 +14,7 @@ export default function SignupPage() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -32,6 +33,12 @@ export default function SignupPage() {
 
     if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
       setError('Benutzername darf nur Buchstaben, Zahlen, - und _ enthalten');
+      setLoading(false);
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      setError('Die Passwörter stimmen nicht überein.');
       setLoading(false);
       return;
     }
@@ -166,7 +173,30 @@ export default function SignupPage() {
                   required
                 />
               </div>
-              <Button type="submit" variant="brand" size="lg" className="w-full" disabled={loading}>
+              <div className="space-y-1.5">
+                <Label htmlFor="password-confirm" className="text-[12px] text-muted-foreground">Passwort wiederholen</Label>
+                <Input
+                  id="password-confirm"
+                  type="password"
+                  placeholder="Passwort erneut eingeben"
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  className={`h-11 text-[14px] ${passwordConfirm.length > 0 && passwordConfirm !== password ? 'border-red-500/60 focus-visible:ring-red-500/30' : ''}`}
+                  minLength={10}
+                  required
+                  aria-invalid={passwordConfirm.length > 0 && passwordConfirm !== password}
+                />
+                {passwordConfirm.length > 0 && passwordConfirm !== password && (
+                  <p className="text-[11px] text-red-600 dark:text-red-400">Passwörter stimmen noch nicht überein</p>
+                )}
+              </div>
+              <Button
+                type="submit"
+                variant="brand"
+                size="lg"
+                className="w-full"
+                disabled={loading || password.length === 0 || passwordConfirm !== password}
+              >
                 {loading ? (
                   <>
                     <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
