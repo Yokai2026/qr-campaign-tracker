@@ -20,6 +20,8 @@ import {
   Scale,
   Search,
   ExternalLink,
+  KeyRound,
+  BookOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -35,6 +37,8 @@ const mainNav = [
   { name: 'QR-Codes', href: '/qr-codes', icon: QrCode, tourId: 'nav-qr' },
   { name: 'Kurzlinks', href: '/links', icon: Link2 },
   { name: 'Analytik', href: '/analytics', icon: BarChart3, tourId: 'nav-analytics' },
+  { name: 'API & Tokens', href: '/settings?tab=integrations', icon: KeyRound },
+  { name: 'Anleitung', href: '/guide', icon: BookOpen },
 ];
 
 const bottomNav = [
@@ -89,7 +93,12 @@ export function Sidebar() {
   }
 
   function NavItem({ item }: { item: typeof mainNav[number] }) {
-    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+    // Items mit Query-Param (z.B. /settings?tab=integrations) sind
+    // Shortcuts in eine Sub-Section — sie sollen nicht den aktiven
+    // State stehlen wenn man eh schon auf /settings ist.
+    const itemPath = item.href.split('?')[0];
+    const hasQuery = item.href.includes('?');
+    const isActive = !hasQuery && (pathname === itemPath || pathname.startsWith(itemPath + '/'));
     return (
       <Link
         href={item.href}
