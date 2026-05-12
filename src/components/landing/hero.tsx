@@ -50,8 +50,9 @@ export function Hero() {
 
         {/* Subline — kürzer, konkret, mit Wirkung */}
         <p className="mx-auto mt-6 max-w-xl text-pretty text-[18px] leading-[1.5] text-muted-foreground sm:text-[20px]">
-          Tracke jeden Scan in Echtzeit. Ohne Cookies, ohne Banner,
-          ohne Datenabfluss in die USA.
+          Unbegrenzte QR-Codes & Kurzlinks, Live-Analytics, eigene Domain —{' '}
+          <span className="font-semibold text-foreground">alles ab 4,99 € im Monat</span>.
+          DSGVO-konform, EU-Hosting, ohne Cookie-Banner.
         </p>
 
         {/* CTAs */}

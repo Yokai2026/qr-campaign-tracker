@@ -3,14 +3,14 @@ import { ArrowRight, ShieldCheck, Wallet, Sparkles } from 'lucide-react';
 import { BillingToggle } from '@/components/landing/billing-toggle';
 
 const INCLUDED = [
-  'Unbegrenzt Kampagnen & QR-Codes',
-  'Unbegrenzte Scans',
-  'Realtime-Dashboard & Alerts',
-  'Eigene Domain',
-  'CSV / PDF / API-Export',
-  'EU-Hosting & DSGVO',
-  'Bot-Filterung inklusive',
-  'Deutscher Support',
+  'Unbegrenzte QR-Codes, Kurzlinks & Scans',
+  'Live-Analytics nach Gerät, Standort, Conversion',
+  'Eigene Kurz-Domain (kurz.deinefirma.de)',
+  'Massen-Erstellung per CSV — 100 Codes in 30 Sek.',
+  'A/B-Tests & Conditional Redirects',
+  'API für KI-Agents, n8n, eigene Skripte',
+  'EU-Hosting, DSGVO — kein Cookie-Banner nötig',
+  'Bot-Filter, Reports, PDF-Export — alles inklusive',
 ];
 
 const REASSURANCE = [

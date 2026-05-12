@@ -26,14 +26,14 @@ export const metadata = {
 };
 
 const FEATURES = [
-  'Unbegrenzte QR-Codes & Kurzlinks',
-  'Kampagnen-Management',
-  'Analytics & Dashboard in Echtzeit',
-  'A/B-Testing & Conditional Redirects',
-  'CSV & PDF Export',
-  'E-Mail-Reports & Scan-Alerts',
-  'Eigene Domain (kurz.deinefirma.de)',
-  'QR-Design-Studio mit Logo',
+  'Unbegrenzte QR-Codes & Kurzlinks · keine Monats-Limits',
+  'Live-Analytics mit Geräte, Standort und Conversion-Tracking',
+  'Eigene Kurz-Domain (kurz.deinefirma.de) für Branded Links',
+  'Massen-Erstellung per CSV — 100 Codes in 30 Sekunden',
+  'Kampagnen, A/B-Tests & Conditional Redirects in einer Plattform',
+  'API-Zugang für KI-Agents, n8n, eigene Skripte',
+  'E-Mail-Reports, Scan-Alerts & PDF-Berichte automatisiert',
+  'EU-Hosting, DSGVO-konform — kein Cookie-Banner nötig',
 ];
 
 const TRUST_ROW = [
@@ -64,15 +64,16 @@ export default function PricingPage() {
 
           <div className="relative mx-auto max-w-5xl px-4 pt-24 pb-12 text-center sm:px-6 sm:pt-32 sm:pb-16">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-brand">
-              Einführungspreis · über 50 % günstiger
+              Einführungspreis · alle Features ohne Limit
             </span>
             <h1 className="mt-6 text-balance font-heading text-[40px] font-semibold leading-[1.05] tracking-[-0.03em] sm:text-[56px] md:text-[64px]">
               Ein Plan —{' '}
               <span className="text-muted-foreground font-normal">alles drin.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-pretty text-[16.5px] leading-relaxed text-muted-foreground sm:text-[18px]">
-              Unbegrenzte Kampagnen, QR-Codes und Scans. Keine Nutzerpakete,
-              keine Feature-Paywall. 14 Tage kostenlos — ohne Kreditkarte.
+              <span className="text-foreground font-semibold">Unbegrenzte</span> QR-Codes, Kurzlinks und Scans.
+              Branded Domain, Live-Analytics, API für KI-Agents — alles ab Tag eins.
+              <span className="block mt-2">14 Tage kostenlos. Keine Kreditkarte. Jederzeit kündbar.</span>
             </p>
 
             <ul className="mx-auto mt-8 flex max-w-xl flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12.5px] text-muted-foreground">
