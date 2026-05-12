@@ -79,6 +79,8 @@ const PUBLIC_PATHS = [
   '/api/track',
   '/api/qr/image',
   '/api/webhooks/',
+  '/api/v1/',
+  '/api-docs',
   '/login',
   '/signup',
   '/auth/callback',

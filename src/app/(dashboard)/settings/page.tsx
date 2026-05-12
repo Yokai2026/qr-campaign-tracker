@@ -17,6 +17,7 @@ import { ReportSchedules } from '@/components/settings/report-schedules';
 import { ScanAlerts } from '@/components/settings/scan-alerts';
 import { UtmTemplates } from '@/components/settings/utm-templates';
 import { CustomDomains } from '@/components/settings/custom-domains';
+import { ApiTokens } from '@/components/settings/api-tokens';
 import { SubscriptionCard } from '@/components/settings/subscription-card';
 import { PageHeader } from '@/components/shared/page-header';
 import type { Profile, Subscription } from '@/types';
@@ -285,6 +286,8 @@ export default function SettingsPage() {
 
         {/* INTEGRATIONEN */}
         <TabsContent value="integrations" className="mt-5 space-y-4">
+          <ApiTokens />
+
           <Card className="border border-border">
             <CardHeader>
               <div className="flex items-center gap-2.5">
