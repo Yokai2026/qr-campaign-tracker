@@ -186,13 +186,31 @@ export default function NewQrCodePage() {
       : '';
 
   function onSubmit(data: FormValues) {
+    // Datums-Inputs vom <input type="date"> kommen als "YYYY-MM-DD".
+    // Werden sie roh an die DB geschickt, interpretiert Postgres als
+    // UTC-Mitternacht — Nutzer in DE (CEST/UTC+2) verlieren so 2h.
+    // Konvertiere zu Start/Ende des Tages in lokaler Zeitzone:
+    //   - valid_from = "2026-05-12" -> Local 12.05.2026 00:00:00 -> UTC ISO
+    //   - valid_until = "2026-05-24" -> Local 24.05.2026 23:59:59.999 -> UTC ISO
+    //     (User meint "bis Ende des Tages 24.05.", nicht "Beginn des 24.05.")
+    function localStartOfDay(dateStr: string): string | undefined {
+      if (!dateStr) return undefined;
+      const d = new Date(`${dateStr}T00:00:00`);
+      return isNaN(d.getTime()) ? undefined : d.toISOString();
+    }
+    function localEndOfDay(dateStr: string): string | undefined {
+      if (!dateStr) return undefined;
+      const d = new Date(`${dateStr}T23:59:59.999`);
+      return isNaN(d.getTime()) ? undefined : d.toISOString();
+    }
+
     const input: QrCodeInput = {
       placement_id: data.placement_id,
       target_url: data.target_url,
       title: data.title || undefined,
       note: data.note || undefined,
-      valid_from: data.valid_from || undefined,
-      valid_until: data.valid_until || undefined,
+      valid_from: localStartOfDay(data.valid_from),
+      valid_until: localEndOfDay(data.valid_until),
       utm_source: data.utm_source || undefined,
       utm_medium: data.utm_medium || undefined,
       utm_campaign: data.utm_campaign || undefined,
