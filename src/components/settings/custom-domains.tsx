@@ -263,6 +263,21 @@ export function CustomDomains() {
               <p id="custom-domain-host-hint" className="text-[11px] text-muted-foreground">
                 Protokoll (https://) und Pfad werden automatisch entfernt
               </p>
+              {/* Apex-Warnung: zaehle Dots — Apex = genau 1 Dot (z.B. "marke.de").
+                  Subdomain hat 2+ Dots ("kurz.marke.de"). Co.uk/com.au sind Edge-
+                  Cases, die akzeptieren wir auch (selten relevant fuer DE-Markt). */}
+              {(() => {
+                const normalized = normalizeHostInput(host);
+                const dots = normalized.split('.').length - 1;
+                if (!normalized || dots !== 1) return null;
+                return (
+                  <div className="mt-2 rounded-md border border-amber-500/30 bg-amber-500/10 p-2.5 text-[11px] text-amber-900 dark:text-amber-200">
+                    <strong className="block mb-0.5">Achtung: Hauptdomain erkannt.</strong>
+                    Wenn auf <code className="font-mono">{normalized}</code> bereits eine Website läuft (z.B. dein Online-Shop), wird sie durch die Verbindung mit Spurig <strong>nicht mehr erreichbar sein</strong>.
+                    Wir empfehlen eine Subdomain wie <code className="font-mono">s.{normalized}</code>, <code className="font-mono">go.{normalized}</code> oder <code className="font-mono">qr.{normalized}</code>.
+                  </div>
+                );
+              })()}
             </div>
             <div className="flex gap-2">
               <Button size="sm" onClick={handleCreate} disabled={isPending}>
