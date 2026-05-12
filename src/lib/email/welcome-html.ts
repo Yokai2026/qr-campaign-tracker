@@ -94,7 +94,15 @@ export function buildWelcomeHtml(data: WelcomeData): string {
         </div>
       </div>
 
-      <div style="padding:20px 28px;border-top:1px solid #1f1f1f;background:#0d0d0d">
+      <div style="padding:18px 28px;border-top:1px solid #1f1f1f;background:#0d0d0d">
+        <div style="font-size:13px;color:#a3a3a3;line-height:1.6">
+          <strong style="color:#e5e5e5">Brauchst du eine Anleitung?</strong>
+          Der <a href="${data.dashboardUrl.replace('/dashboard', '/guide')}" style="color:#22d3ee;text-decoration:none">komplette Leitfaden</a>
+          zeigt dir alles in 30 Min &mdash; inklusive KI-Steuerung via API.
+        </div>
+      </div>
+
+      <div style="padding:18px 28px;border-top:1px solid #1f1f1f;background:#0d0d0d">
         <div style="font-size:13px;color:#a3a3a3;line-height:1.6">
           <strong style="color:#e5e5e5">Fragen?</strong> Schreib uns einfach an
           <a href="mailto:${data.supportEmail}" style="color:#22d3ee;text-decoration:none">${data.supportEmail}</a>

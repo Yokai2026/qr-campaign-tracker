@@ -81,6 +81,7 @@ const PUBLIC_PATHS = [
   '/api/webhooks/',
   '/api/v1/',
   '/api-docs',
+  '/guide',
   '/login',
   '/signup',
   '/auth/callback',
