@@ -8,11 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { QrCode, Loader2, CheckCircle2, Sparkles } from 'lucide-react';
-
-function formatDateDE(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
+import { QrCode, Loader2, Sparkles } from 'lucide-react';
 
 export default function SignupPage() {
   const [username, setUsername] = useState('');
@@ -20,7 +16,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -83,81 +78,9 @@ export default function SignupPage() {
       return;
     }
 
-    // Fetch profile to surface the trial_ends_at set by the signup trigger
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('trial_ends_at')
-        .eq('id', user.id)
-        .single();
-      if (profile?.trial_ends_at) {
-        setTrialEndsAt(profile.trial_ends_at);
-        setLoading(false);
-        return;
-      }
-    }
-
-    // Fallback: no trial info available — redirect directly
-    router.push('/dashboard');
-    router.refresh();
-  }
-
-  if (trialEndsAt) {
-    return (
-      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(ellipse 50% 50% at 50% 30%, oklch(0.64 0.10 185 / 0.08), transparent 65%)',
-          }}
-        />
-        <div className="relative w-full max-w-sm animate-in-page">
-          <Card className="border border-border shadow-[var(--shadow-lg)]">
-            <CardHeader className="text-center pb-2">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 shadow-[var(--shadow-sm)]">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-              </div>
-              <CardTitle className="text-xl font-semibold tracking-tight">
-                Willkommen bei Spurig!
-              </CardTitle>
-              <CardDescription className="text-[13px]">
-                Dein Konto ist startklar.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-2xl border border-brand/20 bg-brand/[0.04] p-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-brand" />
-                  <span className="text-[13px] font-semibold">14 Tage kostenlos</span>
-                </div>
-                <p className="mt-2 text-[12px] leading-relaxed text-muted-foreground">
-                  Dein Testzeitraum endet am{' '}
-                  <span className="font-semibold text-foreground">{formatDateDE(trialEndsAt)}</span>.
-                  Bis dahin kannst du alle Funktionen unbegrenzt nutzen.
-                </p>
-              </div>
-              <Button
-                variant="brand"
-                size="lg"
-                className="mt-4 w-full"
-                onClick={() => {
-                  router.push('/dashboard');
-                  router.refresh();
-                }}
-              >
-                Zum Dashboard
-              </Button>
-              <p className="mt-3 text-center text-[11px] text-muted-foreground">
-                Kein Zahlungsmittel erforderlich.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
+    // Erfolg: Supabase hat eine Bestaetigungsmail mit 6-stelligem Code
+    // verschickt. Weiter zur Verify-Page, wo der User den PIN eingibt.
+    router.push(`/signup/verify?email=${encodeURIComponent(email)}`);
   }
 
   return (
