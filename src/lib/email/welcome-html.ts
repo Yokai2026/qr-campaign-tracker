@@ -71,8 +71,8 @@ export function buildWelcomeHtml(data: WelcomeData): string {
               <div style="width:24px;height:24px;border-radius:50%;background:#0f1f22;border:1px solid #1f3f44;color:#22d3ee;font-size:12px;font-weight:600;text-align:center;line-height:23px">2</div>
             </td>
             <td style="padding:10px 0 10px 12px;vertical-align:top">
-              <div style="font-size:14px;font-weight:600;color:#fafafa;line-height:1.4">QR-Code generieren</div>
-              <div style="font-size:13px;color:#a3a3a3;line-height:1.55;margin-top:2px">Zielseite eintragen, PNG oder SVG runterladen &mdash; bereit f&uuml;r Print oder Web.</div>
+              <div style="font-size:14px;font-weight:600;color:#fafafa;line-height:1.4">QR-Code oder Tracking-Link erstellen</div>
+              <div style="font-size:13px;color:#a3a3a3;line-height:1.55;margin-top:2px">Zielseite eintragen &mdash; du bekommst einen kurzen Tracking-Link und einen QR-Code (PNG oder SVG). Beides bereit f&uuml;r Print, Web und Mailings.</div>
             </td>
           </tr>
           <tr>
@@ -80,8 +80,8 @@ export function buildWelcomeHtml(data: WelcomeData): string {
               <div style="width:24px;height:24px;border-radius:50%;background:#0f1f22;border:1px solid #1f3f44;color:#22d3ee;font-size:12px;font-weight:600;text-align:center;line-height:23px">3</div>
             </td>
             <td style="padding:10px 0 10px 12px;vertical-align:top">
-              <div style="font-size:14px;font-weight:600;color:#fafafa;line-height:1.4">Scans live verfolgen</div>
-              <div style="font-size:13px;color:#a3a3a3;line-height:1.55;margin-top:2px">Jeder Scan landet sofort im Dashboard. Inklusive Ger&auml;t, Land und Zeitverlauf.</div>
+              <div style="font-size:14px;font-weight:600;color:#fafafa;line-height:1.4">Scans und Klicks live verfolgen</div>
+              <div style="font-size:13px;color:#a3a3a3;line-height:1.55;margin-top:2px">Jeder QR-Scan und jeder Link-Klick landet sofort im Dashboard. Inklusive Ger&auml;t, Land und Zeitverlauf.</div>
             </td>
           </tr>
         </table>
