@@ -29,7 +29,10 @@ export async function OnboardingCard() {
 
   return (
     <DismissibleOnboarding>
-      <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-sm)] sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
+      <div
+        data-tour="welcome-card"
+        className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-sm)] sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6"
+      >
         <div className="flex items-start gap-3 sm:items-center">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.18),var(--shadow-sm)]">
             <Sparkles className="h-4 w-4" />

@@ -1,0 +1,120 @@
+/* Spurig-Theme für driver.js Onboarding-Tour.
+   Override der Default-Styles → dunkles Panel mit Cyan-Akzent,
+   konsistent zum Sidebar- und Email-Look. */
+
+.driver-popover.spurig-tour {
+  background-color: #111111;
+  color: #e5e5e5;
+  border: 1px solid #1f1f1f;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  padding: 20px 22px;
+  max-width: 380px;
+  font-family: inherit;
+}
+
+.driver-popover.spurig-tour .driver-popover-title {
+  color: #fafafa;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+
+.driver-popover.spurig-tour .driver-popover-description {
+  color: #a3a3a3;
+  font-size: 13.5px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.driver-popover.spurig-tour .driver-popover-description a {
+  color: #22d3ee;
+  text-decoration: none;
+}
+.driver-popover.spurig-tour .driver-popover-description a:hover {
+  text-decoration: underline;
+}
+
+.driver-popover.spurig-tour .driver-popover-footer {
+  display: flex;
+  align-items: center;
+  margin-top: 18px;
+  gap: 8px;
+}
+
+.driver-popover.spurig-tour .driver-popover-progress-text {
+  color: #737373;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.driver-popover.spurig-tour .driver-popover-navigation-btns {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.driver-popover.spurig-tour button.driver-popover-prev-btn,
+.driver-popover.spurig-tour button.driver-popover-next-btn,
+.driver-popover.spurig-tour button.driver-popover-close-btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 120ms ease, transform 120ms ease;
+  text-shadow: none;
+}
+
+.driver-popover.spurig-tour button.driver-popover-prev-btn {
+  background: transparent;
+  color: #a3a3a3;
+  border: 1px solid #2a2a2a;
+}
+.driver-popover.spurig-tour button.driver-popover-prev-btn:hover {
+  background: #1a1a1a;
+  color: #e5e5e5;
+}
+
+.driver-popover.spurig-tour button.driver-popover-next-btn {
+  background: #22d3ee;
+  color: #0a0a0a;
+  font-weight: 600;
+}
+.driver-popover.spurig-tour button.driver-popover-next-btn:hover {
+  background: #67e8f9;
+}
+
+.driver-popover.spurig-tour .driver-popover-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  color: #737373;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px 8px;
+  border: none;
+}
+.driver-popover.spurig-tour .driver-popover-close-btn:hover {
+  color: #e5e5e5;
+  background: transparent;
+}
+
+/* Pfeil/Tip einfärben */
+.driver-popover.spurig-tour .driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: #111111;
+}
+.driver-popover.spurig-tour .driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: #111111;
+}
+.driver-popover.spurig-tour .driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: #111111;
+}
+.driver-popover.spurig-tour .driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: #111111;
+}

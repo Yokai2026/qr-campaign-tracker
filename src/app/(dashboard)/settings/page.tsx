@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { User, Shield, Code, Loader2, Trash2, Download, ScrollText, Copy, Check, UserCog, Plug, Zap, ShieldAlert } from 'lucide-react';
+import { User, Shield, Code, Loader2, Trash2, Download, ScrollText, Copy, Check, UserCog, Plug, Zap, ShieldAlert, Compass } from 'lucide-react';
+import { restartTour } from '@/lib/auth/tour-actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { deleteAccount } from './account-actions';
 import { ReportSchedules } from '@/components/settings/report-schedules';
@@ -30,6 +31,7 @@ const VALID_TABS = ['account', 'integrations', 'automations', 'privacy'] as cons
 export default function SettingsPage() {
   const supabase = createClient();
   const searchParams = useSearchParams();
+  const router = useRouter();
   // Tab via URL waehlen: /settings?tab=integrations springt direkt in den
   // richtigen Bereich. Wird z.B. vom "Jetzt Domain hinzufuegen"-Link aus
   // dem QR-Erstellungsflow gerufen.
@@ -253,6 +255,32 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           </div>
+
+          <Card className="border border-border">
+            <CardHeader>
+              <div className="flex items-center gap-2.5">
+                <Compass className="h-4 w-4 text-muted-foreground" />
+                <div>
+                  <CardTitle className="text-[14px]">Onboarding-Tour</CardTitle>
+                  <CardDescription className="text-[12px]">Geführter Rundgang durchs Dashboard — nochmal anschauen?</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  await restartTour();
+                  toast.success('Tour wird beim nächsten Dashboard-Aufruf gestartet');
+                  router.push('/dashboard');
+                  router.refresh();
+                }}
+              >
+                Tour erneut starten
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* INTEGRATIONEN */}

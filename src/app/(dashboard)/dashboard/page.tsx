@@ -1,8 +1,10 @@
 import { Suspense } from 'react';
 import { requireAuth } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PrivacyBadge } from '@/components/shared/privacy-badge';
 import { LiveScanFeed } from '@/components/shared/live-scan-feed';
+import { Tour } from '@/components/onboarding/tour';
 import { BillingStatus } from './sections/billing-status';
 import { OnboardingCard } from './sections/onboarding-card';
 import { HeroKpi } from './sections/hero-kpi';
@@ -27,8 +29,20 @@ function RanksSkeleton() {
 export default async function DashboardPage() {
   const profile = await requireAuth();
 
+  // Onboarding-Tour: nur fuer fresh confirmed users (tour_completed_at IS NULL).
+  // Username kommt direkt aus dem Profil — kein separater Roundtrip noetig
+  // (requireAuth liefert ihn schon).
+  const supabase = await createClient();
+  const { data: tourProfile } = await supabase
+    .from('profiles')
+    .select('tour_completed_at, username')
+    .eq('id', profile.id)
+    .maybeSingle();
+  const showTour = tourProfile?.tour_completed_at === null;
+
   return (
     <div className="space-y-6 animate-in-card">
+      {showTour && <Tour username={tourProfile?.username ?? profile.display_name ?? null} autoStart={true} />}
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div>

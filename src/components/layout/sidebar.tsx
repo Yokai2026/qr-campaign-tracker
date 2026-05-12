@@ -28,13 +28,13 @@ import type { EffectiveTier } from '@/lib/billing/gates';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const mainNav = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Kampagnen', href: '/campaigns', icon: Megaphone },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, tourId: 'nav-dashboard' },
+  { name: 'Kampagnen', href: '/campaigns', icon: Megaphone, tourId: 'nav-campaigns' },
   { name: 'Standorte', href: '/locations', icon: MapPin },
   { name: 'Platzierungen', href: '/placements', icon: ClipboardList },
-  { name: 'QR-Codes', href: '/qr-codes', icon: QrCode },
+  { name: 'QR-Codes', href: '/qr-codes', icon: QrCode, tourId: 'nav-qr' },
   { name: 'Kurzlinks', href: '/links', icon: Link2 },
-  { name: 'Analytik', href: '/analytics', icon: BarChart3 },
+  { name: 'Analytik', href: '/analytics', icon: BarChart3, tourId: 'nav-analytics' },
 ];
 
 const bottomNav = [
@@ -94,6 +94,7 @@ export function Sidebar() {
       <Link
         href={item.href}
         onClick={() => setMobileOpen(false)}
+        data-tour={item.tourId}
         className={cn(
           'group flex items-center gap-2.5 rounded-[6px] px-2 py-[7px] text-[13px] transition-colors duration-100',
           isActive
@@ -169,6 +170,7 @@ export function Sidebar() {
             setMobileOpen(false);
             window.dispatchEvent(new Event('open-command-palette'));
           }}
+          data-tour="search"
           className="flex w-full items-center gap-2 rounded-[5px] bg-white/[0.04] px-2 py-[6px] text-[12px] text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/75"
         >
           <Search className="h-[13px] w-[13px]" />
@@ -178,7 +180,7 @@ export function Sidebar() {
       </div>
 
       {/* Main nav */}
-      <nav className="flex-1 space-y-[2px] px-2 pt-1">
+      <nav data-tour="sidebar-nav" className="flex-1 space-y-[2px] px-2 pt-1">
         {mainNav.map((item) => (
           <NavItem key={item.href} item={item} />
         ))}
