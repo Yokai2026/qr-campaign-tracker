@@ -179,41 +179,55 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
               </dl>
             )}
 
-            {/* Inline-Plan-Wechsel: zeigt den jeweils anderen Zyklus als
-                One-Click-Switch. Stripe-Proration übernimmt den Restwert
-                automatisch auf der nächsten Rechnung. */}
-            <div className="rounded-xl border border-dashed border-border bg-muted/20 p-4">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <p className="text-[12.5px] font-medium">
-                    {isYearly ? 'Auf Monatlich wechseln' : 'Auf Jährlich wechseln · spar 16 %'}
-                  </p>
-                  <p className="text-[11.5px] text-muted-foreground">
-                    {isYearly
-                      ? '5,99 € netto / Monat · zzgl. 19 % MwSt (7,13 € brutto) — flexibel monatlich abgerechnet.'
-                      : '4,99 € netto / Monat · zzgl. 19 % MwSt — jährlich 59,88 € netto + 11,38 € MwSt = 71,26 € brutto.'}
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => switchPlan(isYearly ? 'monthly' : 'yearly')}
-                  disabled={isSwitchPending}
-                >
-                  {isSwitchPending ? (
-                    <>
-                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                      Wechsel läuft…
-                    </>
-                  ) : (
-                    <>
-                      <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" />
-                      {isYearly ? 'Zu Monatlich' : 'Zu Jährlich'}
-                    </>
+            {/* Inline-Plan-Wechsel.
+                - Monthly -> Yearly: sofortiger Upgrade mit Stripe-Proration
+                  (User zahlt Differenz, kriegt sofort den Yearly-Discount).
+                - Yearly -> Monthly: kein Sofort-Switch — User hat ja schon
+                  ein ganzes Jahr bezahlt und wuerde Geld verlieren. Wechsel
+                  geht stattdessen via "Abo verwalten" zum Periodenende. */}
+            {isYearly ? (
+              <div className="rounded-xl border border-dashed border-border bg-muted/20 p-4">
+                <p className="text-[12.5px] font-medium">Auf Monatlich wechseln</p>
+                <p className="mt-1 text-[11.5px] text-muted-foreground">
+                  Du hast das Jahr im Voraus bezahlt. Ein Wechsel zu Monatlich
+                  macht erst Sinn, wenn dein Jahr abgelaufen ist
+                  {subscription.current_period_end && mounted && (
+                    <> (ab {formatDateLong(subscription.current_period_end)})</>
                   )}
-                </Button>
+                  . Klick dann auf <span className="font-medium">Abo verwalten</span>{' '}
+                  und kündige zum Periodenende — danach kannst du frisch monatlich starten.
+                </p>
               </div>
-            </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-border bg-muted/20 p-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-[12.5px] font-medium">Auf Jährlich wechseln · spar 16 %</p>
+                    <p className="text-[11.5px] text-muted-foreground">
+                      4,99 € netto / Monat · zzgl. 19 % MwSt — jährlich 59,88 € netto + 11,38 € MwSt = 71,26 € brutto.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => switchPlan('yearly')}
+                    disabled={isSwitchPending}
+                  >
+                    {isSwitchPending ? (
+                      <>
+                        <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                        Wechsel läuft…
+                      </>
+                    ) : (
+                      <>
+                        <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" />
+                        Zu Jährlich
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Footer: CTA */}
             <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
