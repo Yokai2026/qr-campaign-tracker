@@ -70,16 +70,28 @@ export default function SignupPage() {
     });
 
     if (signupError) {
-      // Race-Condition-Fallback: Wenn der Pre-Check sauber war, aber der Trigger
-      // trotzdem am Unique-Index scheitert (paralleler Signup), ist das die
-      // plausibelste Ursache für einen DB-Fehler.
       const msg = signupError.message?.toLowerCase() ?? '';
-      if (msg.includes('database') || msg.includes('duplicate') || msg.includes('unique')) {
+      const code = signupError.code ?? '';
+
+      // Rate-Limit (Supabase Default-Mailer: 2 Bestaetigungs-Mails / Stunde)
+      if (msg.includes('rate limit') || msg.includes('over_email_send_rate_limit') || code === 'over_email_send_rate_limit') {
+        setError('Zu viele Bestätigungs-Mails in kurzer Zeit. Bitte versuche es in etwa einer Stunde erneut.');
+      // Race-Condition: Pre-Check sauber, Trigger scheitert am Unique-Index
+      } else if (msg.includes('database') || msg.includes('duplicate') || msg.includes('unique')) {
         setError('Dieser Benutzername ist bereits vergeben. Bitte wähle einen anderen.');
-      } else if (msg.includes('already registered') || msg.includes('already exists')) {
-        setError('Diese E-Mail-Adresse ist bereits registriert.');
+      } else if (msg.includes('already registered') || msg.includes('already exists') || code === 'user_already_exists') {
+        setError('Diese E-Mail-Adresse ist bereits registriert. Bitte melde dich an oder nutze eine andere.');
+      } else if (msg.includes('password') && (msg.includes('weak') || msg.includes('short') || msg.includes('strength'))) {
+        setError('Passwort zu schwach. Bitte wähle mindestens 10 Zeichen mit Buchstaben und Zahlen.');
+      } else if (msg.includes('invalid') && msg.includes('email')) {
+        setError('Diese E-Mail-Adresse ist ungültig.');
+      } else if (msg.includes('captcha')) {
+        setError('Sicherheitsprüfung fehlgeschlagen. Bitte lade die Seite neu und versuche es nochmal.');
       } else {
-        setError('Registrierung fehlgeschlagen. Bitte prüfe deine Eingaben.');
+        // Echte Fehlermeldung anzeigen statt generischem Text — wir loggen
+        // sie ausserdem in die Console, damit man sie auch beim Support hat.
+        console.error('[signup] Unhandled signup error:', signupError);
+        setError(`Registrierung fehlgeschlagen: ${signupError.message}`);
       }
       setLoading(false);
       return;
