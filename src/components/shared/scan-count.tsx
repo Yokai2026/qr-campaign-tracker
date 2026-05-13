@@ -66,13 +66,11 @@ export function ScanCount({
 }
 
 function TrendBadge({ trend }: { trend: number | 'new' }) {
-  if (trend === 'new') {
-    return (
-      <span className="inline-flex items-center gap-0.5 text-[10.5px] font-semibold uppercase tracking-wider text-brand">
-        Neu
-      </span>
-    );
-  }
+  // Frueher: "NEU"-Badge wenn Vorperiode 0 war. Bei jedem frischen Account
+  // wurde dann ALLES als NEU markiert → reine Visual-Noise statt Signal.
+  // Jetzt: kein Badge ohne historischen Vergleich; sobald genug Daten da
+  // sind zeigt sich der echte Trend-Pfeil unten.
+  if (trend === 'new') return null;
   // Threshold: ±10% — kleinere Änderungen werden als stabil dargestellt
   const isUp = trend > 10;
   const isDown = trend < -10;
