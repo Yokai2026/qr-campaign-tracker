@@ -29,7 +29,7 @@ export const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: 'Welche Zahlungsmethoden werden unterstützt?',
-    a: 'Abgerechnet wird sicher über Stripe: SEPA-Lastschrift, Kreditkarte, Apple Pay und Google Pay. Rechnungen mit korrekter USt.-ID bekommst du automatisch per E-Mail.',
+    a: 'Abgerechnet wird sicher über Stripe: Kreditkarte (Visa, Mastercard, Amex), PayPal, Klarna, Amazon Pay sowie Apple Pay und Google Pay auf kompatiblen Geräten. Rechnungen mit korrekter USt.-ID bekommst du automatisch per E-Mail.',
   },
   {
     q: 'Kann ich meine Daten jederzeit exportieren?',
