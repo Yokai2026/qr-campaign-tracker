@@ -1,120 +1,68 @@
-# Next Session: Design Overhaul Phase 3 — Grosses Redesign
+# Next-Session-Prompt für Spurig
 
-## Kontext
-Nach Screenshot-Review (2026-04-16) ist klar: Die bisherigen Aenderungen reichen nicht.
-Die Seite wirkt immer noch "zusammengebaut" statt "designed".
-User-Feedback: Fonts passen nicht, Farben nicht stimmig, Pricing unklar, nicht modern genug.
+Kopiere ALLES UNTERHALB der Trennlinie in eine neue Claude-Session.
 
-## Entscheidung steht an: Kompletter visueller Reboot
+---
 
-Der User muss in der naechsten Session entscheiden, welche Richtung:
+Hi Claude, ich arbeite an **Spurig** (https://spurig.com) — DSGVO-konformes QR-Code- und Kurzlink-Tracking-Tool, gehostet auf Vercel + Supabase, EU-only.
 
-### Option A: "Linear/Notion"-Richtung (empfohlen)
-- **Font**: Inter Variable fuer alles (wie Linear, Notion, Cal.com)
-- **Akzent**: Teal/Emerald (`#0D9488`) — sagt "Wachstum, Daten, Tracking"
-- **Vibe**: Clean, technisch, vertrauenswuerdig, minimal
-- **Referenzen**: linear.app, resend.com, betterstack.com
+**Pfad:** `C:\Users\david\Documents\3.0 Fertige KI Projekte\qr-campaign-tracker`
 
-### Option B: "Warm-Neutral"
-- **Font**: Satoshi 600-700 (Headings) + Inter 400-500 (Body)
-- **Akzent**: Verfeinertes Amber (weniger laut, konsistenter)
-- **Vibe**: Warm, nahbar, deutsch-handwerklich
-- **Referenzen**: amie.so, notion.so
+## Wo wir stehen
 
-### Option C: "Dark Premium"
-- **Font**: General Sans oder Manrope
-- **Akzent**: Violet/Indigo (`#7C3AED`)
-- **Vibe**: Premium, developer-tool, dunkel
-- **Referenzen**: cursor.com, linear.app (dark mode)
+Lies zuerst diese Memory-Files:
+1. `~/.claude/projects/.../memory/spurig_state_2026_05_13.md` — aktueller Status nach 2-Tages-Sprint
+2. `~/.claude/projects/.../memory/spurig_external_apis.md` — alle Tokens und Resource-IDs
+3. `.claude/sales/` (im Projekt) — Sales-Framework für Customer Acquisition
 
-## Was in JEDER Option passiert
+## Letzte Session-Highlights
 
-### 1. Font-Swap
-- Bricolage Grotesque + IBM Plex Sans RAUS
-- Neue Font(s) via `next/font/google` rein
-- `--font-heading` und `--font-sans` in globals.css updaten
+- **Pricing V2 live:** 12,99 €/Mo Regular, erste 3 Monate 5,99 €, Yearly 8,99 €/Mo = 107,88 €/Jahr (31 % Ersparnis)
+- **Public REST API** auf `/api/v1` + Token-Mgmt in Settings + `/api-docs` öffentlich
+- **Custom Domains** funktionieren end-to-end (Vercel + Cloudflare-API integriert)
+- **Email-Pipeline:** Resend-SMTP für Supabase Auth + Email Routing für support@spurig.com
+- **Sales-Framework gebaut:** 5 Dateien in `.claude/sales/` — ICP, Templates, 7-Tage-Playbook, Discovery-Fragen, Leads-CRM
+- **Onboarding-Tour** mit driver.js auf Dashboard + Restart-Button in Settings
+- **Endnutzer-Guide** auf `/guide` mit Print-zu-PDF
 
-### 2. Farb-Vereinfachung
-- EIN Akzent-Farbe, konsequent ueberall (Buttons, Links, Badges, Charts, Icons)
-- Keine konkurrierenden Farben (kein Amber + Gruen + Blau gleichzeitig)
-- Neutrals auf Zinc-Palette: `#09090B` (dark), `#71717A` (muted), `#FAFAFA` (light)
+## Aktuelle Prioritäten (Reihenfolge nach Wert)
 
-### 3. Pricing-Section komplett neu
-- Preis als GROESSTES Element (48-64px font-size)
-- Single Card, zentriert
-- Feature-Checkliste UNTER dem Preis (nicht daneben)
-- CTA-Button direkt am Preis, keine Aufteilung links/rechts
+### 1. **SALES STARTEN** ← Wichtigste Aufgabe
 
-### 4. Visual Cleanup
-- Uppercase-Labels und Pills reduzieren
-- Domain-Showcase Phone-Mockups vereinfachen (Browser-Chrome ist immer noch drin)
-- Einheitliches Card-Pattern ueberall
-- Weniger Badges, Chips, Deko-Elemente
+David soll mit 20+ potenziellen Kunden Discovery-Gespräche führen (kein „kaufen Sie?", sondern „wie messen Sie Print aktuell?"). Sales-Framework liegt bereit. Du musst die Cold-DMs / Cold-Emails personalisieren wenn David LinkedIn-Profile schickt.
 
-## Was bereits erledigt ist (Session 2026-04-16, Phase 2)
+**Wenn David Profile reinschickt:** Template aus `.claude/sales/outreach-templates.md` nehmen, personalisieren basierend auf was im Profil steht, Final-Text geben den er rauskopieren kann.
 
-### Landing
-- Domain-Showcase: SectionEyebrow -> warmes Label, links-aligned
-- Features-Bento: Icon-Backgrounds auf accent-warm, Chart-Linie/Gradient auf accent-warm
-- Site-Footer: font-heading auf Brand-Name
+### 2. Bekannte offene Bugs
 
-### Dashboard
-- Mobile Bottom-Navigation (5 Tabs: Dashboard, Kampagnen, QR-Codes, Analytik, Mehr)
-- Sidebar: Focus-Trap fuer Mobile-Menu (Escape schliesst, Tab-Cycling)
+- **Analytics/Dashboard-Crash** „Cannot read properties of undefined (reading 'subscribe')" — Defensive-Fixes deployed (Commit 6b5cbdd), aber unklar ob das Browser-Cache war. **TODO:** Status klären — David im Inkognito testen lassen, falls auch da crasht → tieferer Bug.
+- **Welcome-Mail-Receipt** noch nicht End-to-End geprüft
 
-### Accessibility
-- Table: `scope="col"` Default auf allen `<th>`
-- FormField: `aria-describedby` verbindet Inputs mit Error/Help Messages
-- InputField + TextareaField: `aria-describedby` + `aria-invalid`
+### 3. Spurig-Polish-Liste (low priority)
 
-### Aus Phase 1 (fruehere Session)
-- Hero: Gradient-Text entfernt, font-heading, warmer Akzent
-- Hero-Mock: Floating Chips + Browser Chrome entfernt
-- Header: Nav links-aligned
-- Steps: Timeline-Layout mit grossen Nummern
-- Features Bento: Links-aligned Header
-- Pricing: Links-aligned Header, warme Checkmarks
-- FAQ: Eyebrow entfernt
-- Final CTA: font-heading, warme Checkmarks
-- Sidebar: Kontrast erhoeht
-- Skip-Navigation, Focus-Indikatoren, prefers-reduced-motion
+- Edit-QR-Form Lokalzeit-Korrektur (nur Create-Form ist gefixt)
+- n8n-Pipeline für Reports/Alerts testen
+- Cron-Jobs `/api/cron/scheduling`, `/api/cron/reports`, `/api/cron/check-alerts` ungetestet
+- Marketing-Polish auf pitch/page.tsx, opengraph-image — alte Preise prüfen
 
-## Recherche-Ergebnisse (fuer Umsetzung)
+## Wichtige Working-Regeln
 
-### Top SaaS-Font-Kombis 2025/26
-1. **Inter Variable** (alles) — Linear, Notion, Cal.com
-2. **Satoshi 700** (headings) + **Inter 400** (body) — warm aber clean
-3. **General Sans** (headings) + **Inter** (body) — neutral-expressiv
-4. **Manrope** — futuristisch, gut fuer datenreiche UIs
+1. **Wenn ich Tokens/Zugriff habe → ausführen, nicht Dashboard-Anleitung geben.** Alle Tokens in `.env.local`.
+2. **Owner = tomatenkopf36@gmail.com** (user_id `1122b816-54ba-4774-b56c-a6cd637c4ff1`)
+3. **Custom-Domain-Setup** für andere Domains: User muss neuen CF-Token für die jeweilige Zone geben.
+4. **Pricing: 12,99/5,99/8,99 € sind die richtigen Zahlen.** Falls du irgendwo 4,99 oder andere alte siehst → bitte fixen.
+5. **Suchleiste/Command-Palette ist GELÖSCHT** und soll nicht wieder eingebaut werden ohne explizite Diskussion.
+6. **API-Token-Pattern:** Tokens sind SHA-256-gehasht in DB, Plaintext nur 1× beim Erstellen sichtbar.
 
-### Farb-Trends
-- Nicht pure #000/#FFF — stattdessen #09090B/#FAFAFA (tinted neutrals)
-- Zinc-Palette als System: #71717A, #A1A1AA, #D4D4D8
-- Single strong accent: Teal, Violet, oder verfeinertes Amber
-- Emerald nur fuer "Erfolg"-Signale, nicht als Primaer-Akzent
+## Wo finde ich was
 
-### Pricing Best Practices
-- Preis = groesstes Text-Element der Section
-- Spar-Anzeige bei Toggle: konkrete Euros > Prozent
-- Social Proof neben Preis (User-Zahl, Logos)
-- CTA sagt was passiert: "14 Tage kostenlos testen" statt "Starten"
+- **Stripe-Setup:** Neue Prices in `spurig_state_2026_05_13.md` notiert. Coupon `intro_3mo` für Monthly-Intro.
+- **Resend-Domain:** spurig.com verifiziert, ID `87b310d7-2668-48b2-bbc6-a8c4ca62671b`
+- **Cloudflare-Zonen:** spurig.com `d10404eab91e6e1979fd2b9bbb7fbacd`, pokishi.com `87afd60c82ef61656987bfc425aa954e`
+- **Letzter Git-Commit:** `54e2c41` auf master
 
-### Referenz-Sites (checken!)
-- linear.app — dark, monochrome, product-first
-- betterstack.com — dark theme, echte Screenshots
-- resend.com — developer-tool, clean typography
-- amie.so — clean, spezifische Value Props
-- notion.so — weiss, bold CTAs, Whitespace
+## Erste Aktion
 
-## Noch offen (unabhaengig vom Redesign)
-- Dashboard KPI-Consolidation (8 Cards -> Gruppen/Tabs)
-- Copy-Variation-Pass (Heading-Patterns variieren)
-- Scroll-triggered Entrance-Animationen
-- Monochrome Dashboard-Charts auf neue Palette umstellen
+Begrüße mich kurz, sag mir was du in den Memory-Files gefunden hast (so dass ich weiß du bist im Bild), und frag wo wir weitermachen. Schlag mir die 3 sinnvollsten Optionen vor (Sales / Bug-Fixes / Polish).
 
-## Constraints (unveraendert)
-- DSGVO-Konformitaet Pflicht
-- Deutsche UI, englischer Code
-- Privacy-first
-- Build muss clean bleiben
-- Per Phase commiten
+---
