@@ -22,6 +22,7 @@ Lies zuerst diese Memory-Files:
 - **Custom Domains** funktionieren end-to-end (Vercel + Cloudflare-API integriert)
 - **Email-Pipeline:** Resend-SMTP für Supabase Auth + Email Routing für support@spurig.com
 - **Sales-Framework gebaut:** 5 Dateien in `.claude/sales/` — ICP, Templates, 7-Tage-Playbook, Discovery-Fragen, Leads-CRM
+- **UI-Cleanup (13.05. nachmittag):** Suchleiste + CommandPalette entfernt, „NEU"-Badge aus Listen entfernt (war Spam auf frischen Accounts), Realtime-Subscriptions defensiv gewrapped
 - **Onboarding-Tour** mit driver.js auf Dashboard + Restart-Button in Settings
 - **Endnutzer-Guide** auf `/guide` mit Print-zu-PDF
 
