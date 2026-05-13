@@ -28,22 +28,22 @@ const PLANS: Record<Billing, {
   monthlyHint: string;
 }> = {
   monthly: {
-    // 12,99 €/Mo regulär. Erste 3 Monate fuer 5,99 € via Stripe-Coupon
+    // 12,99 €/Mo regulär. Erste 3 Monate fuer 5,99 € via Stripe-Coupon
     // (intro_3mo) — der Coupon wird bei Checkout automatisch angewendet.
     price: 12.99,
     strike: 0, // kein Strike, dafuer separater Intro-Hinweis
     strikeSuffix: '',
     strikeLabel: '',
-    monthlyHint: 'Monatlich abgerechnet · jederzeit kündbar · die ersten 3 Monate nur 5,99 €',
+    monthlyHint: 'Monatlich abgerechnet · jederzeit kündbar · die ersten 3 Monate nur 5,99 €',
   },
   yearly: {
-    // 8,99 €/Mo × 12 = 107,88 €/Jahr. Vergleich zu Listenpreis monatlich:
-    // 12,99 €/Mo × 12 = 155,88 € → Ersparnis 48 € (31 %).
+    // 8,99 €/Mo × 12 = 107,88 €/Jahr. Vergleich zu Listenpreis monatlich:
+    // 12,99 €/Mo × 12 = 155,88 € → Ersparnis 48 € (31 %).
     price: 8.99,
     strike: 155.88,
     strikeSuffix: '/Jahr',
-    strikeLabel: '31 % sparen',
-    monthlyHint: '107,88 € jährlich abgerechnet · 31 % Ersparnis gegenüber Monatlich',
+    strikeLabel: '31 % sparen',
+    monthlyHint: '107,88 € jährlich abgerechnet · 31 % Ersparnis gegenüber Monatlich',
   },
 };
 
@@ -101,7 +101,7 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'brand', included
                   : 'bg-muted text-muted-foreground',
               )}
             >
-              {billing === 'yearly' ? 'Spare 48 €' : '−31 %'}
+              {billing === 'yearly' ? 'Spare 48 €' : '−31 %'}
             </span>
           </button>
         </div>
@@ -143,7 +143,7 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'brand', included
 
         {/* MwSt-Hinweis — gesetzlich Pflicht bei Netto-Darstellung */}
         <p className="mt-2 text-center text-[12px] text-muted-foreground">
-          zzgl. 19 % MwSt · entspricht{' '}
+          zzgl. 19 % MwSt · entspricht{' '}
           <span className="tabular-nums font-medium text-foreground">
             {fmt(plan.price * 1.19)}&nbsp;€
           </span>{' '}
