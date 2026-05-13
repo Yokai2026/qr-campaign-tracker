@@ -91,7 +91,7 @@ export function CommandPalette() {
       supabase.from('campaigns').select('id, name, slug').order('updated_at', { ascending: false }).limit(50),
       supabase.from('placements').select('id, name, placement_code').order('created_at', { ascending: false }).limit(50),
       supabase.from('locations').select('id, venue_name, district').order('created_at', { ascending: false }).limit(50),
-      supabase.from('qr_codes').select('id, short_code, label').order('created_at', { ascending: false }).limit(50),
+      supabase.from('qr_codes').select('id, short_code, title').order('created_at', { ascending: false }).limit(50),
       supabase.from('short_links').select('id, short_code, title').eq('archived', false).order('created_at', { ascending: false }).limit(50),
     ]);
 
@@ -119,7 +119,7 @@ export function CommandPalette() {
       })),
       ...(qrCodes.data ?? []).map((q: Record<string, unknown>) => ({
         id: q.id as string,
-        title: (q.label as string) || (q.short_code as string),
+        title: (q.title as string) || (q.short_code as string),
         subtitle: q.short_code as string,
         shortCode: q.short_code as string,
         href: `/qr-codes/${q.id}`,
