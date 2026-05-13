@@ -82,42 +82,49 @@ export function CommandPalette() {
     };
   }, []);
 
-  // Load searchable data on first open
+  // Load searchable data on first open. Bewusst alle Errors abfangen —
+  // wenn EINE Query fehlschlaegt (RLS, Schema, Netzwerk) soll die Palette
+  // trotzdem laden und nur die anderen Quellen zeigen, statt die ganze
+  // Page mit "couldn't load" zu killen.
   const loadData = useCallback(async () => {
     if (loaded) return;
     const supabase = createClient();
 
+    const safe = async <T,>(p: PromiseLike<{ data: T[] | null }>) => {
+      try { return (await p).data ?? []; } catch { return [] as T[]; }
+    };
+
     const [campaigns, placements, locations, qrCodes, shortLinks] = await Promise.all([
-      supabase.from('campaigns').select('id, name, slug').order('updated_at', { ascending: false }).limit(50),
-      supabase.from('placements').select('id, name, placement_code').order('created_at', { ascending: false }).limit(50),
-      supabase.from('locations').select('id, venue_name, district').order('created_at', { ascending: false }).limit(50),
-      supabase.from('qr_codes').select('id, short_code, title').order('created_at', { ascending: false }).limit(50),
-      supabase.from('short_links').select('id, short_code, title').eq('archived', false).order('created_at', { ascending: false }).limit(50),
+      safe(supabase.from('campaigns').select('id, name, slug').order('updated_at', { ascending: false }).limit(50)),
+      safe(supabase.from('placements').select('id, name, placement_code').order('created_at', { ascending: false }).limit(50)),
+      safe(supabase.from('locations').select('id, venue_name, district').order('created_at', { ascending: false }).limit(50)),
+      safe(supabase.from('qr_codes').select('id, short_code, title').order('created_at', { ascending: false }).limit(50)),
+      safe(supabase.from('short_links').select('id, short_code, title').eq('archived', false).order('created_at', { ascending: false }).limit(50)),
     ]);
 
     const merged: SearchItem[] = [
-      ...(campaigns.data ?? []).map((c: Record<string, unknown>) => ({
+      ...campaigns.map((c: Record<string, unknown>) => ({
         id: c.id as string,
         title: c.name as string,
         subtitle: c.slug as string,
         href: `/campaigns/${c.id}`,
         kind: 'campaign' as const,
       })),
-      ...(placements.data ?? []).map((p: Record<string, unknown>) => ({
+      ...placements.map((p: Record<string, unknown>) => ({
         id: p.id as string,
         title: p.name as string,
         subtitle: p.placement_code as string,
         href: `/placements/${p.id}`,
         kind: 'placement' as const,
       })),
-      ...(locations.data ?? []).map((l: Record<string, unknown>) => ({
+      ...locations.map((l: Record<string, unknown>) => ({
         id: l.id as string,
         title: l.venue_name as string,
         subtitle: (l.district as string) || undefined,
         href: `/locations/${l.id}`,
         kind: 'location' as const,
       })),
-      ...(qrCodes.data ?? []).map((q: Record<string, unknown>) => ({
+      ...qrCodes.map((q: Record<string, unknown>) => ({
         id: q.id as string,
         title: (q.title as string) || (q.short_code as string),
         subtitle: q.short_code as string,
@@ -125,7 +132,7 @@ export function CommandPalette() {
         href: `/qr-codes/${q.id}`,
         kind: 'qr_code' as const,
       })),
-      ...(shortLinks.data ?? []).map((s: Record<string, unknown>) => ({
+      ...shortLinks.map((s: Record<string, unknown>) => ({
         id: s.id as string,
         title: (s.title as string) || (s.short_code as string),
         subtitle: `/r/${s.short_code as string}`,

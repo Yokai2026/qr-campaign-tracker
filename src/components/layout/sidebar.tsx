@@ -175,6 +175,7 @@ export function Sidebar() {
       {/* Search trigger */}
       <div className="px-2 pt-2 pb-1">
         <button
+          type="button"
           onClick={() => {
             setMobileOpen(false);
             window.dispatchEvent(new Event('open-command-palette'));
