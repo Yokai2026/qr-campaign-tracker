@@ -18,7 +18,6 @@ import {
   X,
   Shield,
   Scale,
-  Search,
   ExternalLink,
   KeyRound,
   BookOpen,
@@ -172,25 +171,8 @@ export function Sidebar() {
 
   const navBody = (
     <>
-      {/* Search trigger */}
-      <div className="px-2 pt-2 pb-1">
-        <button
-          type="button"
-          onClick={() => {
-            setMobileOpen(false);
-            window.dispatchEvent(new Event('open-command-palette'));
-          }}
-          data-tour="search"
-          className="flex w-full items-center gap-2 rounded-[5px] bg-white/[0.04] px-2 py-[6px] text-[12px] text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/75"
-        >
-          <Search className="h-[13px] w-[13px]" />
-          <span>Suchen…</span>
-          <kbd className="ml-auto font-mono text-[10px] text-white/30">⌘K</kbd>
-        </button>
-      </div>
-
       {/* Main nav */}
-      <nav data-tour="sidebar-nav" className="flex-1 space-y-[2px] px-2 pt-1">
+      <nav data-tour="sidebar-nav" className="flex-1 space-y-[2px] px-2 pt-2">
         {mainNav.map((item) => (
           <NavItem key={item.href} item={item} />
         ))}

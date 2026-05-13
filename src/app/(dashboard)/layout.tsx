@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
-import { CommandPalette } from '@/components/layout/command-palette';
 import { Toaster } from '@/components/ui/sonner';
 import { Providers } from '@/components/providers';
 import { TrialEndedModal } from '@/components/billing/trial-ended-modal';
@@ -30,7 +29,6 @@ export default function DashboardLayout({
           </div>
         </main>
         <MobileBottomNav />
-        <CommandPalette />
         <Toaster />
         <Suspense fallback={null}>
           <TrialGate />

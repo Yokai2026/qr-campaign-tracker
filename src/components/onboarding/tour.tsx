@@ -67,14 +67,6 @@ export function Tour({ username, autoStart }: TourProps) {
         },
       },
       {
-        element: '[data-tour="search"]',
-        popover: {
-          title: 'Schnellsuche',
-          description: 'Mit <kbd style="background:#1f1f1f;padding:2px 6px;border-radius:4px;color:#22d3ee;font-family:monospace;font-size:12px">Ctrl+K</kbd> findest du alles in 2 Sekunden &mdash; Kampagne, QR-Code, Standort.',
-          side: 'right',
-        },
-      },
-      {
         element: '[data-tour="welcome-card"]',
         popover: {
           title: 'Bereit?',
