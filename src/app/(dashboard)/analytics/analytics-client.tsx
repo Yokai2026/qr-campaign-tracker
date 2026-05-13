@@ -125,19 +125,33 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   }, [queryClient]);
 
   useEffect(() => {
-    const channel = supabase
-      .channel('analytics-realtime')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'redirect_events' },
-        invalidateAnalytics,
-      )
-      .subscribe((status) => {
-        setIsLive(status === 'SUBSCRIBED');
-      });
+    // Realtime ist nice-to-have, aber wenn die Subscription wirft
+    // (Realtime-Modul nicht initialisiert, RLS-Probleme, alte Versionen)
+    // soll die ganze Analytics-Page NICHT abstuerzen. Try/catch + Guard.
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    try {
+      const built = supabase
+        .channel('analytics-realtime')
+        ?.on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'redirect_events' },
+          invalidateAnalytics,
+        );
+      if (built && typeof built.subscribe === 'function') {
+        channel = built.subscribe((status) => {
+          setIsLive(status === 'SUBSCRIBED');
+        });
+      }
+    } catch (err) {
+      console.error('[analytics] realtime subscribe failed:', err);
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      try {
+        if (channel) supabase.removeChannel(channel);
+      } catch {
+        // ignore
+      }
     };
   }, [supabase, invalidateAnalytics]);
 

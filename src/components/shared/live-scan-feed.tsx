@@ -87,25 +87,36 @@ export function LiveScanFeed() {
         setEvents(enriched);
       });
 
-    // Subscribe to new events (QR + Link) — enrich each one async
-    const channel = supabase
-      .channel('live-scans')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'redirect_events' },
-        async (payload) => {
-          const raw = payload.new as RawScanEvent;
-          if (raw.event_type !== 'qr_open' && raw.event_type !== 'link_open') return;
-          const [enriched] = await enrichEvents(supabase, [raw]);
-          setEvents((prev) => [enriched, ...prev].slice(0, 8));
-        },
-      )
-      .subscribe((status) => {
-        setConnected(status === 'SUBSCRIBED');
-      });
+    // Realtime ist optional — Page darf nicht crashen wenn Subscription wirft.
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    try {
+      const built = supabase
+        .channel('live-scans')
+        ?.on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'redirect_events' },
+          async (payload) => {
+            const raw = payload.new as RawScanEvent;
+            if (raw.event_type !== 'qr_open' && raw.event_type !== 'link_open') return;
+            const [enriched] = await enrichEvents(supabase, [raw]);
+            setEvents((prev) => [enriched, ...prev].slice(0, 8));
+          },
+        );
+      if (built && typeof built.subscribe === 'function') {
+        channel = built.subscribe((status) => {
+          setConnected(status === 'SUBSCRIBED');
+        });
+      }
+    } catch (err) {
+      console.error('[live-scan-feed] realtime subscribe failed:', err);
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      try {
+        if (channel) supabase.removeChannel(channel);
+      } catch {
+        // ignore
+      }
     };
   }, []);
 
