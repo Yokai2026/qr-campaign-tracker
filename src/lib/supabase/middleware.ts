@@ -80,6 +80,7 @@ const PUBLIC_PATHS = [
   '/api/qr/image',
   '/api/webhooks/',
   '/api/v1/',
+  '/api/cron/',
   '/api-docs',
   '/guide',
   '/login',
