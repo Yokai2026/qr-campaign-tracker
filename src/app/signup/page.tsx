@@ -135,10 +135,10 @@ export default function SignupPage() {
                 </span>
               </div>
               <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">
-                Danach <strong className="text-foreground">12,99 €/Mo netto</strong> (erste 3 Monate nur{' '}
-                <strong className="text-foreground">5,99 €/Mo</strong>) oder{' '}
-                <strong className="text-foreground">8,99 €/Mo netto</strong> jährlich (107,88 €/Jahr — 31 % günstiger).
-                Alle Preise zzgl. 19 % MwSt. Kein Auto-Upgrade — du entscheidest selbst.
+                Danach <strong className="text-foreground">12,99 €/Mo netto</strong> (erste 3 Monate nur{' '}
+                <strong className="text-foreground">5,99 €/Mo</strong>) oder{' '}
+                <strong className="text-foreground">8,99 €/Mo netto</strong> jährlich (107,88 €/Jahr — 31 % günstiger).
+                Alle Preise zzgl. 19 % MwSt. Kein Auto-Upgrade — du entscheidest selbst.
               </p>
             </div>
             <form onSubmit={handleSignup} className="space-y-4">

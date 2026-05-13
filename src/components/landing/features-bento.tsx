@@ -60,7 +60,7 @@ export function FeaturesBento() {
                 <div className="flex items-center gap-1.5">
                   <span className="text-[11px] font-medium">Scans · 14 Tage</span>
                   <span className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 dark:text-emerald-400">
-                    +24 %
+                    +24 %
                   </span>
                 </div>
                 <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
@@ -153,7 +153,7 @@ export function FeaturesBento() {
             </p>
             {/* Mini city chips */}
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {['Berlin 43 %', 'Hamburg 22 %', 'München 18 %', '+ 12'].map((c) => (
+              {['Berlin 43 %', 'Hamburg 22 %', 'München 18 %', '+ 12'].map((c) => (
                 <span
                   key={c}
                   className="tabular rounded-md border border-border/70 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground transition-colors group-hover:border-brand/30 group-hover:bg-brand/[0.04] group-hover:text-foreground"
@@ -191,9 +191,9 @@ export function FeaturesBento() {
               />
             </div>
             <div className="mt-1 flex items-center gap-3 text-[10px] text-muted-foreground">
-              <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-primary" />iOS 68 %</span>
-              <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-primary/60" />Android 29 %</span>
-              <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-primary/30" />Desktop 3 %</span>
+              <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-primary" />iOS 68 %</span>
+              <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-primary/60" />Android 29 %</span>
+              <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-primary/30" />Desktop 3 %</span>
             </div>
           </article>
 

@@ -15,10 +15,10 @@ type KpiBase = {
   delay: number;
 };
 const KPIS_BASE: KpiBase[] = [
-  { key: 'scans', label: 'Scans heute', base: 2847, trend: '+12 %', positive: true, delay: 0 },
-  { key: 'unique', label: 'Unique', base: 1912, trend: '+8 %', positive: true, delay: 120 },
-  { key: 'ctr', label: 'CTR', base: 67, trend: '+2,1 %', positive: true, suffix: ' %', delay: 240 },
-  { key: 'conv', label: 'Conversions', base: 184, trend: '+24 %', positive: true, delay: 360 },
+  { key: 'scans', label: 'Scans heute', base: 2847, trend: '+12 %', positive: true, delay: 0 },
+  { key: 'unique', label: 'Unique', base: 1912, trend: '+8 %', positive: true, delay: 120 },
+  { key: 'ctr', label: 'CTR', base: 67, trend: '+2,1 %', positive: true, suffix: ' %', delay: 240 },
+  { key: 'conv', label: 'Conversions', base: 184, trend: '+24 %', positive: true, delay: 360 },
 ];
 
 /** Simuliert live eintreffende Scans — inkrementiert jeden Tick um 1-3. */
@@ -300,7 +300,7 @@ export function HeroDashboardMock() {
             </span>
             <span className="inline-flex items-center gap-1.5 text-muted-foreground">
               <Smartphone className="h-3 w-3 text-primary" />
-              iOS 68 % · Android 29 %
+              iOS 68 % · Android 29 %
             </span>
             <span className="inline-flex items-center gap-1.5 text-muted-foreground">
               <TrendingUp className="h-3 w-3 text-primary" />

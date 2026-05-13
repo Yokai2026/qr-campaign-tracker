@@ -233,12 +233,12 @@ export default function PitchPage() {
                 </span>
                 <span className="text-[22px] font-medium text-muted-foreground">€ / Mo</span>
               </div>
-              <p className="mt-5 text-[15px] text-muted-foreground">Erste 3 Monate nur 5,99 €. Monatlich kündbar.</p>
+              <p className="mt-5 text-[15px] text-muted-foreground">Erste 3 Monate nur 5,99 €. Monatlich kündbar.</p>
             </div>
             <div className="rounded-2xl border border-border bg-card p-10">
               <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 Jährlich —{' '}
-                <span className="font-semibold text-warm">spare 31 %</span>
+                <span className="font-semibold text-warm">spare 31 %</span>
               </div>
               <div className="mt-5 flex items-baseline gap-2">
                 <span className="tabular font-heading text-[92px] font-semibold leading-none tracking-[-0.035em]">
@@ -246,7 +246,7 @@ export default function PitchPage() {
                 </span>
                 <span className="text-[22px] font-medium text-muted-foreground">€ / Mo</span>
               </div>
-              <p className="mt-5 text-[15px] text-muted-foreground">Jährliche Abrechnung — 107,88 € / Jahr.</p>
+              <p className="mt-5 text-[15px] text-muted-foreground">Jährliche Abrechnung — 107,88 € / Jahr.</p>
             </div>
           </div>
           <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-[15px] text-muted-foreground">
@@ -318,10 +318,10 @@ export default function PitchPage() {
 
 function StaticDashboardMock() {
   const KPIS = [
-    { label: 'Scans heute', value: '2.847', trend: '+12 %' },
-    { label: 'Unique', value: '1.912', trend: '+8 %' },
-    { label: 'CTR', value: '67 %', trend: '+2,1 %' },
-    { label: 'Conversions', value: '184', trend: '+24 %' },
+    { label: 'Scans heute', value: '2.847', trend: '+12 %' },
+    { label: 'Unique', value: '1.912', trend: '+8 %' },
+    { label: 'CTR', value: '67 %', trend: '+2,1 %' },
+    { label: 'Conversions', value: '184', trend: '+24 %' },
   ];
   const CAMPAIGNS = [
     { name: 'Sommer-Plakate Berlin', scans: '1.243', pct: 84, tag: 'Plakat' },
@@ -425,7 +425,7 @@ function StaticDashboardMock() {
         </span>
         <span className="inline-flex items-center gap-1.5 text-muted-foreground">
           <Smartphone className="h-3 w-3 text-brand" />
-          iOS 68 % · Android 29 %
+          iOS 68 % · Android 29 %
         </span>
       </div>
     </div>

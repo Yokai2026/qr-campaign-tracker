@@ -13,12 +13,12 @@ import {
 } from '@/components/seo/structured-data';
 
 export const metadata = {
-  title: 'Preise — QR-Code-Tracking ab 8,99 €',
+  title: 'Preise — QR-Code-Tracking ab 8,99 €',
   description:
-    'DSGVO-konformes QR-Code-Tracking & Kampagnen-Analytics. Unbegrenzte QR-Codes, eigene Domain, 14 Tage kostenlos testen. Ab 8,99 € / Monat.',
+    'DSGVO-konformes QR-Code-Tracking & Kampagnen-Analytics. Unbegrenzte QR-Codes, eigene Domain, 14 Tage kostenlos testen. Ab 8,99 € / Monat.',
   alternates: { canonical: '/pricing' },
   openGraph: {
-    title: 'Spurig Preise — QR-Code-Tracking ab 8,99 €',
+    title: 'Spurig Preise — QR-Code-Tracking ab 8,99 €',
     description:
       'Ein Plan, alles drin. Unbegrenzte QR-Codes, DSGVO-konform, 14 Tage kostenlos.',
     url: 'https://spurig.com/pricing',

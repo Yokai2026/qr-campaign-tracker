@@ -168,7 +168,7 @@ export default async function OgImage() {
           </div>
 
           <div style={{ display: 'flex', gap: 12 }}>
-            {['DSGVO · Art. 32', 'Ohne Cookies', 'ab 8,99 € / Monat'].map((chip) => (
+            {['DSGVO · Art. 32', 'Ohne Cookies', 'ab 8,99 € / Monat'].map((chip) => (
               <div
                 key={chip}
                 style={{
