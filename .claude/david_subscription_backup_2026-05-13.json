@@ -1,0 +1,27 @@
+{
+  "_purpose": "Backup von Davids Subscription-Row vor Trial-Ended-Test (2026-05-13)",
+  "_revert_sql": "update public.subscriptions set status = 'active' where id = '936c0934-4571-48ca-b7dc-b93598d6fe89';",
+  "_revert_curl_cmd": "curl -X PATCH 'https://otgymdbdurpsszulhsji.supabase.co/rest/v1/subscriptions?id=eq.936c0934-4571-48ca-b7dc-b93598d6fe89' -H \"apikey: $SUPABASE_SERVICE_ROLE_KEY\" -H \"Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY\" -H 'Content-Type: application/json' -d '{\"status\":\"active\"}'",
+  "subscription_row": {
+    "id": "936c0934-4571-48ca-b7dc-b93598d6fe89",
+    "user_id": "1122b816-54ba-4774-b56c-a6cd637c4ff1",
+    "stripe_subscription_id": "sub_1TWAbTPrLX1jIYMmK6xFD5jb",
+    "stripe_customer_id": "cus_UVAwL9JtNxxwbm",
+    "stripe_price_id": "price_1TW2EtPrLX1jIYMmMT0NTxy3",
+    "plan_tier": "paid",
+    "status_BEFORE": "active",
+    "status_AFTER_TEST": "cancelled",
+    "trial_ends_at": null,
+    "current_period_end": "2027-05-12T07:19:14+00:00",
+    "cancel_at": "2027-05-12T07:19:14+00:00",
+    "created_at": "2026-05-12T07:19:48.494591+00:00"
+  },
+  "profile_row": {
+    "id": "1122b816-54ba-4774-b56c-a6cd637c4ff1",
+    "email": "tomatenkopf36@gmail.com",
+    "trial_ends_at": "2026-05-11T07:17:52.772194+00:00",
+    "_note": "Trial war ohnehin schon abgelaufen — kein Profil-Eingriff noetig"
+  },
+  "stripe_unchanged": true,
+  "stripe_note": "Stripe-Subscription bleibt ACTIVE. Nur lokale DB ist auf 'cancelled' — der naechste Webhook von Stripe wuerde es zurueckschreiben. Daher Test schnell durchfuehren oder Stripe-Webhooks pausieren falls noetig."
+}

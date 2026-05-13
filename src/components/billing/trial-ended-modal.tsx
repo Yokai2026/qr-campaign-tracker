@@ -79,7 +79,7 @@ export function TrialEndedModal() {
           >
             <div className="absolute -top-2.5 left-4 flex items-center gap-1.5">
               <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-foreground shadow-sm">
-                Beliebt · Spare 62 %
+                Beliebt · Spare 31 %
               </span>
             </div>
             <div className="flex items-start justify-between gap-4">
@@ -89,11 +89,11 @@ export function TrialEndedModal() {
                   <span className="text-[11px] text-muted-foreground">im Voraus</span>
                 </div>
                 <div className="mt-1 flex items-baseline gap-1.5 tabular-nums">
-                  <span className="text-[24px] font-semibold tracking-tight">4,99 €</span>
+                  <span className="text-[24px] font-semibold tracking-tight">8,99 €</span>
                   <span className="text-[12px] text-muted-foreground">netto / Monat</span>
                 </div>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  zzgl. 19 % MwSt · 59,88 €/Jahr netto (71,26 € brutto) · <span className="line-through">155,88 €</span> gespart
+                  zzgl. 19 % MwSt · 107,88 €/Jahr netto (128,38 € brutto) · spare 48 € vs. Monatlich
                 </p>
               </div>
               <div
@@ -127,11 +127,11 @@ export function TrialEndedModal() {
                   <span className="text-[11px] text-muted-foreground">flexibel</span>
                 </div>
                 <div className="mt-1 flex items-baseline gap-1.5 tabular-nums">
-                  <span className="text-[24px] font-semibold tracking-tight">5,99 €</span>
+                  <span className="text-[24px] font-semibold tracking-tight">12,99 €</span>
                   <span className="text-[12px] text-muted-foreground">netto / Monat</span>
                 </div>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  zzgl. 19 % MwSt (7,13 € brutto) · jederzeit kündbar · <span className="line-through">12,99 €</span> spare 54 %
+                  zzgl. 19 % MwSt (15,46 € brutto) · erste 3 Monate nur <span className="font-semibold text-foreground">5,99 €</span> · jederzeit kündbar
                 </p>
               </div>
               <div
