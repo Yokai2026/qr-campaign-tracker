@@ -89,6 +89,7 @@ const PUBLIC_PATHS = [
   '/reset-password',
   '/datenschutz',
   '/impressum',
+  '/agb',
   '/pricing',
   '/opengraph-image',
   '/twitter-image',

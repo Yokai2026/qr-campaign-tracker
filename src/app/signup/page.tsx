@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { QrCode, Loader2, Sparkles } from 'lucide-react';
 
 export default function SignupPage() {
@@ -15,6 +16,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -43,6 +45,12 @@ export default function SignupPage() {
       return;
     }
 
+    if (!acceptedTerms) {
+      setError('Bitte stimme den AGB und der Datenschutzerklärung zu.');
+      setLoading(false);
+      return;
+    }
+
     // Pre-Check: Username bereits vergeben? (case-insensitive via RPC)
     const { data: taken, error: checkError } = await supabase.rpc('username_exists', {
       lookup_username: username,
@@ -65,6 +73,9 @@ export default function SignupPage() {
         data: {
           username,
           display_name: username,
+          // Legal-Audit-Trail: timestamp + AGB-Version, gespeichert in raw_user_meta_data
+          terms_accepted_at: new Date().toISOString(),
+          terms_version: '1.0',
         },
       },
     });
@@ -201,12 +212,34 @@ export default function SignupPage() {
                   <p className="text-[11px] text-red-600 dark:text-red-400">Passwörter stimmen noch nicht überein</p>
                 )}
               </div>
+              <div className="flex items-start gap-2.5 rounded-lg border border-border bg-muted/20 p-3">
+                <Checkbox
+                  id="accept-terms"
+                  checked={acceptedTerms}
+                  onCheckedChange={(v) => setAcceptedTerms(v === true)}
+                  className="mt-0.5 shrink-0"
+                  required
+                />
+                <Label
+                  htmlFor="accept-terms"
+                  className="text-[12px] font-normal leading-relaxed text-muted-foreground cursor-pointer"
+                >
+                  Ich akzeptiere die{' '}
+                  <Link href="/agb" target="_blank" className="font-medium text-foreground underline underline-offset-2 hover:text-brand">
+                    AGB
+                  </Link>{' '}
+                  und die{' '}
+                  <Link href="/datenschutz" target="_blank" className="font-medium text-foreground underline underline-offset-2 hover:text-brand">
+                    Datenschutzerklärung
+                  </Link>.
+                </Label>
+              </div>
               <Button
                 type="submit"
                 variant="brand"
                 size="lg"
                 className="w-full"
-                disabled={loading || password.length === 0 || passwordConfirm !== password}
+                disabled={loading || password.length === 0 || passwordConfirm !== password || !acceptedTerms}
               >
                 {loading ? (
                   <>
