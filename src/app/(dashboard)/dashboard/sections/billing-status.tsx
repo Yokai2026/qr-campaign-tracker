@@ -29,7 +29,7 @@ export async function BillingStatus() {
       .maybeSingle(),
     supabase
       .from('profiles')
-      .select('trial_ends_ats_at')
+      .select('trial_ends_at')
       .eq('id', user.id)
       .maybeSingle(),
   ]);
@@ -91,9 +91,9 @@ export async function BillingStatus() {
   }
 
   // 4. No subscription — check profile trial
-  if (profile?.trial_ends_ats_at) {
-    const days = daysUntil(profile.trial_ends_ats_at);
-    const endDate = new Date(profile.trial_ends_ats_at);
+  if (profile?.trial_ends_at) {
+    const days = daysUntil(profile.trial_ends_at);
+    const endDate = new Date(profile.trial_ends_at);
 
     if (days !== null && days > 0) {
       return (
