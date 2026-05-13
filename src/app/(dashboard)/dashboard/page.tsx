@@ -7,13 +7,13 @@ import { LiveScanFeed } from '@/components/shared/live-scan-feed';
 import { Tour } from '@/components/onboarding/tour';
 import { BillingStatus } from './sections/billing-status';
 import { OnboardingCard } from './sections/onboarding-card';
-import { HeroKpi } from './sections/hero-kpi';
+import { Overview } from './sections/overview';
 import { Attention } from './sections/attention';
 import { TopPerformers } from './sections/top-performers';
 import { QrHealthCheck } from './sections/qr-health-check';
 
 function HeroSkeleton() {
-  return <Skeleton className="h-60 rounded-2xl" />;
+  return <Skeleton className="h-96 rounded-2xl" />;
 }
 
 function RanksSkeleton() {
@@ -72,9 +72,9 @@ export default async function DashboardPage() {
         <OnboardingCard />
       </Suspense>
 
-      {/* Hero KPI — the single most important thing above the fold */}
+      {/* Übersicht — Hero-Style Dashboard mit KPIs, Verlauf, Top-Kampagnen, Geo/Device/Peak */}
       <Suspense fallback={<HeroSkeleton />}>
-        <HeroKpi />
+        <Overview />
       </Suspense>
 
       {/* Top Performers — what's actually moving this week */}
