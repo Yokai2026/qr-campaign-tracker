@@ -14,6 +14,9 @@ const RESEND_API = 'https://api.resend.com/emails';
 const SENDER_FROM = process.env.OUTBOUND_FROM_EMAIL || 'David <david@spurig.com>';
 const REPLY_TO = process.env.OUTBOUND_REPLY_TO || 'david@spurig.com';
 const UNSUBSCRIBE_BASE = 'https://spurig.com/unsubscribe';
+// BCC-Adresse — bekommt von jeder Outbound-Mail eine stille Kopie zur
+// Bestaetigung dass tatsaechlich versendet wurde. Empfaenger sieht die BCC nicht.
+const BCC_TO = process.env.OUTBOUND_BCC_EMAIL || null;
 
 export type SendBatchOptions = {
   dailyLimit?: number;
@@ -116,6 +119,7 @@ export async function sendOutboundBatch(
         body: JSON.stringify({
           from: SENDER_FROM,
           to: [lead.email],
+          ...(BCC_TO ? { bcc: [BCC_TO] } : {}),
           reply_to: REPLY_TO,
           subject: mail.subject,
           html: mail.bodyHtml,

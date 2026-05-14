@@ -71,7 +71,7 @@ const BRAND = {
 
 const LINKEDIN_URL = 'https://www.linkedin.com/in/david-da-silva-gornik-59262b367/';
 const WEBSITE_URL = 'https://spurig.com';
-const LOGO_URL = 'https://spurig.com/spurig-icon.png';
+const LOGO_URL = 'https://spurig.com/email-assets/spurig-logo-glow.png';
 
 const HERO_IMAGES: Record<TemplateKey, string> = {
   marketing_agency_dsgvo_v2: 'https://spurig.com/email-assets/hero-dashboard.jpg',
@@ -85,10 +85,10 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'marketing_agency_dsgvo_v2',
     segments: ['marketing_agency'],
     subjects: [
-      'Idee für {companyName}',
-      'Frage zu euren Kunden-Kampagnen',
-      'Kurze Frage, {firstName}',
-      '{firstName}, schnelle Idee',
+      '9 von 10 Agenturen messen Print falsch',
+      'Eure Kunden-Reports haben eine Lücke',
+      'Was Top-Agenturen 2026 anders machen',
+      'Diese eine Zahl macht euch zur Premium-Agentur',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
@@ -111,10 +111,10 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'gastronomy_qr_v2',
     segments: ['gastronomy'],
     subjects: [
-      'Idee für {companyName}',
-      'QR-Code auf der Speisekarte',
-      'Welcher Tisch scannt?',
-      '{firstName}, kurze Frage',
+      '247 Scans Tisch 5 · 14 Scans Tisch 11',
+      'Eure Speisekarte hat ein Geheimnis',
+      'Welcher Tisch zieht euch das Geld?',
+      '9 von 10 Restaurants tracken falsch',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
@@ -137,10 +137,10 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'crafts_sme_print_v2',
     segments: ['crafts_sme'],
     subjects: [
-      'Idee für {companyName}',
-      'Welcher Flyer bringt Kunden?',
-      '{firstName}, kurze Frage',
-      'Print-Performance messen',
+      'Welcher Flyer verbrennt euer Geld?',
+      'Eure Visitenkarten haben ein Problem',
+      '30 Sek lesen · 450€ Flyer sparen',
+      'Was 9 von 10 Betriebe übersehen',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
@@ -163,10 +163,10 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'events_tourism_print_v2',
     segments: ['events_tourism'],
     subjects: [
-      'Idee für {companyName}',
-      'Welche Plakate performen?',
-      '{firstName}, kurze Frage',
-      'Plakat-Standort-Performance',
+      '30-40% eures Plakat-Budgets = Müll',
+      '3.000 € pro Kampagne · einfach weg',
+      'Welche Plakate sieht eigentlich niemand?',
+      'Stoppt eure nächste Kampagne — bitte',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
@@ -369,10 +369,8 @@ function buildHtmlVersion(
                   <td style="vertical-align:middle;width:1%;white-space:nowrap">
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr>
                       <td style="padding-right:14px;vertical-align:middle">
-                        <!-- Dark badge wraps the white logo so it stays visible on white header -->
-                        <div style="width:40px;height:40px;border-radius:11px;background:${BRAND.bgDark};display:inline-block;text-align:center;line-height:40px;vertical-align:middle">
-                          <img src="${LOGO_URL}" alt="" width="26" height="26" style="display:inline-block;vertical-align:middle;border:0;outline:none;margin-top:7px">
-                        </div>
+                        <!-- Logo has dark rounded BG baked in for visibility on white header -->
+                        <img src="${LOGO_URL}" alt="Spurig" width="48" height="48" style="display:block;border:0;outline:none;border-radius:12px">
                       </td>
                       <td style="vertical-align:middle">
                         <div style="font-size:22px;font-weight:800;letter-spacing:-0.025em;color:${BRAND.text};line-height:1.1">Spurig</div>
