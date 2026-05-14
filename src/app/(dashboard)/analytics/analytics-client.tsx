@@ -69,6 +69,9 @@ type AnalyticsData = {
   deltas: KpiDeltas;
   botCount: number;
   timeSeriesData: { date: string; qr: number; link: number }[];
+  hourlyData: { hour: number; label: string; scans: number }[];
+  weekdayData: { day: string; sortKey: number; scans: number }[];
+  peakSlot: { dayLabel: string; hourLabel: string; count: number } | null;
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; opens: number; location: string }[];
   deviceData: BreakdownEntry[];
@@ -296,6 +299,57 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([date, val]) => ({ date, ...val }));
 
+      // Stunden-Verteilung (0–23 Lokalzeit) ueber den Filter-Zeitraum
+      const hourlyData: { hour: number; label: string; scans: number }[] =
+        Array.from({ length: 24 }, (_, h) => ({
+          hour: h,
+          label: `${String(h).padStart(2, '0')}:00`,
+          scans: 0,
+        }));
+      filteredEvents.forEach((e: Record<string, unknown>) => {
+        const dt = new Date(e.created_at as string);
+        const h = dt.getHours();
+        if (h >= 0 && h < 24) hourlyData[h].scans++;
+      });
+
+      // Wochentag-Verteilung (Mo–So) ueber den Filter-Zeitraum
+      const WEEKDAYS_DE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      const weekdayData: { day: string; sortKey: number; scans: number }[] = [
+        { day: 'Mo', sortKey: 1, scans: 0 },
+        { day: 'Di', sortKey: 2, scans: 0 },
+        { day: 'Mi', sortKey: 3, scans: 0 },
+        { day: 'Do', sortKey: 4, scans: 0 },
+        { day: 'Fr', sortKey: 5, scans: 0 },
+        { day: 'Sa', sortKey: 6, scans: 0 },
+        { day: 'So', sortKey: 7, scans: 0 },
+      ];
+      filteredEvents.forEach((e: Record<string, unknown>) => {
+        const dow = new Date(e.created_at as string).getDay();
+        const target = weekdayData.find((w) => w.day === WEEKDAYS_DE[dow]);
+        if (target) target.scans++;
+      });
+
+      // Peak-Slot (welche (Wochentag, Stunde)-Kombination ist am stärksten)
+      const slotMap = new Map<string, number>();
+      filteredEvents.forEach((e: Record<string, unknown>) => {
+        const dt = new Date(e.created_at as string);
+        const key = `${dt.getDay()}|${dt.getHours()}`;
+        slotMap.set(key, (slotMap.get(key) ?? 0) + 1);
+      });
+      let peakSlot: { dayLabel: string; hourLabel: string; count: number } | null = null;
+      let peakBest = 0;
+      for (const [key, count] of slotMap) {
+        if (count > peakBest) {
+          peakBest = count;
+          const [d, h] = key.split('|').map(Number);
+          peakSlot = {
+            dayLabel: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'][d],
+            hourLabel: `${String(h).padStart(2, '0')}:00 – ${String((h + 1) % 24).padStart(2, '0')}:00`,
+            count,
+          };
+        }
+      }
+
       // Campaign breakdown
       const campMap: Record<string, number> = {};
       filteredEvents.forEach((e: { campaign_id: string | null }) => {
@@ -382,7 +436,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         .sort((a, b) => b.value - a.value)
         .slice(0, 10);
 
-      return { kpis, deltas, botCount: botCount ?? 0, timeSeriesData, campaignData, placementData, deviceData, browserData, osData, countryData, unknownCountryCount, referrerData };
+      return { kpis, deltas, botCount: botCount ?? 0, timeSeriesData, hourlyData, weekdayData, peakSlot, campaignData, placementData, deviceData, browserData, osData, countryData, unknownCountryCount, referrerData };
     },
   });
 
@@ -390,6 +444,13 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const deltas = data?.deltas ?? { totalOpens: null, qrScans: null, linkClicks: null, uniqueScans: null, ctaClicks: null, formSubmits: null, conversionRate: null };
   const botCount = data?.botCount ?? 0;
   const timeSeriesData = data?.timeSeriesData ?? [];
+  const hourlyData = data?.hourlyData ?? Array.from({ length: 24 }, (_, h) => ({
+    hour: h,
+    label: `${String(h).padStart(2, '0')}:00`,
+    scans: 0,
+  }));
+  const weekdayData = data?.weekdayData ?? [];
+  const peakSlot = data?.peakSlot ?? null;
   const campaignData = data?.campaignData ?? [];
   const placementData = data?.placementData ?? [];
   const deviceData = data?.deviceData ?? [];
@@ -808,6 +869,69 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             </ChartCard>
           </div>
           </ChartTransition>
+          </section>
+
+          {/* Zeiten — Stunden + Wochentage + Peak-Slot */}
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Zeiten</h2>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">Wann gescannt wird — nach Stunde, Wochentag und Peak-Slot</p>
+            </div>
+            <ChartTransition transitionKey={chartTransitionKey + '-times'}>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <ChartCard title="Verteilung über Tagesstunden" empty={hourlyData.every((h) => h.scans === 0)} emptyText="Keine Scans im gewählten Zeitraum" className="lg:col-span-2">
+                <ResponsiveContainer width="100%" height={240}>
+                  <BarChart data={hourlyData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+                    <CartesianGrid {...GRID_STYLE} vertical={false} />
+                    <XAxis dataKey="label" {...AXIS_STYLE} interval={1} />
+                    <YAxis {...AXIS_STYLE} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={TOOLTIP_STYLE}
+                      cursor={{ fill: 'var(--muted)' }}
+                      labelFormatter={(l) => `${l} – ${String((parseInt(String(l).slice(0, 2), 10) + 1) % 24).padStart(2, '0')}:00 Uhr`}
+                      formatter={(v) => [v as number, 'Scans']}
+                    />
+                    <Bar dataKey="scans" name="Scans" fill={SERIES_COLORS.scans} radius={[4, 4, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              <ChartCard title="Verteilung über Wochentage" empty={weekdayData.every((w) => w.scans === 0)}>
+                <ResponsiveContainer width="100%" height={240}>
+                  <BarChart data={weekdayData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+                    <CartesianGrid {...GRID_STYLE} vertical={false} />
+                    <XAxis dataKey="day" {...AXIS_STYLE} />
+                    <YAxis {...AXIS_STYLE} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={TOOLTIP_STYLE}
+                      cursor={{ fill: 'var(--muted)' }}
+                      formatter={(v) => [v as number, 'Scans']}
+                    />
+                    <Bar dataKey="scans" name="Scans" fill={SERIES_COLORS.scans} radius={[4, 4, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              <div className="rounded-2xl border border-border bg-card p-5 flex flex-col justify-center">
+                <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">Peak-Zeit</div>
+                {peakSlot ? (
+                  <>
+                    <div className="mt-2 text-[24px] font-semibold leading-tight tracking-tight">
+                      {peakSlot.dayLabel}
+                    </div>
+                    <div className="text-[20px] font-medium tabular-nums text-brand">{peakSlot.hourLabel}</div>
+                    <div className="mt-3 text-[12.5px] text-muted-foreground">
+                      In diesem Slot wurden im gewählten Zeitraum <span className="font-semibold text-foreground tabular-nums">{peakSlot.count}</span> {peakSlot.count === 1 ? 'Scan' : 'Scans'} aufgezeichnet — die stärkste Aktivitätsphase deiner Kampagne.
+                    </div>
+                  </>
+                ) : (
+                  <div className="mt-3 text-[12.5px] text-muted-foreground">
+                    Noch zu wenig Daten, um einen Peak-Slot zu bestimmen.
+                  </div>
+                )}
+              </div>
+            </div>
+            </ChartTransition>
           </section>
 
           {/* Technik — Browser & Betriebssystem */}
