@@ -148,7 +148,7 @@ const TEMPLATES: Record<TemplateKey, Template> = {
       hook: city
         ? `du gibst monatlich Geld für Flyer, Visitenkarten oder Online-Ads in ${city} aus — aber weißt du wirklich, welche dieser Aktionen dir Anfragen bringt, und welche dein Geld direkt im Mülleimer landen lässt?`
         : `du gibst monatlich Geld für Flyer, Visitenkarten oder Online-Ads aus — aber weißt du wirklich, welche dieser Aktionen dir Anfragen bringt, und welche dein Geld direkt im Mülleimer landen lässt?`,
-      painLine: 'Klassischer Print-Werbe-Fall: 450 € für 500 Flyer, am Ende des Monats kommen 3 Anfragen rein. Aber von welchem Flyer? Welchem Verteil-Gebiet? Welcher Aktion? — Ohne Tracking weißt du es nicht. Mit Tracking druckst du nächstes Mal nur noch was funktioniert.`,
+      painLine: 'Klassischer Print-Werbe-Fall: 450 € für 500 Flyer, am Ende des Monats kommen 3 Anfragen rein. Aber von welchem Flyer? Welchem Verteil-Gebiet? Welcher Aktion? — Ohne Tracking weißt du es nicht. Mit Tracking druckst du nächstes Mal nur noch was funktioniert.',
       bullets: [
         'QR-Code auf jedem Flyer / jeder Visitenkarte — pro Aktion eigene Statistik',
         'Kurzlinks für Online-Ads & Instagram — Klicks separat pro Kampagne',
