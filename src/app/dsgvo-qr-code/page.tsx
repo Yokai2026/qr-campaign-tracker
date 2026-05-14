@@ -25,6 +25,7 @@ export const metadata = {
     description:
       'EU-gehostet, ohne Cookie-Banner, mit IP-Anonymisierung und transparentem Datenschutz.',
     url: 'https://spurig.com/dsgvo-qr-code',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Spurig — DSGVO-konformer QR-Code-Tracker' }],
   },
 };
 

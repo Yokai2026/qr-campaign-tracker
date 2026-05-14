@@ -26,6 +26,7 @@ export const metadata = {
     description:
       'Messe welcher Tisch wie oft scannt, welche Flyer-Kampagne Gäste bringt, welche Aktion wirklich funktioniert.',
     url: 'https://spurig.com/qr-code-fuer-gastronomie',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Spurig — QR-Codes für Gastronomie' }],
   },
 };
 

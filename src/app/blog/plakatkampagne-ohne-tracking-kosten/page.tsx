@@ -14,6 +14,7 @@ export const metadata = {
     type: 'article',
     publishedTime: META.publishedAt,
     url: `https://spurig.com/blog/${META.slug}`,
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: META.title }],
   },
 };
 

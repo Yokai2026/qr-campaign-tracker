@@ -26,6 +26,7 @@ export const metadata = {
     description:
       'Plakat-, Flyer- und Anzeigen-Performance pro Standort messen. Endlich Daten für Print-Budget-Entscheidungen.',
     url: 'https://spurig.com/qr-code-print-tracking',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Spurig — QR-Code-Tracking für Print-Kampagnen' }],
   },
 };
 

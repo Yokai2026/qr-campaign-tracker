@@ -14,6 +14,7 @@ export const metadata = {
     title: 'Spurig Blog',
     description: 'Guides zu QR-Code-Tracking, DSGVO und Print-Marketing.',
     url: 'https://spurig.com/blog',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Spurig Blog' }],
   },
 };
 

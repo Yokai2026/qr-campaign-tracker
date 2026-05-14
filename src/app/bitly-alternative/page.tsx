@@ -17,6 +17,7 @@ export const metadata = {
     description:
       'Deutscher Kurzlink- und QR-Code-Tracker mit EU-Hosting, ohne Cookie-Banner und 70 % günstiger als Bitly Growth.',
     url: 'https://spurig.com/bitly-alternative',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Spurig — Bitly-Alternative, DSGVO-konform' }],
   },
 };
 

@@ -22,6 +22,7 @@ export const metadata = {
     description:
       'Ein Plan, alles drin. Unbegrenzte QR-Codes, DSGVO-konform, 14 Tage kostenlos.',
     url: 'https://spurig.com/pricing',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Spurig Preise — ab 8,99 € / Monat' }],
   },
 };
 

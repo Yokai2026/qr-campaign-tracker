@@ -25,6 +25,7 @@ export const metadata = {
     description:
       'Nicht bitly.com oder spurig.com — sondern s.deinemarke.de. Markenstärke + Vertrauen + Tracking, in einem.',
     url: 'https://spurig.com/kurzlink-eigene-domain',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Spurig — Kurzlinks mit eigener Domain' }],
   },
 };
 
