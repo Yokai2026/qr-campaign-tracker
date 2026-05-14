@@ -2,8 +2,14 @@ import { NextRequest } from 'next/server';
 import { nanoid } from 'nanoid';
 import { apiError, apiOk, serviceRoleClient } from '@/lib/api/auth';
 import { authAndRateLimit } from '@/lib/api/rate-limit';
+import { generateQrCode, buildRedirectUrl } from '@/lib/qr/generate';
 
 export const dynamic = 'force-dynamic';
+
+const REDIRECT_BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  'https://spurig.com';
 
 const SELECT_COLS = 'id, placement_id, short_code, target_url, active, valid_from, valid_until, note, title, utm_source, utm_medium, utm_campaign, utm_content, utm_id, qr_fg_color, qr_bg_color, max_scans, short_host, qr_png_url, qr_svg_url, created_at, updated_at';
 
@@ -35,8 +41,27 @@ export async function POST(req: NextRequest) {
   if (!target_url) return apiError(400, 'Field "target_url" is required');
   try { new URL(target_url); } catch { return apiError(400, 'Field "target_url" must be a valid URL'); }
 
+  const shortCode =
+    typeof body.short_code === 'string' && body.short_code ? body.short_code : nanoid(8);
+  const fgColor = typeof body.qr_fg_color === 'string' ? body.qr_fg_color : '#000000';
+  const bgColor = typeof body.qr_bg_color === 'string' ? body.qr_bg_color : '#FFFFFF';
+
+  // PNG + SVG erzeugen damit der Code in der Detail-View und im Download
+  // sofort verfuegbar ist (vorher: API-erstellte QRs blieben qr_png_url=null
+  // und das UI zeigte "Kein QR-Code").
+  let pngDataUrl: string | null = null;
+  let svgDataUrl: string | null = null;
+  try {
+    const redirectUrl = buildRedirectUrl(REDIRECT_BASE_URL, shortCode);
+    const generated = await generateQrCode(redirectUrl, { fgColor, bgColor });
+    pngDataUrl = generated.pngDataUrl;
+    svgDataUrl = `data:image/svg+xml;base64,${Buffer.from(generated.svgString).toString('base64')}`;
+  } catch (e) {
+    return apiError(500, 'QR generation failed: ' + (e instanceof Error ? e.message : 'unknown'));
+  }
+
   const insert: Record<string, unknown> = {
-    short_code: typeof body.short_code === 'string' && body.short_code ? body.short_code : nanoid(8),
+    short_code: shortCode,
     target_url,
     placement_id: typeof body.placement_id === 'string' ? body.placement_id : null,
     active: body.active === false ? false : true,
@@ -49,8 +74,10 @@ export async function POST(req: NextRequest) {
     utm_campaign: typeof body.utm_campaign === 'string' ? body.utm_campaign : null,
     utm_content: typeof body.utm_content === 'string' ? body.utm_content : null,
     utm_id: typeof body.utm_id === 'string' ? body.utm_id : null,
-    qr_fg_color: typeof body.qr_fg_color === 'string' ? body.qr_fg_color : '#000000',
-    qr_bg_color: typeof body.qr_bg_color === 'string' ? body.qr_bg_color : '#FFFFFF',
+    qr_fg_color: fgColor,
+    qr_bg_color: bgColor,
+    qr_png_url: pngDataUrl,
+    qr_svg_url: svgDataUrl,
     short_host: typeof body.short_host === 'string' ? body.short_host : null,
     max_scans: typeof body.max_scans === 'number' ? body.max_scans : null,
     created_by: auth.userId,

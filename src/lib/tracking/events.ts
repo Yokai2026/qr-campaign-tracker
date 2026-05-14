@@ -42,6 +42,9 @@ const BOT_PATTERNS = [
 ];
 
 export function isBot(userAgent: string): boolean {
+  // Echte Browser senden IMMER einen User-Agent. Fehlender/leerer UA = Bot,
+  // Link-Previewer (WhatsApp/iMessage/Slack ohne UA) oder curl-aehnliches Tool.
+  if (!userAgent || userAgent.trim().length < 5) return true;
   const ua = userAgent.toLowerCase();
   return BOT_PATTERNS.some((pattern) => ua.includes(pattern));
 }
