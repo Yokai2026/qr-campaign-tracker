@@ -1,7 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
 import { getStripe, priceToTierViaProduct, mapStripeStatus } from '@/lib/billing/stripe';
+import { notifyAdminPayment, notifyAdminCancellation } from '@/lib/email/admin-notify';
 import type Stripe from 'stripe';
+
+function planFromPriceId(priceId: string | null | undefined): 'monthly' | 'yearly' | 'unknown' {
+  if (!priceId) return 'unknown';
+  if (priceId === process.env.STRIPE_MONTHLY_PRICE_ID) return 'monthly';
+  if (priceId === process.env.STRIPE_YEARLY_PRICE_ID) return 'yearly';
+  return 'unknown';
+}
+
+async function lookupUserForNotification(
+  supabase: Awaited<ReturnType<typeof createServiceClient>>,
+  userId: string,
+): Promise<{ email: string; username: string | null } | null> {
+  const { data } = await supabase
+    .from('profiles')
+    .select('email, username')
+    .eq('id', userId)
+    .maybeSingle();
+  return data ?? null;
+}
 
 /**
  * Read current_period_end from subscription.
@@ -76,6 +96,19 @@ export async function POST(request: NextRequest) {
         },
         { onConflict: 'stripe_subscription_id' },
       );
+
+      // Admin-Notification: neue Zahlung. Best-effort, blockt Webhook nicht.
+      const plan = planFromPriceId(priceId);
+      const profile = await lookupUserForNotification(supabase, userId);
+      if (profile && plan !== 'unknown') {
+        const amount = plan === 'yearly' ? 8.99 : 12.99;
+        void notifyAdminPayment({
+          email: profile.email,
+          username: profile.username,
+          plan,
+          amount,
+        });
+      }
       break;
     }
 
@@ -107,6 +140,24 @@ export async function POST(request: NextRequest) {
         .from('subscriptions')
         .update({ status: 'expired' })
         .eq('stripe_subscription_id', subscription.id);
+
+      // Admin-Notification: Kuendigung. Best-effort.
+      const { data: subRow } = await supabase
+        .from('subscriptions')
+        .select('user_id, stripe_price_id, current_period_end')
+        .eq('stripe_subscription_id', subscription.id)
+        .maybeSingle();
+      if (subRow) {
+        const profile = await lookupUserForNotification(supabase, subRow.user_id);
+        if (profile) {
+          void notifyAdminCancellation({
+            email: profile.email,
+            username: profile.username,
+            plan: planFromPriceId(subRow.stripe_price_id),
+            cancelAt: subRow.current_period_end ?? null,
+          });
+        }
+      }
       break;
     }
 

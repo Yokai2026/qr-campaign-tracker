@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email/send';
 import { buildWelcomeHtml } from '@/lib/email/welcome-html';
+import { notifyAdminSignup } from '@/lib/email/admin-notify';
 
 const SUPPORT_EMAIL = 'support@spurig.com';
 
@@ -52,6 +53,12 @@ export async function triggerWelcomeEmail(): Promise<void> {
         to: user.email,
         subject: 'Willkommen bei Spurig',
         html,
+      });
+      // Admin-Notification (best-effort, blockt Welcome-Flow nicht)
+      void notifyAdminSignup({
+        email: user.email,
+        username: profile.username ?? null,
+        trialEndsAt: profile.trial_ends_at ?? null,
       });
     } catch (sendErr) {
       await supabase

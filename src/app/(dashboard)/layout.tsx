@@ -4,6 +4,7 @@ import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { Toaster } from '@/components/ui/sonner';
 import { Providers } from '@/components/providers';
 import { TrialEndedModal } from '@/components/billing/trial-ended-modal';
+import { Heartbeat } from '@/components/shared/heartbeat';
 import { getSessionTier } from '@/lib/billing/gates';
 
 // Eigene async-Komponente: Tier-Lookup blockiert das Shell-Streaming nicht mehr.
@@ -30,6 +31,7 @@ export default function DashboardLayout({
         </main>
         <MobileBottomNav />
         <Toaster />
+        <Heartbeat />
         <Suspense fallback={null}>
           <TrialGate />
         </Suspense>

@@ -22,6 +22,7 @@ import {
   ExternalLink,
   KeyRound,
   BookOpen,
+  Crown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -51,6 +52,7 @@ export function Sidebar() {
   const supabase = createClient();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tier, setTier] = useState<EffectiveTier | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const mobileSidebarRef = useRef<HTMLElement>(null);
 
   const trapFocus = useCallback((e: KeyboardEvent) => {
@@ -85,6 +87,18 @@ export function Sidebar() {
   useEffect(() => {
     checkFeatureAccess('analytics').then(({ tier: t }) => setTier(t as EffectiveTier));
   }, []);
+
+  useEffect(() => {
+    // Admin-Check: nur fuer User mit role='admin' (nur Davids Account aktuell)
+    let mounted = true;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
+      if (mounted && data?.role === 'admin') setIsAdmin(true);
+    })();
+    return () => { mounted = false; };
+  }, [supabase]);
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -182,6 +196,24 @@ export function Sidebar() {
         {mainNav.map((item) => (
           <NavItem key={item.href} item={item} />
         ))}
+        {isAdmin && (
+          <>
+            <div className="my-2 border-t border-white/[0.06]" />
+            <div className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-brand/70">Admin</div>
+            <Link
+              href="/admin"
+              className={cn(
+                'group relative flex items-center gap-2.5 rounded-[5px] px-2 py-[7px] text-[13px] transition-colors duration-75',
+                pathname === '/admin' || pathname.startsWith('/admin/')
+                  ? 'bg-white/[0.07] text-white font-medium border-l-2 border-brand pl-[6px]'
+                  : 'text-white/65 hover:bg-white/[0.06] hover:text-white/90',
+              )}
+            >
+              <Crown className={cn('h-[15px] w-[15px]', pathname.startsWith('/admin') ? 'text-brand' : 'text-white/45 group-hover:text-white/70')} />
+              Admin Center
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* Bottom */}

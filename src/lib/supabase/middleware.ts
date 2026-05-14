@@ -81,6 +81,7 @@ const PUBLIC_PATHS = [
   '/api/webhooks/',
   '/api/v1/',
   '/api/cron/',
+  '/api/heartbeat',
   '/api-docs',
   '/guide',
   '/login',
