@@ -85,26 +85,26 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'marketing_agency_dsgvo_v2',
     segments: ['marketing_agency'],
     subjects: [
-      'So verlierst du gerade Premium-Kunden',
-      'Deine Kunden-Reports lügen dich an',
-      'Was deine Konkurrenz über Print weiß — du nicht',
-      'Stop. Bevor du die nächste Kampagne pitchst.',
+      'Zahlt ihr für Werbung — oder für Daten?',
+      '500 € pro Plakat. 0 € Daten zurück.',
+      'Wo geht euer Werbebudget hin?',
+      'Eure Kampagnen ohne Tracking = Bauchgefühl',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `ehrliche Frage: kannst du deinen Kunden in ${city} nach jeder Kampagne sagen, welcher Standort wirklich Anfragen gebracht hat — oder gibst du ihnen Gesamt-Klicks und hoffst dass keiner nachhakt?`
-        : `ehrliche Frage: kannst du deinen Kunden nach jeder Kampagne sagen, welcher Standort wirklich Anfragen gebracht hat — oder gibst du ihnen Gesamt-Klicks und hoffst dass keiner nachhakt?`,
-      painLine: '2026 ist Gesamt-Klicks-Reporting der schnellste Weg, Premium-Kunden zu verlieren. Wer Standort-für-Standort messen kann, kassiert die größeren Budgets.',
+        ? `kurz mal ehrlich: ihr bucht für eure Kunden in ${city} Plakate, Flyer, Google-Ads oder Social-Posts — wisst ihr danach objektiv, welcher Standort, welche Anzeige oder welcher Kanal die Anfragen wirklich gebracht hat?`
+        : `kurz mal ehrlich: ihr bucht für eure Kunden Plakate, Flyer, Google-Ads oder Social-Posts — wisst ihr danach objektiv, welcher Standort, welche Anzeige oder welcher Kanal die Anfragen wirklich gebracht hat?`,
+      painLine: 'Ohne Tracking ist jedes Werbebudget Roulette — egal ob 500 € Plakat oder 5.000 € Online-Ads. Die Agenturen die messen, stecken Budget nur noch in was funktioniert und verdoppeln so die ROI für ihre Kunden.',
       bullets: [
-        'Scans pro Standort, pro Auflage, pro Variante — Drill-down in Live-Dashboard',
-        'Branded Kurz-Domain (z.B. go.kundenname.de) statt bit.ly — kostenlos inklusive',
-        'Daten bleiben in Frankfurt — kein Schrems-II, kein Bußgeld-Risiko für eure Kunden',
-        'Stripe-Rechnung über euch, white-labeled Reports für eure Kunden',
+        'QR-Codes für Plakate, Flyer, Verpackungen — Scans pro Standort & Auflage live',
+        'Kurzlinks für Google-Ads, Social, Newsletter — Klicks pro Kampagne, pro Quelle',
+        'Alles in einem Dashboard, white-labeled für Kunden-Reports',
+        'Server in Frankfurt — kein Schrems-II, kein DSGVO-Risiko für eure Kunden',
       ],
       comparison: [],
       ctaText: 'Spurig in 5 Min anschauen',
       ctaUrl: 'https://spurig.com',
-      closer: `Wenn ich euch das in 10 Min zeige${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — wäre das interessant?`,
+      closer: `Wenn ich euch das mal an einer eurer Kampagnen durchrechne${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — interessant?`,
     }),
   },
 
@@ -112,26 +112,26 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'gastronomy_qr_v2',
     segments: ['gastronomy'],
     subjects: [
-      'So verlierst du Gäste an die Konkurrenz',
-      'Tisch 5: 247 Scans. Tisch 11: 14. Warum?',
-      'Deine Speisekarte verschweigt dir etwas',
-      'Stop. Bevor du wieder QR-Codes druckst.',
+      'Du zahlst für Flyer. Wer scannt sie?',
+      'QR-Code auf der Karte. Daten? Fehlanzeige.',
+      'Wo geht dein Marketingbudget hin?',
+      'Tracken statt raten — geht das?',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `wenn dein Gast den QR-Code für die Speisekarte im ${companyName} (${city}) scannt — weißt du an welchem Tisch er sitzt, wie lange er bleibt, ob er die Bewertungs-Aktion gesehen hat?`
-        : `wenn dein Gast den QR-Code für die Speisekarte im ${companyName} scannt — weißt du an welchem Tisch er sitzt, wie lange er bleibt, ob er die Bewertungs-Aktion gesehen hat?`,
-      painLine: 'Generische QR-Generatoren zeigen Total-Klicks. Die Restaurants die wirklich wachsen, wissen genau welcher Tisch zur Premium-Zeit scannt — und welcher Aushang Google-Bewertungen bringt.',
+        ? `mal ehrlich: du gibst Geld für Flyer, Speisekarten-QR, Bewertungs-Aufsteller oder Google-Ads für ${companyName} (${city}) aus — aber weißt du wirklich, welche dieser Sachen Gäste oder Bewertungen bringt?`
+        : `mal ehrlich: du gibst Geld für Flyer, Speisekarten-QR, Bewertungs-Aufsteller oder Google-Ads für ${companyName} aus — aber weißt du wirklich, welche dieser Sachen Gäste oder Bewertungen bringt?`,
+      painLine: 'Ohne Tracking ist jeder Euro Werbung Bauchgefühl. Wer einmal sieht "Aushang Tür: 247 Scans / Aushang Toilette: 14" — verdoppelt seinen ROI ohne mehr Budget.',
       bullets: [
-        'Scans pro Tisch, pro Aktion, pro Tageszeit — live im Dashboard',
-        'Bewertungs-Booster: misst welcher Aushang Google-Reviews generiert',
-        'Wiederkehrer erkennen: gleicher Tisch, anderer Tag — anonymisiert',
-        'Server in Frankfurt — kein Cookie-Banner, kein DSGVO-Stress',
+        'QR-Code pro Aktion: Speisekarte, Bewertung, Reservierung — alles separat',
+        'Kurzlinks für Online-Ads & Instagram-Posts — Klicks pro Kanal live',
+        'Dashboard zeigt was am Mittag, am Abend, am Wochenende funktioniert',
+        'EU-Hosting, kein Cookie-Banner, ab 8,99 €/Monat',
       ],
       comparison: [],
       ctaText: '14 Tage gratis testen',
       ctaUrl: 'https://spurig.com',
-      closer: `Wenn das deine Speisekarte-Daten live zeigt${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — wert für 5 Min?`,
+      closer: `Wenn das deine Aktionen live trackt${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — wert für 5 Min?`,
     }),
   },
 
@@ -139,26 +139,26 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'crafts_sme_print_v2',
     segments: ['crafts_sme'],
     subjects: [
-      'So verbrennst du gerade 450 € pro Flyer-Druck',
-      'Welcher Flyer dir wirklich Kunden bringt — keiner weiß es',
-      'Deine Visitenkarten kosten dich Aufträge',
-      'Stop. Bevor du wieder Flyer bestellst.',
+      'Du zahlst für Flyer. Bringen sie was?',
+      '450 € Druck. 0 € Daten. Warum?',
+      'Wo verschwindet dein Werbebudget?',
+      'Werbung ohne Tracking = Bauchgefühl',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `wenn du diese Woche Flyer oder Visitenkarten in ${city} verteilst — weißt du nach 7 Tagen objektiv welche der Aktionen Anfragen bringt? Oder ratest du beim nächsten Druck wieder?`
-        : `wenn du diese Woche Flyer oder Visitenkarten verteilst — weißt du nach 7 Tagen objektiv welche der Aktionen Anfragen bringt? Oder ratest du beim nächsten Druck wieder?`,
-      painLine: 'Ohne Tracking ist Print-Werbung Roulette. Die Konkurrenz die misst, druckt nur noch was funktioniert — und verdoppelt damit ihre Anfragen ohne mehr Budget.',
+        ? `du gibst monatlich Geld für Flyer, Visitenkarten oder Online-Ads in ${city} aus — aber weißt du wirklich, welche dieser Aktionen dir Anfragen bringt, und welche dein Geld direkt im Mülleimer landen lässt?`
+        : `du gibst monatlich Geld für Flyer, Visitenkarten oder Online-Ads aus — aber weißt du wirklich, welche dieser Aktionen dir Anfragen bringt, und welche dein Geld direkt im Mülleimer landen lässt?`,
+      painLine: 'Klassischer Print-Werbe-Fall: 450 € für 500 Flyer, am Ende des Monats kommen 3 Anfragen rein. Aber von welchem Flyer? Welchem Verteil-Gebiet? Welcher Aktion? — Ohne Tracking weißt du es nicht. Mit Tracking druckst du nächstes Mal nur noch was funktioniert.`,
       bullets: [
-        'Ein QR-Code pro Aktion — separate Stats für jeden Flyer / jede Visitenkarte',
-        'Setup in 5 Min, ohne Tech-Wissen — du druckst einfach den QR auf den Print',
-        'Live-Daten nach 1-3 Tagen — beim nächsten Druck nur noch Top-Aktionen',
-        'EU-Hosting, kein Cookie-Banner, keine Datenschutz-Sorgen',
+        'QR-Code auf jedem Flyer / jeder Visitenkarte — pro Aktion eigene Statistik',
+        'Kurzlinks für Online-Ads & Instagram — Klicks separat pro Kampagne',
+        'Setup in 5 Min, kein Tech-Wissen nötig — du druckst einfach den Code drauf',
+        'Daten in Frankfurt, kein Cookie-Banner, ab 8,99 €/Monat',
       ],
       comparison: [],
       ctaText: '14 Tage gratis testen',
       ctaUrl: 'https://spurig.com',
-      closer: `Falls du nächste Woche eh wieder druckst${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — lohnt sich der 5-Min-Test vorher?`,
+      closer: `Falls du eh bald wieder druckst oder Ads schaltest${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — lohnt sich vorher der 5-Min-Test?`,
     }),
   },
 
@@ -166,26 +166,26 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'events_tourism_print_v2',
     segments: ['events_tourism'],
     subjects: [
-      'So verlierst du 3.000 € pro Plakatkampagne',
-      'Deine Plakate hängen — aber wer sieht sie?',
-      '30-40 % deines Budgets sind Müll. Hier ist der Beweis.',
-      'Stop. Bevor du die nächste Kampagne buchst.',
+      'Zahlt ihr für Plakate — oder für Aufmerksamkeit?',
+      '3.000 € Kampagne. 0 € Erkenntnis.',
+      'Wo verschwindet euer Event-Budget?',
+      'Werbung ohne Tracking = Bauchgefühl',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `bei eurer letzten Plakatkampagne in ${city} — kannst du objektiv sagen, welche 3 Standorte 80 % der Aufmerksamkeit gebracht haben? Oder hast du am Ende der Laufzeit nur ein Bauchgefühl?`
-        : `bei eurer letzten Plakatkampagne — kannst du objektiv sagen, welche 3 Standorte 80 % der Aufmerksamkeit gebracht haben? Oder hast du am Ende der Laufzeit nur ein Bauchgefühl?`,
-      painLine: 'ZAW-Studie 2024: 30-40 % der Plakat-Standorte bringen weniger als 5 % der Wahrnehmung. Bei einer 7.500 € Kampagne sind das bis zu 3.000 € pro Quartal in tote Standorte. Jedes Jahr neu.',
+        ? `mal ehrlich: ihr habt für die letzte Event-Kampagne in ${city} Plakate, Flyer, Instagram-Ads oder Google-Ads gebucht — könnt ihr objektiv sagen, welche dieser Sachen Besucher gebracht haben? Oder bleibt am Ende ein Bauchgefühl?`
+        : `mal ehrlich: ihr habt für die letzte Kampagne Plakate, Flyer, Instagram-Ads oder Google-Ads gebucht — könnt ihr objektiv sagen, welche dieser Sachen Besucher gebracht haben? Oder bleibt am Ende ein Bauchgefühl?`,
+      painLine: '7.500 €-Plakatkampagne + 2.000 € Online-Ads ohne Tracking — Studien zeigen: 30-40 % davon ist Müll. Das sind bis zu 3.000 € pro Quartal in tote Standorte und ineffektive Anzeigen. Jedes Jahr neu.',
       bullets: [
-        'QR-Code pro Standort — nach 7 Tagen seht ihr objektiv welche performen',
-        'Beim nächsten Buchen: Top-3 Standorte verdoppeln, Bottom-3 streichen',
-        'Kunden-Reports automatisch generiert — keine Excel-Abende mehr',
-        'EU-Hosting, DSGVO-konform, ab 8,99 €/Monat',
+        'QR-Code pro Plakat-Standort — nach 7 Tagen seht ihr objektiv welche scannen',
+        'Kurzlinks für Online-Ads, Newsletter, Social — Klicks pro Kanal',
+        'Beim nächsten Buchen: Top-3 verdoppeln, Bottom-3 streichen',
+        'EU-Hosting, DSGVO-konform, automatische Reports, ab 8,99 €/Monat',
       ],
       comparison: [],
       ctaText: 'Spurig anschauen',
       ctaUrl: 'https://spurig.com',
-      closer: `Wenn ich dir das mal an einer eurer Kampagnen durchrechne${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — wert?`,
+      closer: `Wenn ich euch das an einer letzten Kampagne mal durchrechne${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — wert?`,
     }),
   },
 };
