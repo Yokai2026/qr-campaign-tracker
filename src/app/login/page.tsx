@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
@@ -16,7 +15,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
   const supabase = createClient();
 
   async function handleLogin(e: React.FormEvent) {
@@ -48,8 +46,10 @@ export default function LoginPage() {
       return;
     }
 
-    router.push('/dashboard');
-    router.refresh();
+    // Full page reload statt router.push — der Server-Render muss die neue
+    // Auth-Cookie sehen, sonst loop't die Middleware (Cookie noch nicht gesetzt
+    // wenn /dashboard requested wird).
+    window.location.assign('/dashboard');
   }
 
   return (
