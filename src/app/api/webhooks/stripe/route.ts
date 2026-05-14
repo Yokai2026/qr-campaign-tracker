@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
 import { getStripe, priceToTierViaProduct, mapStripeStatus } from '@/lib/billing/stripe';
 import { notifyAdminPayment, notifyAdminCancellation } from '@/lib/email/admin-notify';
+import { notifyLifecycle } from '@/lib/notify/webhook';
 import type Stripe from 'stripe';
 
 function planFromPriceId(priceId: string | null | undefined): 'monthly' | 'yearly' | 'unknown' {
@@ -108,6 +109,17 @@ export async function POST(request: NextRequest) {
           plan,
           amount,
         });
+        // Discord/Slack-Ping — best-effort
+        void notifyLifecycle({
+          title: `💚 Neuer zahlender Kunde`,
+          description: `${profile.email}${profile.username ? ` (@${profile.username})` : ''} hat **${plan === 'yearly' ? 'Jährlich' : 'Monatlich'}** gebucht`,
+          level: 'success',
+          fields: [
+            { name: 'Plan', value: plan === 'yearly' ? 'Jährlich (8,99 €/Mo)' : 'Monatlich (12,99 €/Mo)' },
+            { name: 'MRR-Beitrag', value: `+${amount.toFixed(2)} €/Mo` },
+          ],
+          url: 'https://spurig.com/admin',
+        });
       }
       break;
     }
@@ -156,6 +168,15 @@ export async function POST(request: NextRequest) {
             plan: planFromPriceId(subRow.stripe_price_id),
             cancelAt: subRow.current_period_end ?? null,
           });
+          void notifyLifecycle({
+            title: '💔 Kündigung wurde wirksam',
+            description: `${profile.email}${profile.username ? ` (@${profile.username})` : ''} — Sub ist jetzt expired`,
+            level: 'error',
+            fields: [
+              { name: 'Plan', value: planFromPriceId(subRow.stripe_price_id) },
+            ],
+            url: 'https://spurig.com/admin',
+          });
         }
       }
       break;
@@ -169,6 +190,30 @@ export async function POST(request: NextRequest) {
         .from('subscriptions')
         .update({ status: 'past_due' })
         .eq('stripe_subscription_id', subId);
+
+      // Discord/Slack-Alert — past_due ist Churn-Risiko
+      const { data: subRow } = await supabase
+        .from('subscriptions')
+        .select('user_id, stripe_price_id, profiles:user_id(email, username)')
+        .eq('stripe_subscription_id', subId)
+        .maybeSingle();
+      const profilesRaw = subRow?.profiles as
+        | { email: string; username: string | null }
+        | { email: string; username: string | null }[]
+        | null
+        | undefined;
+      const profileData = Array.isArray(profilesRaw) ? profilesRaw[0] ?? null : profilesRaw ?? null;
+      if (profileData) {
+        void notifyLifecycle({
+          title: '⚠️ Zahlung fehlgeschlagen',
+          description: `${profileData.email}${profileData.username ? ` (@${profileData.username})` : ''} — Sub auf past_due gesetzt`,
+          level: 'warn',
+          fields: [
+            { name: 'Plan', value: planFromPriceId(subRow?.stripe_price_id) },
+          ],
+          url: 'https://spurig.com/admin',
+        });
+      }
       break;
     }
 

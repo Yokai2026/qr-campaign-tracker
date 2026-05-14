@@ -104,6 +104,87 @@ export async function switchBillingCycle(
   return { success: true };
 }
 
+export type CancellationReason =
+  | 'too_expensive'
+  | 'missing_features'
+  | 'not_using_enough'
+  | 'switched_competitor'
+  | 'project_finished'
+  | 'technical_issues'
+  | 'other';
+
+/**
+ * Kündigt die aktive Subscription zum Periodenende. Speichert den
+ * Kündigungsgrund + Feedback VOR dem Stripe-Cancel — falls Stripe fehlschlägt
+ * bleibt der Grund in der DB für Analyse.
+ */
+export async function cancelSubscription(input: {
+  reason: CancellationReason;
+  feedback?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const profile = await requireAuth();
+  const supabase = await createClient();
+
+  const { data: sub, error: subErr } = await supabase
+    .from('subscriptions')
+    .select('id, stripe_subscription_id, status')
+    .eq('user_id', profile.id)
+    .in('status', ['active', 'on_trial', 'past_due'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (subErr || !sub?.stripe_subscription_id) {
+    return { success: false, error: 'Kein aktives Abo gefunden.' };
+  }
+
+  // 1. Reason VOR Stripe-Call speichern — wenn Stripe failed, haben wir die Info trotzdem.
+  await supabase
+    .from('subscriptions')
+    .update({
+      cancellation_reason: input.reason,
+      cancellation_feedback: input.feedback?.trim() || null,
+    })
+    .eq('id', sub.id);
+
+  // 2. Stripe: cancel_at_period_end → User behält Zugang bis Periodenende.
+  try {
+    const stripe = getStripe();
+    await stripe.subscriptions.update(sub.stripe_subscription_id, {
+      cancel_at_period_end: true,
+      cancellation_details: {
+        comment: input.feedback?.trim().slice(0, 500) || undefined,
+        feedback: mapToStripeFeedback(input.reason),
+      },
+    });
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Stripe-Fehler beim Kündigen' };
+  }
+
+  revalidatePath('/settings');
+  return { success: true };
+}
+
+/** Mapt unsere Reasons auf Stripe's standardisierte feedback-Enums. */
+function mapToStripeFeedback(reason: CancellationReason):
+  | 'too_expensive'
+  | 'missing_features'
+  | 'low_quality'
+  | 'unused'
+  | 'switched_service'
+  | 'other'
+  | undefined {
+  switch (reason) {
+    case 'too_expensive': return 'too_expensive';
+    case 'missing_features': return 'missing_features';
+    case 'not_using_enough': return 'unused';
+    case 'switched_competitor': return 'switched_service';
+    case 'technical_issues': return 'low_quality';
+    case 'project_finished': return 'unused';
+    default: return 'other';
+  }
+}
+
 export async function getSubscription() {
   const profile = await requireAuth();
   const supabase = await createClient();

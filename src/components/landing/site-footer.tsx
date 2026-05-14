@@ -8,7 +8,18 @@ const COLUMNS = [
       { label: 'Features', href: '#features' },
       { label: 'Datenschutz', href: '#dsgvo' },
       { label: 'Preise', href: '/pricing' },
-      { label: 'So funktioniert\'s', href: '#so-funktioniert' },
+      { label: 'Anleitung', href: '/guide' },
+    ],
+  },
+  {
+    heading: 'Lösungen',
+    links: [
+      { label: 'DSGVO-konformer QR-Code', href: '/dsgvo-qr-code' },
+      { label: 'Bitly-Alternative', href: '/bitly-alternative' },
+      { label: 'QR-Code für Gastronomie', href: '/qr-code-fuer-gastronomie' },
+      { label: 'Print-Tracking', href: '/qr-code-print-tracking' },
+      { label: 'Eigene Kurz-Domain', href: '/kurzlink-eigene-domain' },
+      { label: 'Blog', href: '/blog' },
     ],
   },
   {
@@ -33,7 +44,7 @@ export function SiteFooter() {
   return (
     <footer className="relative border-t border-border bg-background">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16">
-        <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+        <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-[1.4fr_repeat(4,1fr)]">
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2.5 group">

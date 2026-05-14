@@ -4,10 +4,10 @@ import { PageHeader } from '@/components/shared/page-header';
 import { FilterToolbar } from '@/components/shared/filter-toolbar';
 import { TableSkeleton } from '@/components/shared/loading-skeleton';
 import { LOCATION_TYPE_LABELS } from '@/lib/constants';
-import { getLocations } from './actions';
-import { LocationsTable } from './locations-table';
+import { getLocationsWithPlacements } from './actions';
+import { LocationsMasterDetail } from './locations-master-detail';
 
-// Shell streamt: PageHeader rendert sofort, Filter+Tabelle nach Daten-Fetch.
+// Shell streamt: PageHeader rendert sofort, Filter+Cards nach Daten-Fetch.
 export default function LocationsPage({
   searchParams,
 }: {
@@ -16,8 +16,8 @@ export default function LocationsPage({
   return (
     <div className="space-y-6 animate-in-card">
       <PageHeader
-        title="Standorte"
-        description="Alle Standorte und Orte verwalten"
+        title="Orte & Platzierungen"
+        description="Standorte und deren Platzierungen an einem Ort verwalten"
         actionLabel="Neuer Standort"
         actionHref="/locations/new"
       />
@@ -35,7 +35,7 @@ async function LocationsContent({
 }) {
   noStore();
   const { district, type } = await searchParams;
-  const allLocations = await getLocations();
+  const allLocations = await getLocationsWithPlacements();
 
   const districts = Array.from(
     new Set(allLocations.map((l) => l.district).filter(Boolean)),
@@ -74,7 +74,7 @@ async function LocationsContent({
           },
         ]}
       />
-      <LocationsTable data={locations} />
+      <LocationsMasterDetail data={locations} />
     </>
   );
 }

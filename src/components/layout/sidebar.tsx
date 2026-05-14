@@ -9,7 +9,6 @@ import {
   LayoutDashboard,
   Megaphone,
   MapPin,
-  ClipboardList,
   QrCode,
   Link2,
   BarChart3,
@@ -33,8 +32,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 const mainNav = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, tourId: 'nav-dashboard' },
   { name: 'Kampagnen', href: '/campaigns', icon: Megaphone, tourId: 'nav-campaigns' },
-  { name: 'Standorte', href: '/locations', icon: MapPin },
-  { name: 'Platzierungen', href: '/placements', icon: ClipboardList },
+  { name: 'Orte & Platzierungen', href: '/locations', icon: MapPin, tourId: 'nav-locations' },
   { name: 'QR-Codes', href: '/qr-codes', icon: QrCode, tourId: 'nav-qr' },
   { name: 'Kurzlinks', href: '/links', icon: Link2 },
   { name: 'Analytik', href: '/analytics', icon: BarChart3, tourId: 'nav-analytics' },

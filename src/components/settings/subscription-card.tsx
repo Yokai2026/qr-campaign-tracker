@@ -5,6 +5,7 @@ import { CreditCard, Clock, CheckCircle, AlertTriangle, Crown, ExternalLink, Loa
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { getBillingPortalUrl, switchBillingCycle } from '@/app/(dashboard)/settings/billing-actions';
+import { CancelModal } from './cancel-modal';
 import type { Subscription } from '@/types';
 
 type Props = {
@@ -232,26 +233,37 @@ export function SubscriptionCard({ subscription, trialEndsAt, checkoutUrls }: Pr
             {/* Footer: CTA */}
             <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-[12px] text-muted-foreground">
-                Zahlungsmethode ändern, Rechnungen ansehen oder kündigen.
+                Zahlungsmethode ändern oder Rechnungen ansehen.
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={openBillingPortal}
-                disabled={isPortalPending}
-              >
-                {isPortalPending ? (
-                  <>
-                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                    Wird geöffnet…
-                  </>
-                ) : (
-                  <>
-                    <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                    Abo verwalten
-                  </>
+              <div className="flex flex-wrap items-center gap-2">
+                {!subscription.cancel_at && (
+                  <CancelModal
+                    trigger={
+                      <Button variant="ghost" size="sm">
+                        Abo kündigen
+                      </Button>
+                    }
+                  />
                 )}
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openBillingPortal}
+                  disabled={isPortalPending}
+                >
+                  {isPortalPending ? (
+                    <>
+                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                      Wird geöffnet…
+                    </>
+                  ) : (
+                    <>
+                      <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                      Abo verwalten
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </>
         ) : isTrialActive ? (

@@ -14,6 +14,8 @@ export type OverviewData = {
   kpis: {
     scans: number;
     scansTrend: number | null;
+    qrScans: number;
+    linkClicks: number;
     unique: number;
     uniqueTrend: number | null;
     trendVsPrev: number | null;
@@ -24,7 +26,7 @@ export type OverviewData = {
     scans: number[];
     unique: number[];
   };
-  chart: Array<{ t: string; scans: number; prev: number }>;
+  chart: Array<{ t: string; qr: number; link: number; total: number; prev: number }>;
   topCampaigns: Array<{ id: string; name: string; tag: string | null; scans: number; pct: number }>;
   topCountries: Array<{ code: string; label: string; pct: number }>;
   devices: { mobile: number; desktop: number; tablet: number };
@@ -91,11 +93,12 @@ export function OverviewClient({ data, windows }: Props) {
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-2 border-b border-border bg-card p-3 sm:grid-cols-4 sm:gap-3 sm:p-4">
         <KpiCard
-          label="Scans gesamt"
+          label="Aufrufe gesamt"
           value={current.kpis.scans}
           trend={current.kpis.scansTrend}
           spark={current.sparklines.scans}
           rangeKey={range}
+          breakdown={{ qr: current.kpis.qrScans, link: current.kpis.linkClicks }}
         />
         <KpiCard
           label="Eindeutig"
@@ -121,7 +124,7 @@ export function OverviewClient({ data, windows }: Props) {
         <div className="col-span-1 border-b border-border p-4 sm:col-span-3 sm:border-b-0 sm:border-r">
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <div className="text-[12.5px] font-medium">Scan-Verlauf</div>
+              <div className="text-[12.5px] font-medium">Aufruf-Verlauf</div>
               <div className="text-[11px] text-muted-foreground">
                 {range === '7d' ? 'Stündlich' : 'Täglich'} · letzte {windows.find((w) => w.key === range)?.label}
               </div>
@@ -129,7 +132,11 @@ export function OverviewClient({ data, windows }: Props) {
             <div className="hidden items-center gap-3 text-[10.5px] text-muted-foreground sm:flex">
               <span className="inline-flex items-center gap-1">
                 <span className="h-1.5 w-3 rounded-full" style={{ background: SERIES_COLORS.scans }} />
-                Scans
+                QR-Scans
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="h-1.5 w-3 rounded-full" style={{ background: SERIES_COLORS.clicks }} />
+                Link-Klicks
               </span>
               <span className="inline-flex items-center gap-1">
                 <span className="h-1.5 w-3 rounded-full border border-dashed border-muted-foreground/40" />
@@ -138,7 +145,7 @@ export function OverviewClient({ data, windows }: Props) {
             </div>
           </div>
           <div className="h-32 w-full sm:h-40">
-            {current.chart.some((p) => p.scans > 0 || p.prev > 0) ? (
+            {current.chart.some((p) => p.qr > 0 || p.link > 0 || p.prev > 0) ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={current.chart} margin={{ top: 6, right: 6, bottom: 0, left: -16 }}>
                   <CartesianGrid {...GRID_STYLE} vertical={false} />
@@ -147,11 +154,11 @@ export function OverviewClient({ data, windows }: Props) {
                   <Tooltip
                     contentStyle={TOOLTIP_STYLE}
                     labelFormatter={(v) => formatTooltipLabel(v as string, range)}
-                    formatter={(val, key) => [val as number, key === 'scans' ? 'Scans' : 'Vorperiode']}
                   />
                   <Line
                     type="monotone"
                     dataKey="prev"
+                    name="Vorperiode"
                     stroke="var(--muted-foreground)"
                     strokeOpacity={0.4}
                     strokeWidth={1.2}
@@ -161,8 +168,19 @@ export function OverviewClient({ data, windows }: Props) {
                   />
                   <Line
                     type="monotone"
-                    dataKey="scans"
+                    dataKey="qr"
+                    name="QR-Scans"
                     stroke={SERIES_COLORS.scans}
+                    strokeWidth={1.75}
+                    dot={false}
+                    isAnimationActive={true}
+                    animationDuration={600}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="link"
+                    name="Link-Klicks"
+                    stroke={SERIES_COLORS.clicks}
                     strokeWidth={1.75}
                     dot={false}
                     isAnimationActive={true}
@@ -172,7 +190,7 @@ export function OverviewClient({ data, windows }: Props) {
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-[12px] text-muted-foreground">
-                Noch keine Scans in diesem Zeitraum
+                Noch keine Aufrufe in diesem Zeitraum
               </div>
             )}
           </div>
@@ -229,7 +247,7 @@ export function OverviewClient({ data, windows }: Props) {
               ))
             ) : (
               <li className="rounded-md border border-dashed border-border/60 px-3 py-4 text-center text-[11.5px] text-muted-foreground">
-                Noch keine Kampagnen mit Scans
+                Noch keine Kampagnen mit Aufrufen
               </li>
             )}
           </ul>
@@ -271,12 +289,14 @@ function KpiCard({
   trend,
   spark,
   rangeKey,
+  breakdown,
 }: {
   label: string;
   value: number;
   trend: number | null;
   spark: number[];
   rangeKey: OverviewRange;
+  breakdown?: { qr: number; link: number };
 }) {
   const Icon = trend == null ? Minus : trend > 0 ? TrendingUp : trend < 0 ? TrendingDown : Minus;
   const color =
@@ -310,6 +330,18 @@ function KpiCard({
           </span>
         )}
       </div>
+      {breakdown && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10.5px] text-muted-foreground tabular-nums">
+          <span className="inline-flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: SERIES_COLORS.scans }} />
+            {breakdown.qr.toLocaleString('de-DE')} QR
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: SERIES_COLORS.clicks }} />
+            {breakdown.link.toLocaleString('de-DE')} Klicks
+          </span>
+        </div>
+      )}
       <Sparkline data={spark} />
     </div>
   );

@@ -83,6 +83,8 @@ function buildWindow(
   // KPIs
   const scans = inWindow.length;
   const prevScans = inPrevWindow.length;
+  const qrScans = inWindow.filter((e) => e.event_type === 'qr_open').length;
+  const linkClicks = inWindow.filter((e) => e.event_type === 'link_open').length;
   const uniqueIps = new Set(inWindow.map((e) => e.ip_hash).filter(Boolean)).size;
   const prevUnique = new Set(inPrevWindow.map((e) => e.ip_hash).filter(Boolean)).size;
 
@@ -167,6 +169,8 @@ function buildWindow(
     kpis: {
       scans,
       scansTrend: trendPct,
+      qrScans,
+      linkClicks,
       unique: uniqueIps,
       uniqueTrend: uniqueTrendPct,
       trendVsPrev: trendPct,
@@ -201,7 +205,7 @@ function bucketize(
   return buckets;
 }
 
-type ChartPoint = { t: string; scans: number; prev: number };
+type ChartPoint = { t: string; qr: number; link: number; total: number; prev: number };
 
 function buildChartSeries(
   curr: RawEvent[],
@@ -211,19 +215,24 @@ function buildChartSeries(
   bucketCount: number,
   bucketSizeMs: number,
 ): ChartPoint[] {
-  const currBuckets = Array.from({ length: bucketCount }, () => 0);
+  const qrBuckets = Array.from({ length: bucketCount }, () => 0);
+  const linkBuckets = Array.from({ length: bucketCount }, () => 0);
   const prevBuckets = Array.from({ length: bucketCount }, () => 0);
   for (const e of curr) {
     const i = Math.floor((new Date(e.created_at).getTime() - fromMs) / bucketSizeMs);
-    if (i >= 0 && i < bucketCount) currBuckets[i]++;
+    if (i < 0 || i >= bucketCount) continue;
+    if (e.event_type === 'qr_open') qrBuckets[i]++;
+    else if (e.event_type === 'link_open') linkBuckets[i]++;
   }
   for (const e of prev) {
     const i = Math.floor((new Date(e.created_at).getTime() - prevFromMs) / bucketSizeMs);
     if (i >= 0 && i < bucketCount) prevBuckets[i]++;
   }
-  return currBuckets.map((v, i) => ({
+  return qrBuckets.map((q, i) => ({
     t: new Date(fromMs + i * bucketSizeMs).toISOString(),
-    scans: v,
+    qr: q,
+    link: linkBuckets[i],
+    total: q + linkBuckets[i],
     prev: prevBuckets[i],
   }));
 }

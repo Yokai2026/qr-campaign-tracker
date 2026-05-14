@@ -165,6 +165,14 @@ export async function GET() {
     recentSubsRaw.map((s: Record<string, unknown>) => resolvePriceMeta(s.stripe_price_id as string | null)),
   );
 
+  // MRR-Snapshots der letzten 30 Tage für Sparkline
+  const thirtyDaysAgo = new Date(now - 30 * 86_400_000).toISOString().slice(0, 10);
+  const { data: mrrHistory } = await sb
+    .from('mrr_snapshots')
+    .select('snapshot_date, mrr_total_eur, paying_count, new_mrr_eur, churned_mrr_eur')
+    .gte('snapshot_date', thirtyDaysAgo)
+    .order('snapshot_date', { ascending: true });
+
   return NextResponse.json({
     timestamp: new Date().toISOString(),
     users: {
@@ -184,6 +192,13 @@ export async function GET() {
       mrrEur,
       arrEur: mrrEur * 12,
     },
+    mrrHistory: (mrrHistory ?? []).map((s) => ({
+      date: s.snapshot_date,
+      mrr: Number(s.mrr_total_eur),
+      paying: s.paying_count,
+      newMrr: Number(s.new_mrr_eur),
+      churnedMrr: Number(s.churned_mrr_eur),
+    })),
     activity: {
       qrScansLastHour: qrScansLastHourRes.count ?? 0,
       qrScansToday: qrScansTodayRes.count ?? 0,

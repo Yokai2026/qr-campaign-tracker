@@ -77,7 +77,7 @@ export default function GuidePage() {
           <ol className="mt-3 space-y-1.5 text-[14px]">
             <li><a href="#was-ist-spurig" className="text-foreground hover:text-brand">1. Was ist Spurig?</a></li>
             <li><a href="#schnellstart" className="text-foreground hover:text-brand">2. Schnellstart in 5 Schritten</a></li>
-            <li><a href="#struktur" className="text-foreground hover:text-brand">3. Struktur: Kampagnen, Standorte, Platzierungen</a></li>
+            <li><a href="#struktur" className="text-foreground hover:text-brand">3. Struktur: Kampagnen & Orte</a></li>
             <li><a href="#qr-codes" className="text-foreground hover:text-brand">4. QR-Codes erstellen</a></li>
             <li><a href="#kurzlinks" className="text-foreground hover:text-brand">5. Kurzlinks erstellen</a></li>
             <li><a href="#domain" className="text-foreground hover:text-brand">6. Eigene Domain einrichten</a></li>
@@ -127,17 +127,23 @@ export default function GuidePage() {
         </Section>
 
         {/* 3. Struktur */}
-        <Section id="struktur" num={3} title="Struktur: Kampagnen, Standorte, Platzierungen">
+        <Section id="struktur" num={3} title="Struktur: Kampagnen & Orte">
           <p>Spurig nutzt 3 Ebenen damit Auswertung präzise wird:</p>
           <div className="my-5 rounded-xl border border-border bg-muted/20 p-4">
             <pre className="font-mono text-[13px] leading-relaxed text-foreground">{`Kampagne ("Sommer 2026")
-   ├── Standort ("U-Bahn Berlin")
-   │     └── Platzierung ("Plakat U7 Friedrichstraße")
+   ├── Standort ("Café Berlin Mitte")
+   │     └── Platzierung ("Plakat im Eingang")
    │           └── QR-Code (Scans landen hier)
-   └── Standort ("Café Mitte")
-         └── Platzierung ("Tischaufsteller")
+   └── Standort ("Messe Hamburg")
+         └── Platzierung ("Banner Halle 5")
                └── QR-Code`}</pre>
           </div>
+          <p>
+            <strong>In der App:</strong> Standorte und Platzierungen findest du gemeinsam unter
+            „<strong>Orte &amp; Platzierungen</strong>". Jeder Standort lässt sich aufklappen und zeigt
+            seine Platzierungen direkt darunter — inkl. Scans pro Platzierung und Schnellzugriff zum
+            Anlegen neuer QR-Codes.
+          </p>
           <p>
             <strong>Vereinfachung möglich:</strong> Wenn du nur einen QR-Code ohne Standort brauchst,
             kannst du den als <em>freistehenden QR</em> ohne Platzierung anlegen.

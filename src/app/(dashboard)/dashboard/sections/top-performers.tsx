@@ -133,7 +133,7 @@ export async function TopPerformers() {
     <section aria-label="Top-Performer" className="space-y-3">
       <div>
         <h2 className="text-[15px] font-semibold tracking-tight">Top-Performer · letzte 7 Tage</h2>
-        <p className="mt-0.5 text-[13px] text-muted-foreground">Wer aktuell Scans zieht</p>
+        <p className="mt-0.5 text-[13px] text-muted-foreground">Wer aktuell Aufrufe zieht</p>
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         <RankCard title="Platzierungen" icon={MapPin} entries={topPlacements} allHref="/placements" />

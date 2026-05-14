@@ -546,7 +546,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         badge={isLive ? (
           <span
             className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400"
-            title="Realtime — Daten aktualisieren sich sobald Scans eintreffen"
+            title="Realtime — Daten aktualisieren sich sobald Aufrufe eintreffen"
           >
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
@@ -881,11 +881,11 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           <section className="space-y-3">
             <div>
               <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Zeiten</h2>
-              <p className="mt-0.5 text-[13px] text-muted-foreground">Wann gescannt wird — nach Stunde, Wochentag und Peak-Slot</p>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">Wann Aufrufe stattfinden — nach Stunde, Wochentag und Peak-Slot</p>
             </div>
             <ChartTransition transitionKey={chartTransitionKey + '-times'}>
             <div className="grid gap-4 lg:grid-cols-2">
-              <ChartCard title="Verteilung über Tagesstunden" empty={hourlyData.every((h) => h.qr === 0 && h.link === 0)} emptyText="Keine Scans im gewählten Zeitraum" className="lg:col-span-2">
+              <ChartCard title="Verteilung über Tagesstunden" empty={hourlyData.every((h) => h.qr === 0 && h.link === 0)} emptyText="Keine Aufrufe im gewählten Zeitraum" className="lg:col-span-2">
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={hourlyData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                     <CartesianGrid {...GRID_STYLE} vertical={false} />
@@ -895,7 +895,6 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                       contentStyle={TOOLTIP_STYLE}
                       cursor={{ fill: 'var(--muted)' }}
                       labelFormatter={(l) => `${l} – ${String((parseInt(String(l).slice(0, 2), 10) + 1) % 24).padStart(2, '0')}:00 Uhr`}
-                      formatter={(v) => [v as number, 'Scans']}
                     />
                     <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
                     <Bar dataKey="qr" name="QR-Scans" stackId="t" fill={SERIES_COLORS.scans} radius={[0, 0, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
@@ -904,7 +903,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 </ResponsiveContainer>
               </ChartCard>
 
-              <ChartCard title="Verteilung über Wochentage" empty={weekdayData.every((w) => w.qr === 0 && w.link === 0)}>
+              <ChartCard title="Verteilung über Wochentage" empty={weekdayData.every((w) => w.qr === 0 && w.link === 0)} emptyText="Keine Aufrufe im gewählten Zeitraum">
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={weekdayData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                     <CartesianGrid {...GRID_STYLE} vertical={false} />
@@ -913,7 +912,6 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                     <Tooltip
                       contentStyle={TOOLTIP_STYLE}
                       cursor={{ fill: 'var(--muted)' }}
-                      formatter={(v) => [v as number, 'Scans']}
                     />
                     <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
                     <Bar dataKey="qr" name="QR-Scans" stackId="t" fill={SERIES_COLORS.scans} radius={[0, 0, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
@@ -931,7 +929,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                     </div>
                     <div className="text-[20px] font-medium tabular-nums text-brand">{peakSlot.hourLabel}</div>
                     <div className="mt-3 text-[12.5px] text-muted-foreground">
-                      In diesem Slot wurden im gewählten Zeitraum <span className="font-semibold text-foreground tabular-nums">{peakSlot.count}</span> {peakSlot.count === 1 ? 'Scan' : 'Scans'} aufgezeichnet — die stärkste Aktivitätsphase deiner Kampagne.
+                      In diesem Slot wurden im gewählten Zeitraum <span className="font-semibold text-foreground tabular-nums">{peakSlot.count}</span> {peakSlot.count === 1 ? 'Aufruf' : 'Aufrufe'} aufgezeichnet — die stärkste Aktivitätsphase deiner Kampagne.
                     </div>
                   </>
                 ) : (
@@ -994,11 +992,11 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                   <ChartCard title="Weltkarte" className="lg:col-span-1">
                     <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
                       <Globe className="h-3.5 w-3.5" />
-                      Geografische Verteilung der Scans
+                      Geografische Verteilung der Aufrufe
                     </div>
                     <WorldMap data={countryData} />
                   </ChartCard>
-                  <ChartCard title="Scans nach Land" className="lg:col-span-1">
+                  <ChartCard title="Aufrufe nach Land" className="lg:col-span-1">
                     <CountryChart data={countryData} />
                   </ChartCard>
                 </div>
@@ -1007,7 +1005,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                   <Globe className="mx-auto h-6 w-6 text-muted-foreground/60" />
                   <p className="mt-2 text-[13.5px] font-semibold">Noch keine Länder-Daten</p>
                   <p className="mt-1 text-[12px] text-muted-foreground max-w-md mx-auto">
-                    Sobald Scans von echten Besuchern über das Internet eingehen, erscheinen hier Weltkarte und Länder-Statistik.
+                    Sobald Aufrufe von echten Besuchern über das Internet eingehen, erscheinen hier Weltkarte und Länder-Statistik.
                   </p>
                 </div>
               )}
@@ -1016,7 +1014,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 <div className="rounded-2xl border border-border bg-muted/20 px-4 py-3 flex items-start gap-2.5">
                   <Globe className="h-3.5 w-3.5 mt-0.5 shrink-0 text-muted-foreground" />
                   <p className="text-[12px] text-muted-foreground leading-relaxed">
-                    <span className="font-medium text-foreground">{unknownCountryCount} Scan{unknownCountryCount !== 1 ? 's' : ''} ohne Länder-Zuordnung.</span>{' '}
+                    <span className="font-medium text-foreground">{unknownCountryCount} {unknownCountryCount === 1 ? 'Aufruf' : 'Aufrufe'} ohne Länder-Zuordnung.</span>{' '}
                     Das kann an lokalen Tests im WLAN (LAN-IPs) oder an fehlenden Geo-Headers liegen.
                     In Produktion (Vercel) werden Länder automatisch via Edge-Network erkannt.
                   </p>
