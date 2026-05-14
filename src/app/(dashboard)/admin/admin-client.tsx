@@ -30,6 +30,7 @@ type Stats = {
     total: number;
     monthly: number;
     yearly: number;
+    manual: number;
     other: number;
     mrrEur: number;
     arrEur: number;
@@ -49,7 +50,7 @@ type Stats = {
     id: string;
     email: string | null;
     username: string | null;
-    plan: 'monthly' | 'yearly' | 'other';
+    plan: 'monthly' | 'yearly' | 'manual' | 'other';
     status: string;
     createdAt: string;
   }>;
@@ -161,7 +162,7 @@ export function AdminClient() {
               <ListRow
                 key={s.id}
                 primary={s.email ?? 'Unbekannt'}
-                secondary={`${s.plan === 'yearly' ? 'Jährlich' : s.plan === 'monthly' ? 'Monatlich' : 'Other'} · ${s.status}`}
+                secondary={`${s.plan === 'yearly' ? 'Jährlich' : s.plan === 'monthly' ? 'Monatlich' : s.plan === 'manual' ? 'Manuell' : 'Sonstige'} · ${s.status}`}
                 trailing={`vor ${formatDistanceToNow(new Date(s.createdAt), { locale: de })}`}
               />
             ))
