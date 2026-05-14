@@ -4,11 +4,6 @@ export const runtime = 'edge';
 export const size = { width: 180, height: 180 };
 export const contentType = 'image/png';
 
-const COLORS = {
-  bg: '#0A0A0A',
-  fg: '#FFFFFF',
-};
-
 export default function AppleIcon() {
   return new ImageResponse(
     (
@@ -19,26 +14,25 @@ export default function AppleIcon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: COLORS.bg,
-          color: COLORS.fg,
+          background: '#0A0A0A',
         }}
       >
         <svg
-          width="112"
-          height="112"
-          viewBox="0 0 24 24"
+          width="128"
+          height="128"
+          viewBox="0 0 32 32"
           fill="none"
-          stroke={COLORS.fg}
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <rect x="3" y="3" width="7" height="7" rx="1.5" />
-          <rect x="14" y="3" width="7" height="7" rx="1.5" />
-          <rect x="3" y="14" width="7" height="7" rx="1.5" />
-          <path d="M14 14h3v3h-3z" />
-          <path d="M20 14v7" />
-          <path d="M14 20h7" />
+          <path
+            d="M22 10 C 22 7.5, 19.5 6, 16 6 C 12.5 6, 10 7.5, 10 10 C 10 13, 13 14, 16 15 C 19 16, 22 17, 22 20 C 22 22.5, 19.5 24, 16 24 C 12.5 24, 10 22.5, 10 20"
+            fill="none"
+            stroke="#FFFFFF"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+          />
+          <circle cx="22" cy="10" r="2.8" fill="#7C3AED" />
+          <circle cx="10" cy="22" r="2.8" fill="#22D3EE" />
         </svg>
       </div>
     ),

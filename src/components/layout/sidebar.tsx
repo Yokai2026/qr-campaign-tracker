@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
@@ -150,10 +151,15 @@ export function Sidebar() {
 
   const brandBlock = (
     <div className="flex h-14 items-center gap-2.5 px-3 border-b border-white/[0.06]">
-      <div className="flex h-[26px] w-[26px] items-center justify-center rounded-[6px] bg-brand text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.2)]">
-        <QrCode className="h-3.5 w-3.5" />
-      </div>
-      <span className="text-[14px] font-semibold tracking-tight text-white/95">
+      <Image
+        src="/spurig-icon.png"
+        alt=""
+        width={32}
+        height={32}
+        priority
+        className="h-7 w-7"
+      />
+      <span className="text-[15px] font-semibold tracking-tight text-white/95">
         Spurig
       </span>
       {tier && (
@@ -231,10 +237,8 @@ export function Sidebar() {
           {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </Button>
         <div className="ml-2 flex items-center gap-2">
-          <div className="flex h-[22px] w-[22px] items-center justify-center rounded-[5px] bg-brand text-brand-foreground">
-            <QrCode className="h-3 w-3" />
-          </div>
-          <span className="text-[13px] font-semibold">Spurig</span>
+          <Image src="/spurig-icon.png" alt="" width={24} height={24} className="h-6 w-6" />
+          <span className="text-[14px] font-semibold">Spurig</span>
         </div>
       </div>
 

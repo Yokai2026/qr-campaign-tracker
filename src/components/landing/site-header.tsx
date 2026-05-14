@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -13,28 +14,15 @@ export function SiteHeader() {
             className="group flex items-center gap-2.5"
             aria-label="Spurig — Startseite"
           >
-            <span
-              aria-hidden
-              className="relative flex h-[26px] w-[26px] items-center justify-center rounded-[7px] bg-ink text-ink-foreground shadow-sm transition-transform group-hover:scale-[1.04]"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="h-3.5 w-3.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                <path d="M14 14h3v3h-3z" />
-                <path d="M20 14v7" />
-                <path d="M14 20h7" />
-              </svg>
-            </span>
-            <span className="font-heading text-[14px] font-semibold tracking-[-0.01em]">Spurig</span>
+            <Image
+              src="/spurig-icon.png"
+              alt=""
+              width={32}
+              height={32}
+              priority
+              className="h-7 w-7 transition-transform group-hover:scale-[1.06]"
+            />
+            <span className="font-heading text-[15px] font-semibold tracking-[-0.01em]">Spurig</span>
           </Link>
 
           <nav

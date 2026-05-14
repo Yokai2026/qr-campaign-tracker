@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { QrCode, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState('');
@@ -66,8 +67,8 @@ export default function LoginPage() {
       <div className="relative w-full max-w-sm animate-in-page">
         <Card className="border border-border shadow-[var(--shadow-lg)]">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand text-brand-foreground shadow-[inset_0_1px_0_oklch(1_0_0/0.18),var(--shadow-md)]">
-              <QrCode className="h-5 w-5" />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center">
+              <Image src="/spurig-icon.png" alt="Spurig" width={56} height={56} priority className="h-14 w-14" />
             </div>
             <CardTitle className="text-xl font-semibold tracking-tight">
               Willkommen zurück

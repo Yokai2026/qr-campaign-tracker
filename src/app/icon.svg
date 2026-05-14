@@ -1,11 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" rx="7" fill="#1C1A24"/>
-  <g fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" transform="translate(4 4)">
-    <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-    <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-    <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-    <path d="M14 14h3v3h-3z"/>
-    <path d="M20 14v7"/>
-    <path d="M14 20h7"/>
-  </g>
+  <rect width="32" height="32" rx="7" fill="#0A0A0A"/>
+  <!-- S-curve: top-right to bottom-left, similar to logo -->
+  <path
+    d="M22 10 C 22 7.5, 19.5 6, 16 6 C 12.5 6, 10 7.5, 10 10 C 10 13, 13 14, 16 15 C 19 16, 22 17, 22 20 C 22 22.5, 19.5 24, 16 24 C 12.5 24, 10 22.5, 10 20"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    opacity="0.9"
+  />
+  <!-- Top-right purple dot -->
+  <circle cx="22" cy="10" r="2.5" fill="#7C3AED"/>
+  <!-- Bottom-left cyan dot -->
+  <circle cx="10" cy="22" r="2.5" fill="#22D3EE"/>
 </svg>
