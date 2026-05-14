@@ -69,8 +69,8 @@ type AnalyticsData = {
   deltas: KpiDeltas;
   botCount: number;
   timeSeriesData: { date: string; qr: number; link: number }[];
-  hourlyData: { hour: number; label: string; scans: number }[];
-  weekdayData: { day: string; sortKey: number; scans: number }[];
+  hourlyData: { hour: number; label: string; qr: number; link: number }[];
+  weekdayData: { day: string; sortKey: number; qr: number; link: number }[];
   peakSlot: { dayLabel: string; hourLabel: string; count: number } | null;
   campaignData: { name: string; opens: number }[];
   placementData: { name: string; opens: number; location: string }[];
@@ -299,34 +299,39 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([date, val]) => ({ date, ...val }));
 
-      // Stunden-Verteilung (0–23 Lokalzeit) ueber den Filter-Zeitraum
-      const hourlyData: { hour: number; label: string; scans: number }[] =
+      // Stunden-Verteilung (0–23 Lokalzeit) ueber den Filter-Zeitraum — qr + link separat
+      const hourlyData: { hour: number; label: string; qr: number; link: number }[] =
         Array.from({ length: 24 }, (_, h) => ({
           hour: h,
           label: `${String(h).padStart(2, '0')}:00`,
-          scans: 0,
+          qr: 0,
+          link: 0,
         }));
       filteredEvents.forEach((e: Record<string, unknown>) => {
         const dt = new Date(e.created_at as string);
         const h = dt.getHours();
-        if (h >= 0 && h < 24) hourlyData[h].scans++;
+        if (h < 0 || h >= 24) return;
+        if (e.event_type === 'qr_open') hourlyData[h].qr++;
+        else if (e.event_type === 'link_open') hourlyData[h].link++;
       });
 
       // Wochentag-Verteilung (Mo–So) ueber den Filter-Zeitraum
       const WEEKDAYS_DE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-      const weekdayData: { day: string; sortKey: number; scans: number }[] = [
-        { day: 'Mo', sortKey: 1, scans: 0 },
-        { day: 'Di', sortKey: 2, scans: 0 },
-        { day: 'Mi', sortKey: 3, scans: 0 },
-        { day: 'Do', sortKey: 4, scans: 0 },
-        { day: 'Fr', sortKey: 5, scans: 0 },
-        { day: 'Sa', sortKey: 6, scans: 0 },
-        { day: 'So', sortKey: 7, scans: 0 },
+      const weekdayData: { day: string; sortKey: number; qr: number; link: number }[] = [
+        { day: 'Mo', sortKey: 1, qr: 0, link: 0 },
+        { day: 'Di', sortKey: 2, qr: 0, link: 0 },
+        { day: 'Mi', sortKey: 3, qr: 0, link: 0 },
+        { day: 'Do', sortKey: 4, qr: 0, link: 0 },
+        { day: 'Fr', sortKey: 5, qr: 0, link: 0 },
+        { day: 'Sa', sortKey: 6, qr: 0, link: 0 },
+        { day: 'So', sortKey: 7, qr: 0, link: 0 },
       ];
       filteredEvents.forEach((e: Record<string, unknown>) => {
         const dow = new Date(e.created_at as string).getDay();
         const target = weekdayData.find((w) => w.day === WEEKDAYS_DE[dow]);
-        if (target) target.scans++;
+        if (!target) return;
+        if (e.event_type === 'qr_open') target.qr++;
+        else if (e.event_type === 'link_open') target.link++;
       });
 
       // Peak-Slot (welche (Wochentag, Stunde)-Kombination ist am stärksten)
@@ -447,7 +452,8 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const hourlyData = data?.hourlyData ?? Array.from({ length: 24 }, (_, h) => ({
     hour: h,
     label: `${String(h).padStart(2, '0')}:00`,
-    scans: 0,
+    qr: 0,
+    link: 0,
   }));
   const weekdayData = data?.weekdayData ?? [];
   const peakSlot = data?.peakSlot ?? null;
@@ -879,7 +885,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             </div>
             <ChartTransition transitionKey={chartTransitionKey + '-times'}>
             <div className="grid gap-4 lg:grid-cols-2">
-              <ChartCard title="Verteilung über Tagesstunden" empty={hourlyData.every((h) => h.scans === 0)} emptyText="Keine Scans im gewählten Zeitraum" className="lg:col-span-2">
+              <ChartCard title="Verteilung über Tagesstunden" empty={hourlyData.every((h) => h.qr === 0 && h.link === 0)} emptyText="Keine Scans im gewählten Zeitraum" className="lg:col-span-2">
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={hourlyData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                     <CartesianGrid {...GRID_STYLE} vertical={false} />
@@ -891,12 +897,14 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                       labelFormatter={(l) => `${l} – ${String((parseInt(String(l).slice(0, 2), 10) + 1) % 24).padStart(2, '0')}:00 Uhr`}
                       formatter={(v) => [v as number, 'Scans']}
                     />
-                    <Bar dataKey="scans" name="Scans" fill={SERIES_COLORS.scans} radius={[4, 4, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
+                    <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+                    <Bar dataKey="qr" name="QR-Scans" stackId="t" fill={SERIES_COLORS.scans} radius={[0, 0, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
+                    <Bar dataKey="link" name="Link-Klicks" stackId="t" fill={SERIES_COLORS.clicks} radius={[4, 4, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>
 
-              <ChartCard title="Verteilung über Wochentage" empty={weekdayData.every((w) => w.scans === 0)}>
+              <ChartCard title="Verteilung über Wochentage" empty={weekdayData.every((w) => w.qr === 0 && w.link === 0)}>
                 <ResponsiveContainer width="100%" height={240}>
                   <BarChart data={weekdayData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                     <CartesianGrid {...GRID_STYLE} vertical={false} />
@@ -907,7 +915,9 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                       cursor={{ fill: 'var(--muted)' }}
                       formatter={(v) => [v as number, 'Scans']}
                     />
-                    <Bar dataKey="scans" name="Scans" fill={SERIES_COLORS.scans} radius={[4, 4, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
+                    <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+                    <Bar dataKey="qr" name="QR-Scans" stackId="t" fill={SERIES_COLORS.scans} radius={[0, 0, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
+                    <Bar dataKey="link" name="Link-Klicks" stackId="t" fill={SERIES_COLORS.clicks} radius={[4, 4, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartCard>

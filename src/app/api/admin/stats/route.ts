@@ -48,6 +48,45 @@ async function resolvePriceMeta(priceId: string | null | undefined): Promise<Pri
   return meta;
 }
 
+type IntroStats = {
+  activeWithIntroCoupon: number;
+  monthlyEurDiscounted: number; // 5,99 € pro User mit Intro
+  fullPriceEur: number;          // 12,99 € pro User ohne
+};
+
+let introCache: { data: IntroStats; expiresAt: number } | null = null;
+const INTRO_TTL_MS = 60_000;
+
+async function countIntroDiscounts(): Promise<IntroStats> {
+  if (introCache && introCache.expiresAt > Date.now()) return introCache.data;
+  const result: IntroStats = { activeWithIntroCoupon: 0, monthlyEurDiscounted: 0, fullPriceEur: 0 };
+  try {
+    const stripe = getStripe();
+    let starting_after: string | undefined;
+    while (true) {
+      const list = await stripe.subscriptions.list({ status: 'active', limit: 100, starting_after, expand: ['data.discount'] });
+      for (const sub of list.data) {
+        const item = sub.items.data[0];
+        if (item?.price?.id !== process.env.STRIPE_MONTHLY_PRICE_ID) continue;
+        const discount = (sub as unknown as { discount?: { coupon?: { id?: string } } }).discount;
+        if (discount?.coupon?.id === 'intro_3mo') {
+          result.activeWithIntroCoupon++;
+          result.monthlyEurDiscounted += 5.99;
+        } else {
+          result.fullPriceEur += 12.99;
+        }
+      }
+      if (!list.has_more) break;
+      starting_after = list.data[list.data.length - 1]?.id;
+      if (!starting_after) break;
+    }
+  } catch {
+    // best-effort
+  }
+  introCache = { data: result, expiresAt: Date.now() + INTRO_TTL_MS };
+  return result;
+}
+
 export async function GET() {
   // Auth-Gate: nur Admin
   const userClient = await createClient();
@@ -72,9 +111,11 @@ export async function GET() {
     subsActiveRes,
     recentSignupsRes,
     recentSubsRes,
-    scansLastHourRes,
-    scansTodayRes,
+    qrScansLastHourRes,
+    qrScansTodayRes,
     profilesWithTrialRes,
+    linkClicksLastHourRes,
+    linkClicksTodayRes,
   ] = await Promise.all([
     sb.from('profiles').select('id', { count: 'exact', head: true }),
     sb.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString()),
@@ -83,9 +124,11 @@ export async function GET() {
     sb.from('subscriptions').select('id, user_id, stripe_price_id, status, created_at').in('status', ['active', 'on_trial', 'past_due']),
     sb.from('profiles').select('id, email, username, created_at, trial_ends_at').order('created_at', { ascending: false }).limit(10),
     sb.from('subscriptions').select('id, user_id, stripe_price_id, status, created_at, profiles:user_id(email, username)').order('created_at', { ascending: false }).limit(10),
-    sb.from('redirect_events').select('id', { count: 'exact', head: true }).gte('created_at', lastHour).eq('is_bot', false),
-    sb.from('redirect_events').select('id', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString()).eq('is_bot', false),
+    sb.from('redirect_events').select('id', { count: 'exact', head: true }).gte('created_at', lastHour).eq('is_bot', false).eq('event_type', 'qr_open'),
+    sb.from('redirect_events').select('id', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString()).eq('is_bot', false).eq('event_type', 'qr_open'),
     sb.from('profiles').select('id, trial_ends_at').not('trial_ends_at', 'is', null),
+    sb.from('redirect_events').select('id', { count: 'exact', head: true }).gte('created_at', lastHour).eq('is_bot', false).eq('event_type', 'link_open'),
+    sb.from('redirect_events').select('id', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString()).eq('is_bot', false).eq('event_type', 'link_open'),
   ]);
 
   const subs = subsActiveRes.data ?? [];
@@ -142,9 +185,15 @@ export async function GET() {
       arrEur: mrrEur * 12,
     },
     activity: {
-      scansLastHour: scansLastHourRes.count ?? 0,
-      scansToday: scansTodayRes.count ?? 0,
+      qrScansLastHour: qrScansLastHourRes.count ?? 0,
+      qrScansToday: qrScansTodayRes.count ?? 0,
+      linkClicksLastHour: linkClicksLastHourRes.count ?? 0,
+      linkClicksToday: linkClicksTodayRes.count ?? 0,
+      // Backwards-compat
+      scansLastHour: (qrScansLastHourRes.count ?? 0) + (linkClicksLastHourRes.count ?? 0),
+      scansToday: (qrScansTodayRes.count ?? 0) + (linkClicksTodayRes.count ?? 0),
     },
+    intro: await countIntroDiscounts(),
     recentSignups: (recentSignupsRes.data ?? []).map((p) => ({
       id: p.id,
       email: p.email,

@@ -36,8 +36,17 @@ type Stats = {
     arrEur: number;
   };
   activity: {
+    qrScansLastHour: number;
+    qrScansToday: number;
+    linkClicksLastHour: number;
+    linkClicksToday: number;
     scansLastHour: number;
     scansToday: number;
+  };
+  intro: {
+    activeWithIntroCoupon: number;
+    monthlyEurDiscounted: number;
+    fullPriceEur: number;
   };
   recentSignups: Array<{
     id: string;
@@ -96,7 +105,7 @@ export function AdminClient() {
       {/* LIVE jetzt — pulsierende Cards */}
       <section aria-label="Live-Aktivität">
         <SectionTitle icon={Activity}>Live jetzt</SectionTitle>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <div className="mt-3 grid gap-3 md:grid-cols-3">
           <LiveCard
             label="User online"
             value={data.users.onlineNow}
@@ -104,9 +113,15 @@ export function AdminClient() {
             accent="emerald"
           />
           <LiveCard
-            label="Scans letzte Stunde"
-            value={data.activity.scansLastHour}
-            sub={`Heute insgesamt: ${data.activity.scansToday.toLocaleString('de-DE')}`}
+            label="QR-Scans letzte Stunde"
+            value={data.activity.qrScansLastHour}
+            sub={`Heute insgesamt: ${data.activity.qrScansToday.toLocaleString('de-DE')}`}
+            accent="brand"
+          />
+          <LiveCard
+            label="Link-Klicks letzte Stunde"
+            value={data.activity.linkClicksLastHour}
+            sub={`Heute insgesamt: ${data.activity.linkClicksToday.toLocaleString('de-DE')}`}
             accent="brand"
           />
         </div>
@@ -135,6 +150,30 @@ export function AdminClient() {
             value={Math.round(data.payments.mrrEur)}
             unit="€"
             sub={`ARR ≈ ${Math.round(data.payments.arrEur).toLocaleString('de-DE')} €`}
+          />
+        </div>
+      </section>
+
+      {/* Intro-Discount aktiv (Neukunden mit 5,99 € statt 12,99 €) */}
+      <section aria-label="Intro-Discount">
+        <SectionTitle icon={Sparkles}>Neukunden im Intro-Discount</SectionTitle>
+        <div className="mt-3 grid gap-3 md:grid-cols-3">
+          <StatCard
+            label="Aktive Intro-User"
+            value={data.intro.activeWithIntroCoupon}
+            sub="Coupon intro_3mo läuft (5,99 €/Mo)"
+          />
+          <StatCard
+            label="Discounted MRR"
+            value={Math.round(data.intro.monthlyEurDiscounted)}
+            unit="€"
+            sub="Aus den Intro-Usern"
+          />
+          <StatCard
+            label="Voll-Preis MRR (Monthly)"
+            value={Math.round(data.intro.fullPriceEur)}
+            unit="€"
+            sub="Aus Monthly-Usern ohne Coupon"
           />
         </div>
       </section>
