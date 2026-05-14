@@ -85,30 +85,25 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'marketing_agency_dsgvo_v2',
     segments: ['marketing_agency'],
     subjects: [
-      'Bitly = 4% Bußgeld-Risiko für eure Kunden',
-      'Eure Bitly-Links sind nicht DSGVO-konform',
-      'Schrems-II-Falle bei Kunden-Kampagnen?',
-      'Bitly-Alternative aus Berlin — kurze Frage',
+      'Idee für {companyName}',
+      'Frage zu euren Kunden-Kampagnen',
+      'Kurze Frage, {firstName}',
+      '{firstName}, schnelle Idee',
     ],
-    build: ({ greetingTarget, city }) => ({
+    build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `als Agentur in ${city} arbeitet ihr sicher mit QR-Codes und Kurzlinks in Kunden-Kampagnen.`
-        : `als Agentur arbeitet ihr sicher mit QR-Codes und Kurzlinks in Kunden-Kampagnen.`,
-      painLine: 'Wenn ihr Bitly nutzt: das ist nach Schrems-II rechtlich angreifbar.',
+        ? `kurze Frage als Agentur in ${city}: wie messt ihr aktuell die Performance von Print- oder QR-Kampagnen für eure Kunden?`
+        : `kurze Frage: wie messt ihr aktuell die Performance von Print- oder QR-Kampagnen für eure Kunden?`,
+      painLine: 'Die meisten Tools zeigen Gesamt-Klicks — aber nicht welcher Standort, welche Auflage oder welche Aktion wirklich performt.',
       bullets: [
-        'Bitly = US-Hosting → CLOUD Act → Kunden-Daten in den USA',
-        'Bußgeld-Risiko: bis 4% vom Jahresumsatz eures Kunden',
-        '2024 erste DSGVO-Entscheidung gegen US-Kurzlink-Dienst',
+        'QR-Code- & Kurzlink-Tracking pro Standort, Auflage, Variante',
+        'Live-Dashboard für Kunden-Reports — keine Excel-Exporte mehr',
+        'Eigene Domain (z.B. go.kundenname.de) + API + n8n-Integration',
       ],
-      comparison: [
-        { bitlyOrAlt: 'US-Server', spurig: 'EU-Server (Frankfurt)' },
-        { bitlyOrAlt: '199 $ / Monat', spurig: '8,99 € / Monat' },
-        { bitlyOrAlt: 'Cookie-Banner Pflicht', spurig: 'Kein Banner nötig' },
-        { bitlyOrAlt: 'Eigene Domain ab 499$', spurig: 'Eigene Domain inklusive' },
-      ],
-      ctaText: 'Spurig 14 Tage gratis testen',
-      ctaUrl: 'https://spurig.com/bitly-alternative',
-      closer: `Hat das für eure Kampagnen-Strategie Relevanz, ${greetingTarget.split('-')[0]}?`,
+      comparison: [],
+      ctaText: 'Spurig in 5 Min anschauen',
+      ctaUrl: 'https://spurig.com',
+      closer: `Würde das eure Kampagnen-Berichte für Kunden konkreter machen${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''}?`,
     }),
   },
 
@@ -116,29 +111,25 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'gastronomy_qr_v2',
     segments: ['gastronomy'],
     subjects: [
-      'Welcher Tisch scannt euren QR-Code?',
-      'QR-Code für Speisekarte — DSGVO-Update',
-      '247 Scans Tisch 5 · 14 Scans Tisch 11',
-      'Bewertungs-QR auf der Rechnung tracken',
+      'Idee für {companyName}',
+      'QR-Code auf der Speisekarte',
+      'Welcher Tisch scannt?',
+      '{firstName}, kurze Frage',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `falls ihr im ${companyName} in ${city} QR-Codes für Speisekarte oder Google-Bewertungen nutzt — kurze Frage.`
-        : `falls ihr im ${companyName} QR-Codes für Speisekarte oder Google-Bewertungen nutzt — kurze Frage.`,
-      painLine: 'Wisst ihr, welcher Tisch wie oft scannt? Welche Aktion Gäste bringt?',
+        ? `falls ihr im ${companyName} (${city}) schon QR-Codes nutzt — Speisekarte, Bewertungs-Links, Reservierung — wisst ihr welcher davon wie oft genutzt wird?`
+        : `falls ihr im ${companyName} schon QR-Codes nutzt — Speisekarte, Bewertungs-Links, Reservierung — wisst ihr welcher davon wie oft genutzt wird?`,
+      painLine: 'Die meisten QR-Generatoren zeigen nur Total-Klicks. Spurig zeigt euch was wirklich funktioniert.',
       bullets: [
-        'Echte Daten statt Bauchgefühl: Scans pro Tisch, pro Flyer, pro Aktion',
-        'Live-Dashboard — Top-Tische und tote Werbe-Aktionen sofort sichtbar',
-        'DSGVO-konform: Server in Frankfurt, kein Cookie-Banner',
+        'Scans pro Tisch, pro Aktion, pro Tageszeit — live',
+        'Bewertungs-Boost: welcher Aushang bringt Google-Reviews',
+        'Alle Daten in der EU, kein Cookie-Banner nötig',
       ],
-      comparison: [
-        { bitlyOrAlt: 'Bitly: US-Daten', spurig: 'EU-Hosting, AVV inkl.' },
-        { bitlyOrAlt: 'Standard-Tools: nur Total-Klicks', spurig: 'Scans pro Tisch / pro Plakat' },
-        { bitlyOrAlt: 'Versteckte Kosten', spurig: 'Ab 8,99 € / Monat, alles drin' },
-      ],
-      ctaText: '14 Tage gratis testen',
-      ctaUrl: 'https://spurig.com/qr-code-fuer-gastronomie',
-      closer: `Wäre der 5-Min-Blick wert, ${greetingTarget.split('-')[0]}?`,
+      comparison: [],
+      ctaText: 'Spurig 14 Tage gratis testen',
+      ctaUrl: 'https://spurig.com',
+      closer: `Lohnt sich der 5-Min-Blick für ${shortCompanyName(companyName)}${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''}?`,
     }),
   },
 
@@ -146,26 +137,25 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'crafts_sme_print_v2',
     segments: ['crafts_sme'],
     subjects: [
-      'Welcher Flyer bringt eure Kunden?',
-      'QR-Tracking für Visitenkarten & Flyer',
-      '450 € Flyer-Budget verbrannt? (möglich)',
+      'Idee für {companyName}',
+      'Welcher Flyer bringt Kunden?',
+      '{firstName}, kurze Frage',
+      'Print-Performance messen',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
-      hook: `${companyName}${city ? ' in ' + city : ''} hat sicher Visitenkarten, Flyer oder Plakate in der Region.`,
-      painLine: 'Aber: wisst ihr welche Aktion am meisten Anfragen bringt?',
+      hook: city
+        ? `${companyName} in ${city} hat sicher Visitenkarten, Flyer oder Werbung in der Umgebung — habt ihr Daten dazu welche Aktion am meisten Anfragen bringt?`
+        : `${companyName} hat sicher Visitenkarten, Flyer oder Werbung in der Umgebung — habt ihr Daten dazu welche Aktion am meisten Anfragen bringt?`,
+      painLine: 'Ohne Tracking sind alle Print-Investitionen Bauchgefühl. Mit Spurig wisst ihr nach 7 Tagen was wirklich funktioniert.',
       bullets: [
-        'QR-Code auf Visitenkarte / Flyer / Plakat — pro Aktion eigene Stats',
-        'Nach 7 Tagen seht ihr objektiv was funktioniert',
-        'Beim nächsten Druck: nur noch Top-Aktionen, kein Geld mehr verbrennen',
+        'QR-Code auf jedem Druck — pro Aktion eigene Statistik',
+        'Setup in 5 Min, kein technisches Wissen nötig',
+        'Beim nächsten Druck: Top-Aktionen verdoppeln, Rest streichen',
       ],
-      comparison: [
-        { bitlyOrAlt: 'Ohne Tracking: Bauchgefühl', spurig: 'Mit Spurig: echte Daten' },
-        { bitlyOrAlt: 'Bitly: DSGVO-Risiko', spurig: 'EU-Hosting, DSGVO-konform' },
-        { bitlyOrAlt: 'Stundenlanges Setup', spurig: 'In 5 Min einsatzbereit' },
-      ],
-      ctaText: 'Jetzt 14 Tage gratis testen',
-      ctaUrl: 'https://spurig.com/qr-code-print-tracking',
-      closer: `Wäre das relevant für euch, ${greetingTarget.split('-')[0]}?`,
+      comparison: [],
+      ctaText: '14 Tage gratis testen',
+      ctaUrl: 'https://spurig.com',
+      closer: `Macht das beim nächsten Druck Sinn für ${shortCompanyName(companyName)}${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''}?`,
     }),
   },
 
@@ -173,26 +163,25 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'events_tourism_print_v2',
     segments: ['events_tourism'],
     subjects: [
-      '3.000 € pro Plakat-Kampagne verbrennen?',
-      'Welcher Plakat-Standort wirklich performt',
-      'Datenidee für eure Event-Werbung',
+      'Idee für {companyName}',
+      'Welche Plakate performen?',
+      '{firstName}, kurze Frage',
+      'Plakat-Standort-Performance',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
-      hook: `Plakat-Kampagnen für Events / Tourismus${city ? ' in ' + city : ''} — typisches Problem: man weiß nicht welche Standorte tatsächlich Aufmerksamkeit bringen.`,
-      painLine: 'Studien: 30-40 % der Standorte bringen < 5 % der Wahrnehmung.',
+      hook: city
+        ? `Plakat- und Print-Kampagnen für ${city} — habt ihr Daten dazu welche Standorte tatsächlich Aufmerksamkeit bringen?`
+        : `Plakat- und Print-Kampagnen — habt ihr Daten dazu welche Standorte tatsächlich Aufmerksamkeit bringen?`,
+      painLine: 'Studien zeigen: 30-40 % der Plakat-Standorte bringen < 5 % der Wahrnehmung. Das sind 2.000-3.000 € pro Kampagne im Sand.',
       bullets: [
-        'Bei 7.500 €-Kampagnen sind das 2.000-3.000 € verbranntes Budget',
-        'Mit QR-pro-Standort seht ihr nach 7 Tagen objektiv welcher Standort scannt',
+        'QR-Code pro Standort — nach 7 Tagen seht ihr objektiv was funktioniert',
         'Bei nächster Kampagne: Top-3 verdoppeln, Bottom-3 streichen',
+        'EU-Hosting, DSGVO-konform, ab 8,99 €/Monat',
       ],
-      comparison: [
-        { bitlyOrAlt: 'Plakatkampagne ohne Tracking', spurig: 'Spurig pro Standort' },
-        { bitlyOrAlt: '30-40% Budget-Verlust', spurig: 'Daten nach 7 Tagen' },
-        { bitlyOrAlt: 'Bitly: US-Hosting', spurig: 'EU-Hosting, DSGVO ok' },
-      ],
-      ctaText: 'Beispiel-Analyse anschauen',
-      ctaUrl: 'https://spurig.com/qr-code-print-tracking',
-      closer: `Wäre das für ${companyName} relevant, ${greetingTarget.split('-')[0]}?`,
+      comparison: [],
+      ctaText: 'Spurig anschauen',
+      ctaUrl: 'https://spurig.com',
+      closer: `Wäre das ein 5-Min-Test wert für ${shortCompanyName(companyName)}${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''}?`,
     }),
   },
 };
@@ -374,21 +363,25 @@ function buildHtmlVersion(
 
           <!-- Dark Brand Header -->
           <tr>
-            <td style="padding:18px 24px;background:${BRAND.bgDark};text-align:left">
+            <td style="padding:22px 32px;background:#ffffff;border-bottom:1px solid ${BRAND.border}">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td style="vertical-align:middle">
+                  <td style="vertical-align:middle;width:1%;white-space:nowrap">
                     <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr>
-                      <td style="padding-right:8px;vertical-align:middle">
-                        <img src="${LOGO_URL}" alt="" width="28" height="28" style="display:block;border:0;outline:none">
+                      <td style="padding-right:14px;vertical-align:middle">
+                        <!-- Dark badge wraps the white logo so it stays visible on white header -->
+                        <div style="width:40px;height:40px;border-radius:11px;background:${BRAND.bgDark};display:inline-block;text-align:center;line-height:40px;vertical-align:middle">
+                          <img src="${LOGO_URL}" alt="" width="26" height="26" style="display:inline-block;vertical-align:middle;border:0;outline:none;margin-top:7px">
+                        </div>
                       </td>
                       <td style="vertical-align:middle">
-                        <div style="font-size:18px;font-weight:700;letter-spacing:-0.02em;color:#ffffff;line-height:1">Spurig</div>
+                        <div style="font-size:22px;font-weight:800;letter-spacing:-0.025em;color:${BRAND.text};line-height:1.1">Spurig</div>
+                        <div style="font-size:11px;color:${BRAND.textSubtle};letter-spacing:0.02em;margin-top:2px">Made in Berlin</div>
                       </td>
                     </tr></table>
                   </td>
                   <td style="text-align:right;vertical-align:middle">
-                    <span style="display:inline-block;padding:4px 10px;border:1px solid rgba(255,255,255,0.18);border-radius:999px;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.85)">DSGVO · EU-Hosting</span>
+                    <span style="display:inline-block;padding:7px 14px;border:1px solid ${BRAND.border};border-radius:999px;font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:${BRAND.textMuted};background:#ffffff">DSGVO · EU-Hosting</span>
                   </td>
                 </tr>
               </table>
@@ -410,11 +403,11 @@ function buildHtmlVersion(
             </td>
           </tr>
 
-          <!-- Pain Banner -->
+          <!-- Insight Banner — neutral, value-focused -->
           <tr>
             <td style="padding:0 32px">
-              <div style="padding:14px 18px;background:#fef3c7;border-left:4px solid ${BRAND.warn};border-radius:8px;font-size:15px;font-weight:600;color:#78350f;line-height:1.4">
-                ⚠ ${escapeHtml(c.painLine)}
+              <div style="padding:16px 20px;background:${BRAND.bgSoft};border-left:3px solid ${BRAND.primary};border-radius:8px;font-size:15px;color:${BRAND.text};line-height:1.5">
+                ${escapeHtml(c.painLine)}
               </div>
             </td>
           </tr>
@@ -428,15 +421,15 @@ function buildHtmlVersion(
             </td>
           </tr>
 
-          <!-- Comparison Table -->
-          <tr>
+          <!-- Comparison Table (nur wenn Vergleichszeilen definiert) -->
+          ${c.comparison.length > 0 ? `<tr>
             <td style="padding:16px 32px">
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:${BRAND.textMuted};margin-bottom:8px;font-weight:600">Bitly/Standard vs Spurig</div>
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:${BRAND.textMuted};margin-bottom:8px;font-weight:600">Vergleich</div>
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border:1px solid ${BRAND.border};border-radius:10px;overflow:hidden">
                 ${comparisonRows}
               </table>
             </td>
-          </tr>
+          </tr>` : ''}
 
           <!-- CTA Button -->
           <tr>
