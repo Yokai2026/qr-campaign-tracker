@@ -52,21 +52,33 @@ type Template = {
   build: (input: TemplateInput) => TemplateContent;
 };
 
+// Spurig Brand-Colors (von spurig.com OG-Image + Brand-System)
 const BRAND = {
-  primary: '#6366f1',
-  primaryDark: '#4f46e5',
-  text: '#111827',
-  textMuted: '#6b7280',
-  bg: '#ffffff',
-  bgSoft: '#f9fafb',
-  border: '#e5e7eb',
-  success: '#10b981',
-  warn: '#f59e0b',
-  danger: '#ef4444',
+  primary: '#7C3AED',         // Brand-Lila (Logo-Dot)
+  secondary: '#22D3EE',       // Brand-Cyan (Logo-Dot)
+  text: '#111113',            // Near-Black
+  textMuted: '#525252',
+  textSubtle: '#737373',
+  bg: '#FFFFFF',
+  bgSoft: '#F5F5F5',
+  bgDark: '#0a0a0a',
+  border: '#E5E5E5',
+  borderSoft: '#F0F0F0',
+  success: '#10B981',
+  warn: '#F59E0B',
+  danger: '#EF4444',
 };
 
 const LINKEDIN_URL = 'https://www.linkedin.com/in/david-da-silva-gornik-59262b367/';
 const WEBSITE_URL = 'https://spurig.com';
+const LOGO_URL = 'https://spurig.com/spurig-icon.png';
+
+const HERO_IMAGES: Record<TemplateKey, string> = {
+  marketing_agency_dsgvo_v2: 'https://spurig.com/email-assets/hero-dashboard.jpg',
+  gastronomy_qr_v2: 'https://spurig.com/email-assets/hero-gastro.jpg',
+  crafts_sme_print_v2: 'https://spurig.com/email-assets/hero-dashboard.jpg',
+  events_tourism_print_v2: 'https://spurig.com/email-assets/hero-dashboard.jpg',
+};
 
 const TEMPLATES: Record<TemplateKey, Template> = {
   marketing_agency_dsgvo_v2: {
@@ -217,7 +229,7 @@ export function buildMailForLead(
     templateKey: template.key,
     subject,
     bodyText: buildTextVersion(greetingTarget, content),
-    bodyHtml: buildHtmlVersion(greetingTarget, content, unsubscribeUrl),
+    bodyHtml: buildHtmlVersion(template.key, greetingTarget, content, unsubscribeUrl),
     personalizationHook: content.hook,
   };
 }
@@ -253,10 +265,11 @@ function extractFirstName(email: string): string | null {
   return null;
 }
 
-function extractGreetingTarget(email: string, companyName: string): string {
+function extractGreetingTarget(email: string, _companyName: string): string {
   const firstName = extractFirstName(email);
   if (firstName) return firstName;
-  return shortCompanyName(companyName) + '-Team';
+  // Fallback: neutrales Standard-B2B-Greeting auf Deutsch
+  return 'zusammen';
 }
 
 function shortCompanyName(companyName: string): string {
@@ -272,8 +285,18 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+function openingFor(greeting: string): string {
+  return greeting === 'zusammen' ? `Hallo ${greeting}` : `Hi ${greeting}`;
+}
+
+function openingHtmlFor(greeting: string): string {
+  return greeting === 'zusammen'
+    ? `Hallo zusammen`
+    : `Hi <strong>${escapeHtml(greeting)}</strong>`;
+}
+
 function buildTextVersion(greeting: string, c: TemplateContent): string {
-  return `Hi ${greeting},
+  return `${openingFor(greeting)},
 
 ${c.hook}
 
@@ -300,10 +323,13 @@ Impressum: https://spurig.com/impressum`;
 }
 
 function buildHtmlVersion(
+  templateKey: TemplateKey,
   greeting: string,
   c: TemplateContent,
   unsubscribeUrl: string,
 ): string {
+  const heroUrl = HERO_IMAGES[templateKey];
+  void greeting; // greeting wird via openingHtmlFor inline genutzt
   const bulletItems = c.bullets
     .map(
       (b) => `
@@ -346,27 +372,40 @@ function buildHtmlVersion(
       <td align="center">
         <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
 
-          <!-- Header with logo -->
+          <!-- Dark Brand Header -->
           <tr>
-            <td style="padding:24px 32px 0;text-align:left">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+            <td style="padding:18px 24px;background:${BRAND.bgDark};text-align:left">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td style="padding-right:10px">
-                    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,${BRAND.primary} 0%,#a855f7 100%);color:white;font-size:22px;font-weight:800;text-align:center;line-height:38px">S</div>
+                  <td style="vertical-align:middle">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr>
+                      <td style="padding-right:8px;vertical-align:middle">
+                        <img src="${LOGO_URL}" alt="" width="28" height="28" style="display:block;border:0;outline:none">
+                      </td>
+                      <td style="vertical-align:middle">
+                        <div style="font-size:18px;font-weight:700;letter-spacing:-0.02em;color:#ffffff;line-height:1">Spurig</div>
+                      </td>
+                    </tr></table>
                   </td>
-                  <td>
-                    <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;color:${BRAND.text}">Spurig</div>
-                    <div style="font-size:11px;color:${BRAND.textMuted};letter-spacing:0.04em;text-transform:uppercase">Made in Berlin · DSGVO-konform</div>
+                  <td style="text-align:right;vertical-align:middle">
+                    <span style="display:inline-block;padding:4px 10px;border:1px solid rgba(255,255,255,0.18);border-radius:999px;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,0.85)">DSGVO · EU-Hosting</span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
+          <!-- Hero Image -->
+          <tr>
+            <td style="padding:0;font-size:0;line-height:0">
+              <img src="${heroUrl}" alt="Spurig Dashboard" width="600" style="display:block;width:100%;height:auto;max-width:600px;border:0;outline:none">
+            </td>
+          </tr>
+
           <!-- Greeting -->
           <tr>
-            <td style="padding:24px 32px 8px">
-              <p style="margin:0 0 12px;font-size:16px;line-height:1.5;color:${BRAND.text}">Hi <strong>${escapeHtml(greeting)}</strong>,</p>
+            <td style="padding:28px 32px 8px">
+              <p style="margin:0 0 12px;font-size:16px;line-height:1.5;color:${BRAND.text}">${openingHtmlFor(greeting)},</p>
               <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:${BRAND.text}">${escapeHtml(c.hook)}</p>
             </td>
           </tr>
@@ -402,7 +441,7 @@ function buildHtmlVersion(
           <!-- CTA Button -->
           <tr>
             <td style="padding:24px 32px;text-align:center">
-              <a href="${escapeAttr(c.ctaUrl)}" style="display:inline-block;padding:14px 28px;background:${BRAND.primary};color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;letter-spacing:-0.01em;box-shadow:0 2px 6px rgba(99,102,241,0.3)">
+              <a href="${escapeAttr(c.ctaUrl)}" style="display:inline-block;padding:14px 28px;background:${BRAND.primary};color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;letter-spacing:-0.01em;box-shadow:0 2px 8px rgba(124,58,237,0.35)">
                 ${escapeHtml(c.ctaText)} →
               </a>
               <div style="margin-top:10px;font-size:12px;color:${BRAND.textMuted}">14 Tage gratis · keine Kreditkarte · jederzeit kündbar</div>
