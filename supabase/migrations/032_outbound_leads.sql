@@ -40,9 +40,8 @@ create table if not exists public.outbound_leads (
   updated_at timestamptz not null default now()
 );
 
-create unique index if not exists outbound_leads_source_id_uniq
-  on public.outbound_leads (source, source_id)
-  where source_id is not null;
+alter table public.outbound_leads
+  add constraint outbound_leads_source_id_uniq unique (source, source_id);
 
 create index if not exists outbound_leads_status_idx on public.outbound_leads (status);
 create index if not exists outbound_leads_segment_idx on public.outbound_leads (segment);
