@@ -85,25 +85,26 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'marketing_agency_dsgvo_v2',
     segments: ['marketing_agency'],
     subjects: [
-      '9 von 10 Agenturen messen Print falsch',
-      'Eure Kunden-Reports haben eine Lücke',
-      'Was Top-Agenturen 2026 anders machen',
-      'Diese eine Zahl macht euch zur Premium-Agentur',
+      'So verlierst du gerade Premium-Kunden',
+      'Deine Kunden-Reports lügen dich an',
+      'Was deine Konkurrenz über Print weiß — du nicht',
+      'Stop. Bevor du die nächste Kampagne pitchst.',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `kurze Frage als Agentur in ${city}: wie messt ihr aktuell die Performance von Print- oder QR-Kampagnen für eure Kunden?`
-        : `kurze Frage: wie messt ihr aktuell die Performance von Print- oder QR-Kampagnen für eure Kunden?`,
-      painLine: 'Die meisten Tools zeigen Gesamt-Klicks — aber nicht welcher Standort, welche Auflage oder welche Aktion wirklich performt.',
+        ? `ehrliche Frage: kannst du deinen Kunden in ${city} nach jeder Kampagne sagen, welcher Standort wirklich Anfragen gebracht hat — oder gibst du ihnen Gesamt-Klicks und hoffst dass keiner nachhakt?`
+        : `ehrliche Frage: kannst du deinen Kunden nach jeder Kampagne sagen, welcher Standort wirklich Anfragen gebracht hat — oder gibst du ihnen Gesamt-Klicks und hoffst dass keiner nachhakt?`,
+      painLine: '2026 ist Gesamt-Klicks-Reporting der schnellste Weg, Premium-Kunden zu verlieren. Wer Standort-für-Standort messen kann, kassiert die größeren Budgets.',
       bullets: [
-        'QR-Code- & Kurzlink-Tracking pro Standort, Auflage, Variante',
-        'Live-Dashboard für Kunden-Reports — keine Excel-Exporte mehr',
-        'Eigene Domain (z.B. go.kundenname.de) + API + n8n-Integration',
+        'Scans pro Standort, pro Auflage, pro Variante — Drill-down in Live-Dashboard',
+        'Branded Kurz-Domain (z.B. go.kundenname.de) statt bit.ly — kostenlos inklusive',
+        'Daten bleiben in Frankfurt — kein Schrems-II, kein Bußgeld-Risiko für eure Kunden',
+        'Stripe-Rechnung über euch, white-labeled Reports für eure Kunden',
       ],
       comparison: [],
       ctaText: 'Spurig in 5 Min anschauen',
       ctaUrl: 'https://spurig.com',
-      closer: `Würde das eure Kampagnen-Berichte für Kunden konkreter machen${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''}?`,
+      closer: `Wenn ich euch das in 10 Min zeige${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — wäre das interessant?`,
     }),
   },
 
@@ -111,25 +112,26 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'gastronomy_qr_v2',
     segments: ['gastronomy'],
     subjects: [
-      '247 Scans Tisch 5 · 14 Scans Tisch 11',
-      'Eure Speisekarte hat ein Geheimnis',
-      'Welcher Tisch zieht euch das Geld?',
-      '9 von 10 Restaurants tracken falsch',
+      'So verlierst du Gäste an die Konkurrenz',
+      'Tisch 5: 247 Scans. Tisch 11: 14. Warum?',
+      'Deine Speisekarte verschweigt dir etwas',
+      'Stop. Bevor du wieder QR-Codes druckst.',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `falls ihr im ${companyName} (${city}) schon QR-Codes nutzt — Speisekarte, Bewertungs-Links, Reservierung — wisst ihr welcher davon wie oft genutzt wird?`
-        : `falls ihr im ${companyName} schon QR-Codes nutzt — Speisekarte, Bewertungs-Links, Reservierung — wisst ihr welcher davon wie oft genutzt wird?`,
-      painLine: 'Die meisten QR-Generatoren zeigen nur Total-Klicks. Spurig zeigt euch was wirklich funktioniert.',
+        ? `wenn dein Gast den QR-Code für die Speisekarte im ${companyName} (${city}) scannt — weißt du an welchem Tisch er sitzt, wie lange er bleibt, ob er die Bewertungs-Aktion gesehen hat?`
+        : `wenn dein Gast den QR-Code für die Speisekarte im ${companyName} scannt — weißt du an welchem Tisch er sitzt, wie lange er bleibt, ob er die Bewertungs-Aktion gesehen hat?`,
+      painLine: 'Generische QR-Generatoren zeigen Total-Klicks. Die Restaurants die wirklich wachsen, wissen genau welcher Tisch zur Premium-Zeit scannt — und welcher Aushang Google-Bewertungen bringt.',
       bullets: [
-        'Scans pro Tisch, pro Aktion, pro Tageszeit — live',
-        'Bewertungs-Boost: welcher Aushang bringt Google-Reviews',
-        'Alle Daten in der EU, kein Cookie-Banner nötig',
+        'Scans pro Tisch, pro Aktion, pro Tageszeit — live im Dashboard',
+        'Bewertungs-Booster: misst welcher Aushang Google-Reviews generiert',
+        'Wiederkehrer erkennen: gleicher Tisch, anderer Tag — anonymisiert',
+        'Server in Frankfurt — kein Cookie-Banner, kein DSGVO-Stress',
       ],
       comparison: [],
-      ctaText: 'Spurig 14 Tage gratis testen',
+      ctaText: '14 Tage gratis testen',
       ctaUrl: 'https://spurig.com',
-      closer: `Lohnt sich der 5-Min-Blick für ${shortCompanyName(companyName)}${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''}?`,
+      closer: `Wenn das deine Speisekarte-Daten live zeigt${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — wert für 5 Min?`,
     }),
   },
 
@@ -137,25 +139,26 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'crafts_sme_print_v2',
     segments: ['crafts_sme'],
     subjects: [
-      'Welcher Flyer verbrennt euer Geld?',
-      'Eure Visitenkarten haben ein Problem',
-      '30 Sek lesen · 450€ Flyer sparen',
-      'Was 9 von 10 Betriebe übersehen',
+      'So verbrennst du gerade 450 € pro Flyer-Druck',
+      'Welcher Flyer dir wirklich Kunden bringt — keiner weiß es',
+      'Deine Visitenkarten kosten dich Aufträge',
+      'Stop. Bevor du wieder Flyer bestellst.',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `${companyName} in ${city} hat sicher Visitenkarten, Flyer oder Werbung in der Umgebung — habt ihr Daten dazu welche Aktion am meisten Anfragen bringt?`
-        : `${companyName} hat sicher Visitenkarten, Flyer oder Werbung in der Umgebung — habt ihr Daten dazu welche Aktion am meisten Anfragen bringt?`,
-      painLine: 'Ohne Tracking sind alle Print-Investitionen Bauchgefühl. Mit Spurig wisst ihr nach 7 Tagen was wirklich funktioniert.',
+        ? `wenn du diese Woche Flyer oder Visitenkarten in ${city} verteilst — weißt du nach 7 Tagen objektiv welche der Aktionen Anfragen bringt? Oder ratest du beim nächsten Druck wieder?`
+        : `wenn du diese Woche Flyer oder Visitenkarten verteilst — weißt du nach 7 Tagen objektiv welche der Aktionen Anfragen bringt? Oder ratest du beim nächsten Druck wieder?`,
+      painLine: 'Ohne Tracking ist Print-Werbung Roulette. Die Konkurrenz die misst, druckt nur noch was funktioniert — und verdoppelt damit ihre Anfragen ohne mehr Budget.',
       bullets: [
-        'QR-Code auf jedem Druck — pro Aktion eigene Statistik',
-        'Setup in 5 Min, kein technisches Wissen nötig',
-        'Beim nächsten Druck: Top-Aktionen verdoppeln, Rest streichen',
+        'Ein QR-Code pro Aktion — separate Stats für jeden Flyer / jede Visitenkarte',
+        'Setup in 5 Min, ohne Tech-Wissen — du druckst einfach den QR auf den Print',
+        'Live-Daten nach 1-3 Tagen — beim nächsten Druck nur noch Top-Aktionen',
+        'EU-Hosting, kein Cookie-Banner, keine Datenschutz-Sorgen',
       ],
       comparison: [],
       ctaText: '14 Tage gratis testen',
       ctaUrl: 'https://spurig.com',
-      closer: `Macht das beim nächsten Druck Sinn für ${shortCompanyName(companyName)}${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''}?`,
+      closer: `Falls du nächste Woche eh wieder druckst${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — lohnt sich der 5-Min-Test vorher?`,
     }),
   },
 
@@ -163,25 +166,26 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'events_tourism_print_v2',
     segments: ['events_tourism'],
     subjects: [
-      '30-40% eures Plakat-Budgets = Müll',
-      '3.000 € pro Kampagne · einfach weg',
-      'Welche Plakate sieht eigentlich niemand?',
-      'Stoppt eure nächste Kampagne — bitte',
+      'So verlierst du 3.000 € pro Plakatkampagne',
+      'Deine Plakate hängen — aber wer sieht sie?',
+      '30-40 % deines Budgets sind Müll. Hier ist der Beweis.',
+      'Stop. Bevor du die nächste Kampagne buchst.',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
-        ? `Plakat- und Print-Kampagnen für ${city} — habt ihr Daten dazu welche Standorte tatsächlich Aufmerksamkeit bringen?`
-        : `Plakat- und Print-Kampagnen — habt ihr Daten dazu welche Standorte tatsächlich Aufmerksamkeit bringen?`,
-      painLine: 'Studien zeigen: 30-40 % der Plakat-Standorte bringen < 5 % der Wahrnehmung. Das sind 2.000-3.000 € pro Kampagne im Sand.',
+        ? `bei eurer letzten Plakatkampagne in ${city} — kannst du objektiv sagen, welche 3 Standorte 80 % der Aufmerksamkeit gebracht haben? Oder hast du am Ende der Laufzeit nur ein Bauchgefühl?`
+        : `bei eurer letzten Plakatkampagne — kannst du objektiv sagen, welche 3 Standorte 80 % der Aufmerksamkeit gebracht haben? Oder hast du am Ende der Laufzeit nur ein Bauchgefühl?`,
+      painLine: 'ZAW-Studie 2024: 30-40 % der Plakat-Standorte bringen weniger als 5 % der Wahrnehmung. Bei einer 7.500 € Kampagne sind das bis zu 3.000 € pro Quartal in tote Standorte. Jedes Jahr neu.',
       bullets: [
-        'QR-Code pro Standort — nach 7 Tagen seht ihr objektiv was funktioniert',
-        'Bei nächster Kampagne: Top-3 verdoppeln, Bottom-3 streichen',
+        'QR-Code pro Standort — nach 7 Tagen seht ihr objektiv welche performen',
+        'Beim nächsten Buchen: Top-3 Standorte verdoppeln, Bottom-3 streichen',
+        'Kunden-Reports automatisch generiert — keine Excel-Abende mehr',
         'EU-Hosting, DSGVO-konform, ab 8,99 €/Monat',
       ],
       comparison: [],
       ctaText: 'Spurig anschauen',
       ctaUrl: 'https://spurig.com',
-      closer: `Wäre das ein 5-Min-Test wert für ${shortCompanyName(companyName)}${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''}?`,
+      closer: `Wenn ich dir das mal an einer eurer Kampagnen durchrechne${greetingTarget !== 'zusammen' ? `, ${greetingTarget}` : ''} — wert?`,
     }),
   },
 };
