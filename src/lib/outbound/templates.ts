@@ -85,10 +85,10 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'marketing_agency_dsgvo_v2',
     segments: ['marketing_agency'],
     subjects: [
-      'Zahlt ihr für Werbung — oder für Daten?',
-      '500 € pro Plakat. 0 € Daten zurück.',
-      'Wo geht euer Werbebudget hin?',
-      'Eure Kampagnen ohne Tracking = Bauchgefühl',
+      'STOPP. Bevor ihr die nächste Kampagne pitcht.',
+      'Eure Kunden bezahlen für Daten die ihr nicht habt',
+      '40 % eurer Werbebudgets = Müll. Hier der Beweis.',
+      'Was Top-Agenturen 2026 wissen — ihr nicht',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
@@ -112,10 +112,10 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'gastronomy_qr_v2',
     segments: ['gastronomy'],
     subjects: [
-      'Du zahlst für Flyer. Wer scannt sie?',
-      'QR-Code auf der Karte. Daten? Fehlanzeige.',
-      'Wo geht dein Marketingbudget hin?',
-      'Tracken statt raten — geht das?',
+      'STOPP. Bevor du nochmal QR-Codes druckst.',
+      'Tisch 5 zieht 247 Scans. Eurer? Keine Ahnung.',
+      'Eure Speisekarte verschweigt euch was',
+      '70 % eurer Aktionen sind Geld-Verbrennen',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
@@ -139,10 +139,10 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'crafts_sme_print_v2',
     segments: ['crafts_sme'],
     subjects: [
-      'Du zahlst für Flyer. Bringen sie was?',
-      '450 € Druck. 0 € Daten. Warum?',
-      'Wo verschwindet dein Werbebudget?',
-      'Werbung ohne Tracking = Bauchgefühl',
+      'STOPP. Bevor du nochmal Flyer druckst.',
+      '450 € pro Druck — direkt im Mülleimer',
+      '70 % deiner Werbung ist Geld verbrennen',
+      'Eure Konkurrenz misst. Du nicht.',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
@@ -166,10 +166,10 @@ const TEMPLATES: Record<TemplateKey, Template> = {
     key: 'events_tourism_print_v2',
     segments: ['events_tourism'],
     subjects: [
-      'Zahlt ihr für Plakate — oder für Aufmerksamkeit?',
-      '3.000 € Kampagne. 0 € Erkenntnis.',
-      'Wo verschwindet euer Event-Budget?',
-      'Werbung ohne Tracking = Bauchgefühl',
+      'STOPP. Bevor ihr nochmal Plakate bucht.',
+      '3.000 € pro Kampagne verbrannt — jedes Quartal',
+      '30-40 % eurer Plakate sieht KEINER',
+      'Eure Werbung ist blind. Hier ist der Beweis.',
     ],
     build: ({ greetingTarget, companyName, city }) => ({
       hook: city
