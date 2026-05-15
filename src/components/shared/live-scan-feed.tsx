@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { Radio, Smartphone, Monitor, Tablet, QrCode, Link2 } from 'lucide-react';
+import { Radio, Smartphone, Monitor, Tablet, Link2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { QrPreview } from '@/components/shared/qr-preview';
 
 type RawScanEvent = {
   id: string;
@@ -143,7 +144,6 @@ export function LiveScanFeed() {
           events.map((event, i) => {
             const DeviceIcon = DEVICE_ICONS[event.device_type || ''] || Radio;
             const isLink = event.event_type === 'link_open';
-            const SourceIcon = isLink ? Link2 : QrCode;
             const isNewest = i === 0;
             const hasTitle = event.title !== event.short_code;
 
@@ -155,7 +155,15 @@ export function LiveScanFeed() {
                     className="pointer-events-none absolute inset-0 bg-brand/[0.06] opacity-0 motion-safe:animate-[scanFlash_1.6s_ease-out_forwards]"
                   />
                 )}
-                <SourceIcon className="relative h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+                {/* QR-Events: echte Mini-QR-Vorschau (Pattern unterscheidet Codes visuell).
+                    Link-Events: Link-Icon (kein QR vorhanden, der gerendert werden koennte). */}
+                {isLink ? (
+                  <Link2 className="relative h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+                ) : (
+                  <span className="relative">
+                    <QrPreview shortCode={event.short_code} size={28} />
+                  </span>
+                )}
                 <div className="relative flex min-w-0 flex-1 flex-col">
                   <span className="truncate text-[12.5px] font-medium leading-tight">{event.title}</span>
                   {hasTitle && (

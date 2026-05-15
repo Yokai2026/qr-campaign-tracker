@@ -1,7 +1,8 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { ArrowRight, ArrowUp, ArrowDown, Minus, MapPin, Megaphone, Link2 } from 'lucide-react';
+import { ArrowRight, ArrowUp, ArrowDown, Minus, MapPin, Megaphone, Link2, QrCode } from 'lucide-react';
+import { QrPreview } from '@/components/shared/qr-preview';
 
 const WINDOW_DAYS = 7;
 
@@ -12,6 +13,10 @@ type Entry = {
   count: number;
   delta: 'up' | 'down' | 'flat' | null;
   href: string;
+  /** Wenn gesetzt: rendert eine Mini-QR-Vorschau anstelle der Rang-Nummer.
+   *  Benutzt nur fuer die "QR-Codes"-Spalte — die anderen Top-Listen
+   *  haben keinen Code, der visualisiert werden koennte. */
+  previewCode?: string;
 };
 
 export async function TopPerformers() {
@@ -22,7 +27,7 @@ export async function TopPerformers() {
   const weekAgoIso = new Date(now - WINDOW_DAYS * 86_400_000).toISOString();
   const twoWeeksAgoIso = new Date(now - 2 * WINDOW_DAYS * 86_400_000).toISOString();
 
-  const [placementsCurr, placementsPrev, linksData, campaignsData] = await Promise.all([
+  const [placementsCurr, placementsPrev, linksData, campaignsData, qrCodesData] = await Promise.all([
     supabase
       .from('redirect_events')
       .select('placement_id, placements(id, name, placement_code, location:locations(venue_name))')
@@ -51,6 +56,15 @@ export async function TopPerformers() {
       .in('event_type', ['qr_open', 'link_open'])
       .eq('is_bot', false)
       .not('campaign_id', 'is', null)
+      .gte('created_at', weekAgoIso),
+    // Top-QR-Codes: redirect_events haben short_code, aber kein qr_codes_id-FK
+    // — wir greifen ueber qr_code_id (existiert auf redirect_events).
+    supabase
+      .from('redirect_events')
+      .select('qr_code_id, qr_codes!inner(id, short_code, note)')
+      .eq('event_type', 'qr_open')
+      .eq('is_bot', false)
+      .not('qr_code_id', 'is', null)
       .gte('created_at', weekAgoIso),
   ]);
 
@@ -106,6 +120,36 @@ export async function TopPerformers() {
       href: `/links/${id}`,
     }));
 
+  // Aggregate QR-Codes — Note dient als Display-Name, Fallback short_code
+  const qrMap: Record<string, { count: number; title: string; subtitle: string; shortCode: string }> = {};
+  (qrCodesData.data ?? []).forEach((e: Record<string, unknown>) => {
+    const qid = e.qr_code_id as string;
+    if (!qid) return;
+    if (!qrMap[qid]) {
+      const q = e.qr_codes as { short_code: string; note: string | null } | null;
+      const code = q?.short_code ?? '';
+      qrMap[qid] = {
+        count: 0,
+        title: q?.note?.trim() || code || 'QR-Code',
+        subtitle: q?.note?.trim() ? code : '',
+        shortCode: code,
+      };
+    }
+    qrMap[qid].count++;
+  });
+  const topQrCodes: Entry[] = Object.entries(qrMap)
+    .sort(([, a], [, b]) => b.count - a.count)
+    .slice(0, 5)
+    .map(([id, info]) => ({
+      id,
+      title: info.title,
+      subtitle: info.subtitle,
+      count: info.count,
+      delta: null,
+      href: `/qr-codes/${id}`,
+      previewCode: info.shortCode || undefined,
+    }));
+
   // Aggregate campaigns
   const campMap: Record<string, { count: number; name: string; slug: string }> = {};
   (campaignsData.data ?? []).forEach((e: Record<string, unknown>) => {
@@ -135,7 +179,8 @@ export async function TopPerformers() {
         <h2 className="text-[15px] font-semibold tracking-tight">Top-Performer · letzte 7 Tage</h2>
         <p className="mt-0.5 text-[13px] text-muted-foreground">Wer aktuell Aufrufe zieht</p>
       </div>
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <RankCard title="QR-Codes" icon={QrCode} entries={topQrCodes} allHref="/qr-codes" />
         <RankCard title="Platzierungen" icon={MapPin} entries={topPlacements} allHref="/placements" />
         <RankCard title="Kampagnen" icon={Megaphone} entries={topCampaigns} allHref="/campaigns" />
         <RankCard title="Kurzlinks" icon={Link2} entries={topLinks} allHref="/links" />
@@ -182,9 +227,17 @@ function RankCard({
         {entries.length > 0 ? entries.map((e, idx) => (
           <li key={e.id}>
             <Link href={e.href} className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30">
-              <span className="tabular-nums flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-semibold text-muted-foreground">
-                {idx + 1}
-              </span>
+              {/* QR-Vorschau wenn previewCode gesetzt (Spalte "QR-Codes"),
+                  sonst die klassische Rang-Nummer. Die Reihenfolge ist durch
+                  die Listen-Position bereits sichtbar — auf die Nummer verzichten
+                  wir hier zugunsten der Wiedererkennbarkeit. */}
+              {e.previewCode ? (
+                <QrPreview shortCode={e.previewCode} size={28} />
+              ) : (
+                <span className="tabular-nums flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-semibold text-muted-foreground">
+                  {idx + 1}
+                </span>
+              )}
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[13px] font-medium group-hover:text-brand transition-colors">{e.title}</div>
                 {e.subtitle && (

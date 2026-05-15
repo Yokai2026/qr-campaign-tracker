@@ -28,6 +28,8 @@ import { format, subDays } from 'date-fns';
 import { CHART_PALETTE, SERIES_COLORS, AXIS_STYLE, GRID_STYLE, TOOLTIP_STYLE, BAR_MAX_SIZE } from '@/lib/chart-config';
 import dynamic from 'next/dynamic';
 import { CountryChart } from '@/components/shared/country-chart';
+import { InsightBanner } from '@/components/shared/insight-banner';
+import { ConversionFunnel } from '@/components/shared/conversion-funnel';
 
 // react-simple-maps zieht D3 + topojson nach (~250KB). Nur laden,
 // wenn der User wirklich bis zum Karten-Block gescrollt hat.
@@ -469,6 +471,33 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
   const conversionRate = kpis.totalOpens > 0 ? ((kpis.ctaClicks / kpis.totalOpens) * 100).toFixed(1) : '0.0';
   const formRate = kpis.totalOpens > 0 ? ((kpis.formSubmits / kpis.totalOpens) * 100).toFixed(1) : '0.0';
 
+  // Anomalie-Erkennung: Tage, an denen Total > Mittelwert + 2*Standardabweichung
+  // — werden im Chart als orange Dots hervorgehoben. Hilft User "ungewoehnliche
+  // Spitzen" zu erkennen ohne dass er die Kurve manuell scannen muss.
+  // Mindestens 5 Tage Daten noetig, damit eine sinnvolle Statistik moeglich ist.
+  const anomalyThreshold = (() => {
+    if (timeSeriesData.length < 5) return Number.POSITIVE_INFINITY;
+    const totals = timeSeriesData.map((d) => d.qr + d.link);
+    const mean = totals.reduce((a, b) => a + b, 0) / totals.length;
+    const variance =
+      totals.reduce((a, b) => a + (b - mean) ** 2, 0) / totals.length;
+    const std = Math.sqrt(variance);
+    // 2-Sigma Schwelle, mit Mindestabstand zur Vermeidung von "alles ist Anomalie" bei flat data
+    return Math.max(mean + 2 * std, mean + 3);
+  })();
+  const timeSeriesWithAnomalies = timeSeriesData.map((d) => ({
+    ...d,
+    total: d.qr + d.link,
+    isAnomaly: d.qr + d.link > anomalyThreshold,
+  }));
+  const anomalyCount = timeSeriesWithAnomalies.filter((d) => d.isAnomaly).length;
+
+  // Top-Kampagne fuer Insight-Banner (bereits in campaignData sortiert)
+  const topCampaignForInsight =
+    campaignData.length > 0 && campaignData[0].opens > 0
+      ? { name: campaignData[0].name, opens: campaignData[0].opens }
+      : null;
+
   const chartTransitionKey = `${dateFrom}-${dateTo}-${campaignId}-${district}-${source}`;
 
   async function handleExport() {
@@ -644,18 +673,42 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         >
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Quelle</Label>
-            <Select value={source} onValueChange={(v) => setSource((v ?? 'all') as SourceFilter)}>
-              <SelectTrigger className="h-9 text-[13px]">
-                <SelectValue>
-                  {source === 'all' ? 'Alle Quellen' : source === 'qr' ? 'QR-Codes' : 'Kurzlinks'}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Quellen</SelectItem>
-                <SelectItem value="qr">QR-Codes</SelectItem>
-                <SelectItem value="link">Kurzlinks</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Chips statt Dropdown — nur 3 Optionen, sofort sichtbar/klickbar
+                spart einen Klick im Vergleich zum Select. */}
+            <div
+              role="radiogroup"
+              aria-label="Quelle filtern"
+              className="inline-flex h-9 w-full items-center gap-0.5 rounded-md border border-border bg-muted/30 p-0.5"
+            >
+              {(
+                [
+                  { value: 'all', label: 'Alle', icon: null },
+                  { value: 'qr', label: 'QR-Codes', icon: QrCode },
+                  { value: 'link', label: 'Kurzlinks', icon: Link2 },
+                ] as const
+              ).map((opt) => {
+                const active = source === opt.value;
+                const Icon = opt.icon;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => setSource(opt.value as SourceFilter)}
+                    className={
+                      'flex flex-1 items-center justify-center gap-1.5 rounded-sm px-2 py-1 text-[12px] font-medium transition-colors ' +
+                      (active
+                        ? 'bg-card text-foreground shadow-[var(--shadow-xs)]'
+                        : 'text-muted-foreground hover:text-foreground')
+                    }
+                  >
+                    {Icon && <Icon className="h-3 w-3" strokeWidth={2} />}
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label className="text-[12px] text-muted-foreground">Kampagne</Label>
@@ -689,6 +742,19 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Insight-Banner — Plain-Language-Zusammenfassung, erfuellt die "5-Sekunden-Regel":
+          User sieht IN EINEM SATZ wie es im Zeitraum gerade laeuft, ohne 7 KPI-Cards zu scannen. */}
+      {!loading && (
+        <InsightBanner
+          totalOpens={kpis.totalOpens}
+          delta={deltas.totalOpens}
+          topCampaign={topCampaignForInsight}
+          peakSlot={peakSlot}
+          uniqueVisitors={kpis.uniqueScans}
+          hasData={kpis.totalOpens > 0}
+        />
+      )}
 
       {loading ? (
         <div className="space-y-4">
@@ -767,39 +833,50 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               </div>
             </div>
 
-            {/* Engagement — Sub-Block der Überblick-Section, nur wenn Landing-Page-Tracking aktiv. */}
+            {/* Engagement — Sub-Block der Überblick-Section, nur wenn Landing-Page-Tracking aktiv.
+                Funnel ergaenzt die Endzahlen mit dem Drop-off zwischen den Steps. */}
             {(kpis.ctaClicks > 0 || kpis.formSubmits > 0) && (
-              <div className="space-y-2 pt-1">
+              <div className="space-y-3 pt-1">
                 <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                   Engagement auf der Zielseite
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
-                  <KPIStatCard
-                    label="CTA-Klicks"
-                    value={kpis.ctaClicks}
-                    icon={MousePointerClick}
-                    subtext="Klicks auf der Zielseite"
-                    hint="Klicks auf Buttons/Links auf deiner Zielseite (via Tracking-Script)."
-                    delta={deltas.ctaClicks}
-                    deltaLabel="vs. Vorperiode"
-                  />
-                  <KPIStatCard
-                    label="Formular-Abschlüsse"
-                    value={kpis.formSubmits}
-                    icon={FileText}
-                    subtext={kpis.formSubmits ? `${formRate}% der Besucher` : 'Noch keine Abschlüsse'}
-                    hint="Gesendete Formulare auf der Zielseite (z. B. Anmeldungen, Kontakte)."
-                    delta={deltas.formSubmits}
-                    deltaLabel="vs. Vorperiode"
-                  />
-                  <KPIStatCard
-                    label="Conversion-Rate"
-                    value={`${conversionRate}%`}
-                    icon={ArrowUpRight}
-                    subtext="CTA-Klicks ÷ Aufrufe"
-                    hint="Anteil der Aufrufe, die zu einer CTA-Aktion geführt haben."
-                    delta={deltas.conversionRate}
-                    deltaLabel="vs. Vorperiode"
+                <div className="grid gap-3 lg:grid-cols-5">
+                  {/* KPI-Cards — 3 Cards in 3 Spalten (Desktop), darunter Funnel mit 2 Spalten */}
+                  <div className="grid gap-3 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-1">
+                    <KPIStatCard
+                      label="CTA-Klicks"
+                      value={kpis.ctaClicks}
+                      icon={MousePointerClick}
+                      subtext="Klicks auf der Zielseite"
+                      hint="Klicks auf Buttons/Links auf deiner Zielseite (via Tracking-Script)."
+                      delta={deltas.ctaClicks}
+                      deltaLabel="vs. Vorperiode"
+                    />
+                    <KPIStatCard
+                      label="Formular-Abschlüsse"
+                      value={kpis.formSubmits}
+                      icon={FileText}
+                      subtext={kpis.formSubmits ? `${formRate}% der Besucher` : 'Noch keine Abschlüsse'}
+                      hint="Gesendete Formulare auf der Zielseite (z. B. Anmeldungen, Kontakte)."
+                      delta={deltas.formSubmits}
+                      deltaLabel="vs. Vorperiode"
+                    />
+                    <KPIStatCard
+                      label="Conversion-Rate"
+                      value={`${conversionRate}%`}
+                      icon={ArrowUpRight}
+                      subtext="CTA-Klicks ÷ Aufrufe"
+                      hint="Anteil der Aufrufe, die zu einer CTA-Aktion geführt haben."
+                      delta={deltas.conversionRate}
+                      deltaLabel="vs. Vorperiode"
+                    />
+                  </div>
+                  {/* Conversion-Funnel — visualisiert den Drop-off Aufruf→CTA→Formular */}
+                  <ConversionFunnel
+                    totalOpens={kpis.totalOpens}
+                    ctaClicks={kpis.ctaClicks}
+                    formSubmits={kpis.formSubmits}
+                    className="lg:col-span-2"
                   />
                 </div>
               </div>
@@ -822,17 +899,19 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
           </section>
 
           {/* 02 — Verlauf: Zeitreihen-Chart als eigener Block. Volle Breite,
-              ohne Konkurrenz durch andere Charts — das ist DER Trend-Indikator. */}
+              ohne Konkurrenz durch andere Charts — das ist DER Trend-Indikator.
+              Anomalie-Dots: Tage mit Total > Mittelwert+2σ werden orange markiert,
+              damit der User Spitzen sofort sieht ohne mit dem Auge zu scannen. */}
           <section className="space-y-4 scroll-mt-24" aria-labelledby="section-verlauf">
             <AnalyticsSectionHeader
               step="02 · Verlauf"
               title="Aufrufe im Zeitverlauf"
-              description="QR-Scans und Link-Klicks Tag für Tag — erkenne Spitzen, Wochen-Muster und Kampagnen-Effekte"
+              description="QR-Scans und Link-Klicks Tag für Tag — auffällige Spitzen sind orange markiert"
             />
             <ChartTransition transitionKey={chartTransitionKey}>
               <ChartCard title="QR-Scans & Link-Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum">
                 <ResponsiveContainer width="100%" height={320}>
-                  <LineChart data={timeSeriesData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+                  <LineChart data={timeSeriesWithAnomalies} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                     <CartesianGrid {...GRID_STYLE} />
                     <XAxis
                       dataKey="date"
@@ -854,11 +933,130 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                       }
                     />
                     <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
-                    <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                    <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                    <Line
+                      type="monotone"
+                      dataKey="qr"
+                      name="QR-Scans"
+                      stroke={SERIES_COLORS.scans}
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="link"
+                      name="Link-Klicks"
+                      stroke={SERIES_COLORS.clicks}
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                    />
+                    {/* Unsichtbare Anomalie-Linie ueber dem "total" — nur fuer die orange
+                        Dots an Spitzen-Tagen. Selbst nicht sichtbar (transparent stroke). */}
+                    <Line
+                      type="monotone"
+                      dataKey="total"
+                      name="Anomalien"
+                      stroke="transparent"
+                      strokeWidth={0}
+                      legendType="none"
+                      activeDot={false}
+                      isAnimationActive={false}
+                      dot={(props: { cx?: number; cy?: number; payload?: { isAnomaly?: boolean } }) => {
+                        if (!props.payload?.isAnomaly || props.cx == null || props.cy == null) {
+                          return <g />;
+                        }
+                        return (
+                          <g>
+                            <circle
+                              cx={props.cx}
+                              cy={props.cy}
+                              r={8}
+                              fill="rgb(251 146 60 / 0.18)"
+                              stroke="rgb(251 146 60 / 0.4)"
+                              strokeWidth={1}
+                            />
+                            <circle cx={props.cx} cy={props.cy} r={4} fill="rgb(251 146 60)" stroke="white" strokeWidth={1.5} />
+                          </g>
+                        );
+                      }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </ChartCard>
+              {anomalyCount > 0 && (
+                <p className="mt-2 flex items-center gap-1.5 text-[12px] text-muted-foreground">
+                  <span className="inline-flex h-2 w-2 rounded-full bg-orange-400" />
+                  <span>
+                    <span className="font-medium text-foreground tabular-nums">{anomalyCount}</span>{' '}
+                    {anomalyCount === 1 ? 'auffälliger Tag' : 'auffällige Tage'} im Zeitraum (Total ≥ Mittelwert + 2σ) —
+                    schau, ob eine Kampagne oder ein Event den Spike erklärt
+                  </span>
+                </p>
+              )}
+
+              {/* Fokussierte Einzel-Charts: gleicher Zeitraum, aber QR und Link
+                  je in einem eigenen Bar-Chart. Macht es einfacher den isolierten
+                  Trend einer Quelle zu lesen, ohne dass die jeweils andere stoert. */}
+              <div className="mt-2 grid gap-4 lg:grid-cols-2">
+                <ChartCard title="QR-Scans im Verlauf" empty={timeSeriesData.length === 0 || timeSeriesData.every((d) => d.qr === 0)} emptyText="Keine QR-Scans im Zeitraum">
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={timeSeriesData} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
+                      <CartesianGrid {...GRID_STYLE} vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        {...AXIS_STYLE}
+                        tickFormatter={(d: string) => {
+                          const date = new Date(d);
+                          return date.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+                        }}
+                        minTickGap={24}
+                      />
+                      <YAxis {...AXIS_STYLE} allowDecimals={false} />
+                      <Tooltip
+                        contentStyle={TOOLTIP_STYLE}
+                        cursor={{ fill: 'var(--muted)' }}
+                        labelFormatter={(d) =>
+                          typeof d === 'string'
+                            ? new Date(d).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long', year: 'numeric' })
+                            : String(d ?? '')
+                        }
+                        formatter={(value) => [Number(value ?? 0).toLocaleString('de-DE'), 'QR-Scans']}
+                      />
+                      <Bar dataKey="qr" name="QR-Scans" fill={SERIES_COLORS.scans} radius={[4, 4, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+
+                <ChartCard title="Link-Klicks im Verlauf" empty={timeSeriesData.length === 0 || timeSeriesData.every((d) => d.link === 0)} emptyText="Keine Link-Klicks im Zeitraum">
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={timeSeriesData} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
+                      <CartesianGrid {...GRID_STYLE} vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        {...AXIS_STYLE}
+                        tickFormatter={(d: string) => {
+                          const date = new Date(d);
+                          return date.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+                        }}
+                        minTickGap={24}
+                      />
+                      <YAxis {...AXIS_STYLE} allowDecimals={false} />
+                      <Tooltip
+                        contentStyle={TOOLTIP_STYLE}
+                        cursor={{ fill: 'var(--muted)' }}
+                        labelFormatter={(d) =>
+                          typeof d === 'string'
+                            ? new Date(d).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long', year: 'numeric' })
+                            : String(d ?? '')
+                        }
+                        formatter={(value) => [Number(value ?? 0).toLocaleString('de-DE'), 'Link-Klicks']}
+                      />
+                      <Bar dataKey="link" name="Link-Klicks" fill={SERIES_COLORS.clicks} radius={[4, 4, 0, 0]} maxBarSize={BAR_MAX_SIZE} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+              </div>
             </ChartTransition>
           </section>
 

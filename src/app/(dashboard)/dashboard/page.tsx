@@ -14,6 +14,8 @@ import { Overview } from './sections/overview';
 import { Attention } from './sections/attention';
 import { TopPerformers } from './sections/top-performers';
 import { QrHealthCheck } from './sections/qr-health-check';
+import { InsightSummary } from './sections/insight-summary';
+import { SevenDayBars } from './sections/seven-day-bars';
 
 function HeroSkeleton() {
   return <Skeleton className="h-96 rounded-2xl" />;
@@ -21,10 +23,19 @@ function HeroSkeleton() {
 
 function RanksSkeleton() {
   return (
-    <div className="grid gap-3 md:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, i) => (
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, i) => (
         <Skeleton key={i} className="h-64 rounded-2xl" />
       ))}
+    </div>
+  );
+}
+
+function SevenDaySkeleton() {
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      <Skeleton className="h-[260px] rounded-2xl" />
+      <Skeleton className="h-[260px] rounded-2xl" />
     </div>
   );
 }
@@ -83,9 +94,22 @@ export default async function DashboardPage() {
         <OnboardingCard />
       </Suspense>
 
+      {/* Insight-Banner — "5-Sekunden-Regel": User sieht in einem Satz wie's laeuft.
+          Steht VOR dem Hero-Block, damit "wie geht's mir gerade?" sofort beantwortet wird,
+          bevor man in Detailzahlen taucht. */}
+      <Suspense fallback={<Skeleton className="h-20 rounded-2xl" />}>
+        <InsightSummary />
+      </Suspense>
+
       {/* Übersicht — Hero-Style Dashboard mit KPIs, Verlauf, Top-Kampagnen, Geo/Device/Peak */}
       <Suspense fallback={<HeroSkeleton />}>
         <Overview />
+      </Suspense>
+
+      {/* 7-Tage-Verlauf — kompakte Bar-Charts (QR-Scans + Link-Klicks).
+          Steht vor TopPerformer: erst "wie war meine Woche?", dann "wer war oben"? */}
+      <Suspense fallback={<SevenDaySkeleton />}>
+        <SevenDayBars />
       </Suspense>
 
       {/* Top Performers — what's actually moving this week */}
