@@ -7,7 +7,9 @@ import type { ContentCluster } from '@/lib/content/pillars';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+// 300s max auf Vercel Pro. Blog-Generation + 3 Repurpose-Calls + Image-Generation
+// kann 90-120s dauern wenn Web-Search aktiv ist.
+export const maxDuration = 300;
 
 /**
  * POST /api/admin/content/ideas/expand

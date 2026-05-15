@@ -61,21 +61,33 @@ export function IdeasBacklog() {
 
   async function generate(cluster: Cluster) {
     setGeneratingCluster(cluster);
+    toast.info(`Generiere Ideen fuer ${CLUSTER_LABEL[cluster]} — kann 30-60 Sek dauern (Claude sucht im Web)…`);
     try {
       const r = await fetch('/api/admin/content/ideas/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cluster, count: 15 }),
       });
-      const j = await r.json();
-      if (j.generated > 0) {
-        toast.success(`${j.generated} neue Ideen für ${CLUSTER_LABEL[cluster]}${j.duplicates > 0 ? ` (${j.duplicates} Duplikate übersprungen)` : ''}`);
-        queryClient.invalidateQueries({ queryKey: ['content-ideas'] });
-      } else {
-        toast.info('Alle Ideen waren bereits im Backlog (Duplikate)');
+      // r.json() darf bei 504/Empty failen — abfangen
+      let j: { generated?: number; duplicates?: number; error?: string } = {};
+      try { j = await r.json(); } catch { /* ignore parse */ }
+
+      if (!r.ok) {
+        const msg = j.error ?? `HTTP ${r.status}`;
+        toast.error(`Generierung fehlgeschlagen: ${msg.slice(0, 200)}`);
+        return;
       }
-    } catch {
-      toast.error('Generierung fehlgeschlagen');
+      if ((j.generated ?? 0) > 0) {
+        toast.success(`${j.generated} neue Ideen für ${CLUSTER_LABEL[cluster]}${(j.duplicates ?? 0) > 0 ? ` (${j.duplicates} Duplikate übersprungen)` : ''}`);
+        queryClient.invalidateQueries({ queryKey: ['content-ideas'] });
+      } else if ((j.duplicates ?? 0) > 0) {
+        toast.info(`Alle ${j.duplicates} generierten Ideen waren Duplikate. Versuch's nochmal — Claude liefert beim 2. Anlauf andere.`);
+      } else {
+        toast.warning('Generierung lieferte 0 Ideen. Pruefe /admin/content Logs.');
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'unknown';
+      toast.error(`Network/Timeout: ${msg.slice(0, 150)}`);
     } finally {
       setGeneratingCluster(null);
     }

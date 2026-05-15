@@ -5,7 +5,9 @@ import { CLUSTERS, type ContentCluster } from '@/lib/content/pillars';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+// 300s ist max auf Vercel Pro. Auf Hobby wird's bei 60s gekappt — dann muss
+// CONTENT_WEB_SEARCH_MAX_USES auf 1 oder 0 (=off) gesetzt werden.
+export const maxDuration = 300;
 
 /**
  * POST /api/admin/content/ideas/generate
