@@ -65,8 +65,8 @@ Klassifiziere genau einen Intent:
 - "other"           = Sonstiges
 
 Drafte eine Antwort-Mail (deutsch, du-Form, max 4 Saetze):
-- Bei "interested": kurz freuen + konkreten Naechsten-Schritt vorschlagen (15-Min-Call, Demo-Link)
-- Bei "question": antworte konkret auf die Frage + sanfter Termin-Hinweis
+- Bei "interested": kurz freuen + konkret 15-Min-Call vorschlagen MIT diesem Booking-Link am Ende der Mail: ${process.env.CALENDLY_URL ?? 'https://cal.com/spurig/15min'}
+- Bei "question": antworte konkret auf die Frage + optional Booking-Link ${process.env.CALENDLY_URL ?? 'https://cal.com/spurig/15min'} fuer Vertiefung
 - Bei "not_interested": respektvoll bedanken + Tuer offen halten ("falls sich was aendert")
 - Bei "unsubscribe": kurze Bestaetigung dass aus Liste entfernt
 - Bei "spam"/"other": gar keine Antwort drafte (return null)

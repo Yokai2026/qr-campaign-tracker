@@ -73,6 +73,12 @@ type Stats = {
     newMrr: number;
     churnedMrr: number;
   }>;
+  /** Stripe-Webhook-Health: null wenn webhook_diagnostics noch keinen Eintrag hat. */
+  stripeWebhook: {
+    lastReceivedAt: string | null;
+    lastEventType: string | null;
+    totalReceived: number;
+  } | null;
 };
 
 type Plan = 'monthly' | 'yearly' | 'manual' | 'other' | 'trial' | 'free';
@@ -289,6 +295,12 @@ export function AdminClient() {
           }
         />
       </section>
+
+      {/* Stripe-Webhook-Health — kompakter Banner direkt unter den Business-KPIs.
+          Zeigt nur Warnung wenn Webhook seit > 24h kein Event gesehen hat ODER
+          noch nie. Bei aktivem Webhook bleibt's komplett unsichtbar (kein
+          UI-Noise wenn alles laeuft). */}
+      <StripeWebhookBanner stripeWebhook={data.stripeWebhook} hasPayingCustomers={data.payments.total > 0} />
 
       {/* LIVE-Strip */}
       <section

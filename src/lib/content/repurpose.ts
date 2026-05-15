@@ -261,7 +261,11 @@ Style:
 - Erste Person, vergangenheits-Form ("Ich hatte das Problem...", "Ich hab probiert...")
 - Markdown (## Sub-Headers, **bold** sparsam, - Listen wo's passt)
 - Mind. EINE Stelle wo du eigene Fehleinschaetzung zugibst ("Ich dachte erst...")
-- Subreddits-Empfehlung am Ende: "Passt zu r/de_EDV, r/Marketing, r/dsgvo"
+- Subreddits-Empfehlung am Ende: waehle 2-3 passende DACH/internationale Subs aus dieser Liste:
+  · DACH-B2B: r/de_EDV, r/de_marketing, r/Selbststaendig, r/Unternehmer, r/Finanzen (wenn ROI-Topic)
+  · DACH-DSGVO: r/de_IT, r/datenschutz_de, r/recht
+  · International (englisch-Posts erlaubt): r/SaaS, r/Entrepreneur, r/marketing, r/smallbusiness, r/GDPR
+  · Praezise empfehlen: gleich angeben WARUM dieser Sub passt (1 Zeile)
 - VERBOTEN: CTAs, Werbe-Phrasen, "Spoiler:", emotionale Manipulation
 
 Antworte mit:

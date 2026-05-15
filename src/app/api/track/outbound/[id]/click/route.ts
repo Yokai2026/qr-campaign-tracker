@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
+import { notifyLifecycle } from '@/lib/notify/webhook';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+
+const SEGMENT_LABELS: Record<string, string> = {
+  marketing_agency: 'Marketing-Agentur',
+  gastronomy: 'Gastronomie',
+  crafts_sme: 'Handwerk & KMU',
+  events_tourism: 'Events & Tourismus',
+};
 
 /**
  * Eigener Click-Tracker — alle Outbound-Mail-Links zeigen hierhin und
@@ -56,6 +64,7 @@ export async function GET(
       // 'replied'/'converted' damit explizite Stati nicht ueberschrieben werden.
       // .select() zurueckgegeben damit wir 0-row-Updates loggen koennen — sonst
       // schlucken wir Race-Conditions stillschweigend (Original-Bug-Quelle).
+      const isFirstClick = !current.clicked_at;
       if (current.lead_id) {
         const { data: updatedLeads, error: leadErr } = await sb
           .from('outbound_leads')
@@ -70,6 +79,32 @@ export async function GET(
           // 'converted'/'bounced'/'do_not_contact'. Nicht zwingend ein Bug,
           // aber wir loggen damit man's im Audit nachvollziehen kann.
           console.warn('[track/click] lead-status not updated (no match): lead_id=' + current.lead_id);
+        }
+
+        // ERSTER Click eines Leads → Discord-Ping. Sekunden-genaue Follow-Up-
+        // Chance fuer David. Best-effort fire-and-forget, blockt Redirect nicht.
+        if (isFirstClick) {
+          void (async () => {
+            const { data: lead } = await sb
+              .from('outbound_leads')
+              .select('name, email, segment, city')
+              .eq('id', current.lead_id)
+              .maybeSingle();
+            if (!lead) return;
+            const fields: Array<{ name: string; value: string }> = [
+              { name: 'Firma', value: lead.name },
+              { name: 'Email', value: lead.email ?? '—' },
+              { name: 'Segment', value: SEGMENT_LABELS[lead.segment] ?? lead.segment },
+            ];
+            if (lead.city) fields.push({ name: 'Stadt', value: lead.city });
+            await notifyLifecycle({
+              title: '🎯 Cold-Mail-Click',
+              description: `**${lead.name}** hat einen Link in deiner Cold-Mail geklickt — jetzt ist das beste Follow-Up-Window.`,
+              level: 'success',
+              fields,
+              url: 'https://spurig.com/admin/outbound',
+            });
+          })().catch((e) => console.warn('[track/click] notify failed:', e));
         }
       }
     }

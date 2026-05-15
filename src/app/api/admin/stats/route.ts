@@ -184,7 +184,29 @@ export async function GET() {
     .gte('snapshot_date', thirtyDaysAgo)
     .order('snapshot_date', { ascending: true });
 
+  // Stripe-Webhook-Health: aus webhook_diagnostics. Nicht in Promise.all oben,
+  // damit ein fehlender Tabellen-Eintrag (vor erster Migration-Anwendung) den
+  // ganzen Stats-Call nicht killt.
+  let stripeWebhook: { lastReceivedAt: string | null; lastEventType: string | null; totalReceived: number } | null = null;
+  try {
+    const { data: diag } = await sb
+      .from('webhook_diagnostics')
+      .select('last_received_at, last_event_type, total_received')
+      .eq('service', 'stripe')
+      .maybeSingle();
+    if (diag) {
+      stripeWebhook = {
+        lastReceivedAt: diag.last_received_at as string | null,
+        lastEventType: diag.last_event_type as string | null,
+        totalReceived: (diag.total_received as number) ?? 0,
+      };
+    }
+  } catch {
+    // best-effort
+  }
+
   return NextResponse.json({
+    stripeWebhook,
     timestamp: new Date().toISOString(),
     users: {
       total: profilesAllRes.count ?? 0,
