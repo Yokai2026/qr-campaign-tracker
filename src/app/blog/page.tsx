@@ -3,7 +3,31 @@ import { CalendarDays, ArrowRight, BookOpen } from 'lucide-react';
 import { SiteHeader } from '@/components/landing/site-header';
 import { SiteFooter } from '@/components/landing/site-footer';
 import { GridBackdrop } from '@/components/ui/grid-backdrop';
+import { createServiceClient } from '@/lib/supabase/server';
 import { ARTICLES } from './articles';
+
+export const dynamic = 'force-dynamic';
+
+async function fetchDbBlogs() {
+  try {
+    const sb = await createServiceClient();
+    const { data } = await sb
+      .from('content_blogs')
+      .select('slug, title, description, tags, body_md, created_at')
+      .order('created_at', { ascending: false });
+    return (data ?? []).map((b) => ({
+      slug: b.slug,
+      title: b.title,
+      description: b.description,
+      publishedAt: (b.created_at ?? '').slice(0, 10),
+      author: 'Spurig-Team',
+      readingMinutes: Math.max(2, Math.round((b.body_md ?? '').split(/\s+/).length / 220)),
+      tags: b.tags ?? [],
+    }));
+  } catch {
+    return [];
+  }
+}
 
 export const metadata = {
   title: 'Spurig Blog — QR-Code-Tracking, DSGVO & Print-Marketing',
@@ -18,8 +42,15 @@ export const metadata = {
   },
 };
 
-export default function BlogIndexPage() {
-  const articles = [...ARTICLES].sort(
+export default async function BlogIndexPage() {
+  const dbBlogs = await fetchDbBlogs();
+  const dbSlugs = new Set(dbBlogs.map((b) => b.slug));
+  // File + DB mergen, dedupe (DB-Slug gewinnt)
+  const merged = [
+    ...dbBlogs,
+    ...ARTICLES.filter((a) => !dbSlugs.has(a.slug)),
+  ];
+  const articles = merged.sort(
     (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   );
 
@@ -73,7 +104,7 @@ export default function BlogIndexPage() {
                   </p>
                   {a.tags && a.tags.length > 0 && (
                     <div className="mt-4 flex flex-wrap items-center gap-1.5">
-                      {a.tags.map((t) => (
+                      {a.tags.map((t: string) => (
                         <span
                           key={t}
                           className="inline-flex items-center rounded-md bg-muted/60 px-1.5 py-0.5 text-[10.5px] font-medium uppercase tracking-wide text-muted-foreground"
