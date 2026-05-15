@@ -181,5 +181,32 @@ export async function POST(request: NextRequest) {
     await sb.from('outbound_leads').update(leadUpdate).eq('id', msgs[0].lead_id);
   }
 
+  // Diagnostik: jeden signatur-verifizierten Eingang in webhook_diagnostics
+  // tracken — damit der Admin-Banner zuverlaessig zeigt ob Resend Events liefert,
+  // auch wenn die jeweilige resend_message_id keinem outbound_message-Eintrag matcht.
+  // Best-effort: Fehler werden geschluckt, damit die Webhook-Antwort nicht blockiert.
+  try {
+    const { data: current } = await sb
+      .from('webhook_diagnostics')
+      .select('total_received')
+      .eq('service', 'resend')
+      .maybeSingle();
+    const totalReceived = (current?.total_received ?? 0) + 1;
+    await sb
+      .from('webhook_diagnostics')
+      .upsert(
+        {
+          service: 'resend',
+          last_received_at: new Date().toISOString(),
+          last_event_type: type,
+          total_received: totalReceived,
+        },
+        { onConflict: 'service' },
+      );
+  } catch (e) {
+    // Tabelle existiert evtl. noch nicht (Migration nicht applied). Silent skip.
+    console.warn('[webhooks/resend] diagnostics upsert skipped:', e);
+  }
+
   return NextResponse.json({ ok: true, type, resendMessageId, ...updates });
 }

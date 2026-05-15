@@ -156,18 +156,38 @@ export async function GET() {
   }
   const daily = Array.from(days.values());
 
-  // Hoechstes Webhook-Event-Timestamp ermitteln
-  const webhookTimestamps: string[] = [];
-  const [d, o, c, b, cm] = lastWebhook;
-  if (d.data?.delivered_at) webhookTimestamps.push(d.data.delivered_at as string);
-  if (o.data?.opened_at) webhookTimestamps.push(o.data.opened_at as string);
-  if (c.data?.clicked_at) webhookTimestamps.push(c.data.clicked_at as string);
-  if (b.data?.bounced_at) webhookTimestamps.push(b.data.bounced_at as string);
-  if (cm.data?.complained_at) webhookTimestamps.push(cm.data.complained_at as string);
-  const lastWebhookAt =
-    webhookTimestamps.length > 0
-      ? webhookTimestamps.sort().slice(-1)[0]
-      : null;
+  // Webhook-Diagnostik: Bevorzugt aus dedizierter webhook_diagnostics-Tabelle.
+  // Das ist die ehrlichste Quelle, da dort JEDER signaturen-verifizierte Eingang
+  // gelogged wird (auch wenn die Resend-ID keinem outbound_message-Eintrag matcht).
+  // Fallback: aelteres Verhalten (juengstes delivered/opened/clicked/...-Feld
+  // ueber alle Messages). Greift wenn die Tabelle noch nicht existiert oder leer ist.
+  let lastWebhookAt: string | null = null;
+  try {
+    const { data: diag } = await sb
+      .from('webhook_diagnostics')
+      .select('last_received_at')
+      .eq('service', 'resend')
+      .maybeSingle();
+    if (diag?.last_received_at) {
+      lastWebhookAt = diag.last_received_at as string;
+    }
+  } catch {
+    // Tabelle nicht da → Fallback unten
+  }
+
+  if (!lastWebhookAt) {
+    const webhookTimestamps: string[] = [];
+    const [d, o, c, b, cm] = lastWebhook;
+    if (d.data?.delivered_at) webhookTimestamps.push(d.data.delivered_at as string);
+    if (o.data?.opened_at) webhookTimestamps.push(o.data.opened_at as string);
+    if (c.data?.clicked_at) webhookTimestamps.push(c.data.clicked_at as string);
+    if (b.data?.bounced_at) webhookTimestamps.push(b.data.bounced_at as string);
+    if (cm.data?.complained_at) webhookTimestamps.push(cm.data.complained_at as string);
+    lastWebhookAt =
+      webhookTimestamps.length > 0
+        ? webhookTimestamps.sort().slice(-1)[0]
+        : null;
+  }
 
   return NextResponse.json({ totals, rates, segments, byStatus, daily, lastWebhookAt });
 }
