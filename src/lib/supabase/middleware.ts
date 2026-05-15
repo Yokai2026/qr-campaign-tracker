@@ -145,6 +145,15 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user && path !== '/') {
+    // API-Routen bekommen JSON 401 zurueck statt Redirect — sonst folgt der
+    // Browser dem 307, fetch() bekommt HTML, JSON.parse failt, UI hat keine
+    // Ahnung was passiert.
+    if (path.startsWith('/api/')) {
+      return new NextResponse(
+        JSON.stringify({ error: 'unauthorized', message: 'Session abgelaufen — bitte neu einloggen.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);

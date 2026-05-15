@@ -61,33 +61,49 @@ export function IdeasBacklog() {
 
   async function generate(cluster: Cluster) {
     setGeneratingCluster(cluster);
-    toast.info(`Generiere Ideen fuer ${CLUSTER_LABEL[cluster]} — kann 30-60 Sek dauern (Claude sucht im Web)…`);
+    const loadingId = toast.loading(`Generiere Ideen fuer ${CLUSTER_LABEL[cluster]} — kann 20-60 Sek dauern…`);
     try {
       const r = await fetch('/api/admin/content/ideas/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ cluster, count: 15 }),
+        redirect: 'manual',  // Fang Auth-Redirect ab — sonst silent fail
+        credentials: 'include',
       });
-      // r.json() darf bei 504/Empty failen — abfangen
-      let j: { generated?: number; duplicates?: number; error?: string } = {};
+
+      // Browser fetch mit redirect:manual liefert opaqueredirect / status 0 wenn Server 30x sendet
+      if (r.type === 'opaqueredirect' || r.status === 0) {
+        toast.dismiss(loadingId);
+        toast.error('Session abgelaufen. Lade die Seite neu und logge dich neu ein.');
+        return;
+      }
+
+      let j: { generated?: number; duplicates?: number; error?: string; message?: string } = {};
       try { j = await r.json(); } catch { /* ignore parse */ }
 
+      toast.dismiss(loadingId);
+
+      if (r.status === 401 || r.status === 403) {
+        toast.error(j.message || j.error || `Auth-Fehler ${r.status} — neu einloggen.`);
+        return;
+      }
       if (!r.ok) {
         const msg = j.error ?? `HTTP ${r.status}`;
-        toast.error(`Generierung fehlgeschlagen: ${msg.slice(0, 200)}`);
+        toast.error(`Generierung fehlgeschlagen: ${String(msg).slice(0, 200)}`);
         return;
       }
       if ((j.generated ?? 0) > 0) {
         toast.success(`${j.generated} neue Ideen für ${CLUSTER_LABEL[cluster]}${(j.duplicates ?? 0) > 0 ? ` (${j.duplicates} Duplikate übersprungen)` : ''}`);
         queryClient.invalidateQueries({ queryKey: ['content-ideas'] });
       } else if ((j.duplicates ?? 0) > 0) {
-        toast.info(`Alle ${j.duplicates} generierten Ideen waren Duplikate. Versuch's nochmal — Claude liefert beim 2. Anlauf andere.`);
+        toast.info(`Alle ${j.duplicates} generierten Ideen waren Duplikate. Nochmal klicken — Claude liefert beim 2. Anlauf andere.`);
       } else {
-        toast.warning('Generierung lieferte 0 Ideen. Pruefe /admin/content Logs.');
+        toast.warning('0 Ideen erzeugt. Versuch nochmal oder pruefe Vercel-Logs.');
       }
     } catch (e) {
+      toast.dismiss(loadingId);
       const msg = e instanceof Error ? e.message : 'unknown';
-      toast.error(`Network/Timeout: ${msg.slice(0, 150)}`);
+      toast.error(`Netzwerk/Timeout: ${msg.slice(0, 150)}`);
     } finally {
       setGeneratingCluster(null);
     }
