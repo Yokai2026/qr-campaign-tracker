@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useTransition, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { type ColumnDef } from '@tanstack/react-table';
 import {
   QrCode as QrCodeIcon,
@@ -203,22 +202,12 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
       id: 'qr',
       header: '',
       cell: ({ row }) => (
+        // Bewusst KEINE qr_png_url-Branch mehr: die DB hat haeufig leere oder
+        // nicht erreichbare URLs, dann blieb die Vorschau leer. QrPreview rendert
+        // immer zuverlaessig clientseitig — fuer die Listen-Vorschau ist das
+        // optimal (Detail-Seite zeigt weiterhin den echten gestylten Code).
         <Link href={`/qr-codes/${row.original.id}`} className="inline-block">
-          {row.original.qr_png_url ? (
-            <Image
-              src={row.original.qr_png_url}
-              alt={`QR ${row.original.short_code}`}
-              width={40}
-              height={40}
-              className="rounded border"
-              unoptimized
-            />
-          ) : (
-            // Fallback: live-generierte Mini-QR-Vorschau wenn keine PNG-URL
-            // (z. B. weil Code in einer alten Migration ohne URL angelegt wurde).
-            // So sieht der User IMMER ein erkennbares Pattern, nie nur ein generisches Icon.
-            <QrPreview shortCode={row.original.short_code} size={40} />
-          )}
+          <QrPreview shortCode={row.original.short_code} size={40} />
         </Link>
       ),
       meta: { className: 'w-16' },
