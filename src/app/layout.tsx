@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Geist_Mono } from 'next/font/google';
 import { CookieBanner } from '@/components/layout/cookie-banner';
 import { ThemeProvider } from '@/components/theme-provider';
+import { PresenceHeartbeat } from '@/components/shared/presence-heartbeat';
 import './globals.css';
 
 const inter = Inter({
@@ -82,6 +83,9 @@ export default function RootLayout({
           </a>
           {children}
           <CookieBanner />
+          {/* Live-Presence-Tracking auf JEDER Page (auch Landing/Public).
+              Erfasst anonyme Besucher + eingeloggte User getrennt. */}
+          <PresenceHeartbeat />
         </ThemeProvider>
       </body>
     </html>

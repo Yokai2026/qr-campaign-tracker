@@ -143,6 +143,12 @@ export function LinkedinDmsClient() {
           <p className="mt-1 text-sm text-muted-foreground">
             Generiere personalisierte Opener für deine Outbound-Leads. Kein Auto-DM — Copy-Paste in LinkedIn (ToS-konform).
           </p>
+          <div className="mt-3 max-w-2xl rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-[12px] text-amber-200">
+            <strong className="block mb-1 text-amber-100">Wie LinkedIn-Cold-Outreach funktioniert</strong>
+            "Nachricht" geht nur an Verbindungen 1. Grades. Für Cold-Outreach: <strong>Vernetzen → Notiz hinzufügen → Opener einfügen → Senden</strong>.
+            Der generierte Opener ist mit ~170 Zeichen unter dem 300-Zeichen-Limit für Connection-Notes.
+            Neue LinkedIn-Konten haben ~100 Requests/Woche Limit — 15-20/Tag bleibt safe.
+          </div>
         </div>
         <div className="flex gap-2">
           <Button
@@ -302,10 +308,10 @@ function LeadCard({
     }
     toast.success(
       hasDirectUrl
-        ? 'Opener kopiert. Nachricht → Strg+V → Senden.'
-        : 'Opener kopiert. LinkedIn-Personensuche offen: Inhaber/Founder oben anklicken → Nachricht → Strg+V → Senden.',
+        ? 'Opener kopiert. Auf LinkedIn: Vernetzen → Notiz hinzufügen → Strg+V → Senden.'
+        : 'Opener kopiert. LinkedIn-Personensuche offen: Inhaber/Founder anklicken → Vernetzen → Notiz hinzufügen → Strg+V → Senden.',
       {
-        duration: 14000,
+        duration: 16000,
         action: {
           label: 'Als gesendet markieren',
           onClick: () => onUpdate(lead.id, { dm_status: 'sent' }),
@@ -478,7 +484,7 @@ function LeadCard({
         {lead.dm_opener && lead.dm_status !== 'sent' && lead.dm_status !== 'replied' && (
           <Button size="sm" variant="default" onClick={startDm} className="bg-[#0a66c2] text-white hover:bg-[#0a66c2]/90">
             <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-            DM senden → LinkedIn
+            Vernetzen + Opener → LinkedIn
           </Button>
         )}
         {lead.dm_opener && (
