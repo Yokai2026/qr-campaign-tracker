@@ -190,26 +190,30 @@ Antworte NUR mit dem Post-Text. Keine Erklaerung, keine Quotes, keine Code-Fence
   }
 
   if (channel === 'twitter') {
+    const blogUrl = `https://spurig.com/blog/${blog.slug}`;
+    // URL ist exakt ~30 Zeichen; max Tweet = 280 → fuer Text bleiben ~245 Zeichen
     return `${base}
 
-Generiere einen Twitter/X-Thread (deutsch, du-Form, 5-7 Tweets) im Social-Media-Vibe.
+Generiere EINEN einzelnen Twitter/X-Tweet (deutsch, du-Form). HARTE GRENZE: **max 270 Zeichen TOTAL inklusive dem Blog-Link am Ende**.
 
 Format:
-- **Tweet 1 = Wow-Hook** (max 270 Zeichen). Pattern-Break oder konkrete Zahl. NICHT "Thread:", NICHT "1/".
-  Beispiel: "Bitly nutzt fast jede DACH-Marketing-Abteilung. Fast keine weiss dass das 2026 ein DSGVO-Bussgeld-Risiko ist."
-- **Tweet 2-5 = Mini-Insights** (je max 270 Zeichen). Eine Idee pro Tweet, mit konkreter Zahl oder Beispiel.
-- **Tweet 6/7 = Pointe + Link**: persoenlicher Take + "Voller Artikel: https://spurig.com/blog/${blog.slug}"
+1) Wow-Hook in Zeile 1: konkrete Zahl, Pattern-Break, oder kontroverser Take
+2) (Optional) 1-2 weitere Saetze als Punchline / Mini-Story
+3) Letzte Zeile: ${blogUrl}
 
-Separator zwischen Tweets: EINZIGE Zeile mit nur "---"
+Beispiel-Tweets die funktionieren:
+- "23 € pro Scan. Pro Plakat. Echt gemessen. Spoiler: 80% der Standorte rechnen sich nie. Welche Plakatwand hat dir letztes Mal wirklich Kunden gebracht? ${blogUrl}"
+- "Bitly speichert deine Kurzlink-Daten in den USA. Schrems II sagt: ist DSGVO-problematisch. 2026 fragt die Aufsicht nach. ${blogUrl}"
 
-Style:
-- Jeder Tweet muss alleine klick-wuerdig sein (Twitter-User scrollt schnell)
-- Konkrete Zahlen, kontroverse Takes, eigene Erfahrung
-- KURZE Saetze. Subjekt-Verb-Objekt.
-- 0-1 Emoji im gesamten Thread. Default 0.
-- 0-3 Hashtags im LETZTEN Tweet, nur wenn wirklich relevant
+VERBOTEN:
+- "Thread:", "1/", "Spoiler:" als Marker
+- Emojis (default 0, MAX 1 wenn wirklich passend)
+- Hashtags (max 0-2 wenn relevant, default 0)
+- "Pro-Tipp", "Game Changer", "krass"
 
-Antworte NUR mit dem Thread-Text (Tweets durch "---"-Zeile getrennt). Keine Erklaerung.`;
+WICHTIG: ZAEHLE die Zeichen. Wenn Tweet ueber 270 Zeichen → kuerzer machen.
+
+Antworte NUR mit dem Tweet-Text (Text + Link am Ende). Keine Erklaerung, keine Quotes.`;
   }
 
   // reddit

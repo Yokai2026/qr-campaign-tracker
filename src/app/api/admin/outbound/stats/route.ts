@@ -189,5 +189,37 @@ export async function GET() {
         : null;
   }
 
-  return NextResponse.json({ totals, rates, segments, byStatus, daily, lastWebhookAt });
+  // Tracking-Refactor-Marker: alle Mails mit '/api/track/outbound/' im body_html
+  // nutzen unseren Open-Pixel + Click-Wrap. Davor wurde Resends eingebautes
+  // Tracking verwendet, das Gmail/Yahoo/Apple Mail standardmaessig blockt.
+  // Wir geben Cutoff-Zeitpunkt + Counts zurueck, damit das UI klarstellen kann
+  // warum die Pre-Refactor-Mails so niedrige Open-Rates haben.
+  const [oldRes, newRes, cutoffRes] = await Promise.all([
+    sb
+      .from('outbound_messages')
+      .select('id', { count: 'exact', head: true })
+      .not('sent_at', 'is', null)
+      .not('body_html', 'ilike', '%/api/track/outbound/%'),
+    sb
+      .from('outbound_messages')
+      .select('id', { count: 'exact', head: true })
+      .not('sent_at', 'is', null)
+      .ilike('body_html', '%/api/track/outbound/%'),
+    sb
+      .from('outbound_messages')
+      .select('sent_at')
+      .ilike('body_html', '%/api/track/outbound/%')
+      .not('sent_at', 'is', null)
+      .order('sent_at', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
+  const trackingRefactor = {
+    cutoffAt: (cutoffRes.data?.sent_at as string | undefined) ?? null,
+    oldCount: oldRes.count ?? 0,
+    newCount: newRes.count ?? 0,
+  };
+
+  return NextResponse.json({ totals, rates, segments, byStatus, daily, lastWebhookAt, trackingRefactor });
 }

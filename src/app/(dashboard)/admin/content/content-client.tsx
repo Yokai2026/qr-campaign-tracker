@@ -247,15 +247,32 @@ function DraftCard({
   }
 
   function openPublishWindow() {
-    navigator.clipboard.writeText(draft!.draft_text);
-    window.open(CHANNEL_PUBLISH_URLS[channel], '_blank');
-    toast.success(`${CHANNEL_LABELS[channel]} offen — Strg+V zum Einfügen`, {
-      duration: 12000,
-      action: {
-        label: 'Als gepostet markieren',
-        onClick: () => onUpdate(draft!.id, { status: 'posted' }),
-      },
-    });
+    const text = draft!.draft_text;
+    // Twitter unterstuetzt Pre-Fill via ?text= → Tweet erscheint vorbefuellt im Compose-Fenster.
+    // LinkedIn + Reddit unterstuetzen das nicht zuverlaessig → Clipboard-Fallback.
+    if (channel === 'twitter') {
+      window.open(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
+        '_blank',
+      );
+      toast.success('Tweet ist im Compose-Fenster vorausgefüllt. Nur noch Post klicken.', {
+        duration: 12000,
+        action: {
+          label: 'Als gepostet markieren',
+          onClick: () => onUpdate(draft!.id, { status: 'posted' }),
+        },
+      });
+    } else {
+      navigator.clipboard.writeText(text);
+      window.open(CHANNEL_PUBLISH_URLS[channel], '_blank');
+      toast.success(`${CHANNEL_LABELS[channel]} offen — Strg+V zum Einfügen`, {
+        duration: 12000,
+        action: {
+          label: 'Als gepostet markieren',
+          onClick: () => onUpdate(draft!.id, { status: 'posted' }),
+        },
+      });
+    }
   }
 
   return (
@@ -324,8 +341,34 @@ function DraftCard({
           )}
         </div>
       )}
-      <div className="mt-2 text-[10px] text-muted-foreground">
-        {draft.draft_text.length} Zeichen · {draft.model}
+      <div className="mt-2 flex items-center justify-between text-[10px]">
+        <span className="text-muted-foreground">
+          {draft.draft_text.length} Zeichen · {draft.model}
+        </span>
+        {channel === 'twitter' && (
+          <span
+            className={
+              draft.draft_text.length <= 280
+                ? 'rounded bg-green-500/15 px-1.5 py-0.5 font-medium text-green-400'
+                : 'rounded bg-red-500/15 px-1.5 py-0.5 font-medium text-red-400'
+            }
+          >
+            {draft.draft_text.length <= 280
+              ? `Tweet-tauglich (${280 - draft.draft_text.length} übrig)`
+              : `Tweet zu lang (${draft.draft_text.length - 280} zu viel)`}
+          </span>
+        )}
+        {channel === 'linkedin' && (
+          <span
+            className={
+              draft.draft_text.length <= 3000
+                ? 'rounded bg-green-500/15 px-1.5 py-0.5 font-medium text-green-400'
+                : 'rounded bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-400'
+            }
+          >
+            {draft.draft_text.length <= 3000 ? 'LinkedIn ok' : 'gekürzt empfohlen'}
+          </span>
+        )}
       </div>
     </div>
   );

@@ -19,6 +19,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Info,
 } from 'lucide-react';
 
 type Totals = {
@@ -51,6 +52,14 @@ type Stats = {
   /** Zeitstempel des juengsten Webhook-Events (delivered/opened/clicked/bounced/complained).
    *  null = es ist NIE ein Webhook-Event angekommen → Resend-Webhook nicht konfiguriert. */
   lastWebhookAt: string | null;
+  /** Pre-Refactor-Marker: Mails ohne eigenen Open-Pixel zaehlen ihre Opens
+   *  nicht zuverlaessig (Gmail/Yahoo blockten Resends Pixel). cutoffAt ist
+   *  der Zeitpunkt ab dem unser eigener Pixel aktiv ist. */
+  trackingRefactor?: {
+    cutoffAt: string | null;
+    oldCount: number;
+    newCount: number;
+  };
 };
 
 type Lead = {
@@ -254,6 +263,16 @@ export function OutboundClient() {
       {/* Webhook-Diagnose: wenn Mails versendet sind aber noch nie ein Webhook-
           Event ankam → roter Setup-Banner mit konkreten Anweisungen. */}
       {stats && <WebhookStatusBanner sent={t?.sent ?? 0} lastWebhookAt={stats.lastWebhookAt} />}
+
+      {/* Tracking-Refactor-Hinweis: Mails ohne eigenen Pixel (= vor dem
+          Refactor) sind nicht zuverlaessig getrackt (Gmail blockt Resend-Pixel). */}
+      {stats?.trackingRefactor && stats.trackingRefactor.oldCount > 0 && (
+        <TrackingRefactorBanner
+          cutoffAt={stats.trackingRefactor.cutoffAt}
+          oldCount={stats.trackingRefactor.oldCount}
+          newCount={stats.trackingRefactor.newCount}
+        />
+      )}
 
       {/* Funnel Bar */}
       <FunnelBar totals={t} />
@@ -516,6 +535,56 @@ function WebhookStatusBanner({
             </li>
             <li>Speichern — nächste Mail wird komplett getrackt.</li>
           </ol>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Tracking-Refactor-Banner — erklaert warum aeltere Mails (vor Pixel-Refactor)
+ * niedrige Open-Rates anzeigen: Resends eingebauter Pixel wird von Gmail/Yahoo
+ * blockiert. Unser eigener Pixel (eingebaut ab cutoffAt) liefert echte Daten.
+ *
+ * Sichtbar nur wenn oldCount > 0 (sonst gibt's nichts zu erklaeren).
+ */
+function TrackingRefactorBanner({
+  cutoffAt,
+  oldCount,
+  newCount,
+}: {
+  cutoffAt: string | null;
+  oldCount: number;
+  newCount: number;
+}) {
+  const cutoffLabel = cutoffAt
+    ? new Date(cutoffAt).toLocaleString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : null;
+
+  return (
+    <div className="rounded-lg border border-blue-500/30 bg-blue-500/5 px-4 py-3 flex items-start gap-3">
+      <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+      <div className="text-sm space-y-1">
+        <div>
+          <strong>Eigener Open/Click-Pixel aktiv{cutoffLabel ? ` seit ${cutoffLabel}` : ''}.</strong>
+        </div>
+        <div className="text-muted-foreground text-[12.5px] leading-relaxed">
+          <strong className="text-foreground">{oldCount} ältere Mail{oldCount === 1 ? '' : 's'}</strong>
+          {' '}verwenden Resends eingebauten Pixel — den Gmail, Yahoo und Apple Mail
+          standardmäßig blockieren. Deren Opens/Clicks erscheinen daher meist als 0,
+          obwohl die Empfänger geöffnet haben können.
+          {newCount > 0 && (
+            <>
+              {' '}Die <strong className="text-foreground">{newCount} neuere{newCount === 1 ? '' : 'n'} Mail{newCount === 1 ? '' : 's'}</strong>
+              {' '}werden zuverlässig gemessen.
+            </>
+          )}
         </div>
       </div>
     </div>
