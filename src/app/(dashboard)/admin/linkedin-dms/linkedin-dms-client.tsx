@@ -85,7 +85,9 @@ function cleanCompanyName(name: string): string {
 
 export function LinkedinDmsClient() {
   const [tab, setTab] = useState<DmStatus | 'all'>('ready');
-  const [segment, setSegment] = useState<string | null>(null);
+  // Default: nur Marketing-Agenturen — Gastro/Handwerk/Events haben meist kein
+  // LinkedIn-Profil. Fuer diese laeuft Email-Outbound autonom (siehe /admin/outbound).
+  const [segment, setSegment] = useState<string | null>('marketing_agency');
   const [generating, setGenerating] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const queryClient = useQueryClient();
@@ -160,7 +162,7 @@ export function LinkedinDmsClient() {
             LinkedIn-DM-Helper
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Generiere personalisierte Opener für deine Outbound-Leads. Kein Auto-DM — Copy-Paste in LinkedIn (ToS-konform).{' '}
+            Default: <strong>Marketing-Agenturen</strong> (höchste LinkedIn-Trefferquote). Für Gastro/Handwerk läuft <Link href="/admin/outbound" className="underline hover:text-foreground">Email-Outbound autonom</Link>{' '}— da brauchst du nichts klicken.{' '}
             <button
               onClick={() => setShowHelp((v) => !v)}
               className="ml-1 underline underline-offset-2 hover:text-foreground"

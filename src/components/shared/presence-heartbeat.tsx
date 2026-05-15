@@ -49,6 +49,32 @@ export function PresenceHeartbeat() {
       }).catch(() => {});
     }
 
+    function leave() {
+      // sendBeacon: synchron beim Page-Unload, funktioniert auch wenn Tab gerade
+      // geschlossen wird oder Mobile-Browser die App in den Hintergrund schickt.
+      const visitorId = getVisitorId();
+      try {
+        const blob = new Blob(
+          [JSON.stringify({ visitorId, leave: true })],
+          { type: 'application/json' },
+        );
+        if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+          navigator.sendBeacon('/api/heartbeat', blob);
+        } else {
+          // Fallback: keepalive-fetch (funktioniert in modernen Browsern auch
+          // waehrend Page-Unload)
+          fetch('/api/heartbeat', {
+            method: 'POST',
+            keepalive: true,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ visitorId, leave: true }),
+          }).catch(() => {});
+        }
+      } catch {
+        // ignore
+      }
+    }
+
     function start() {
       if (timer) return;
       ping();
@@ -63,16 +89,30 @@ export function PresenceHeartbeat() {
     }
 
     function onVisibilityChange() {
-      if (document.visibilityState === 'visible') start();
-      else stop();
+      if (document.visibilityState === 'visible') {
+        start();
+      } else {
+        // Tab/App in Hintergrund → sofort als offline melden (Mobile Standby!).
+        stop();
+        leave();
+      }
+    }
+
+    function onPageHide() {
+      stop();
+      leave();
     }
 
     if (document.visibilityState === 'visible') start();
     document.addEventListener('visibilitychange', onVisibilityChange);
+    // pagehide ist auf Mobile der zuverlaessigste Event (greift auch beim
+    // Tab-Wechsel/Schliessen in Safari iOS).
+    window.addEventListener('pagehide', onPageHide);
 
     return () => {
       stop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', onPageHide);
     };
   }, []);
 

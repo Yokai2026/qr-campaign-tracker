@@ -26,30 +26,37 @@ export async function POST(request: NextRequest) {
       : null;
   const page =
     typeof body?.page === 'string' && body.page.length <= 256 ? body.page.slice(0, 256) : null;
+  const isLeaveSignal = body?.leave === true;
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Eingeloggter User: profiles.last_seen_at updaten (Legacy-Verhalten)
-  if (user) {
+  // Eingeloggter User: profiles.last_seen_at updaten — aber nur bei Heartbeat,
+  // nicht bei Leave (sonst kann man durch sofortiges Schliessen den Online-
+  // Status manipulieren).
+  if (user && !isLeaveSignal) {
     await supabase
       .from('profiles')
       .update({ last_seen_at: new Date().toISOString() })
       .eq('id', user.id);
   }
 
-  // visitor_heartbeats nur upserten wenn visitorId vorhanden
+  // visitor_heartbeats: bei leave setzen wir last_seen_at auf einen lang
+  // zurueck liegenden Zeitstempel (Epoch+1) → Row bleibt fuer Lifetime-Counter
+  // erhalten, zaehlt aber nicht mehr als "online".
   if (visitorId) {
-    // Service-Client weil RLS unsigned writes blockt + wir die Row-ID kennen
     const admin = await createServiceClient();
     const userAgent = request.headers.get('user-agent')?.slice(0, 256) ?? null;
+    const lastSeenAt = isLeaveSignal
+      ? '1970-01-01T00:00:01.000Z'
+      : new Date().toISOString();
     await admin
       .from('visitor_heartbeats')
       .upsert(
         {
           visitor_id: visitorId,
           user_id: user?.id ?? null,
-          last_seen_at: new Date().toISOString(),
+          last_seen_at: lastSeenAt,
           user_agent: userAgent,
           page,
         },
@@ -57,5 +64,10 @@ export async function POST(request: NextRequest) {
       );
   }
 
-  return NextResponse.json({ ok: true, authenticated: !!user, tracked: !!visitorId });
+  return NextResponse.json({
+    ok: true,
+    authenticated: !!user,
+    tracked: !!visitorId,
+    leave: isLeaveSignal,
+  });
 }

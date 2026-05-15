@@ -97,7 +97,9 @@ export async function GET() {
 
   const sb = await createServiceClient();
   const now = Date.now();
-  const twoMinAgo = new Date(now - 2 * 60 * 1000).toISOString();
+  // 60s Online-Fenster — Heartbeat-Intervall ist 30s, also 1 verpasster Ping = offline.
+  // Frueher 2 min, was bei Tab-Schliessen/Hintergrund zu "Geist"-Anzeige fuehrte.
+  const twoMinAgo = new Date(now - 60 * 1000).toISOString();
   const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
   const sevenDaysAgo = new Date(now - 7 * 86_400_000).toISOString();
