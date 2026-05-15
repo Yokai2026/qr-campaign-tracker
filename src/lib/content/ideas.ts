@@ -253,15 +253,91 @@ PRO IDEE LIEFERST DU 4 FELDER
   - DACH-Suchterme (deutsch wo möglich)
   - Long-Tail bevorzugt ("DSGVO-konformes Link-Tracking" > "Tracking")
 
+==========================================
+IDEA-CATEGORY-WHEEL — PFLICHT-DIVERSITY
+==========================================
+Über die ${count} Ideen MUSS jede der folgenden 10 Kategorien mindestens 1x
+auftauchen (wenn count<10, dann mind. 8 verschiedene Kategorien). MAX 2 Ideen
+in derselben Kategorie.
+
+  C1 — HIDDEN COST / WAS DICH WIRKLICH KOSTET
+       "Was dich Bitly tatsächlich pro Jahr kostet (nicht der Preis auf der Webseite)"
+       "Die 800 Euro im Monat, die deine Print-Kampagnen versteckt verbrennen"
+
+  C2 — COUNTER-INTUITIVE FACT / GEGEN ALLE ERWARTUNG
+       "Warum große QR-Codes weniger gescannt werden als kleine (Eye-Tracking-Daten)"
+       "Cookie-Banner senken deine Conversion um 23%. Niemand redet darüber."
+
+  C3 — FUNNY FAILURE / LUSTIGE PEINLICHKEIT
+       "Mein erster Sales-Call: ich habe 'Frankfurt' dreimal falsch ausgesprochen"
+       "Mein Kunde hat Bitly drei Jahre lang als 'Bittlee' ausgesprochen"
+
+  C4 — INDUSTRY-INSIDER REVEAL / WAS NIEMAND SAGT
+       "Was Marketing-Agenturen ihren Kunden NICHT über Bitly erzählen"
+       "Der eine Vertrag den DSGVO-Anwälte nie zuerst prüfen — und warum das fatal ist"
+
+  C5 — DID YOU KNOW? / FAKTEN-REVEAL
+       "Wusstest du: Bitly speichert auch Geräte-Hashes deiner Klicker"
+       "Wusstest du: Plakatwerbung kommt für 17% der DACH-Online-Conversions auf"
+
+  C6 — COMPARISON / DIREKTER VERGLEICH
+       "Bitly Free vs Spurig: das eine kostet 0 Euro. Das andere 800 Euro pro Jahr verstecktes Risiko."
+       "Plakat vs Instagram-Ad: pro Conversion ist Plakat günstiger. Mit einem Trick."
+
+  C7 — PERSONAL REVEAL / DAVID-STORY
+       "Ich habe Spurig in 8 Wochen gebaut. 3 Sachen die mich fast aufgeben ließen"
+       "Mein größter Fehler beim Solo-Building: Feature gebaut, das niemand wollte"
+
+  C8 — DATA / NUMBERS-PUNCH
+       "8.247 QR-Code-Scans in 30 Tagen. Hier was wir gelernt haben."
+       "Aus 100 Cold-Mails kamen 4 Antworten. Eine davon wurde Kunde."
+
+  C9 — CONTRARIAN TAKE / KONTROVERSE
+       "QR-Codes sind nicht 'wieder' im Trend. Sie waren nie weg. Ihr habt nur nicht gemessen."
+       "DSGVO ist gut. Anwälte machen sie schlecht. Hier mein Take."
+
+  C10 — BEHIND-THE-SCENES / HOW IT REALLY WORKS
+       "Was bei einem Bitly-Klick wirklich passiert — Schritt für Schritt"
+       "So bauen wir die Tracking-Pipeline bei Spurig (öffentlich)"
+
+WICHTIG: Markiere im "angle"-Feld in eckigen Klammern die Kategorie:
+"[C5: Did-you-know] Wusstest du, dass..."
+"[C7: Personal Reveal] Bei meinem ersten Sales-Call..."
+
 ----------------------------------------
-VARIATIONS-PFLICHT
+HOOK-FIRST-WORDS-TEST (Pflicht pro Idee)
 ----------------------------------------
-Über die ${count} Ideen verteilt:
+Die ersten 5 Wörter des Titels MÜSSEN ALLEINE schon catchen.
+
+Schau dir die ersten 5 Wörter deines Titels an. Wenn jemand NUR die liest — bleibt
+er hängen? Will er weiterlesen?
+
+STARK (erste 5 Wörter packen):
+  - "500 Postkarten. Drei Anrufe. Niemand."
+  - "Dein Plakat-Budget verschwindet grade."
+  - "Ein Anwalt sagte mir gestern:"
+  - "Sechs Jahre. Falsches Land. Vergessen."
+  - "47 Standorte. 3 funktionierten. Null"
+
+SCHWACH (erste 5 Wörter zu generisch):
+  - "Die wichtigsten Tipps für besseres..."  → BORING
+  - "Wie du mit QR-Codes..."  → BORING
+  - "Warum es so wichtig ist..."  → BORING
+  - "Eine Marketing-Strategie die hilft..."  → BORING
+
+REGEL: Wenn deine ersten 5 Wörter ohne den Rest des Titels schon nicht
+fesseln, hast du den Hook-Test nicht bestanden. Neuer Titel.
+
+----------------------------------------
+VARIATIONS-PFLICHT (zusätzlich zum Category-Wheel)
+----------------------------------------
 - NICHT alle mit "Bitly" im Titel (max 30%)
-- NICHT alle als "Ich"-Story (max 50%, Rest echter Dialog / Kunden-Story)
+- NICHT alle als "Ich"-Story (max 40%)
 - NICHT alle mit Zahl am Anfang (max 30%)
 - Variiere Hook-Patterns A-F
-- Mische emotionale Trigger (Wut, Neugier, Identifikation, Status, Verlustangst)
+- Mische emotionale Trigger (Wut, Neugier, Identifikation, Status, Verlustangst, Humor)
+- Mind. 2 Ideen mit Humor / Selbstironie (C3 oder C7-Vibe)
+- Mind. 3 Ideen mit "Did-you-know"-Reveal-Charakter (C2/C5/C10)
 
 ==========================================
 OUTPUT-FORMAT (STRIKT EINHALTEN — sonst Parser-Crash)
@@ -942,11 +1018,112 @@ VERBOTEN IM IMAGE-PROMPT
 - "Beautiful", "stunning", "amazing" (KI-Floskeln, keine Information)
 - Text/Logos im Bild ("avoid all text, no logos visible" muss am Ende stehen)
 
+═══════════════════════════════════════════
+3-AKT-BILD-KOMPOSITION (PFLICHT-Struktur des Prompts)
+═══════════════════════════════════════════
+Dein image-Prompt muss aus 3 Akten bestehen, in dieser Reihenfolge:
+
+AKT 1 — DAS HAUPTMOTIV (40-60 Worte)
+  Was sieht der Betrachter zuerst? Konkretes Objekt oder Szene.
+  Inkl. exakte Position (vorne, mitte, rechts oben), Material (rusty,
+  weathered, glossy, charred), Zustand (mid-burn, falling, scattered,
+  half-buried), Anzahl (5, 23, hundreds).
+
+AKT 2 — DIE UMGEBUNG + STIMMUNG (40-60 Worte)
+  Wo spielt das Bild? Konkreter Ort (workshop yard, Berlin underpass,
+  industrial dumpster lot, kitchen, foggy tarmac).
+  Wetter / Tageszeit (golden hour, deep blue-hour, overcast, rain,
+  smoke-filled).
+  Sekundär-Elemente die die Story tragen (Passant unscharf im Hintergrund,
+  überfließender Mülleimer, leeres Schwarz-Plakat).
+
+AKT 3 — DIE TECHNIK + DAS WOW-DETAIL (40-60 Worte)
+  Camera + Brennweite + Blende ("shot on Canon EOS R5 24mm f/2.8").
+  Lichtquelle benannt + Richtung ("harsh diagonal late-afternoon sun
+  through workshop window").
+  Farbpalette mit 2-3 Kontrast-Farben ("burnt orange against deep charcoal
+  with cyan accent on a single bottle").
+  EIN UNERWARTETES Wow-Detail das die Story zementiert (z.B. "a single
+  half-burnt euro note floating mid-air with the EU stars still visible").
+  Ende mit "no text visible, no logos visible".
+
+═══════════════════════════════════════════
+SHOCK-DETAIL-BANK (mind. 1 davon im Output)
+═══════════════════════════════════════════
+Eines dieser Wow-Details MUSS im Image-Prompt vorkommen — sie machen den
+Unterschied zwischen "ganz nett" und "scroll-stop":
+
+  Physisch:
+  - "a single [object] mid-action / mid-flight / mid-fall / mid-burn"
+  - "scattered debris suspended in dust beams"
+  - "one melting / dripping / cracking [object]"
+  - "raindrops beading on [surface]"
+  - "broken glass / torn fabric / spilled liquid creating organic chaos"
+
+  Human-Element ohne Gesicht:
+  - "a single hand visible from edge of frame holding [object]"
+  - "blurred pedestrian silhouette in background"
+  - "shadow of a person on the wall but person out of frame"
+  - "footprints leading away into the distance"
+
+  Story-Anchor:
+  - "scattered receipts with the date 2026 visible on one"
+  - "a single stamped passport corner peeking from envelope"
+  - "an old printed Bitly logo faintly visible on a torn sticker"
+
+  Unexpected-Juxtaposition:
+  - "expensive object in cheap setting (Rolex on muddy concrete)"
+  - "fragile object in rough setting (vintage photo album in dumpster)"
+  - "delicate light in industrial setting"
+
+═══════════════════════════════════════════
+VISUAL-DNA-PFLICHT
+═══════════════════════════════════════════
+Pro Output mind. 1 Element aus jeder dieser DNA-Säulen:
+
+  PALETTE: ein Kontrast-Farbpaar benannt + Sättigung
+    z.B. "saturated burnt orange against deep charcoal, single cyan accent"
+
+  KAMERA: Marke + Brennweite + Blende + Distanz
+    z.B. "shot on Canon EOS R5 24mm f/2.8 from 30cm distance"
+
+  LICHT: Quelle + Richtung + Qualität
+    z.B. "harsh single overhead workshop pendant casting hard diagonal shadow"
+
+  WINKEL: kein eye-level, etwas dynamisches
+    z.B. "low-angle 15cm above the muddy ground", "extreme top-down 90 degrees"
+
+  TEXTUR: physische Materialqualitäten benennen
+    z.B. "fine paper fibers visible, slight ink bleed on weathered surface"
+
+  STYLE-REFERENZ: zum Schluss EIN Genre benennen
+    z.B. "photorealistic gritty documentary style" / "VICE magazine reportage"
+    / "National Geographic photojournalism" / "noir editorial photography"
+
+═══════════════════════════════════════════
+NIE-ZWEIMAL-GLEICH-Regel
+═══════════════════════════════════════════
+Wenn der Blog-Title viele "QR-Code" / "Plakat" / "Bitly" enthält, variiere die
+visuelle Umsetzung trotzdem:
+  - Plakat → Mal Plakatwand frontal, Mal U-Bahn-Station, Mal Bushaltestelle,
+            Mal Fußgängerzone in der Pampa, Mal Tankstelle bei Nacht
+  - QR-Code → Mal Speisekarte, Mal Visitenkarte, Mal Tankstelle, Mal Friedhof,
+              Mal Industrie-Schild, Mal Veterinäramt
+  - Bitly → Mal Server-Raum, Mal Reisepass, Mal Flughafen, Mal AVV-Vertrag-
+            Detail, Mal physischer Brief
+
+Verwende Blog-spezifische CONTEXT-Hooks: wenn der Blog "Speisekarte" nennt
+→ Speisekarte zentral. Wenn "Plakatwand" → Plakatwand zentral. Niemals
+generische "Marketing-Materialien".
+
 ----------------------------------------
-LAENGE
+LÄNGE
 ----------------------------------------
-60-120 Worte. Lieber zu lang als zu kurz.
-Konkrete Details > vage Adjektive.
+**150-220 Worte.** Dieser Prompt geht direkt in ChatGPT/DALL-E/Midjourney.
+Je präziser, desto besser das resultierende Bild.
+
+Konkrete Details > vage Adjektive. Lieber 220 Worte mit echten Specs als 80
+Worte mit "beautiful / cinematic / professional".
 
 Output-Format — KRITISCH WICHTIG (Parser hängt sonst):
 
@@ -954,7 +1131,7 @@ Output-Format — KRITISCH WICHTIG (Parser hängt sonst):
 slug: kurz-knackig-url-friendly
 description: 1-2 Sätze SEO max 155 Zeichen, mit Wow-Hook
 tags: Tag1, Tag2, Tag3
-image_prompt: [ENGLISCHER DALL-E/Midjourney-Prompt, ein zusammenhängender Satz, ~50-80 Worte, KEINE Quotes]
+image_prompt: [START MUST BEGIN with a concrete PHYSICAL OBJECT like "A stack of", "A burnt", "A single torn", "An open vintage", "Hundreds of scattered", NEVER with "A cluttered scene", "A split-screen", "A minimalist", "A modern". The first 6 words determine the image. 150-220 Wörter, 3-Akt-Struktur (Object → Setting → Camera/Light/Detail), mind. 1 Shock-Detail aus der Bank, alle Visual-DNA-Säulen abgedeckt. ABSOLUT VERBOTEN: "split-screen", "overlay", "comparison side by side", "infographic", "minimalist", "chart", "before-after", "data visualization". KEINE Quotes drum, ein einziger zusammenhängender Text-Block.]
 image_alt: [deutscher Alt-Text für Accessibility, max 120 Zeichen]
 ---BODY---
 [FULL MARKDOWN HIER, ohne ## Titel-Headline am Anfang]

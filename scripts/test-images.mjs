@@ -39,10 +39,25 @@ Title: "${t.title}"
 Angle: ${t.angle}
 Pillar: ${t.pillar}
 
-Liefere AUSSCHLIESSLICH den ENGLISCHEN image-Prompt-String (80-130 Worte).
-KEIN "Hier ist:", keine Erklaerung, keine Anfuehrungszeichen drum, direkt los.
+KRITISCHE OUTPUT-REGELN (verstoesse killen das Bild):
+1) Beginne mit einem KONKRETEN PHYSISCHEN OBJEKT. Erste 6 Wörter MÜSSEN starten mit:
+   "A stack of..." / "A burnt..." / "A single torn..." / "Hundreds of scattered..." /
+   "An open vintage..." / "A crumpled..." / "A weathered..." / "Three thousand..."
+   NIEMALS mit "A cluttered scene", "A split-screen", "A minimalist", "A modern office".
 
-Style-Reference: REF 1-5 oben. Wirf KEIN data-visualization oder infographic.`;
+2) STRUKTUR: 150-220 Wörter, 3 Akte (Objekt → Setting → Camera/Light/Wow-Detail).
+
+3) ABSOLUT VERBOTEN — wenn EINES davon im Prompt ist, NEU SCHREIBEN:
+   "split-screen", "overlay", "side by side comparison", "before-after",
+   "infographic", "minimalist", "chart", "graph", "data visualization",
+   "icon", "stylized", "corporate"
+
+4) Wähle EIN Konzept (K2/K3/K5/K6 — K1 nur Notfall) — KEIN Mix mit Split-Screen.
+
+5) Style: VICE Magazin / National Geographic Photojournalism. Gritty. Real. Photo.
+
+Liefere AUSSCHLIESSLICH den ENGLISCHEN image-Prompt-String. KEIN "Hier ist:",
+keine Erklaerung, direkt los mit dem konkreten Objekt.`;
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
