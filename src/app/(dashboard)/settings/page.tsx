@@ -21,6 +21,7 @@ import { ApiTokens } from '@/components/settings/api-tokens';
 import { SubscriptionCard } from '@/components/settings/subscription-card';
 import { PageHeader } from '@/components/shared/page-header';
 import { trackGoogleAdsPurchase } from '@/lib/conversion/google-ads';
+import { trackMetaPurchase } from '@/lib/conversion/meta-pixel';
 import type { Profile, Subscription } from '@/types';
 
 type ProfileFormValues = {
@@ -67,6 +68,7 @@ export default function SettingsPage() {
   useEffect(() => {
     if (searchParams.get('upgraded') !== '1') return;
     trackGoogleAdsPurchase({ value: 12.99 });
+    trackMetaPurchase({ value: 12.99, contentName: 'monthly' });
     // URL bereinigen damit der Event nicht beim Reload neu feuert
     if (typeof window !== 'undefined' && window.history.replaceState) {
       const url = new URL(window.location.href);

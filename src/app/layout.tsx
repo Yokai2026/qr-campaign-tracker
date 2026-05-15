@@ -4,6 +4,7 @@ import { CookieBanner } from '@/components/layout/cookie-banner';
 import { ThemeProvider } from '@/components/theme-provider';
 import { PresenceHeartbeat } from '@/components/shared/presence-heartbeat';
 import { GoogleAdsScript } from '@/components/marketing/google-ads-script';
+import { MetaPixelScript } from '@/components/marketing/meta-pixel-script';
 import './globals.css';
 
 const inter = Inter({
@@ -89,6 +90,9 @@ export default function RootLayout({
           <PresenceHeartbeat />
           {/* Google-Ads-Tag (gtag.js). Rendert nichts wenn NEXT_PUBLIC_GOOGLE_ADS_ID nicht gesetzt ist. */}
           <GoogleAdsScript />
+          {/* Meta-Pixel (fbq). Rendert nichts wenn NEXT_PUBLIC_META_PIXEL_ID nicht gesetzt ist.
+              Feuert auto PageView. Lead/Purchase via meta-pixel.ts an signup-verify + settings. */}
+          <MetaPixelScript />
         </ThemeProvider>
       </body>
     </html>

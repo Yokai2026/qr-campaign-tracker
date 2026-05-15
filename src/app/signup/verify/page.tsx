@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { MailCheck, Loader2 } from 'lucide-react';
 import { triggerWelcomeEmail } from '@/lib/auth/welcome-action';
 import { trackGoogleAdsSignup } from '@/lib/conversion/google-ads';
+import { trackMetaLead } from '@/lib/conversion/meta-pixel';
 
 const PIN_LENGTH = 6;
 
@@ -124,6 +125,9 @@ function SignupVerifyInner() {
     // Google-Ads Conversion-Event: Signup-Verify abgeschlossen = Lead.
     // No-op wenn NEXT_PUBLIC_GOOGLE_ADS_ID nicht gesetzt.
     trackGoogleAdsSignup();
+
+    // Meta-Pixel Lead-Event. No-op wenn NEXT_PUBLIC_META_PIXEL_ID nicht gesetzt.
+    trackMetaLead();
 
     // Harte Navigation statt router.push: Browser uebernimmt das
     // Lade-Indikator, die Verify-Page unmountet sofort, Dashboard
