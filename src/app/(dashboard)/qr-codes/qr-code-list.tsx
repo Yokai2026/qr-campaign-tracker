@@ -32,6 +32,7 @@ import { DataTable } from '@/components/shared/data-table';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { ScanCount } from '@/components/shared/scan-count';
+import { QrPreview } from '@/components/shared/qr-preview';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -202,7 +203,7 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
       id: 'qr',
       header: '',
       cell: ({ row }) => (
-        <Link href={`/qr-codes/${row.original.id}`}>
+        <Link href={`/qr-codes/${row.original.id}`} className="inline-block">
           {row.original.qr_png_url ? (
             <Image
               src={row.original.qr_png_url}
@@ -213,9 +214,10 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
               unoptimized
             />
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded border bg-muted">
-              <QrCodeIcon className="h-5 w-5 text-muted-foreground" />
-            </div>
+            // Fallback: live-generierte Mini-QR-Vorschau wenn keine PNG-URL
+            // (z. B. weil Code in einer alten Migration ohne URL angelegt wurde).
+            // So sieht der User IMMER ein erkennbares Pattern, nie nur ein generisches Icon.
+            <QrPreview shortCode={row.original.short_code} size={40} />
           )}
         </Link>
       ),
