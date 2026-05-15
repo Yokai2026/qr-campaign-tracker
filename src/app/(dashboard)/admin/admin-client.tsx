@@ -37,6 +37,9 @@ type Stats = {
     newToday: number;
     newThisWeek: number;
     onlineNow: number;
+    visitorsOnline: number;
+    loggedInOnline: number;
+    anonymousOnline: number;
     trialActive: number;
     trialExpired: number;
   };
@@ -292,13 +295,21 @@ export function AdminClient() {
         className="rounded-2xl border border-border bg-card px-4 py-3"
       >
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px]">
+          {/* Live-Presence: Gesamt-Besucher (anonym + eingeloggt) + Detail.
+              visitorsOnline kommt aus visitor_heartbeats <2min,
+              loggedInOnline = visitor_heartbeats mit user_id != null. */}
           <Chip
             pulse
             color="emerald"
             label={
               <>
-                <span className="tabular-nums font-semibold text-foreground">{data.users.onlineNow}</span>{' '}
-                <span className="text-muted-foreground">online</span>
+                <span className="tabular-nums font-semibold text-foreground">
+                  {data.users.visitorsOnline}
+                </span>{' '}
+                <span className="text-muted-foreground">live online</span>
+                <span className="ml-1.5 text-[11px] text-muted-foreground/80 tabular-nums">
+                  ({data.users.loggedInOnline} eingeloggt · {data.users.anonymousOnline} anonym)
+                </span>
               </>
             }
           />
