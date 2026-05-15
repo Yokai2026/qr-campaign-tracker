@@ -1264,6 +1264,14 @@ function Header({ lastUpdated }: { lastUpdated: number | null }) {
       </div>
       <div className="flex items-center gap-3">
         <Link
+          href="/admin/content"
+          className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1.5 text-[11.5px] font-semibold text-orange-400 hover:bg-orange-500/20 transition-colors"
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          Content-Drafts
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+        <Link
           href="/admin/linkedin-dms"
           className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-[11.5px] font-semibold text-blue-400 hover:bg-blue-500/20 transition-colors"
         >
