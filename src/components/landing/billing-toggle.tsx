@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -53,10 +53,31 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'brand', included
   const [billing, setBilling] = useState<Billing>('yearly');
   const plan = PLANS[billing];
 
+  const isYearly = billing === 'yearly';
+
   return (
     <div className="mx-auto w-full max-w-lg">
       {/* Single price card — price is the hero */}
-      <div className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-md)] sm:p-10">
+      <div
+        className={cn(
+          'relative rounded-3xl border bg-card p-8 shadow-[var(--shadow-md)] transition-colors sm:p-10',
+          isYearly ? 'border-brand/40' : 'border-border',
+        )}
+      >
+        {/* Beliebteste-Wahl Badge — floating ribbon, only on yearly */}
+        <div
+          aria-hidden={!isYearly}
+          className={cn(
+            'absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-300',
+            isYearly ? 'opacity-100 scale-100' : 'pointer-events-none opacity-0 scale-95',
+          )}
+        >
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-brand-foreground shadow-[var(--shadow-md)]">
+            <Sparkles className="h-3 w-3" />
+            Beliebteste Wahl
+          </span>
+        </div>
+
         {/* Toggle */}
         <div
           role="radiogroup"
@@ -171,6 +192,17 @@ export function BillingToggle({ href = '/signup', ctaVariant = 'brand', included
           <p className="mt-3 text-center text-[12px] text-muted-foreground">
             Keine Kreditkarte nötig · Jederzeit kündbar
           </p>
+
+          {/* 30-Tage-Geld-zurueck-Garantie */}
+          <div className="mt-5 flex items-center justify-center gap-2 rounded-xl border border-dashed border-brand/30 bg-brand/[0.04] px-4 py-3 text-[12.5px] leading-snug">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-brand" aria-hidden />
+            <span className="text-foreground">
+              <span className="font-semibold">30-Tage-Geld-zurück-Garantie.</span>{' '}
+              <span className="text-muted-foreground">
+                Nicht überzeugt? Wir erstatten den ersten Bezahlmonat — ohne Rückfrage.
+              </span>
+            </span>
+          </div>
         </div>
 
         {/* Feature list — under the price */}

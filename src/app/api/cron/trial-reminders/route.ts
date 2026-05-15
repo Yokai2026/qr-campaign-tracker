@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email/send';
 import { sendTrialUpsell, type TrialUpsellStage } from '@/lib/email/trial-upsell';
+import { sendActivation, type ActivationStage } from '@/lib/email/activation';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -29,6 +30,9 @@ export async function GET(request: NextRequest) {
   const now = Date.now();
 
   const stagesResult = {
+    activation_d1: await runActivationStage(sb, 'd1', now),
+    activation_d2: await runActivationStage(sb, 'd2', now),
+    activation_d3: await runActivationStage(sb, 'd3', now),
     d3: await runUpsellStage(sb, 'd3', now),
     d7: await runUpsellStage(sb, 'd7', now),
     d12: await runUpsellStage(sb, 'd12', now),
@@ -36,6 +40,116 @@ export async function GET(request: NextRequest) {
   };
 
   return NextResponse.json(stagesResult);
+}
+
+// ---------------------------------------------------------------------------
+// Activation-Stages (D1 / D2 / D3) — paralleler Track zum Upsell
+// ---------------------------------------------------------------------------
+
+type ActivationStageConfig = {
+  dayOffset: number;
+  windowDays: number;
+  markerColumn: 'activation_d1_sent_at' | 'activation_d2_sent_at' | 'activation_d3_sent_at';
+};
+
+const ACTIVATION_CONFIG: Record<ActivationStage, ActivationStageConfig> = {
+  d1: { dayOffset: 1, windowDays: 1, markerColumn: 'activation_d1_sent_at' },
+  d2: { dayOffset: 2, windowDays: 1, markerColumn: 'activation_d2_sent_at' },
+  d3: { dayOffset: 3, windowDays: 1, markerColumn: 'activation_d3_sent_at' },
+};
+
+async function runActivationStage(sb: SupabaseLike, stage: ActivationStage, now: number) {
+  const cfg = ACTIVATION_CONFIG[stage];
+  const day = 86_400_000;
+  const upperCreated = new Date(now - cfg.dayOffset * day).toISOString();
+  const lowerCreated = new Date(now - (cfg.dayOffset + cfg.windowDays) * day).toISOString();
+
+  const { data: candidates, error } = await sb
+    .from('profiles')
+    .select('id, email, username, created_at')
+    .lte('created_at', upperCreated)
+    .gt('created_at', lowerCreated)
+    .is(cfg.markerColumn, null);
+
+  if (error) return { error: error.message, sent: 0 };
+  if (!candidates || candidates.length === 0) return { checked: 0, sent: 0 };
+
+  const userIds = candidates.map((c) => c.id);
+
+  const [{ data: subs }, { data: campaigns }, { data: qrCodes }] = await Promise.all([
+    sb
+      .from('subscriptions')
+      .select('user_id, status')
+      .in('user_id', userIds)
+      .in('status', ['active', 'past_due']),
+    sb.from('campaigns').select('owner_id').in('owner_id', userIds),
+    sb.from('qr_codes').select('id, created_by').in('created_by', userIds),
+  ]);
+
+  const paid = new Set((subs ?? []).map((s) => s.user_id));
+  const campaignsByUser = new Set(
+    (campaigns ?? []).map((c) => c.owner_id).filter((v): v is string => !!v),
+  );
+  const qrByUser = new Set(
+    (qrCodes ?? []).map((q) => q.created_by).filter((v): v is string => !!v),
+  );
+
+  // Hat ein User einen Scan? Lookup qr_id -> owner und nur deren Scans pruefen.
+  const qrIdToOwner = new Map<string, string>();
+  for (const q of qrCodes ?? []) {
+    if (q.created_by) qrIdToOwner.set(q.id, q.created_by);
+  }
+  const scansByUser = new Set<string>();
+  if (qrIdToOwner.size > 0) {
+    const qrIds = Array.from(qrIdToOwner.keys());
+    const { data: scanRows } = await sb
+      .from('redirect_events')
+      .select('qr_code_id')
+      .in('qr_code_id', qrIds)
+      .limit(qrIds.length); // ein Hit pro QR reicht — wir wollen nur "hat_scan ja/nein"
+    for (const s of scanRows ?? []) {
+      const owner = s.qr_code_id ? qrIdToOwner.get(s.qr_code_id) : undefined;
+      if (owner) scansByUser.add(owner);
+    }
+  }
+
+  const eligible = candidates.filter((c) => !paid.has(c.id) && c.email);
+
+  let sent = 0;
+  const errors: string[] = [];
+  for (const u of eligible) {
+    const hasCampaign = campaignsByUser.has(u.id);
+    const hasQrCode = qrByUser.has(u.id);
+    const hasScan = scansByUser.has(u.id);
+
+    // Skip-Logic: wenn alle Steps fuer diese Stage erledigt sind, Marker setzen ohne Mail
+    const shouldSkip =
+      (stage === 'd1' && hasQrCode) ||
+      (stage === 'd2' && hasScan) ||
+      (stage === 'd3' && hasScan && hasCampaign && hasQrCode);
+
+    try {
+      if (!shouldSkip) {
+        await sendActivation({
+          to: u.email,
+          username: u.username,
+          stage,
+          hasCampaign,
+          hasQrCode,
+          hasScan,
+        });
+        sent++;
+      }
+      await sb
+        .from('profiles')
+        .update({ [cfg.markerColumn]: new Date().toISOString() })
+        .eq('id', u.id);
+    } catch (e) {
+      errors.push(`${u.email}: ${e instanceof Error ? e.message : 'unknown'}`);
+    }
+  }
+
+  return { checked: candidates.length, eligible: eligible.length, sent, errors };
 }
 
 // ---------------------------------------------------------------------------

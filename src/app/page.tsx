@@ -18,6 +18,7 @@ import { PricingTeaser } from '@/components/landing/pricing-teaser';
 import { FaqSection, FAQ_ITEMS } from '@/components/landing/faq-section';
 import { FinalCTA } from '@/components/landing/final-cta';
 import { SiteFooter } from '@/components/landing/site-footer';
+import { StickyMobileCta } from '@/components/landing/sticky-mobile-cta';
 import { Reveal } from '@/components/shared/reveal';
 import { ScrollProgress } from '@/components/shared/scroll-progress';
 
@@ -44,6 +45,7 @@ export default function LandingPage() {
         <Reveal><FinalCTA /></Reveal>
       </main>
       <SiteFooter />
+      <StickyMobileCta />
     </div>
   );
 }

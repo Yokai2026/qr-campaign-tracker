@@ -3,6 +3,7 @@ import { ArrowRight, Check, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GridBackdrop } from '@/components/ui/grid-backdrop';
 import { HeroDashboardMock } from './hero-dashboard-mock';
+import { LiveStatsBar } from './live-stats-bar';
 import { Magnetic } from '@/components/shared/magnetic-button';
 
 const TRUST = [
@@ -32,12 +33,12 @@ export function Hero() {
         <div className="mx-auto mb-10 inline-flex items-center gap-2.5 rounded-full border border-border bg-card py-1.5 pl-2 pr-4 text-[12.5px] font-medium text-foreground shadow-[var(--shadow-sm)]">
           <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-brand">
             <Sparkles className="h-2.5 w-2.5" />
-            Neu
+            DACH
           </span>
           <span className="hidden text-muted-foreground sm:inline">
-            Einführungspreis bis Ende 2026
+            Die DSGVO-Alternative zu Bitly · Server in Frankfurt
           </span>
-          <span className="text-muted-foreground sm:hidden">Einführungspreis</span>
+          <span className="text-muted-foreground sm:hidden">DSGVO-Alternative zu Bitly</span>
         </div>
 
         {/* Headline — größer, dominanter */}
@@ -92,6 +93,9 @@ export function Hero() {
             </li>
           ))}
         </ul>
+
+        {/* Live-Counter / Trust-Bar — fällt auf statisches Trust-Signal wenn unter Threshold */}
+        <LiveStatsBar />
       </div>
 
       <HeroDashboardMock />

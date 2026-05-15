@@ -24,6 +24,10 @@ export const FAQ_ITEMS: { q: string; a: string }[] = [
     a: 'Ja. Monatlich gebuchte Pläne kannst du zum Monatsende kündigen, Jahrespläne zum Laufzeitende. Keine Mindestlaufzeit, keine versteckten Klauseln — ein Klick im Dashboard genügt.',
   },
   {
+    q: 'Gibt es eine Geld-zurück-Garantie?',
+    a: 'Ja. Wenn Spurig dich in den ersten 30 Tagen nach dem Bezahl-Start nicht überzeugt, schreib uns kurz an info@spurig.com — wir erstatten den ersten Bezahlmonat ohne Rückfrage. Bei Jahresbuchungen erstatten wir anteilig. Das gilt zusätzlich zum 14-tägigen Trial.',
+  },
+  {
     q: 'Brauche ich eine eigene Domain?',
     a: 'Nein. Jeder QR-Code bekommt standardmäßig eine spurig-Kurz-URL. Für stärkeres Branding kannst du deine eigene Domain anschließen (z. B. kurz.deinefirma.de) — einfach CNAME setzen, fertig.',
   },

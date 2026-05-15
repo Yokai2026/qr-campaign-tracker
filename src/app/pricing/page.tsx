@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ShieldCheck, CreditCard, Undo2 } from 'lucide-react';
 import { BillingToggle } from '@/components/landing/billing-toggle';
+import { PricingComparisonTable } from '@/components/landing/pricing-comparison-table';
 import { SiteHeader } from '@/components/landing/site-header';
 import { SiteFooter } from '@/components/landing/site-footer';
 import { FaqSection, FAQ_ITEMS } from '@/components/landing/faq-section';
@@ -110,6 +111,7 @@ export default function PricingPage() {
           </div>
         </section>
 
+        <PricingComparisonTable />
         <FaqSection />
         <FinalCTA />
       </main>

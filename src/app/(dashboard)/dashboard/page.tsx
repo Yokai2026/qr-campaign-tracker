@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { PrivacyBadge } from '@/components/shared/privacy-badge';
 import { LiveScanFeed } from '@/components/shared/live-scan-feed';
 import { Tour } from '@/components/onboarding/tour';
+import { ActivationChecklist } from './sections/activation-checklist';
 import { BillingStatus } from './sections/billing-status';
 import { OnboardingCard } from './sections/onboarding-card';
 import { Overview } from './sections/overview';
@@ -92,6 +93,12 @@ export default async function DashboardPage() {
       {/* Onboarding — only for empty, non-dismissed accounts; one CTA */}
       <Suspense fallback={null}>
         <OnboardingCard />
+      </Suspense>
+
+      {/* Activation-Checklist — kicks in sobald 1+ Kampagne existiert,
+          fuehrt durch Schritte 2-4 bis zum Aha-Moment (erster Scan + Pro-Setup). */}
+      <Suspense fallback={null}>
+        <ActivationChecklist />
       </Suspense>
 
       {/* Insight-Banner — "5-Sekunden-Regel": User sieht in einem Satz wie's laeuft.
