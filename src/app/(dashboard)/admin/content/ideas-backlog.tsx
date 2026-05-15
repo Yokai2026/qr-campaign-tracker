@@ -66,7 +66,7 @@ export function IdeasBacklog() {
       const r = await fetch('/api/admin/content/ideas/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ cluster, count: 15 }),
+        body: JSON.stringify({ cluster, count: 10 }),
         redirect: 'manual',  // Fang Auth-Redirect ab — sonst silent fail
         credentials: 'include',
       });
@@ -194,7 +194,7 @@ export function IdeasBacklog() {
           ) : (
             <Sparkles className="mr-1.5 h-3.5 w-3.5" />
           )}
-          15 neue Ideen generieren
+          10 neue Ideen generieren
         </Button>
       </div>
 
@@ -205,7 +205,7 @@ export function IdeasBacklog() {
         </div>
       ) : ideas.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border bg-muted/20 py-10 text-center text-sm text-muted-foreground">
-          Kein Backlog für {CLUSTER_LABEL[activeCluster]}. Klick "15 neue Ideen generieren" oben.
+          Kein Backlog für {CLUSTER_LABEL[activeCluster]}. Klick "10 neue Ideen generieren" oben.
         </div>
       ) : (
         <div className="grid gap-2 md:grid-cols-2">

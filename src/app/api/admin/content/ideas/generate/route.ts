@@ -31,7 +31,11 @@ export async function POST(request: NextRequest) {
   if (!CLUSTERS.includes(cluster)) {
     return NextResponse.json({ error: 'invalid cluster' }, { status: 400 });
   }
-  const count = Math.max(5, Math.min(20, body.count ?? 15));
+  // Cap auf 10 — bei 15 dauert die Generation ~65s und reisst das Vercel-Hobby
+  // 60s-Limit. Mit 10 ist die Generation bei ~35-45s sicher unter Limit.
+  // Auf Pro kann ueber CONTENT_IDEAS_MAX_COUNT auf bis zu 20 hochgezogen werden.
+  const hardCap = Number(process.env.CONTENT_IDEAS_MAX_COUNT ?? '10');
+  const count = Math.max(5, Math.min(hardCap, body.count ?? 10));
 
   let ideas;
   const generateStart = Date.now();

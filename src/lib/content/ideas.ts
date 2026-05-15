@@ -237,18 +237,16 @@ PRO IDEE LIEFERST DU 4 FELDER
   - Besteht den Hook-Quality-Test (PART 7)
   - Hyper-spezifisch (Zahl ODER Ort ODER Marke ODER Rolle ODER Zeitpunkt)
 
-* **angle** (Story-Hook fuer Intro, 1-2 Saetze):
+* **angle** (Story-Hook fuer Intro, MAX 200 Zeichen / 1-2 Saetze):
   - Persoenliche Beobachtung mit echtem konkreten Moment
   - Idealerweise mit Dialog ("Sie sagte gestern: '...'")
-  - Format: "Letzte Woche saß ich mit...", "Ein Kunde rief an...", "Bis vor drei Monaten dachte ich..."
   - NIE: generisches "In der heutigen Zeit..." oder "Viele Marketer fragen sich..."
 
-* **outline** (3-5 Saetze):
-  - WAS konkret im Post drin steht (mit konkreten Zahlen, Marken, Beispielen)
-  - MINDESTENS eine kontroverse Aussage oder Anti-Mainstream-These
-  - MINDESTENS einen "Aha"-Moment den der Leser nicht erwartet
-  - Konkrete Action-Steps oder Insider-Wissen
+* **outline** (MAX 350 Zeichen / 2-3 sehr knappe Saetze):
+  - WAS konkret im Post drin steht (mit konkreten Zahlen, Marken)
+  - 1 kontroverse Aussage ODER 1 "Aha"-Moment
   - Schluss-Frage / Diskussions-Trigger
+  - KEIN Brei. KEINE 8 Saetze. Storyboard-knapp.
 
 * **target_keywords** (2-4 SEO-Keywords kommagetrennt):
   - Natuerlich, nicht stuffed
@@ -285,28 +283,97 @@ Dein letzter ausgegebener Charakter MUSS "]" sein.
 
 Jetzt liefere die ${count} besten Ideen.`;
 
-  const text = await callClaude(apiKey, prompt, { maxTokens: 4000, useSearch: true });
+  // 8000 max_tokens gibt Buffer fuer 10-15 Ideen mit knappem Outline.
+  // Bei tighten outline-cap (350 chars) ist eine Idee ca. 200-300 output-tokens.
+  const text = await callClaude(apiKey, prompt, { maxTokens: 8000, useSearch: true });
 
-  // Robust-Parse — selbst wenn Claude Pre-Text liefert, extrahiere das JSON-Array
-  let jsonText = text.trim();
-  // Strip Markdown-Code-Fences wenn vorhanden
-  jsonText = jsonText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
-  // Finde das erste "[" + "{" gefolgt von Inhalt — robuster als nur indexOf
+  const ideas = parseIdeasJson(text);
+  return ideas.filter((i) => i.title && i.outline).slice(0, count);
+}
+
+/**
+ * Robust-Parser: erst clean parse versuchen, dann Code-Fences/Pre-Text strippen,
+ * dann Salvage-Mode (truncierte JSON-Arrays).
+ */
+function parseIdeasJson(text: string): GeneratedIdea[] {
+  let jsonText = text.trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/i, '')
+    .trim();
+
+  // Pre-Text strippen — finde das echte Array-Start
   const arrayStart = jsonText.search(/\[\s*\{/);
   const lastBracket = jsonText.lastIndexOf(']');
   if (arrayStart >= 0 && lastBracket > arrayStart) {
     jsonText = jsonText.slice(arrayStart, lastBracket + 1);
+  } else if (arrayStart >= 0) {
+    jsonText = jsonText.slice(arrayStart);
   }
 
-  let ideas: GeneratedIdea[];
+  // Versuch 1: clean parse
   try {
-    ideas = JSON.parse(jsonText);
-  } catch (e) {
-    throw new Error(`Ideas JSON parse failed: ${(e as Error).message}. First 200 chars: ${jsonText.slice(0, 200)}`);
+    const parsed = JSON.parse(jsonText);
+    if (Array.isArray(parsed)) return parsed as GeneratedIdea[];
+  } catch {
+    // fallthrough zum Salvage
   }
-  if (!Array.isArray(ideas)) throw new Error('Ideas response is not an array');
 
-  return ideas.filter((i) => i.title && i.outline).slice(0, count);
+  // Versuch 2: Salvage — bei Truncation finde letztes vollstaendiges }-Objekt,
+  // schliesse Array dort. Behebt 'Unterminated string in JSON'-Fehler.
+  const salvaged = salvageTruncatedArray(jsonText);
+  if (salvaged) {
+    try {
+      const parsed = JSON.parse(salvaged);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed as GeneratedIdea[];
+      }
+    } catch {
+      // weiter unten in throw
+    }
+  }
+
+  throw new Error(
+    `Ideas JSON parse failed (truncated or malformed). First 200 chars: ${jsonText.slice(0, 200)}`,
+  );
+}
+
+/**
+ * Wenn die API-Response mid-string abgeschnitten wurde, finde das letzte
+ * vollstaendige Idee-Objekt (durch passende geschlossene Quote-States und }
+ * Klammern) und schliesse das Array dort.
+ */
+function salvageTruncatedArray(jsonText: string): string | null {
+  if (!jsonText.startsWith('[')) return null;
+
+  // Scanne durch und tracke balance + ob wir gerade in einem String sind.
+  // Merke uns die Position des letzten validen "}" das auf top-level steht
+  // (depth === 1, also ein Array-Element).
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  let lastTopLevelObjectEnd = -1;
+
+  for (let i = 0; i < jsonText.length; i++) {
+    const c = jsonText[i];
+
+    if (inString) {
+      if (escape) escape = false;
+      else if (c === '\\') escape = true;
+      else if (c === '"') inString = false;
+      continue;
+    }
+
+    if (c === '"') { inString = true; continue; }
+    if (c === '{' || c === '[') depth++;
+    else if (c === '}' || c === ']') {
+      depth--;
+      // Nach Array-Start (depth 1 nach '[') ist ein Objekt-Ende auf depth=1
+      if (c === '}' && depth === 1) lastTopLevelObjectEnd = i;
+    }
+  }
+
+  if (lastTopLevelObjectEnd < 0) return null;
+  return jsonText.slice(0, lastTopLevelObjectEnd + 1) + ']';
 }
 
 // ---------------------------------------------------------------------------
