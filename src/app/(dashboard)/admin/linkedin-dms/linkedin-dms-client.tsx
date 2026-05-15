@@ -65,6 +65,24 @@ const SEGMENT_LABELS: Record<string, string> = {
   events_tourism: 'Events',
 };
 
+/**
+ * Saeubert Firmennamen fuer LinkedIn-Suche.
+ * Entfernt Bullets, Stadt-Suffixe und Rechtsformen die in LinkedIn-Profilen
+ * meistens nicht stehen und sonst zu 0 Treffern fuehren.
+ */
+function cleanCompanyName(name: string): string {
+  const cities = '(Köln|Koeln|Graz|München|Muenchen|Berlin|Hamburg|Frankfurt|Wien|Salzburg|Stuttgart|Düsseldorf|Duesseldorf|Bremen|Hannover|Leipzig|Dresden|Nürnberg|Nuernberg|Linz|Innsbruck|Klagenfurt|Zürich|Zuerich|Basel|Bern)';
+  return name
+    .replace(/["“”„″]/g, '')
+    .replace(/[•·]/g, ' ')
+    .replace(/\s*[\-–—]\s*/g, ' ')
+    .replace(new RegExp(`\\s+${cities}\\s*$`, 'i'), '')
+    .replace(/\s+(GmbH|AG|UG|KG|OHG|e\.K\.?|Ltd\.?|GbR|LLC|Inc\.?)\b.*$/i, '')
+    .replace(/\s+(Restaurant|Café|Cafe|Bar|Bistro|Hotel|Boutique|Studio|Salon)\s+/i, ' $1 ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function LinkedinDmsClient() {
   const [tab, setTab] = useState<DmStatus | 'all'>('ready');
   const [segment, setSegment] = useState<string | null>(null);
@@ -278,17 +296,19 @@ function LeadCard({
    * Google-bypass fuer LinkedIn-Profile.
    *
    * LinkedIn anonymisiert 3rd-degree-Profile als "LinkedIn Mitglied" + Sales-Nav-
-   * Paywall. Google indexiert die Profile aber oeffentlich -- Suche via Google
-   * mit site:linkedin.com/in/ liefert echte Namen + direkte Profil-URLs zum
-   * Anklicken (umgehen die Anonymisierung).
+   * Paywall. Google indexiert die Profile aber oeffentlich. Mit site:linkedin.com/in/
+   * landen wir auf direkten Profil-URLs der Inhaber/Gruender.
    *
-   * Query: site:linkedin.com/in/ "{Firmenname}" {Stadt} (Rollen-Keywords)
+   * Cleanup-Regeln (kritisch -- "Café Fotter • Graz" findet 0 Resultate wegen Bullet
+   * + Stadt-Suffix als Phrase):
+   *  - Bullets/Dashes/Stadt-Suffixe entfernen
+   *  - Rechtsform-Suffixe (GmbH/AG/UG/KG) entfernen
+   *  - Deutsche Umlaute beibehalten (Profile schreiben "Gruender" mit Umlaut)
    */
   function searchLinkedIn() {
-    const cleanName = lead.name.replace(/["“”„″]/g, '').trim();
-    const cityPart = lead.city ? ` ${lead.city}` : '';
-    const rolePart = ' (Inhaber OR Gruender OR Founder OR Owner OR CEO OR "Geschaeftsfuehrer")';
-    const q = encodeURIComponent(`site:linkedin.com/in/ "${cleanName}"${cityPart}${rolePart}`);
+    const cleanName = cleanCompanyName(lead.name);
+    const rolePart = ' (Inhaber OR Inhaberin OR Gründer OR Gründerin OR Founder OR Owner OR CEO)';
+    const q = encodeURIComponent(`site:linkedin.com/in/ "${cleanName}"${rolePart}`);
     window.open(`https://www.google.com/search?q=${q}`, '_blank');
   }
 
