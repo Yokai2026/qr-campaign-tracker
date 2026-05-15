@@ -41,6 +41,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type LinkListProps = {
   links: ShortLinkWithStats[];
@@ -52,6 +62,9 @@ export function LinkList({ links, groups }: LinkListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [groupFilter, setGroupFilter] = useState<string>('all');
   const [campaignFilter, setCampaignFilter] = useState<string>('all');
+  // Loesch-Bestaetigung — vorher loeschte das Dropdown direkt ohne Confirm,
+  // was bei versehentlichem Klick unwiderruflich Daten verlor.
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; label: string } | null>(null);
 
   // Max 7d-clicks in der aktuellen Liste — für relative Performance-Bars
   const maxClicks7d = useMemo(
@@ -157,6 +170,7 @@ export function LinkList({ links, groups }: LinkListProps) {
       } else {
         toast.error(result.error || 'Fehler');
       }
+      setPendingDelete(null);
     });
   }
 
@@ -296,7 +310,12 @@ export function LinkList({ links, groups }: LinkListProps) {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
-                onClick={() => handleDelete(sl.id)}
+                onClick={() =>
+                  setPendingDelete({
+                    id: sl.id,
+                    label: sl.title?.trim() || sl.short_code,
+                  })
+                }
               >
                 <Trash2 className="mr-2 h-3.5 w-3.5" />
                 Löschen
@@ -374,17 +393,48 @@ export function LinkList({ links, groups }: LinkListProps) {
   );
 
   return (
-    <DataTable
-      columns={columns}
-      data={filteredLinks}
-      searchKey="short_code"
-      searchPlaceholder="Kurzlinks durchsuchen..."
-      toolbar={filterToolbar}
-      emptyIcon={Link2}
-      emptyTitle="Keine Kurzlinks vorhanden"
-      emptyDescription="Erstelle deinen ersten trackbaren Kurzlink — perfekt für Social Media, E-Mail oder digitale Kampagnen."
-      emptyActionLabel="Neuer Kurzlink"
-      emptyActionHref="/links/new"
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={filteredLinks}
+        searchKey="short_code"
+        searchPlaceholder="Kurzlinks durchsuchen..."
+        toolbar={filterToolbar}
+        emptyIcon={Link2}
+        emptyTitle="Keine Kurzlinks vorhanden"
+        emptyDescription="Erstelle deinen ersten trackbaren Kurzlink — perfekt für Social Media, E-Mail oder digitale Kampagnen."
+        emptyActionLabel="Neuer Kurzlink"
+        emptyActionHref="/links/new"
+      />
+
+      {/* Loesch-Bestaetigung — vorher loeschte der Dropdown direkt ohne Confirm. */}
+      <AlertDialog open={pendingDelete !== null} onOpenChange={(o) => !o && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-[15px]">Kurzlink löschen?</AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px]">
+              {pendingDelete ? (
+                <>Der Kurzlink „<span className="font-mono">{pendingDelete.label}</span>&ldquo; wird unwiderruflich gelöscht. Alle zugehörigen Klick-Daten gehen verloren.</>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="text-[13px]" disabled={isPending}>
+              Abbrechen
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                if (pendingDelete) handleDelete(pendingDelete.id);
+              }}
+              disabled={isPending}
+              className="bg-destructive text-white hover:bg-destructive/90 text-[13px]"
+            >
+              {isPending ? 'Wird gelöscht…' : 'Endgültig löschen'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

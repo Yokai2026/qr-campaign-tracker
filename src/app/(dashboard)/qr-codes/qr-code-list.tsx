@@ -32,6 +32,17 @@ import { StatusBadge } from '@/components/shared/status-badge';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { ScanCount } from '@/components/shared/scan-count';
 import { QrPreview } from '@/components/shared/qr-preview';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import QRCode from 'qrcode';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -63,6 +74,10 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
   const [campaignFilter, setCampaignFilter] = useState<string>('all');
   const [placementFilter, setPlacementFilter] = useState<string>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  // Loesch-Bestaetigung — wird vom Dropdown-Menu gesetzt, AlertDialog haengt
+  // ausserhalb der Tabelle. So gibt's keinen Konflikt mit der Dropdown-Schliessen-
+  // Logik (frueheres Wrapping in ConfirmDialog verschluckte Klicks).
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; shortCode: string } | null>(null);
   // Client-side host, nach Mount gesetzt — ohne window.origin zur SSR-Zeit.
   const [origin, setOrigin] = useState('');
   useEffect(() => {
@@ -184,7 +199,7 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
   }
 
   function handleDelete(id: string, shortCode: string) {
-    // Delete proceeds directly — user already clicked explicit "Löschen" in dropdown
+    void shortCode;
     startTransition(async () => {
       try {
         await deleteQrCode(id);
@@ -193,8 +208,38 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
         toast.error(
           err instanceof Error ? err.message : 'Fehler beim Löschen',
         );
+      } finally {
+        setPendingDelete(null);
       }
     });
+  }
+
+  /** Generiert PNG/SVG live, falls die DB keine URL hat (oder die URL kaputt ist).
+   *  So funktioniert der Download IMMER, auch fuer alte Codes ohne gespeicherte Datei. */
+  async function downloadLive(qr: QrCodeWithMeta, format: 'png' | 'svg') {
+    try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://spurig.app';
+      const url = `${origin}/r/${qr.short_code}`;
+      const fg = qr.qr_fg_color ?? '#000000';
+      const bg = qr.qr_bg_color ?? '#FFFFFF';
+      const options = {
+        errorCorrectionLevel: 'M' as const,
+        margin: 2,
+        width: 1024,
+        color: { dark: fg, light: bg },
+      };
+      if (format === 'png') {
+        const dataUrl = await QRCode.toDataURL(url, options);
+        downloadQrPng(dataUrl, qr.short_code);
+      } else {
+        const svgString = await QRCode.toString(url, { ...options, type: 'svg' });
+        const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+        downloadQrSvg(dataUrl, qr.short_code);
+      }
+      toast.success(`${format.toUpperCase()} heruntergeladen`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Download fehlgeschlagen');
+    }
   }
 
   const columns: ColumnDef<QrCodeWithMeta>[] = [
@@ -360,13 +405,16 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
                 <MoreVertical className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[200px]">
+                {/* PNG/SVG: bei Bedarf live generieren (qr_png_url/qr_svg_url
+                    sind oft leer in der DB — Item soll trotzdem klickbar sein). */}
                 <DropdownMenuItem
                   onClick={() => {
                     if (qr.qr_png_url) {
                       downloadQrPng(qr.qr_png_url, qr.short_code);
+                    } else {
+                      void downloadLive(qr, 'png');
                     }
                   }}
-                  disabled={!qr.qr_png_url}
                 >
                   <Download className="mr-2 h-3.5 w-3.5" />
                   PNG herunterladen
@@ -375,28 +423,24 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
                   onClick={() => {
                     if (qr.qr_svg_url) {
                       downloadQrSvg(qr.qr_svg_url, qr.short_code);
+                    } else {
+                      void downloadLive(qr, 'svg');
                     }
                   }}
-                  disabled={!qr.qr_svg_url}
                 >
                   <Download className="mr-2 h-3.5 w-3.5" />
                   SVG herunterladen
                 </DropdownMenuItem>
-                <ConfirmDialog
-                  trigger={
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-3.5 w-3.5" />
-                      Löschen
-                    </DropdownMenuItem>
-                  }
-                  title="QR-Code löschen?"
-                  description={`Der QR-Code „${qr.short_code}" wird unwiderruflich gelöscht. Alle zugehörigen Scan-Daten gehen verloren.`}
-                  confirmLabel="Endgültig löschen"
-                  onConfirm={() => handleDelete(qr.id, qr.short_code)}
-                />
+                {/* Loeschen: einfacher Click setzt pendingDelete; AlertDialog
+                    haengt ausserhalb der Tabelle und oeffnet sich dann.
+                    Frueheres ConfirmDialog-Wrapping war mit base-ui-Menus buggy. */}
+                <DropdownMenuItem
+                  onClick={() => setPendingDelete({ id: qr.id, shortCode: qr.short_code })}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="mr-2 h-3.5 w-3.5" />
+                  Löschen
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -457,6 +501,7 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
   );
 
   return (
+    <>
     <DataTable
       columns={columns}
       data={filteredQrCodes}
@@ -510,5 +555,36 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
         </>
       )}
     />
+
+    {/* Loesch-Bestaetigung — controlled AlertDialog ausserhalb der Tabelle.
+        Wird durch setPendingDelete im Dropdown geoeffnet. */}
+    <AlertDialog open={pendingDelete !== null} onOpenChange={(o) => !o && setPendingDelete(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-[15px]">QR-Code löschen?</AlertDialogTitle>
+          <AlertDialogDescription className="text-[13px]">
+            {pendingDelete ? (
+              <>Der QR-Code „<span className="font-mono">{pendingDelete.shortCode}</span>&ldquo; wird unwiderruflich gelöscht. Alle zugehörigen Scan-Daten gehen verloren.</>
+            ) : null}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="text-[13px]" disabled={isPending}>
+            Abbrechen
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              if (pendingDelete) handleDelete(pendingDelete.id, pendingDelete.shortCode);
+            }}
+            disabled={isPending}
+            className="bg-destructive text-white hover:bg-destructive/90 text-[13px]"
+          >
+            {isPending ? 'Wird gelöscht…' : 'Endgültig löschen'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
