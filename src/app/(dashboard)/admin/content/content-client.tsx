@@ -39,6 +39,10 @@ type Article = {
   description: string;
   publishedAt: string;
   tags: string[];
+  source?: 'file' | 'db';
+  image_prompt?: string | null;
+  image_url?: string | null;
+  image_alt?: string | null;
 };
 
 type Response = {
@@ -180,6 +184,10 @@ export function ContentClient() {
                     {hasAny ? 'Neu generieren' : 'Drafts generieren'}
                   </Button>
                 </div>
+
+                {article.image_prompt && (
+                  <ImagePromptCard prompt={article.image_prompt} alt={article.image_alt ?? null} title={article.title} />
+                )}
 
                 {hasAny && (
                   <div className="grid gap-3 md:grid-cols-3">
@@ -337,3 +345,54 @@ function StatusBadge({ status }: { status: Status }) {
   );
 }
 
+function ImagePromptCard({ prompt, alt, title }: { prompt: string; alt: string | null; title: string }) {
+  const [copied, setCopied] = useState(false);
+
+  function copyPrompt() {
+    navigator.clipboard.writeText(prompt);
+    setCopied(true);
+    toast.success('Image-Prompt kopiert. Jetzt in ChatGPT/DALL-E/Midjourney einfügen.');
+    setTimeout(() => setCopied(false), 1800);
+  }
+
+  function openChatGPT() {
+    navigator.clipboard.writeText(prompt);
+    window.open('https://chatgpt.com/', '_blank');
+    toast.success('Prompt in Clipboard. ChatGPT-Tab offen — Strg+V im Chat einfügen.', { duration: 10000 });
+  }
+
+  return (
+    <div className="mb-3 rounded-lg border border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-cyan-500/5 p-3">
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-purple-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-purple-300">
+            Bild-Prompt
+          </span>
+          <span className="text-[10px] text-muted-foreground">Für ChatGPT / DALL-E / Midjourney</span>
+        </div>
+        <span className="text-[10px] text-muted-foreground">{prompt.length} Zeichen</span>
+      </div>
+      <p className="mb-2 max-h-32 overflow-auto whitespace-pre-wrap rounded border border-border/40 bg-background/40 p-2 text-[12px] leading-relaxed text-muted-foreground">
+        {prompt}
+      </p>
+      {alt && (
+        <p className="mb-2 text-[10.5px] text-muted-foreground/70">
+          <span className="text-foreground">Alt-Text:</span> {alt}
+        </p>
+      )}
+      <div className="flex flex-wrap gap-1.5">
+        <Button size="sm" variant="default" onClick={openChatGPT} className="bg-purple-500 text-white hover:bg-purple-500/90">
+          <ExternalLink className="mr-1 h-3 w-3" />
+          In ChatGPT öffnen
+        </Button>
+        <Button size="sm" variant="outline" onClick={copyPrompt}>
+          {copied ? <CheckCircle2 className="mr-1 h-3 w-3" /> : <Copy className="mr-1 h-3 w-3" />}
+          {copied ? 'Kopiert' : 'Prompt kopieren'}
+        </Button>
+        <span className="ml-auto self-center text-[10px] italic text-muted-foreground/60">
+          {title.slice(0, 40)}
+        </span>
+      </div>
+    </div>
+  );
+}

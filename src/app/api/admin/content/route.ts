@@ -30,7 +30,7 @@ export async function GET() {
       .order('updated_at', { ascending: false }),
     service
       .from('content_blogs')
-      .select('slug, title, description, tags, cluster, created_at')
+      .select('slug, title, description, tags, cluster, image_prompt, image_url, image_alt, created_at')
       .order('created_at', { ascending: false }),
   ]);
 
@@ -53,6 +53,9 @@ export async function GET() {
     tags: b.tags ?? [],
     source: 'db' as const,
     cluster: b.cluster,
+    image_prompt: b.image_prompt ?? null,
+    image_url: b.image_url ?? null,
+    image_alt: b.image_alt ?? null,
   }));
 
   // Dedup nach slug (DB wins)

@@ -81,11 +81,13 @@ export async function POST(request: NextRequest) {
         description: expanded.description,
         tags: expanded.tags,
         body_md: expanded.body_md,
+        image_prompt: expanded.image_prompt,
+        image_alt: expanded.image_alt,
         source: 'ideas',
         cluster: idea.cluster,
         origin_idea_id: idea.id,
       })
-      .select('id, slug, title, description, tags, body_md')
+      .select('id, slug, title, description, tags, body_md, image_prompt, image_alt')
       .single();
     if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 });
     blog = inserted;

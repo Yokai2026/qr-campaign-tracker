@@ -28,6 +28,8 @@ export type ExpandedBlog = {
   description: string;
   tags: string[];
   body_md: string;
+  image_prompt: string;
+  image_alt: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -155,12 +157,23 @@ Struktur:
 6. **Mindestens 2 konkrete Zahlen/Stats** (aus Spurig-Daten, plausibel)
 7. **Schluss-H2 "Fazit"** oder aehnlich: 2-3 Saetze + 1 Diskussions-Frage
 
+ZUSAETZLICH generiere einen DALL-E/Midjourney-tauglichen ENGLISCHEN Image-Prompt fuer ein Hero-Bild:
+- Photorealistic, 16:9 aspect ratio
+- Spurig-Brand: dark background (#0a0a0a or near-black), subtle purple (#7C3AED) + cyan (#22d3ee) accent lighting
+- Scene: konkret abgeleitet aus dem Blog-Thema (z.B. "marketing analyst at desk reviewing QR-code scan data on minimalist dark dashboard, German poster wall visible through window")
+- Editorial premium-SaaS landing-page feel
+- NO TEXT visible in image (kritisch — KI macht oft hässliche Letters)
+- Style: cinematic, minimalist, professional
+- Auf englisch fuer beste Image-AI-Ergebnisse
+
 Output-Format — KRITISCH WICHTIG (Parser haengt sonst):
 
 ---META---
 slug: kurz-knackig-url-friendly
 description: 1-2 Saetze SEO max 155 Zeichen, mit Wow-Hook
 tags: Tag1, Tag2, Tag3
+image_prompt: [ENGLISCHER DALL-E/Midjourney-Prompt, ein zusammenhaengender Satz, ~50-80 Worte, KEINE Quotes]
+image_alt: [deutscher Alt-Text fuer Accessibility, max 120 Zeichen]
 ---BODY---
 [FULL MARKDOWN HIER, ohne ## Titel-Headline am Anfang]
 
@@ -236,7 +249,13 @@ function parseMetaBodyBlock(text: string, fallbackTitle: string): ExpandedBlog {
     description: (meta.description ?? '').slice(0, 200),
     tags,
     body_md: body,
+    image_prompt: meta.image_prompt ?? fallbackImagePrompt(fallbackTitle),
+    image_alt: (meta.image_alt ?? fallbackTitle).slice(0, 160),
   };
+}
+
+function fallbackImagePrompt(title: string): string {
+  return `Photorealistic 16:9 hero image, dark background (#0a0a0a) with subtle purple (#7C3AED) and cyan (#22d3ee) accent lighting, minimalist editorial scene related to "${title.slice(0, 80)}", no text visible, premium SaaS landing-page aesthetic, cinematic depth of field.`;
 }
 
 function slugify(s: string): string {
