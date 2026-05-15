@@ -590,74 +590,145 @@ function DailyChart({
   hovered: { date: string; sent: number; opened: number; clicked: number; replied: number } | null;
   setHovered: (d: { date: string; sent: number; opened: number; clicked: number; replied: number } | null) => void;
 }) {
+  // Summary-Header — gibt sofort den 14-Tage-Eindruck, auch wenn die Strip-Zellen
+  // an leeren Tagen nur Punkte zeigen.
+  const totals = daily.reduce(
+    (acc, d) => ({
+      sent: acc.sent + d.sent,
+      opened: acc.opened + d.opened,
+      clicked: acc.clicked + d.clicked,
+      replied: acc.replied + d.replied,
+    }),
+    { sent: 0, opened: 0, clicked: 0, replied: 0 },
+  );
   const max = Math.max(1, ...daily.map((d) => Math.max(d.sent, d.opened, d.clicked, d.replied)));
+  const activeDays = daily.filter((d) => d.sent + d.opened + d.clicked + d.replied > 0).length;
+
+  const display = hovered ?? daily[daily.length - 1];
+
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-xs uppercase tracking-wide text-muted-foreground">Letzte 14 Tage</div>
-        <div className="text-xs text-muted-foreground tabular-nums min-h-[16px]">
-          {hovered
-            ? `${hovered.date} · Sent ${hovered.sent} · Opened ${hovered.opened} · Clicked ${hovered.clicked} · Replied ${hovered.replied}`
-            : 'Hover über einen Tag für Details'}
+    <div className="rounded-xl border border-border bg-card p-4 space-y-4">
+      {/* Kopfzeile: Label + Zeitraum + Aktivitaets-Detail rechts */}
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div>
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">Letzte 14 Tage</div>
+          <div className="mt-0.5 text-[11px] text-muted-foreground">
+            {activeDays} von {daily.length} Tag{daily.length === 1 ? '' : 'en'} mit Aktivität
+          </div>
         </div>
+        {display && (
+          <div className="text-right">
+            <div className="text-[11px] text-muted-foreground tabular-nums">
+              {formatDayLabel(display.date)}
+            </div>
+            <div className="mt-0.5 inline-flex items-center gap-2 text-[11.5px] tabular-nums">
+              <Dot color="bg-slate-400" /> {display.sent}
+              <Dot color="bg-emerald-500" /> {display.opened}
+              <Dot color="bg-purple-500" /> {display.clicked}
+              <Dot color="bg-amber-500" /> {display.replied}
+            </div>
+          </div>
+        )}
       </div>
-      <div className="flex items-end justify-between gap-1 h-32">
+
+      {/* 14-Tages-Strip — eine fixe Spalte pro Tag, gut lesbar.
+          Bars getrennt nebeneinander statt gestapelt → keine Verwechslung
+          welcher Wert wozu gehoert. */}
+      <div className="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-1 sm:gap-1.5">
         {daily.map((d) => {
           const active = hovered?.date === d.date;
+          const empty = d.sent + d.opened + d.clicked + d.replied === 0;
           return (
-            <div
+            <button
               key={d.date}
-              className="flex-1 flex flex-col items-center justify-end gap-1 cursor-pointer"
+              type="button"
               onMouseEnter={() => setHovered(d)}
               onMouseLeave={() => setHovered(null)}
+              onFocus={() => setHovered(d)}
+              onBlur={() => setHovered(null)}
+              className={
+                'group relative flex h-20 flex-col justify-end rounded-md border px-0.5 pb-1 transition-colors ' +
+                (active
+                  ? 'border-primary/40 bg-primary/[0.04]'
+                  : empty
+                    ? 'border-border/40 bg-transparent'
+                    : 'border-border/60 bg-muted/10 hover:border-border')
+              }
+              aria-label={`${d.date} · Sent ${d.sent}, Opened ${d.opened}, Clicked ${d.clicked}, Replied ${d.replied}`}
             >
-              <div className={`w-full flex flex-col items-stretch gap-0.5 transition-opacity ${active ? '' : hovered ? 'opacity-40' : ''}`}>
-                <div
-                  className="bg-slate-500 rounded-sm"
-                  style={{ height: (d.sent / max) * 80 + 'px' }}
-                />
-                {d.opened > 0 && (
-                  <div
-                    className="bg-emerald-500 rounded-sm"
-                    style={{ height: (d.opened / max) * 80 + 'px' }}
-                  />
-                )}
-                {d.clicked > 0 && (
-                  <div
-                    className="bg-purple-500 rounded-sm"
-                    style={{ height: (d.clicked / max) * 80 + 'px' }}
-                  />
-                )}
-                {d.replied > 0 && (
-                  <div
-                    className="bg-amber-500 rounded-sm"
-                    style={{ height: (d.replied / max) * 80 + 'px' }}
-                  />
-                )}
-              </div>
-              <div className={`text-[9px] -rotate-45 origin-top-left translate-x-1 ${active ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>
-                {d.date.slice(5)}
-              </div>
-            </div>
+              {empty ? (
+                // Punkt fuer leere Tage — visuelle Konsistenz, signalisiert "kein Ereignis"
+                <span className="absolute inset-0 m-auto h-1 w-1 rounded-full bg-muted-foreground/20" />
+              ) : (
+                <div className="flex items-end justify-center gap-[2px] h-full">
+                  <MiniBar value={d.sent} max={max} color="bg-slate-400" />
+                  <MiniBar value={d.opened} max={max} color="bg-emerald-500" />
+                  <MiniBar value={d.clicked} max={max} color="bg-purple-500" />
+                  <MiniBar value={d.replied} max={max} color="bg-amber-500" />
+                </div>
+              )}
+            </button>
           );
         })}
       </div>
-      <div className="flex items-center gap-4 mt-3 text-[11px] text-muted-foreground flex-wrap">
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 bg-slate-500 rounded-sm" /> Sent
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 bg-emerald-500 rounded-sm" /> Opened
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 bg-purple-500 rounded-sm" /> Clicked
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 bg-amber-500 rounded-sm" /> Replied
-        </span>
+
+      {/* X-Axis-Labels — alle 3 Tage zeigen damit nichts ueberlappt */}
+      <div className="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-1 sm:gap-1.5 -mt-2">
+        {daily.map((d, i) => (
+          <div key={d.date} className="text-center text-[9.5px] text-muted-foreground tabular-nums">
+            {i % 3 === 0 || i === daily.length - 1 ? d.date.slice(5) : ''}
+          </div>
+        ))}
+      </div>
+
+      {/* Footer: 14-Tage-Totals + Legende */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px] tabular-nums">
+          <Total label="Sent" value={totals.sent} color="bg-slate-400" />
+          <Total label="Opened" value={totals.opened} color="bg-emerald-500" />
+          <Total label="Clicked" value={totals.clicked} color="bg-purple-500" />
+          <Total label="Replied" value={totals.replied} color="bg-amber-500" />
+        </div>
+        <div className="text-[10.5px] text-muted-foreground">Hover für Tagesdetails</div>
       </div>
     </div>
   );
+}
+
+function MiniBar({ value, max, color }: { value: number; max: number; color: string }) {
+  const pct = max > 0 ? (value / max) * 100 : 0;
+  if (value === 0) {
+    // Schmaler Baseline-Stub damit alle 4 Reihen visuell aligned bleiben
+    return <span className={`w-1 rounded-t-sm bg-border/40`} style={{ height: '2px' }} />;
+  }
+  return (
+    <span
+      className={`w-1 rounded-t-sm ${color} transition-all`}
+      style={{ height: `${Math.max(pct, 8)}%` }}
+      title={String(value)}
+    />
+  );
+}
+
+function Dot({ color }: { color: string }) {
+  return <span className={`inline-block h-1.5 w-1.5 rounded-full ${color}`} />;
+}
+
+function Total({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+      <Dot color={color} />
+      <span className="text-foreground font-semibold">{value}</span>
+      <span>{label}</span>
+    </span>
+  );
+}
+
+function formatDayLabel(iso: string): string {
+  // "2026-05-15" → "Fr · 15. Mai"
+  const d = new Date(iso + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'short' });
 }
 
 function SegmentBreakdown({ segments }: { segments: Record<string, number> }) {
