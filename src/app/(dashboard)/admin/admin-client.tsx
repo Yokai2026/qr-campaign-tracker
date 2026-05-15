@@ -40,6 +40,7 @@ type Stats = {
     visitorsOnline: number;
     loggedInOnline: number;
     anonymousOnline: number;
+    visitorsLifetime: number;
     trialActive: number;
     trialExpired: number;
   };
@@ -310,6 +311,17 @@ export function AdminClient() {
                 <span className="ml-1.5 text-[11px] text-muted-foreground/80 tabular-nums">
                   ({data.users.loggedInOnline} eingeloggt · {data.users.anonymousOnline} anonym)
                 </span>
+              </>
+            }
+          />
+          <span className="text-muted-foreground/40">·</span>
+          <Chip
+            label={
+              <>
+                <span className="tabular-nums font-semibold text-foreground">
+                  {data.users.visitorsLifetime.toLocaleString('de-DE')}
+                </span>{' '}
+                <span className="text-muted-foreground">Besucher gesamt</span>
               </>
             }
           />

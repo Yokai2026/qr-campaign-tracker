@@ -34,7 +34,7 @@ export async function GET(
   try {
     const { data: current } = await sb
       .from('outbound_messages')
-      .select('clicked_at, opened_at, click_count, open_count')
+      .select('lead_id, clicked_at, opened_at, click_count, open_count')
       .eq('id', id)
       .maybeSingle();
     if (current) {
@@ -50,6 +50,17 @@ export async function GET(
           status: 'clicked',
         })
         .eq('id', id);
+
+      // Lead-Status auf 'engaged' setzen — wenn er Click macht ist er
+      // definitiv interessiert (oder zumindest neugierig). Wirft nicht ueber
+      // 'replied'/'converted' damit explizite Stati nicht ueberschrieben werden.
+      if (current.lead_id) {
+        await sb
+          .from('outbound_leads')
+          .update({ status: 'engaged' })
+          .eq('id', current.lead_id)
+          .in('status', ['contacted', 'queued']);
+      }
     }
   } catch (e) {
     console.warn('[track/click] update failed:', e);

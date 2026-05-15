@@ -84,6 +84,7 @@ const STATUS_LABELS: Record<string, string> = {
   new: 'Neu',
   queued: 'Queue',
   contacted: 'Angeschrieben',
+  engaged: 'Engagiert',
   replied: 'Geantwortet',
   bounced: 'Bounced',
   uninterested: 'Kein Interesse',
@@ -901,6 +902,7 @@ function LeadRow({ lead, compact }: { lead: Lead; compact: boolean }) {
 
 function statusClass(status: string): string {
   if (status === 'replied' || status === 'converted') return 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
+  if (status === 'engaged') return 'bg-purple-500/15 text-purple-400 border border-purple-500/30';
   if (status === 'contacted') return 'bg-blue-500/15 text-blue-500 border border-blue-500/30';
   if (status === 'bounced' || status === 'do_not_contact') return 'bg-red-500/15 text-red-500 border border-red-500/30';
   return 'bg-muted/30 text-muted-foreground border border-border';

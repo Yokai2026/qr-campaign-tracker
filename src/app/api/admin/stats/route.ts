@@ -111,6 +111,7 @@ export async function GET() {
     // Live-Presence ueber visitor_heartbeats — alle Besucher (anonym + eingeloggt)
     visitorsTotalRes,
     visitorsLoggedInRes,
+    visitorsLifetimeRes,
     subsActiveRes,
     recentSignupsRes,
     recentSubsRes,
@@ -126,6 +127,9 @@ export async function GET() {
     sb.from('profiles').select('id', { count: 'exact', head: true }).gte('last_seen_at', twoMinAgo),
     sb.from('visitor_heartbeats').select('visitor_id', { count: 'exact', head: true }).gte('last_seen_at', twoMinAgo),
     sb.from('visitor_heartbeats').select('visitor_id', { count: 'exact', head: true }).gte('last_seen_at', twoMinAgo).not('user_id', 'is', null),
+    // Gesamt-Besucher-Zaehler: jede visitor_id ist ein einzigartiger Browser-Tab.
+    // Da visitor_id = PRIMARY KEY, gibt COUNT(*) die lifetime-distinct-Visitor-Anzahl.
+    sb.from('visitor_heartbeats').select('visitor_id', { count: 'exact', head: true }),
     sb.from('subscriptions').select('id, user_id, stripe_price_id, status, created_at').in('status', ['active', 'on_trial', 'past_due']),
     sb.from('profiles').select('id, email, username, created_at, trial_ends_at').order('created_at', { ascending: false }).limit(10),
     sb.from('subscriptions').select('id, user_id, stripe_price_id, status, created_at, profiles:user_id(email, username)').order('created_at', { ascending: false }).limit(10),
@@ -189,6 +193,8 @@ export async function GET() {
       visitorsOnline: visitorsTotalRes.count ?? 0,
       loggedInOnline: visitorsLoggedInRes.count ?? 0,
       anonymousOnline: Math.max(0, (visitorsTotalRes.count ?? 0) - (visitorsLoggedInRes.count ?? 0)),
+      // Lifetime: jede visitor_id ist ein einzigartiger Browser-Tab seit Tracking-Start.
+      visitorsLifetime: visitorsLifetimeRes.count ?? 0,
       trialActive,
       trialExpired,
     },
