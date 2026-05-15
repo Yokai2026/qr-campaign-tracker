@@ -264,9 +264,21 @@ function LeadCard({
     setTimeout(() => setCopied(false), 1500);
   }
 
+  /**
+   * Oeffnet direkt LinkedIn People-Search (User ist eh eingeloggt fuer DM).
+   * Query: "{Firmenname}" {Stadt} (Inhaber|Geschaeftsfuehrer|Gruender|Founder|CEO)
+   *
+   * Vorteile vs. Google: User landet auf LinkedIn-Personenliste mit Filter.
+   * Founder/Inhaber-Profile stehen typischerweise oben durch Keyword-Match.
+   * Bindestrich im Firmennamen wird nicht als Minus-Operator missinterpretiert.
+   */
   function searchLinkedIn() {
-    const q = encodeURIComponent(`${lead.name} ${lead.city ?? ''} ${SEGMENT_LABELS[lead.segment] ?? ''}`.trim());
-    window.open(`https://www.google.com/search?q=site%3Alinkedin.com%2Fin+${q}`, '_blank');
+    // Firmenname clean: Sonderzeichen weg, in Anfuehrungszeichen fuer Phrase-Match
+    const cleanName = lead.name.replace(/["“”„″]/g, '').trim();
+    const cityPart = lead.city ? ` ${lead.city}` : '';
+    const rolePart = ' (Inhaber OR Geschaeftsfuehrer OR Gruender OR Founder OR CEO OR Owner)';
+    const keywords = encodeURIComponent(`"${cleanName}"${cityPart}${rolePart}`);
+    window.open(`https://www.linkedin.com/search/results/people/?keywords=${keywords}`, '_blank');
   }
 
   /**
@@ -282,18 +294,24 @@ function LeadCard({
       toast.error('Clipboard-Zugriff blockiert — manuell kopieren');
       return;
     }
-    if (lead.linkedin_url) {
-      window.open(lead.linkedin_url, '_blank');
+    const hasDirectUrl = !!lead.linkedin_url;
+    if (hasDirectUrl) {
+      window.open(lead.linkedin_url!, '_blank');
     } else {
       searchLinkedIn();
     }
-    toast.success('Opener in Zwischenablage. Auf LinkedIn: Nachricht → Strg+V → Senden.', {
-      duration: 12000,
-      action: {
-        label: 'Als gesendet markieren',
-        onClick: () => onUpdate(lead.id, { dm_status: 'sent' }),
+    toast.success(
+      hasDirectUrl
+        ? 'Opener kopiert. Nachricht → Strg+V → Senden.'
+        : 'Opener kopiert. LinkedIn-Personensuche offen: Inhaber/Founder oben anklicken → Nachricht → Strg+V → Senden.',
+      {
+        duration: 14000,
+        action: {
+          label: 'Als gesendet markieren',
+          onClick: () => onUpdate(lead.id, { dm_status: 'sent' }),
+        },
       },
-    });
+    );
   }
 
   const segLabel = SEGMENT_LABELS[lead.segment] ?? lead.segment;
