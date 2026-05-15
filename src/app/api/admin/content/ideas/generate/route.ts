@@ -37,11 +37,24 @@ export async function POST(request: NextRequest) {
   const hardCap = Number(process.env.CONTENT_IDEAS_MAX_COUNT ?? '10');
   const count = Math.max(5, Math.min(hardCap, body.count ?? 10));
 
+  // Existing titles per cluster — JETZT VORHER fetchen damit wir sie an den
+  // Generator weitergeben koennen (so dass Claude EXPLICIT vermeidet sie zu
+  // wiederholen statt nur nachher zu deduppen)
+  const service = await createServiceClient();
+  const { data: existing } = await service
+    .from('content_ideas')
+    .select('title')
+    .eq('cluster', cluster)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  const existingTitles = (existing ?? []).map((r) => r.title);
+  const existingSet = new Set(existingTitles.map((t) => t.trim().toLowerCase()));
+
   let ideas;
   const generateStart = Date.now();
   try {
-    ideas = await generateIdeasForCluster(cluster, count);
-    console.log(`[ideas-generate] cluster=${cluster} count=${ideas.length} took=${Date.now() - generateStart}ms`);
+    ideas = await generateIdeasForCluster(cluster, count, existingTitles);
+    console.log(`[ideas-generate] cluster=${cluster} count=${ideas.length} existing=${existingTitles.length} took=${Date.now() - generateStart}ms`);
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'unknown';
     const stack = e instanceof Error ? e.stack : '';
@@ -52,17 +65,35 @@ export async function POST(request: NextRequest) {
 
   if (!ideas.length) return NextResponse.json({ generated: 0, ideas: [] });
 
-  const service = await createServiceClient();
+  // Soft-Dup-Filter: 4-Wort-Overlap mit existierendem Titel = Wiederholung.
+  // Faengt Faelle wie "Postkarten/Anrufe/Niemand/misst" vs "Postkarten/Anrufe/
+  // Niemand/weiss" trotz unterschiedlicher Wort-Kombo.
+  const stopWords = new Set(['ist', 'das', 'die', 'der', 'und', 'oder', 'mit', 'für', 'von', 'auf',
+    'nach', 'bei', 'vom', 'zum', 'zur', 'sich', 'sind', 'wie', 'was', 'wer', 'wir', 'ich', 'dein',
+    'mein', 'sein', 'eine', 'einen', 'einem', 'eines', 'aus', 'nicht', 'noch', 'doch', 'immer', 'auch',
+    'wenn', 'weil', 'dann', 'aber', 'sehr', 'hier', 'mehr', 'kein', 'keine']);
+  const tokenize = (s: string) => new Set(
+    s.toLowerCase().split(/[^a-zäöüß0-9]+/).filter((w) => w.length >= 4 && !stopWords.has(w)),
+  );
+  const existingTokenSets = existingTitles.map(tokenize);
+  const SOFT_DUP_OVERLAP = 4; // 4 oder mehr gemeinsame Schlagwoerter = Duplikat
 
-  // Existing titles per cluster -> skip dupes
-  const { data: existing } = await service
-    .from('content_ideas')
-    .select('title')
-    .eq('cluster', cluster);
-  const existingSet = new Set((existing ?? []).map((r) => r.title.trim().toLowerCase()));
-
+  let softDupCount = 0;
   const rows = ideas
-    .filter((i) => !existingSet.has(i.title.trim().toLowerCase()))
+    .filter((i) => {
+      const newTitleLower = i.title.trim().toLowerCase();
+      if (existingSet.has(newTitleLower)) return false;
+      const newTokens = tokenize(i.title);
+      for (const ex of existingTokenSets) {
+        let overlap = 0;
+        for (const t of newTokens) if (ex.has(t)) overlap++;
+        if (overlap >= SOFT_DUP_OVERLAP) {
+          softDupCount++;
+          return false;
+        }
+      }
+      return true;
+    })
     .map((i) => ({
       cluster,
       title: i.title.slice(0, 200),
@@ -71,6 +102,7 @@ export async function POST(request: NextRequest) {
       target_keywords: i.target_keywords ?? null,
       status: 'backlog' as const,
     }));
+  console.log(`[ideas-generate dedupe] hard-dups=${ideas.length - rows.length - softDupCount} soft-dups=${softDupCount} kept=${rows.length}`);
 
   if (rows.length === 0) {
     return NextResponse.json({ generated: 0, duplicates: ideas.length });

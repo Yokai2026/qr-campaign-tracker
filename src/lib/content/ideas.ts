@@ -125,9 +125,37 @@ export type ExpandedBlog = {
 export async function generateIdeasForCluster(
   cluster: ContentCluster,
   count = 15,
+  existingTitles: string[] = [],
 ): Promise<GeneratedIdea[]> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
+
+  const existingSection = existingTitles.length > 0 ? `
+══════════════════════════════════════════════════════════════════════
+KRITISCH — ANTI-WIEDERHOLUNGS-CONTEXT (HOCHSTE PRIORITAT)
+══════════════════════════════════════════════════════════════════════
+Diese ${existingTitles.length} Titel/Themen existieren BEREITS im Backlog.
+JEDE Idee die du jetzt generierst muss SUBSTANTIELL anders sein —
+nicht nur andere Worte, sondern ein KOMPLETT anderer Angle.
+
+EXISTIERENDE TITEL (NICHT in dieser Form, nicht mit aehnlichem Sub-Thema):
+${existingTitles.slice(0, 40).map((t, i) => `  ${i + 1}. ${t}`).join('\n')}
+
+ANTI-WIEDERHOLUNGS-CHECK pro neuer Idee:
+  [ ] Hat dieses Sub-Thema schon einer der existierenden Titel?
+      → JA: verwerfen, anderen Angle finden.
+  [ ] Wenn ein Topic "Postkarten / 500 Stueck / Anrufe" schon existiert,
+      generiere KEIN weiteres "Postkarten / N Stueck / Anrufe"-Thema.
+  [ ] Wenn "47 Plakate / 3 funktionieren" schon existiert, generiere KEIN
+      weiteres "X Standorte / Y funktionieren"-Thema.
+  [ ] Wenn "Bruder versteht Spurig nicht" schon existiert, KEIN anderes
+      "Verwandter versteht mich nicht"-Thema.
+  [ ] Wenn "Cookie-Banner nicht das Problem" schon existiert, KEIN anderes
+      "Cookie-Banner ist Ablenkung"-Thema.
+
+PFLICHT: Wenn du mit einem Sub-Topic startest, pruefe gegen die Liste oben.
+Wenn aehnlich → STOP und finde ein anderes Sub-Topic.
+` : '';
 
   const researchSection = WEB_SEARCH_ENABLED ? `
 ----------------------------------------
@@ -166,7 +194,45 @@ Pillar-Scope: ${CLUSTER_DESCRIPTION[cluster]}
 Generiere ${count} CONTENT-IDEEN nach dem Elite-Psychologie-Framework oben.
 Jede Idee muss Hook-Quality-Test (PART 7) bestehen und mind. 3 psychologische
 Hebel (PART 3) einbauen.
-${researchSection}
+${existingSection}${researchSection}
+══════════════════════════════════════════════════════════════════════
+YOUTUBE-CTR-TITLE-FORMELN (Research 2026 — 8%+ CTR validiert)
+══════════════════════════════════════════════════════════════════════
+Top-7-Formeln die wirklich klicken erzeugen (kombiniere mit Hook-Patterns):
+
+  F1 — SPECIFIC NUMBER + OUTCOME
+       "47 Plakate. 3 funktionierten. 22.000€/Monat gespart."
+       (Specificity = Credibility. +67% Klicks vs. generische Formulierung)
+
+  F2 — CURIOSITY GAP
+       "Ein Anwalt sagte mir gestern einen Satz. Er geht mir nicht aus dem Kopf."
+       (Information bewusst zurückhalten. Klick = einzige Loesung)
+
+  F3 — TRANSFORMATION PROMISE
+       "Von 0 auf 47€ MRR in 8 Wochen. Eine einzige Sache hat den Unterschied gemacht."
+       (Konkretes Vorher → Nachher mit Andeutung der Methode)
+
+  F4 — WARNING PATTERN
+       "Wenn du noch X benutzt, hast du dieses Risiko."
+       "Achtung wenn du deine Tracking-Daten in den USA hostest."
+
+  F5 — VERSUS FRAME
+       "Bitly Free vs Spurig 29€: das eine kostet wirklich 0 Euro?"
+       "Plakat vs Instagram-Ad: pro Conversion gewinnt das alte Medium."
+
+  F6 — ACHIEVEMENT STORY
+       "Ich hab Spurig in 8 Wochen gebaut — und 3 Sachen falsch gemacht."
+
+  F7 — UNUSUAL NUMBER + CLAIM
+       "23 von 47 DACH-Marketing-Teams: kein AV-Vertrag mit Bitly."
+
+══════════════════════════════════════════════════════════════════════
+TITLE-LAENGE-WINDOW (Research 2026)
+══════════════════════════════════════════════════════════════════════
+- Optimum: 40-65 Zeichen (Mobile truncate ab 65 Zeichen)
+- Maximum: 70 Zeichen
+- Wenn dein Titel >65 Zeichen: kürzen, eine Zahl präziser machen, ein Wort weg.
+
 ----------------------------------------
 PRE-WRITING-ANALYSE (denk SELBER durch, vor dem Generieren)
 ----------------------------------------
