@@ -263,6 +263,33 @@ function LeadCard({
     window.open(`https://www.google.com/search?q=site%3Alinkedin.com%2Fin+${q}`, '_blank');
   }
 
+  /**
+   * 1-Click-Sender: kopiert Opener in Clipboard + oeffnet LinkedIn-Profil (oder
+   * Google-Suche falls URL fehlt) in neuem Tab. Toast bietet "Als gesendet"-Action
+   * fuer einklick-Confirmation wenn User vom LinkedIn-Tab zurueckkommt.
+   */
+  async function startDm() {
+    if (!lead.dm_opener) return;
+    try {
+      await navigator.clipboard.writeText(lead.dm_opener);
+    } catch {
+      toast.error('Clipboard-Zugriff blockiert — manuell kopieren');
+      return;
+    }
+    if (lead.linkedin_url) {
+      window.open(lead.linkedin_url, '_blank');
+    } else {
+      searchLinkedIn();
+    }
+    toast.success('Opener in Zwischenablage. Auf LinkedIn: Nachricht → Strg+V → Senden.', {
+      duration: 12000,
+      action: {
+        label: 'Als gesendet markieren',
+        onClick: () => onUpdate(lead.id, { dm_status: 'sent' }),
+      },
+    });
+  }
+
   const segLabel = SEGMENT_LABELS[lead.segment] ?? lead.segment;
   const cityLabel = [lead.city, lead.region].filter(Boolean).join(', ');
 
@@ -424,16 +451,22 @@ function LeadCard({
 
       {/* Actions */}
       <div className="flex flex-wrap items-center gap-2">
+        {lead.dm_opener && lead.dm_status !== 'sent' && lead.dm_status !== 'replied' && (
+          <Button size="sm" variant="default" onClick={startDm} className="bg-[#0a66c2] text-white hover:bg-[#0a66c2]/90">
+            <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+            DM senden → LinkedIn
+          </Button>
+        )}
         {lead.dm_opener && (
           <Button size="sm" variant="outline" onClick={copyOpener}>
             {copied ? <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" /> : <Copy className="mr-1.5 h-3.5 w-3.5" />}
-            {copied ? 'Kopiert' : 'Opener kopieren'}
+            {copied ? 'Kopiert' : 'Nur kopieren'}
           </Button>
         )}
         {lead.dm_status !== 'sent' && lead.dm_status !== 'replied' && lead.dm_opener && (
           <Button
             size="sm"
-            variant="default"
+            variant="ghost"
             onClick={() => onUpdate(lead.id, { dm_status: 'sent' })}
           >
             <Send className="mr-1.5 h-3.5 w-3.5" />
