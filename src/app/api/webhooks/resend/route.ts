@@ -176,9 +176,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: msgErr.message }, { status: 500 });
   }
 
-  // Lead-State updaten wenn nötig (bounce/complain)
+  // Lead-State updaten wenn nötig (bounce/complain). Mit .select() um 0-row-
+  // Updates zu erkennen — der Original-Code hat das Result ignoriert, weshalb
+  // wir Bounces in Production gesehen haben die das outbound_messages-Status
+  // aktualisiert haben, aber den Lead unangetastet liessen.
   if (leadUpdate && msgs && msgs[0]?.lead_id) {
-    await sb.from('outbound_leads').update(leadUpdate).eq('id', msgs[0].lead_id);
+    const { data: updatedLeads, error: leadErr } = await sb
+      .from('outbound_leads')
+      .update(leadUpdate)
+      .eq('id', msgs[0].lead_id)
+      .select('id, status');
+    if (leadErr) {
+      console.warn('[webhooks/resend] lead-update error:', leadErr.message, 'lead_id=' + msgs[0].lead_id, 'type=' + type);
+    } else if (!updatedLeads || updatedLeads.length === 0) {
+      console.warn('[webhooks/resend] lead-update affected 0 rows: lead_id=' + msgs[0].lead_id, 'type=' + type, 'intended=' + JSON.stringify(leadUpdate));
+    }
   }
 
   // Diagnostik: jeden signatur-verifizierten Eingang in webhook_diagnostics

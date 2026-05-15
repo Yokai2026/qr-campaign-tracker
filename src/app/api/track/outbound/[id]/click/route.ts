@@ -54,12 +54,23 @@ export async function GET(
       // Lead-Status auf 'engaged' setzen — wenn er Click macht ist er
       // definitiv interessiert (oder zumindest neugierig). Wirft nicht ueber
       // 'replied'/'converted' damit explizite Stati nicht ueberschrieben werden.
+      // .select() zurueckgegeben damit wir 0-row-Updates loggen koennen — sonst
+      // schlucken wir Race-Conditions stillschweigend (Original-Bug-Quelle).
       if (current.lead_id) {
-        await sb
+        const { data: updatedLeads, error: leadErr } = await sb
           .from('outbound_leads')
           .update({ status: 'engaged' })
           .eq('id', current.lead_id)
-          .in('status', ['contacted', 'queued']);
+          .in('status', ['contacted', 'queued'])
+          .select('id, status');
+        if (leadErr) {
+          console.warn('[track/click] lead-update error:', leadErr.message, 'lead_id=' + current.lead_id);
+        } else if (!updatedLeads || updatedLeads.length === 0) {
+          // Filter hat nicht gematcht — Lead ist evtl. bereits 'engaged'/'replied'/
+          // 'converted'/'bounced'/'do_not_contact'. Nicht zwingend ein Bug,
+          // aber wir loggen damit man's im Audit nachvollziehen kann.
+          console.warn('[track/click] lead-status not updated (no match): lead_id=' + current.lead_id);
+        }
       }
     }
   } catch (e) {

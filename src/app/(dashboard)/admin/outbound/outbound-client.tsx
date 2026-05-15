@@ -230,6 +230,30 @@ export function OutboundClient() {
             Resend-Sync
           </button>
           <button
+            onClick={async () => {
+              const res = await fetch('/api/admin/outbound/sync-lead-status', { method: 'POST' });
+              const j = await res.json();
+              if (res.ok) {
+                alert(
+                  `Lead-Status-Sync:\n` +
+                  `· DNC gesetzt: ${j.setDoNotContact}\n` +
+                  `· Engaged gesetzt: ${j.setEngaged}\n` +
+                  `· Contacted gesetzt: ${j.setContacted}\n` +
+                  `· Unveraendert: ${j.unchanged}\n` +
+                  `· Total Leads gescannt: ${j.leadsScanned}`,
+                );
+                refreshAll();
+              } else {
+                alert(`Sync-Error: ${j.error ?? 'unknown'}`);
+              }
+            }}
+            title="Repariert Lead-Status retroaktiv aus outbound_messages-Evidenz. Idempotent."
+            className="inline-flex items-center gap-2 rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-sm text-blue-300 hover:bg-blue-500/20"
+          >
+            <RefreshCcw className="h-3.5 w-3.5" />
+            Lead-Status-Sync
+          </button>
+          <button
             onClick={refreshAll}
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-sm hover:bg-muted/50"
           >
