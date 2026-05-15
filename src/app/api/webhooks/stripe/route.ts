@@ -258,5 +258,32 @@ export async function POST(request: NextRequest) {
       break;
   }
 
+  // Diagnostik-Heartbeat: jeden signaturen-verifizierten Stripe-Event in
+  // webhook_diagnostics tracken — auch wenn der Event-Typ vom Default-Branch
+  // ignoriert wird. Analog zum Resend-Webhook. Damit das Admin-Panel ehrlich
+  // zeigen kann, dass der Stripe-Webhook live ist. Best-effort: Fehler hier
+  // duerfen die Webhook-Antwort nicht blocken (sonst wuerde Stripe retryen).
+  try {
+    const { data: current } = await supabase
+      .from('webhook_diagnostics')
+      .select('total_received')
+      .eq('service', 'stripe')
+      .maybeSingle();
+    const totalReceived = (current?.total_received ?? 0) + 1;
+    await supabase
+      .from('webhook_diagnostics')
+      .upsert(
+        {
+          service: 'stripe',
+          last_received_at: new Date().toISOString(),
+          last_event_type: event.type,
+          total_received: totalReceived,
+        },
+        { onConflict: 'service' },
+      );
+  } catch (e) {
+    console.warn('[webhooks/stripe] diagnostics upsert skipped:', e);
+  }
+
   return NextResponse.json({ received: true });
 }
