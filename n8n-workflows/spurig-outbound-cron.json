@@ -1,0 +1,176 @@
+{
+  "name": "Spurig — Outbound-Cron (täglich)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "scrape-trigger",
+      "name": "06:00 UTC · Lead-Scrape",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 100]
+    },
+    {
+      "parameters": {
+        "url": "https://spurig.com/api/cron/outbound-scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 70000
+        }
+      },
+      "id": "scrape-call",
+      "name": "POST scrape",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 100],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "spurig-cron",
+          "name": "Spurig CRON_SECRET"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            }
+          ]
+        }
+      },
+      "id": "discover-trigger",
+      "name": "07:00 UTC · E-Mail-Discovery",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 250]
+    },
+    {
+      "parameters": {
+        "url": "https://spurig.com/api/cron/outbound-discover-emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "discover-call",
+      "name": "POST discover-emails",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 250],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "spurig-cron",
+          "name": "Spurig CRON_SECRET"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 9 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "send-trigger",
+      "name": "09:30 UTC Mo-Fr · Cold-Mail Send",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 400]
+    },
+    {
+      "parameters": {
+        "url": "https://spurig.com/api/cron/outbound-send",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 70000
+        }
+      },
+      "id": "send-call",
+      "name": "POST send",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 400],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "spurig-cron",
+          "name": "Spurig CRON_SECRET"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 18 * * *"
+            }
+          ]
+        }
+      },
+      "id": "report-trigger",
+      "name": "18:00 UTC · Tagesreport",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 550]
+    },
+    {
+      "parameters": {
+        "url": "https://spurig.com/api/cron/outbound-report",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "report-call",
+      "name": "POST report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 550],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "spurig-cron",
+          "name": "Spurig CRON_SECRET"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "06:00 UTC · Lead-Scrape": {
+      "main": [[{ "node": "POST scrape", "type": "main", "index": 0 }]]
+    },
+    "07:00 UTC · E-Mail-Discovery": {
+      "main": [[{ "node": "POST discover-emails", "type": "main", "index": 0 }]]
+    },
+    "09:30 UTC Mo-Fr · Cold-Mail Send": {
+      "main": [[{ "node": "POST send", "type": "main", "index": 0 }]]
+    },
+    "18:00 UTC · Tagesreport": {
+      "main": [[{ "node": "POST report", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1"
+}
