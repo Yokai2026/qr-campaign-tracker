@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow, format } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -1238,16 +1239,26 @@ function Header({ lastUpdated }: { lastUpdated: number | null }) {
           Live-Übersicht aller User, Zahlungen, Churn und Aktivität auf Spurig
         </p>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="relative flex h-1.5 w-1.5">
-          <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
-        </span>
-        <span className="text-[11.5px] text-muted-foreground tabular-nums">
-          {lastUpdated
-            ? `Live · ${new Date(lastUpdated).toLocaleTimeString('de-DE')}`
-            : 'lädt …'}
-        </span>
+      <div className="flex items-center gap-3">
+        <Link
+          href="/admin/outbound"
+          className="inline-flex items-center gap-1.5 rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-[11.5px] font-semibold text-purple-400 hover:bg-purple-500/20 transition-colors"
+        >
+          <Mail className="h-3.5 w-3.5" />
+          Outbound-Tracking
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.4s_ease-in-out_infinite] rounded-full bg-emerald-400/70" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          </span>
+          <span className="text-[11.5px] text-muted-foreground tabular-nums">
+            {lastUpdated
+              ? `Live · ${new Date(lastUpdated).toLocaleTimeString('de-DE')}`
+              : 'lädt …'}
+          </span>
+        </div>
       </div>
     </div>
   );
