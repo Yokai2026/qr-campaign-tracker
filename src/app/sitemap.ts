@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { ARTICLES } from './blog/articles';
 import { createServiceClient } from '@/lib/supabase/server';
+import { COMPETITORS } from '@/data/competitors';
 
 export const revalidate = 3600; // 1h cache — Sitemap braucht nicht real-time zu sein
 
@@ -42,6 +43,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/pricing`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     // SEO-Landing-Pages — höchster Such-Intent
     { url: `${base}/bitly-alternative`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    // Comparison-Pages /vergleich/<competitor>-alternative (SEO-Goldmines)
+    ...COMPETITORS.map((c) => ({
+      url: `${base}/vergleich/${c.slug}-alternative`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.88,
+    })),
     { url: `${base}/dsgvo-qr-code`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${base}/qr-code-fuer-gastronomie`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${base}/qr-code-print-tracking`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },

@@ -3,6 +3,7 @@ import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
 import { createServiceClient } from '@/lib/supabase/server';
 import { ArticleLayout } from '@/components/blog/article-layout';
+import { LeadMagnetCTA } from '@/components/blog/lead-magnet-cta';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -76,6 +77,7 @@ export default async function DbBlogPage({ params }: { params: Promise<Params> }
         className="db-blog-content"
         dangerouslySetInnerHTML={{ __html: safeHtml }}
       />
+      <LeadMagnetCTA />
     </ArticleLayout>
   );
 }
