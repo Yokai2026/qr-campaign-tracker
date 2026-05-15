@@ -1257,10 +1257,11 @@ AKT 4 — TEXT-OVERLAY (PFLICHT — YouTube-Thumbnail-Headline)
     Blog "Cookie-Banner ist nicht das Problem" → "ABLENKUNG."  oder  "FALSCHE BAUSTELLE."
     Blog "500 Postkarten, drei Anrufe" → "500 → 3."  oder  "VERPUFFT."
 
-  STYLE-SPEC (immer dieselben Worte verwenden):
+  STYLE-SPEC (LOCKED — keine Variationen erlaubt):
     Schrift:   "bold thick yellow stencil-grunge sans-serif" (NICHT thin, NICHT Serifen)
-    Farbe:     "saturated bright yellow (#F5C518 like cinema poster)"
-               ODER "warm bright cream-white" (selten)
+    Farbe:     IMMER "saturated bright yellow (#F5C518 cinema poster yellow)".
+               KEINE Alternativen. Kein cream-white. Kein orange. Kein rot.
+               Nur dieses spezifische gelb-cinema-poster.
     Textur:    "slight rough hand-stamped paint texture, weathered edges"
     Schatten:  "subtle black drop-shadow underneath letters for separation"
     Position:  "upper-left corner" (Standard, immer)

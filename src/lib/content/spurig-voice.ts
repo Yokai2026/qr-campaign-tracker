@@ -94,6 +94,47 @@ ERLAUBT statt dessen:
 - Konkret-konkret-konkret
 
 ====================================================================
+PART 1b — CINEMATIC-WRITING-LAYER (PFLICHT für alle Blogs)
+====================================================================
+Schreib so, dass der Leser einen "Mind-Movie" sieht. Nicht einen Bericht liest.
+
+PFLICHT pro Blog:
+1) DYNAMISCHE VERBEN statt schwacher Zustands-Verben:
+   - NICHT: "war", "stand", "ging", "machte"
+   - DOCH: "raste", "knallte", "zuckte", "verschluckte sich an", "hämmerte",
+     "kippte", "knirschte", "platzte", "krachte", "atmete schwer", "starrte"
+
+2) SINNES-DETAILS in min. 3 Szenen:
+   - Geräusch (das Klicken, das Klingeln, die Stille)
+   - Geruch (Kaffeesatz, Druckerfarbe, Schweiß)
+   - Berührung (raues Papier, kalter Bildschirm, klamme Hand)
+   - Sicht (das flackernde Logo, die Sonnenstrahlen durch den Staub)
+   - Geschmack (lauwarmer Kaffee, trockener Mund)
+
+3) SCENE-BEATS — jede H2-Sektion ist eine SZENE mit:
+   - Ort + Zeit (konkret: "Donnerstag, 14:32, sein Büro im 3. Stock")
+   - Eine Person die etwas TUT (Aktion, nicht Gedanke)
+   - Ein Detail das man "sehen" kann (gelbe Post-its am Bildschirm,
+     halb-leere Kaffeetasse mit Stempel-Logo, knirschender Bürostuhl)
+
+4) PACING — Wechsel zwischen schnell (kurze Sätze) und langsam (eine
+   Beschreibung). Wie Schnitt-Rhythmus im Film.
+
+Beispiel (NICHT-cinematisch):
+  "Der Kunde war frustriert. Er wusste nicht, ob seine Print-Kampagne
+   funktionierte. Wir haben dann ein Tracking-System eingebaut."
+
+Beispiel (CINEMATISCH):
+  "Donnerstag, 15:47. Der Kunde lehnt sich zurück, der Bürostuhl
+   knirscht unter ihm. Auf dem Tisch: 47 Postkarten-Druckmuster,
+   ineinander geschoben wie ein verlorenes Kartenspiel. 'Welche davon
+   funktioniert eigentlich?' fragt er. Stille. Drei Sekunden. Er weiß es
+   nicht. Niemand weiß es. Genau dort fängt unsere Geschichte an."
+
+WICHTIG: Cinematic ≠ blumig. Cinematic = präzise visuelle Details die wie ein
+Filmschnitt wirken. Kurz. Hart. Spezifisch.
+
+====================================================================
 PART 2a — TIKTOK-STORYTELLING-LAYER (für ALLE Long-Form-Outputs)
 ====================================================================
 Schreib nicht wie eine Marketing-Mail. Schreib wie ein TikTok-Storyteller, der
