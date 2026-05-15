@@ -221,6 +221,34 @@ PATTERN F — Hyper-spezifische Mini-Story:
 - "Donnerstag 14:30. Ihr Büro in Düsseldorf. Sie konnte die Frage nicht beantworten."
 - "Ein Restaurant-Besitzer aus Köln zeigte mir seine QR-Code-Statistik. Eine Spalte fehlte."
 
+PATTERN G — "Geld-verbrennt + niemand traut sich":
+- "Dein Plakat-Budget verschwindet grade in der Luft. Und niemand traut sich, es auszusprechen."
+- "38.000 Euro pro Monat für Plakate, die fast nichts bringen."
+
+PATTERN H — "Common-Advice-Is-Wrong":
+- "Alle predigen kleine QR-Codes sind eleganter. Eye-Tracking sagt: 78% seltener gescannt."
+- "Marketing-Berater sagen: Print-Tracking ist kompliziert. Falsch. Ein QR pro Standort."
+
+PATTERN I — "Stop-Doing-This":
+- "Hör auf, QR-Codes unten rechts zu platzieren. Hamburger Studie 2026 zeigt warum."
+- "Hör auf, deine Druckkosten pro Plakat zu rechnen. Rechne pro Anfrage."
+
+PATTERN J — "Outcome-Then-Tease":
+- "47 Plakatstandorte auf 3 reduziert. 22.000 Euro/Monat gespart. So gings:"
+- "0 auf 47 Euro MRR in 8 Wochen. Eine einzige Sache hat den Unterschied gemacht:"
+
+PATTERN K — "Unpopular-Opinion":
+- "Unpopular: 90% der DACH-Cookie-Banner sind nicht DSGVO-konform. Hier was kommt:"
+- "Unbequem: Bitly ist nicht das Problem. Du bist es."
+
+PATTERN L — "Vulnerability-Reveal":
+- "Ich gebe zu: 3 Wochen an einem Feature gebaut, das niemand wollte."
+- "Mein peinlichster Sales-Call: ich habe Spurig nicht erklären können."
+
+PATTERN M — "Question-That-Hits":
+- "Hand aufs Herz: weißt du, wo deine Tracking-Daten von letztem Monat liegen?"
+- "Schnelle Umfrage: AVV-Vertrag mit deinem Link-Tool — ja, nein, keine Ahnung?"
+
 NICHT generieren (Instant-Fail):
 - "5 Tipps für besseres DSGVO-Tracking" (Listicle)
 - "Was ist QR-Code-Tracking?" (Anfaenger-Frage)
@@ -328,6 +356,53 @@ PFLICHT-ANTEILE pro Batch (count=10):
   - Mind. 1 Idee aus C11 (Money-Reveal)
   - Mind. 1 Idee aus C12 (Alltagsdusselheit)
   - Mind. 1 Idee aus C13 oder C14 (Micro-Doc oder TikTok-Quick)
+  - Mind. 1 Idee mit CLEVER-TRICK-Charakter (Hidden Hack der "ahh wusste
+    ich nicht, das ist clever, muss ich probieren" auslöst —
+    z.B. "1 QR pro TAG statt pro Kampagne — siehst Wochentag-Muster"
+    oder "Stripe-Coupon einmal/Quartal statt Permanent — gleiche Conversion,
+    kein MRR-Verlust"). Markiere den Trick im outline-Feld klar erkennbar:
+    "CLEVER-TRICK: [Beschreibung]"
+
+==========================================
+HOOK-PATTERN-ROTATION (NEU — Research-validiert)
+==========================================
+Über die ${count} Ideen MUSS Claude die Hook-Patterns A-M (13 verschiedene)
+ROTIEREN.
+
+Regel:
+  - MAX 2 Ideen pro Pattern
+  - Mind. (count - 3) verschiedene Patterns benutzen
+  - Markiere den verwendeten Pattern im "angle"-Feld:
+    "[C5 / PATTERN-J Outcome-Then-Tease] ..."
+
+Verfügbare Hook-Patterns (siehe PART 7 im Voice oben):
+  A — Echter Dialog
+  B — Persönlicher Fail / Selbstkritik
+  C — Konkrete Zahl + Pattern-Break
+  D — Verlustangst + Specificity
+  E — Provokante Behauptung
+  F — Hyper-spezifische Mini-Story
+  G — Geld-verbrennt + niemand traut sich
+  H — Common-Advice-Is-Wrong (Research 2026)
+  I — Stop-Doing-This (Research 2026)
+  J — Outcome-Then-Tease (Research 2026)
+  K — Unpopular-Opinion (Research 2026)
+  L — Vulnerability-Reveal (Research 2026)
+  M — Question-That-Hits (Research 2026)
+
+Beispiele frischer Rotation für 10 Ideen:
+  Idee 1: PATTERN-G (Geld verbrennt)
+  Idee 2: PATTERN-J (Outcome-Tease)
+  Idee 3: PATTERN-L (Vulnerability)
+  Idee 4: PATTERN-H (Common-Advice-Wrong)
+  Idee 5: PATTERN-F (Mini-Story)
+  Idee 6: PATTERN-M (Question)
+  Idee 7: PATTERN-K (Unpopular)
+  Idee 8: PATTERN-A (Dialog)
+  Idee 9: PATTERN-I (Stop-Doing-This)
+  Idee 10: PATTERN-C (Zahl + Break)
+
+→ 10 verschiedene Patterns. Keine Wiederholung. Jede Idee fühlt sich anders an.
 
 ANTI-WIEDERHOLUNG (zusätzlich):
   - KEINE zwei Ideen mit demselben Sub-Thema (z.B. NICHT 2x "Bitly speichert Daten in

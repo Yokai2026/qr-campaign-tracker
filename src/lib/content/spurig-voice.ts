@@ -405,6 +405,89 @@ es auszusprechen."
 Variante: "[N] Euro pro Monat für [Aktivitaet]. Wir wissen es nicht. Aber wir
 ahnen es."
 
+PATTERN H — "Common-Advice-Is-Wrong" (Research-validiert für 2026 LinkedIn):
+"Alle sagen [Mainstream-Tipp]. Falsch. Hier was wirklich passiert:"
+"Marketing-Berater predigen [These]. Datenstand 2026: [Gegen-Fakt]."
+Beispiel: "Alle predigen 'kleine QR-Codes sind eleganter'. Eye-Tracking-Daten
+2026 sagen: kleine QR-Codes werden um 78% seltener gescannt."
+
+PATTERN I — "Stop-Doing-This" (Research-validiert):
+"Hör auf, [Habit] zu machen. Es schadet dir."
+"Wenn du noch [X] benutzt, hörst du auf zu wachsen."
+Beispiel: "Hör auf, deinen QR-Code unten rechts auf das Plakat zu packen. Die
+Studie aus Hamburg zeigt: oben links bringt 3.2x mehr Scans."
+
+PATTERN J — "Outcome-Then-Tease" (Research-validiert für B2B-Founder):
+"[Konkretes Outcome]. Hier wie ich es geschafft habe:"
+"In 8 Wochen von 0 auf 47 Euro MRR. So habe ich angefangen:"
+Beispiel: "47 Plakatstandorte auf 3 reduziert. Anfragen gleich geblieben.
+22.000 Euro pro Monat gespart. Hier was wir gemacht haben:"
+
+PATTERN K — "Unpopular-Opinion" (Research-validiert):
+"Unpopular Take: [Aussage]. Hier mein Argument:"
+"Unbequeme Wahrheit: [Branchen-Fakt]. Niemand sagt es laut."
+Beispiel: "Unpopular Take: 90% der DACH-Cookie-Banner sind nicht DSGVO-konform.
+Aber niemand kontrolliert. Hier was passiert wenn doch:"
+
+PATTERN L — "Vulnerability-Reveal" (Research-validiert — bricht LinkedIn-Polish):
+"Ich gebe es zu: [Schwäche / Fail]. Was es mich gelehrt hat:"
+"Mein peinlichster Founder-Moment war [konkrete Szene]. Hier was ich daraus
+gelernt habe:"
+Beispiel: "Ich gebe es zu: ich habe 3 Wochen an einem Feature gebaut, das
+NIEMAND wollte. Mein nächster Schritt war richtig peinlich."
+
+PATTERN M — "Question-That-Hits" (Research-validiert für Comment-Engagement):
+"Hand aufs Herz: [Frage die zwingt eine Antwort zu geben]?"
+"Schnelle Umfrage: [Frage mit Status-Implikation]?"
+Beispiel: "Hand aufs Herz: weißt du, wo deine Tracking-Daten von letztem
+Monat physisch liegen? Stadt. Land. Server-Provider?"
+
+----------------------------------------
+PART 7d — CLEVER-TRICK-PFLICHT (Research-validiert)
+----------------------------------------
+Mindestens 1 Idee pro Batch MUSS einen "Cleveren Trick" enthalten — eine Methode/
+Hack/Insight bei dem der Leser denkt: "Ahh wusste ich nicht. Das ist clever.
+Das muss ich probieren."
+
+Pattern:
+- "Cleverer Hack: [unerwartete Methode] spart [konkrete Sache]"
+- "Ein einfacher Trick: [Action] → [überraschender Effekt]"
+- "Insider-Move: [was die Profis machen, was der Mainstream nicht weiß]"
+
+Beispiele:
+- "1 QR pro TAG statt 1 pro Kampagne — Plötzlich siehst du Wochentag-Muster,
+  die niemand sieht."
+- "4 Wochen vor Druck mit DIN A6 testen → 80% Druck-Budget gespart."
+- "Stripe-Coupon einmal pro Quartal statt Permanent-Rabatt — Conversion gleich,
+  MRR-Verlust 0 Euro."
+
+Die clevere Idee MUSS:
+- Konkret umsetzbar sein (nicht abstrakt)
+- Überraschend sein (nicht offensichtlich)
+- Mit einer Zahl quantifiziert sein (Zeit/Geld/Effizienz)
+- In 1-2 Sätzen erklärbar sein
+
+----------------------------------------
+PART 7e — INSIDE-JOKE-LAYER (DACH-Solopreneur-Identität)
+----------------------------------------
+Diese Mini-Anekdoten / Beobachtungen bauen "Geteilte Identität" mit DACH-
+Solopreneurs auf — wer das liest, denkt: "Genau wie bei mir."
+
+Pool zum gelegentlichen Streuen:
+- Steuerberater-Frust ("Mein Steuerberater liest LinkedIn nicht. Er wäre
+  fassungslos was hier passiert.")
+- "Mein Bruder versteht nicht was ich mache" Bonding
+- Vercel/Stripe/Hetzner Bill-Schmerz transparent machen
+- "Solo-Founder-Office = Küchentisch" Realismus
+- Late-Night-Hacking ("Es ist 23:47 Uhr, mein Kühlschrank ist leer, ich schreibe
+  diesen Post")
+- Coffee-Count statt Productivity-Metriken ("Heute: 4 Espressi, 1 Customer-Call,
+  3 Bugs gefixt")
+- "Ich kann mir kein Marketing-Team leisten — also bin ich es"
+
+Diese Elemente NICHT zwingend in jeder Idee — aber sie tauchen organisch in
+mind. 30% der Outputs auf wenn passend.
+
 ----------------------------------------
 PART 7b — DISKUSSIONS-TRIGGER (Schluss-Frage-Qualitaet)
 ----------------------------------------
