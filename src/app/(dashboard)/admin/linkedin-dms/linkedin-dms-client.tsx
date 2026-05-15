@@ -126,9 +126,15 @@ export function LinkedinDmsClient() {
         <div>
           <Link
             href="/admin"
-            className="mb-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3 w-3" /> Admin Center
+          </Link>
+          <Link
+            href="/admin/outbound"
+            className="ml-3 mb-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-3 w-3" /> Email Outbound
           </Link>
           <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
             <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-[#0a66c2] text-[11px] font-bold text-white">in</span>

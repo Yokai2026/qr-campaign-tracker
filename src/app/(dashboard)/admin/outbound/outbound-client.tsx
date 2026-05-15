@@ -186,9 +186,15 @@ export function OutboundClient() {
         <div>
           <Link
             href="/admin"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-2"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" /> Admin
+            <ArrowLeft className="h-4 w-4" /> Admin Center
+          </Link>
+          <Link
+            href="/admin/linkedin-dms"
+            className="ml-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-2"
+          >
+            <ArrowLeft className="h-4 w-4" /> LinkedIn DM
           </Link>
           <h1 className="text-2xl font-semibold">Outbound-Tracking</h1>
           <p className="text-sm text-muted-foreground mt-1">
