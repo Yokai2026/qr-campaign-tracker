@@ -41,6 +41,7 @@ type Stats = {
     loggedInOnline: number;
     anonymousOnline: number;
     visitorsLifetime: number;
+    visitorsDevices: number;
     trialActive: number;
     trialExpired: number;
   };
@@ -331,9 +332,15 @@ export function AdminClient() {
             label={
               <>
                 <span className="tabular-nums font-semibold text-foreground">
-                  {data.users.visitorsLifetime.toLocaleString('de-DE')}
+                  {data.users.visitorsDevices.toLocaleString('de-DE')}
                 </span>{' '}
-                <span className="text-muted-foreground">Besuche gesamt</span>
+                <span className="text-muted-foreground">Geräte</span>
+                <span
+                  className="ml-1.5 text-[11px] text-muted-foreground/80 tabular-nums"
+                  title="Tab-Sessions (jeder neue Tab oder Browser-Restart = +1)"
+                >
+                  ({data.users.visitorsLifetime.toLocaleString('de-DE')} Sessions)
+                </span>
               </>
             }
           />

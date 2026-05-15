@@ -114,6 +114,7 @@ export async function GET() {
     visitorsTotalRes,
     visitorsLoggedInRes,
     visitorsLifetimeRes,
+    visitorsUserAgentsRes,
     subsActiveRes,
     recentSignupsRes,
     recentSubsRes,
@@ -129,9 +130,13 @@ export async function GET() {
     sb.from('profiles').select('id', { count: 'exact', head: true }).gte('last_seen_at', twoMinAgo),
     sb.from('visitor_heartbeats').select('visitor_id', { count: 'exact', head: true }).gte('last_seen_at', twoMinAgo),
     sb.from('visitor_heartbeats').select('visitor_id', { count: 'exact', head: true }).gte('last_seen_at', twoMinAgo).not('user_id', 'is', null),
-    // Gesamt-Besucher-Zaehler: jede visitor_id ist ein einzigartiger Browser-Tab.
-    // Da visitor_id = PRIMARY KEY, gibt COUNT(*) die lifetime-distinct-Visitor-Anzahl.
+    // Gesamt-Besucher-Zaehler: COUNT(*) der visitor_heartbeats. Nach Wechsel
+    // auf sessionStorage ist 1 Row = 1 Tab-Session, NICHT eindeutige Person.
+    // Wir holen daher zusaetzlich die distinct user_agents als Device-Proxy
+    // (siehe unten — User-Agent ist nicht perfekt, aber besser als Tab-Sessions).
     sb.from('visitor_heartbeats').select('visitor_id', { count: 'exact', head: true }),
+    // User-Agents fuer Device-Count: limit 10k Rows. Filter epoch-leave-Rows raus.
+    sb.from('visitor_heartbeats').select('user_agent').gt('last_seen_at', '2000-01-01').limit(10000),
     sb.from('subscriptions').select('id, user_id, stripe_price_id, status, created_at').in('status', ['active', 'on_trial', 'past_due']),
     sb.from('profiles').select('id, email, username, created_at, trial_ends_at').order('created_at', { ascending: false }).limit(10),
     sb.from('subscriptions').select('id, user_id, stripe_price_id, status, created_at, profiles:user_id(email, username)').order('created_at', { ascending: false }).limit(10),
@@ -219,6 +224,12 @@ export async function GET() {
       anonymousOnline: Math.max(0, (visitorsTotalRes.count ?? 0) - (visitorsLoggedInRes.count ?? 0)),
       // Lifetime: jede visitor_id ist ein einzigartiger Browser-Tab seit Tracking-Start.
       visitorsLifetime: visitorsLifetimeRes.count ?? 0,
+      // Device-Proxy: distinkte User-Agents (= naeherungsweise Anzahl verschiedener
+      // Browser/Geraete). Nicht perfekt (2 iPhones mit gleichem iOS = 1 UA), aber
+      // viel naeher an 'eindeutige Personen' als die Tab-Session-Anzahl.
+      visitorsDevices: new Set(
+        (visitorsUserAgentsRes.data ?? []).map((r) => r.user_agent).filter(Boolean),
+      ).size,
       trialActive,
       trialExpired,
     },
