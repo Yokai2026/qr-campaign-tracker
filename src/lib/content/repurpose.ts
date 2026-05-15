@@ -211,34 +211,34 @@ Nutze einen der Hook-Patterns aus PART 7:
   C. Konkrete Zahl + Pattern-Break: "47 Marketing-Mitarbeiter. Keiner stellte die Frage."
   D. Verlustangst + Specificity: "Sechs Jahre Daten. Server in Ashburn, Virginia. Kein AV-Vertrag."
   E. Provokante Behauptung: "Cookie-Banner sind nicht das DSGVO-Problem."
-  F. Hyper-spezifische Mini-Story: "Donnerstag 14:30. Buero in Duesseldorf. Drei Minuten Stille."
+  F. Hyper-spezifische Mini-Story: "Donnerstag 14:30. Büro in Düsseldorf. Drei Minuten Stille."
 
-ZEILE 2: LEER (LinkedIn-Cut-Off-Trick — der Hook haengt allein, der "weiter lesen"-Klick faellt)
+ZEILE 2: LEER (LinkedIn-Cut-Off-Trick — der Hook hängt allein, der "weiter lesen"-Klick faellt)
 
 BLOCK 2-4 (Story-Aufbau, je 2-4 Zeilen, mit Leerzeile dazwischen):
 
   Block A — Relatable Moment: konkrete Situation, Wer/Wann/Wo, mit Specificity.
-    (z.B. "Wir sassen in ihrem Buero. Sie zeigte mir ihre Funnel — sauber gebaut,
+    (z.B. "Wir sassen in ihrem Büro. Sie zeigte mir ihre Funnel — sauber gebaut,
     jeder Touchpoint vermessen.")
 
-  Block B — Konflikt: die Wendung, die Ueberraschung, mit Mini-Cliffhanger.
+  Block B — Konflikt: die Wendung, die Überraschung, mit Mini-Cliffhanger.
     (z.B. "Ich hab eine einzige Frage gestellt. Drei Minuten Tippen. Stille.
     Dann: 'Ashburn, Virginia.'")
 
-  Block C — Insight + Selbstkritik / Kontroverse: was die Geschichte fuer ALLE
+  Block C — Insight + Selbstkritik / Kontroverse: was die Geschichte für ALLE
     bedeutet. Eine starke These oder Selbst-Eingestaendnis.
     (z.B. "Das eigentliche Problem ist nicht Bitly. Es ist, dass niemand fragt.")
 
   Block D (optional) — Praktischer Mehrwert: was der Leser KONKRET tun kann,
-    in 1-2 Saetzen, NICHT als Liste. Nahtlos im Lesefluss.
+    in 1-2 Sätzen, NICHT als Liste. Nahtlos im Lesefluss.
 
 SCHLUSS-BLOCK (separater Absatz, kurz):
   - Punchige Schluss-Zeile, memorable
   - DANN ECHTE Diskussions-Frage:
-    * "Wer hat in den letzten 6 Monaten den AV-Vertrag mit seinem Link-Tool geprueft?"
-    * "Welches Tracking-Tool nutzt ihr aktuell — und wuerdet ihr's einem
-       Datenschutzbeauftragten erklaeren koennen?"
-    * "Was war dein groesster Marketing-Reinfall? Ich teil meinen."
+    * "Wer hat in den letzten 6 Monaten den AV-Vertrag mit seinem Link-Tool geprüft?"
+    * "Welches Tracking-Tool nutzt ihr aktuell — und würdet ihr's einem
+       Datenschutzbeauftragten erklären können?"
+    * "Was war dein größter Marketing-Reinfall? Ich teil meinen."
   - KEINE rhetorische Frage ("Was meint ihr?")
   - KEINE Werbe-CTA
 
@@ -251,14 +251,14 @@ Optional 0-2 Hashtags am Ende (wenn wirklich passend, default 0).
 RETENTION-CHECKS (PART 8)
 ----------------------------------------
 - Mind. 1 Cliffhanger ("Drei Minuten Stille. Dann:")
-- Mind. 1 direkter Satz in Anfuehrungszeichen
-- Mind. 2 sehr kurze Saetze (3-6 Worte) als Pattern-Interrupt
+- Mind. 1 direkter Satz in Anführungszeichen
+- Mind. 2 sehr kurze Sätze (3-6 Worte) als Pattern-Interrupt
 - Mind. 1 konkrete Zahl/Ort/Person/Marke
 
 ----------------------------------------
 LINKEDIN-VIBE (Bier-mit-Founder, nicht Corporate)
 ----------------------------------------
-- Kurze Saetze. Subjekt-Verb-Objekt. Keine Verschachtelung.
+- Kurze Sätze. Subjekt-Verb-Objekt. Keine Verschachtelung.
 - Erste Person, direkte Du-Adresse an Leser
 - Konkret + ehrlich + manchmal unbequem
 - Wechsel zwischen Beobachtung und Konfrontation
@@ -269,7 +269,7 @@ SPEZIFITAETS-CHECKLISTE (vor Output)
 ----------------------------------------
 [ ] Mind. 1 konkrete Zahl
 [ ] Mind. 1 konkreter Ort ODER Rolle ODER Zeitpunkt
-[ ] Mind. 1 direkter Satz in Anfuehrungszeichen
+[ ] Mind. 1 direkter Satz in Anführungszeichen
 [ ] Mind. 1 Marke / Tool konkret genannt
 [ ] Schluss-Frage ist KEINE rhetorische Floskel
 
@@ -287,19 +287,19 @@ VERBOTEN (Instant-Fail)
 - Emoji-Spam, Hashtag-Salat
 - Lange Werbe-Sehnsuchts-Texte
 
-Antworte NUR mit dem Post-Text. Keine Erklaerung, keine Quotes, keine Code-Fences.`;
+Antworte NUR mit dem Post-Text. Keine Erklärung, keine Quotes, keine Code-Fences.`;
   }
 
   if (channel === 'twitter') {
     const blogUrl = `https://spurig.com/blog/${blog.slug}`;
-    // URL ist exakt ~30 Zeichen; max Tweet = 280 → fuer Text bleiben ~245 Zeichen
+    // URL ist exakt ~30 Zeichen; max Tweet = 280 → für Text bleiben ~245 Zeichen
     return `${base}
 
 Generiere EINEN einzelnen Twitter/X-Tweet (deutsch, du-Form). HARTE GRENZE: **max 270 Zeichen TOTAL inklusive dem Blog-Link am Ende**.
 
 Format:
 1) Wow-Hook in Zeile 1: konkrete Zahl, Pattern-Break, oder kontroverser Take
-2) (Optional) 1-2 weitere Saetze als Punchline / Mini-Story
+2) (Optional) 1-2 weitere Sätze als Punchline / Mini-Story
 3) Letzte Zeile: ${blogUrl}
 
 Beispiel-Tweets die funktionieren:
@@ -312,9 +312,9 @@ VERBOTEN:
 - Hashtags (max 0-2 wenn relevant, default 0)
 - "Pro-Tipp", "Game Changer", "krass"
 
-WICHTIG: ZAEHLE die Zeichen. Wenn Tweet ueber 270 Zeichen → kuerzer machen.
+WICHTIG: ZAEHLE die Zeichen. Wenn Tweet über 270 Zeichen → kürzer machen.
 
-Antworte NUR mit dem Tweet-Text (Text + Link am Ende). Keine Erklaerung, keine Quotes.`;
+Antworte NUR mit dem Tweet-Text (Text + Link am Ende). Keine Erklärung, keine Quotes.`;
   }
 
   // reddit
@@ -332,7 +332,7 @@ Style:
 - Erste Person, vergangenheits-Form ("Ich hatte das Problem...", "Ich hab probiert...")
 - Markdown (## Sub-Headers, **bold** sparsam, - Listen wo's passt)
 - Mind. EINE Stelle wo du eigene Fehleinschaetzung zugibst ("Ich dachte erst...")
-- Subreddits-Empfehlung am Ende: waehle 2-3 passende DACH/internationale Subs aus dieser Liste:
+- Subreddits-Empfehlung am Ende: wähle 2-3 passende DACH/internationale Subs aus dieser Liste:
   · DACH-B2B: r/de_EDV, r/de_marketing, r/Selbststaendig, r/Unternehmer, r/Finanzen (wenn ROI-Topic)
   · DACH-DSGVO: r/de_IT, r/datenschutz_de, r/recht
   · International (englisch-Posts erlaubt): r/SaaS, r/Entrepreneur, r/marketing, r/smallbusiness, r/GDPR

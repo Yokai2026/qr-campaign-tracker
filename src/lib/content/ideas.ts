@@ -25,7 +25,7 @@ const WEB_SEARCH_ENABLED = process.env.CONTENT_ENABLE_WEB_SEARCH === '1';
 const WEB_SEARCH_MAX_USES = Number(process.env.CONTENT_WEB_SEARCH_MAX_USES ?? '2');
 
 /**
- * Server-side Web-Search-Tool (Anthropic built-in). Claude fuehrt die Search
+ * Server-side Web-Search-Tool (Anthropic built-in). Claude führt die Search
  * selbst aus und faedelt die Ergebnisse in die Antwort ein. Der finale Text-Block
  * enthaelt die synthetisierte Antwort.
  *
@@ -49,7 +49,7 @@ type ClaudeContentBlock = {
 
 /**
  * Ruft Claude auf. Bei aktiviertem Web-Search wird das Tool mitgeschickt;
- * Claude fuehrt die Searches server-side aus und liefert am Ende den finalen
+ * Claude führt die Searches server-side aus und liefert am Ende den finalen
  * Text-Block.
  *
  * Bei Web-Search-Antworten gibt es mehrere Content-Blocks: server_tool_use,
@@ -135,7 +135,7 @@ RESEARCH-FIRST-PROTOKOLL (Pflicht — vor jeder Idee)
 ----------------------------------------
 Du hast Zugriff auf web_search. **Nutze es BEVOR du Ideen generierst.**
 
-Fuer den Pillar "${CLUSTER_LABEL[cluster]}" fuehre 2-3 gezielte Searches durch.
+Für den Pillar "${CLUSTER_LABEL[cluster]}" fuehre 2-3 gezielte Searches durch.
 Suche nach AKTUELLEN, KONKRETEN, DEUTSCHEN Themen — nicht generischen Konzepten.
 
 Such-Beispiele je nach Pillar:
@@ -147,12 +147,12 @@ Such-Beispiele je nach Pillar:
 
 Ziel der Searches:
 - Konkrete Fakten / Zahlen / News-Geschichten der letzten 90 Tage
-- Echte Firmen / Behoerden / Personen zum Zitieren
+- Echte Firmen / Behörden / Personen zum Zitieren
 - Wettbewerbs-Pricing-Updates wenn relevant
 - Reale Bußgeld-Faelle / DSGVO-Verfahren wenn DSGVO-Topic
 
 VERWENDE die Such-Ergebnisse in den outline-Feldern (zitiere Quellen, Daten,
-Behoerden). Mach Ideen TOPICAL ("Die [Bußgeld-Fall XYZ] zeigt:...").
+Behörden). Mach Ideen TOPICAL ("Die [Bußgeld-Fall XYZ] zeigt:...").
 ` : '';
 
   const prompt = `${SPURIG_VOICE}
@@ -170,21 +170,21 @@ ${researchSection}
 ----------------------------------------
 PRE-WRITING-ANALYSE (denk SELBER durch, vor dem Generieren)
 ----------------------------------------
-Bevor du Ideen formulierst, ueberlege intern:
+Bevor du Ideen formulierst, überlege intern:
 - 5 echte Situationen die ein DACH-Marketer / Founder / Restaurant-Besitzer wirklich erlebt
 - 3 Mainstream-Annahmen die FALSCH sind (kontroverse Takes)
 - 3 konkrete Zahlen / Marken / Fakten die ueberraschen
-- 2 Original-Saetze die ein Profi-Insider sagen wuerde
+- 2 Original-Sätze die ein Profi-Insider sagen würde
 Erst dann: Ideen formulieren.
 
 ----------------------------------------
 HOOK-QUALITAETS-SCHWELLE PRO IDEE
 ----------------------------------------
-Bevor du eine Idee aufnimmst, pruefe den Titel gegen DIESEN Test:
+Bevor du eine Idee aufnimmst, prüfe den Titel gegen DIESEN Test:
 
-Wuerde ein DACH-Marketer beim Scrollen auf LinkedIn / Reddit anhalten und denken
-EINEN dieser Saetze:
-  - "Das fuehle ich gerade."
+Würde ein DACH-Marketer beim Scrollen auf LinkedIn / Reddit anhalten und denken
+EINEN dieser Sätze:
+  - "Das fühle ich gerade."
   - "Das ist mir auch passiert."
   - "Wait, mache ich das auch?"
   - "Krass, daran hatte ich nie gedacht."
@@ -194,11 +194,11 @@ Wenn NEIN → Idee verwerfen, neu schreiben.
 Wenn JA → behalten.
 
 ----------------------------------------
-TITEL-PATTERNS (Pflicht: nutze unterschiedliche Patterns ueber die ${count} Ideen verteilt)
+TITEL-PATTERNS (Pflicht: nutze unterschiedliche Patterns über die ${count} Ideen verteilt)
 ----------------------------------------
 
 PATTERN A — Echter Dialog (sehr stark):
-- "Ein Anwalt sagte mir gestern einen Satz, der mich nicht loslaesst."
+- "Ein Anwalt sagte mir gestern einen Satz, der mich nicht loslässt."
 - "Eine Marketing-Chefin: 'Wir nutzen das seit 6 Jahren. Niemand weiss, ob das legal ist.'"
 
 PATTERN B — Persoenlicher Fail / Selbstkritik:
@@ -210,7 +210,7 @@ PATTERN C — Konkrete Zahl + Pattern-Break:
 - "Drei Minuten Stille. Dann sagte sie: 'Ashburn, Virginia.'"
 
 PATTERN D — Verlustangst + Specificity:
-- "Sechs Jahre Klick-Daten. Ueber den Atlantik. Ohne Vertrag."
+- "Sechs Jahre Klick-Daten. Über den Atlantik. Ohne Vertrag."
 - "Was bei einem Bitly-Klick im Hintergrund passiert, bevor du auf der Seite landest."
 
 PATTERN E — Provokante Behauptung:
@@ -218,11 +218,11 @@ PATTERN E — Provokante Behauptung:
 - "Bitly ist eine Falle. Jeder weiss es. Keiner sagt's."
 
 PATTERN F — Hyper-spezifische Mini-Story:
-- "Donnerstag 14:30. Ihr Buero in Duesseldorf. Sie konnte die Frage nicht beantworten."
-- "Ein Restaurant-Besitzer aus Koeln zeigte mir seine QR-Code-Statistik. Eine Spalte fehlte."
+- "Donnerstag 14:30. Ihr Büro in Düsseldorf. Sie konnte die Frage nicht beantworten."
+- "Ein Restaurant-Besitzer aus Köln zeigte mir seine QR-Code-Statistik. Eine Spalte fehlte."
 
 NICHT generieren (Instant-Fail):
-- "5 Tipps fuer besseres DSGVO-Tracking" (Listicle)
+- "5 Tipps für besseres DSGVO-Tracking" (Listicle)
 - "Was ist QR-Code-Tracking?" (Anfaenger-Frage)
 - "Datensparsamkeit im modernen Marketing" (Whitepaper-Tone)
 - "Tracking 101" / "Der ultimative Guide zu..." / "Alles was du wissen musst"
@@ -237,26 +237,26 @@ PRO IDEE LIEFERST DU 4 FELDER
   - Besteht den Hook-Quality-Test (PART 7)
   - Hyper-spezifisch (Zahl ODER Ort ODER Marke ODER Rolle ODER Zeitpunkt)
 
-* **angle** (Story-Hook fuer Intro, MAX 200 Zeichen / 1-2 Saetze):
+* **angle** (Story-Hook für Intro, MAX 200 Zeichen / 1-2 Sätze):
   - Persoenliche Beobachtung mit echtem konkreten Moment
   - Idealerweise mit Dialog ("Sie sagte gestern: '...'")
   - NIE: generisches "In der heutigen Zeit..." oder "Viele Marketer fragen sich..."
 
-* **outline** (MAX 350 Zeichen / 2-3 sehr knappe Saetze):
+* **outline** (MAX 350 Zeichen / 2-3 sehr knappe Sätze):
   - WAS konkret im Post drin steht (mit konkreten Zahlen, Marken)
   - 1 kontroverse Aussage ODER 1 "Aha"-Moment
   - Schluss-Frage / Diskussions-Trigger
-  - KEIN Brei. KEINE 8 Saetze. Storyboard-knapp.
+  - KEIN Brei. KEINE 8 Sätze. Storyboard-knapp.
 
 * **target_keywords** (2-4 SEO-Keywords kommagetrennt):
   - Natuerlich, nicht stuffed
-  - DACH-Suchterme (deutsch wo moeglich)
+  - DACH-Suchterme (deutsch wo möglich)
   - Long-Tail bevorzugt ("DSGVO-konformes Link-Tracking" > "Tracking")
 
 ----------------------------------------
 VARIATIONS-PFLICHT
 ----------------------------------------
-Ueber die ${count} Ideen verteilt:
+Über die ${count} Ideen verteilt:
 - NICHT alle mit "Bitly" im Titel (max 30%)
 - NICHT alle als "Ich"-Story (max 50%, Rest echter Dialog / Kunden-Story)
 - NICHT alle mit Zahl am Anfang (max 30%)
@@ -270,7 +270,7 @@ OUTPUT-FORMAT (STRIKT EINHALTEN — sonst Parser-Crash)
 ANTWORTE AUSSCHLIESSLICH MIT JSON.
 KEIN Vorwort. KEIN "Ich starte mit...". KEINE Research-Notes.
 KEINE Markdown-Code-Fences (kein \`\`\`json).
-KEIN Erklaerungstext nach dem JSON.
+KEIN Erklärungstext nach dem JSON.
 
 Format (genau so):
 [
@@ -283,7 +283,7 @@ Dein letzter ausgegebener Charakter MUSS "]" sein.
 
 Jetzt liefere die ${count} besten Ideen.`;
 
-  // 8000 max_tokens gibt Buffer fuer 10-15 Ideen mit knappem Outline.
+  // 8000 max_tokens gibt Buffer für 10-15 Ideen mit knappem Outline.
   // Bei tighten outline-cap (350 chars) ist eine Idee ca. 200-300 output-tokens.
   const text = await callClaude(apiKey, prompt, { maxTokens: 8000, useSearch: true });
 
@@ -377,7 +377,7 @@ function salvageTruncatedArray(jsonText: string): string | null {
 }
 
 // ---------------------------------------------------------------------------
-// Blog-Expander (META/BODY-Block-Format fuer Parse-Robustheit)
+// Blog-Expander (META/BODY-Block-Format für Parse-Robustheit)
 // ---------------------------------------------------------------------------
 
 export async function expandIdeaToBlog(idea: {
@@ -396,7 +396,7 @@ RESEARCH-FIRST-PROTOKOLL (Pflicht — vor dem Schreiben)
 ----------------------------------------
 Du hast Zugriff auf web_search. **Nutze es BEVOR du den Blog schreibst.**
 
-Such 2-3 mal gezielt nach aktuellen Fakten / News-Geschichten / Behoerden-Verfahren
+Such 2-3 mal gezielt nach aktuellen Fakten / News-Geschichten / Behörden-Verfahren
 zum Thema. Webe Findings natuerlich in den Text ein (kein Zitate-Listen-Format).
 Wenn du keinen konkreten News findest: weiter mit Story-Mode, kein Problem.
 ` : '';
@@ -436,7 +436,7 @@ HOOK-ABSATZ (Zeile 1-4) — CATCH-LEVEL: MAXIMAL HART
 Die ersten 5-12 Worte entscheiden, ob der Leser weiterscrollt.
 Wenn der Hook nicht VISZERAL trifft — Blog ist tot.
 
-PFLICHT-CHECKLISTE fuer den ERSTEN SATZ (jede Box muss erfuellt sein):
+PFLICHT-CHECKLISTE für den ERSTEN SATZ (jede Box muss erfüllt sein):
 
   [ ] (1) Maximal 12 Worte
   [ ] (2) Enthaelt mind. EIN viszerales Wort:
@@ -445,7 +445,7 @@ PFLICHT-CHECKLISTE fuer den ERSTEN SATZ (jede Box muss erfuellt sein):
            verschwunden, eiskalt, schockiert]
   [ ] (3) Enthaelt mind. eines:
           - Konkrete Zahl (47, 50.000, 6 Wochen, 18%)
-          - Konkreter Ort (Duesseldorf, Frankfurt, Hannover)
+          - Konkreter Ort (Düsseldorf, Frankfurt, Hannover)
           - Pattern-Break ("...und keiner traut sich")
           - Direkter Dialog ("'Keine Ahnung', sagte sie.")
   [ ] (4) Triggert MINDESTENS 1 Emotion sofort:
@@ -476,7 +476,7 @@ Weitere Beispiele die ALLE Boxen abhaken:
   SCHLECHT (zu zahm, neu schreiben):
   "Print-Marketing in Deutschland steht vor Herausforderungen." → BORING
   "Viele Marketer haben das Problem, dass..." → ABSTRAKT
-  "Lass uns ueber Plakatwerbung sprechen." → SCHWACH
+  "Lass uns über Plakatwerbung sprechen." → SCHWACH
   "Ein interessanter Fall aus der Praxis..." → MARKETING-FLOSKEL
 
 ----------------------------------------
@@ -486,25 +486,25 @@ Nach dem Killer-Opener: SOFORT konkret werden.
 Wer? Wo? Wann? Mit welcher Zahl? Mit welchem Zitat?
 
 PFLICHT:
-- Satz 2 oder 3 enthaelt direkten Dialog in Anfuehrungszeichen
+- Satz 2 oder 3 enthaelt direkten Dialog in Anführungszeichen
 - Satz 2-4 enthaelt mind. 1 konkrete Zahl
 - Satz 2-4 enthaelt mind. 1 konkreten Ort (Stadt) ODER Rolle (Sanitaerbetrieb,
   Marketing-Chefin, B2B-SaaS, Restaurant-Inhaber, etc.)
 
 VIBE:
-- Kurze Saetze (3-12 Worte). Wechsel mit 1-Wort-Punchlines ("Muell.")
+- Kurze Sätze (3-12 Worte). Wechsel mit 1-Wort-Punchlines ("Muell.")
 - Wirkt wie gesprochen, nicht wie geschrieben
 - Frust + Beobachtung + Faktum mischen
 
 REFERENZ (aus David's Post):
-"Mein Kunde zahlte 50.000 Euro monatlich fuer 47 Plakat-Standorte. Dann fragte
+"Mein Kunde zahlte 50.000 Euro monatlich für 47 Plakat-Standorte. Dann fragte
 ich: 'Welche drei funktionieren am besten?' Antwort: 'Keine Ahnung.' Das war
-der Moment, wo mir klar wurde — Print-Marketing laeuft in Deutschland komplett
+der Moment, wo mir klar wurde — Print-Marketing läuft in Deutschland komplett
 blind."
 
 Beachte:
 - Satz 1 = konkrete Zahl + Person (50k € + 47 Plakate + Kunde)
-- Satz 2 = direkte Frage in Anfuehrungszeichen
+- Satz 2 = direkte Frage in Anführungszeichen
 - Satz 3 = direkte Antwort ("Keine Ahnung.")
 - Satz 4 = Insight-Pivot ("Das war der Moment, wo mir klar wurde...")
 
@@ -516,17 +516,17 @@ VERBOTEN (Instant-Fail):
 - "In der heutigen Zeit ist es wichtig..."
 - "Lass uns gemeinsam einen Blick werfen..."
 - "Hier sind 5 Tipps..."
-- Lange einleitende Saetze ueber das Thema im Allgemeinen
+- Lange einleitende Sätze über das Thema im Allgemeinen
 - "Bevor wir in die Details gehen, lass uns kurz festhalten..."
 
 ----------------------------------------
 STRUKTUR
 ----------------------------------------
 
-1. **HOOK-ABSATZ** (siehe oben — 2-4 Saetze, mit Specificity + Dialog)
+1. **HOOK-ABSATZ** (siehe oben — 2-4 Sätze, mit Specificity + Dialog)
 
-2. **RELATABLE-MOMENT-ABSATZ** (3-5 Saetze):
-   Ausweitung der Situation. Der Leser denkt: "Das koennte mir genauso passieren."
+2. **RELATABLE-MOMENT-ABSATZ** (3-5 Sätze):
+   Ausweitung der Situation. Der Leser denkt: "Das könnte mir genauso passieren."
    Konkret bleiben. Eine Person, ein Ort, eine Beobachtung.
 
 3. **4-5 H2-UNTERABSCHNITTE** mit ## Headlines:
@@ -535,20 +535,20 @@ STRUKTUR
      ("Sechs Jahre. Niemand fragte.") ODER Pattern-Break ("Das eigentliche Problem
      ist nicht Bitly.")
    - Headlines DUERFEN provokant / kontrovers sein
-   - KEINE Headlines wie "Was ist X?" / "Die Vorteile von X" / "Tipps fuer X"
+   - KEINE Headlines wie "Was ist X?" / "Die Vorteile von X" / "Tipps für X"
 
 4. **PRO H2-ABSCHNITT (Inhalt)**:
-   - 2-4 kurze Absaetze
+   - 2-4 kurze Absätze
    - MINDESTENS 1 konkrete Zahl / Name / Zitat pro Abschnitt
    - MINDESTENS 1 Mini-Cliffhanger oder Open-Loop
    - MINDESTENS 1 direkte Leser-Adresse ("du", "fragst du jetzt...")
-   - Saetze meist kurz (3-12 Worte), gelegentlich 1-Wort-Punchlines ("Klingt absurd.")
+   - Sätze meist kurz (3-12 Worte), gelegentlich 1-Wort-Punchlines ("Klingt absurd.")
 
 5. **MITTE-DES-TEXTES-BOLD-LINE**: irgendwo in der Mitte EIN fett gesetzter Satz
    (mit **...**) der zentralen Insight zusammenfasst und visuell den Lesefluss bricht.
 
 6. **PRAKTISCHER MEHRWERT**: irgendwo ein Block mit konkreten Action-Steps (nicht als
-   stumpfe Liste mit "1, 2, 3" — sondern als Empfehlung im Erzaehlfluss).
+   stumpfe Liste mit "1, 2, 3" — sondern als Empfehlung im Erzählfluss).
    Beispiel: "Falls du jetzt selbst kurz tippst — frag dein Marketing-Team drei
    Dinge. Welches Tool. Wo Server. Gibt's einen AV-Vertrag. Das reicht."
 
@@ -566,22 +566,22 @@ RETENTION-PFLICHT (PART 8 anwenden)
 
 Pro 200 Worte mindestens EIN Retention-Hebel:
   - Cliffhanger ("Drei Minuten Stille. Dann:")
-  - Offene Frage ("Was sie als naechstes sagte, war neu fuer mich.")
+  - Offene Frage ("Was sie als nächstes sagte, war neu für mich.")
   - Mini-Pattern-Interrupt ("Ich dachte das Gegenteil. Bis...")
   - 1-Wort-Satz ("Stille.")
-  - Konkrete Andeutung ("Eine einzige Frage hat alles geaendert.")
+  - Konkrete Andeutung ("Eine einzige Frage hat alles geändert.")
 
-Wenn ein Absatz auch ohne den naechsten verstanden werden kann — er ist zu rund.
+Wenn ein Absatz auch ohne den nächsten verstanden werden kann — er ist zu rund.
 Umschreiben mit Cliffhanger am Ende.
 
 ----------------------------------------
 SPEZIFITAETS-CHECKLISTE (vor finalem Output)
 ----------------------------------------
 
-Pruefe nach dem Schreiben:
+Prüfe nach dem Schreiben:
 [ ] Mind. 2 konkrete Zahlen im Text (47 Mitarbeiter, 6 Jahre, etc.)
-[ ] Mind. 1 konkreter Ort (Duesseldorf, Frankfurt, Ashburn Virginia)
-[ ] Mind. 1 direkter Satz in Anfuehrungszeichen
+[ ] Mind. 1 konkreter Ort (Düsseldorf, Frankfurt, Ashburn Virginia)
+[ ] Mind. 1 direkter Satz in Anführungszeichen
 [ ] Mind. 1 namentlich benannte Rolle (Marketing-Chefin, DSGVO-Anwalt, CMO)
 [ ] Mind. 1 Marke / Tool / Service konkret genannt (Bitly, Ashburn AWS, Rebrandly)
 [ ] Mind. 1 konkrete Zeitangabe (Donnerstag, gestern, vor 6 Wochen)
@@ -591,7 +591,7 @@ Wenn irgendwas davon fehlt — Text ist zu generisch. Spezifik einbauen.
 ==========================================
 IMAGE-PROMPT — CLICKBAIT-THUMBNAIL-STYLE
 ==========================================
-Generiere einen ENGLISCHEN Image-Prompt (60-120 Worte) fuer einen Bild-Generator
+Generiere einen ENGLISCHEN Image-Prompt (60-120 Worte) für einen Bild-Generator
 (ChatGPT/DALL-E 3 / Midjourney / Gemini Imagen).
 
 ZIEL: Ein THUMBNAIL das aussieht wie eine virale YouTube/LinkedIn-Vorschau.
@@ -604,7 +604,7 @@ stoppen. Konkret. Visuell. Emotional. Mit einem Wow-Moment.
 WAS EIN CATCHY THUMBNAIL HAT (alle 7 Punkte einbauen)
 ----------------------------------------
 
-1) **EINE klare zentrale Idee** — der Bildinhalt sollte sich in 1 Satz erklaeren
+1) **EINE klare zentrale Idee** — der Bildinhalt sollte sich in 1 Satz erklären
    lassen ("Geld brennt", "Mann schockiert vor Bildschirm", "Plakat im Muelleimer")
 
 2) **HOHE EMOTION** — wenn Person im Bild: starke Mimik
@@ -615,7 +615,7 @@ WAS EIN CATCHY THUMBNAIL HAT (alle 7 Punkte einbauen)
 3) **HOHE FARBSAETTIGUNG + KONTRAST** — Thumbnail-Look, nicht subtil
    - Mind. EINE knall-Farbe (warm fire-orange / electric cyan / hazard yellow /
      deep red)
-   - Dunkler Hintergrund (black, deep navy, dark wood) fuer Pop
+   - Dunkler Hintergrund (black, deep navy, dark wood) für Pop
    - Strong rim light auf Hauptmotiv
 
 4) **VISUELLE METAPHER zum Blog-Thema** — das Bild "uebersetzt" den Hook
@@ -628,11 +628,11 @@ WAS EIN CATCHY THUMBNAIL HAT (alle 7 Punkte einbauen)
 5) **EIN UNERWARTETES DETAIL** — der "Wait, what?"-Effekt
    - Brennende Geldscheine in der Hand einer Person
    - Plakatwand komplett leer ausser einem einzigen QR-Code
-   - Marketing-Manager schlaeft im Buero, Bildschirm zeigt rote Zahlen
+   - Marketing-Manager schlaeft im Büro, Bildschirm zeigt rote Zahlen
    - Schredder spuckt Asche statt Papier
 
 6) **CAMERA + LIGHTING SPEC** (Pflicht in jedem Prompt)
-   Waehle pro Bild einen Stil:
+   Wähle pro Bild einen Stil:
    - "shot on Sony A7 IV, 35mm lens, shallow depth of field"
    - "cinematic wide angle, 24mm, dramatic golden-hour rim light"
    - "macro shot 100mm, soft natural window light"
@@ -646,10 +646,10 @@ WAS EIN CATCHY THUMBNAIL HAT (alle 7 Punkte einbauen)
    Generiere NIE generische Bilder die zum Hook nicht passen.
 
 ----------------------------------------
-KONZEPT-FAMILIEN (waehle 1, kombiniere wenn moeglich)
+KONZEPT-FAMILIEN (wähle 1, kombiniere wenn möglich)
 ----------------------------------------
 
-K1 — **HUMAN-REACTION-CLOSEUP** (sehr stark fuer LinkedIn)
+K1 — **HUMAN-REACTION-CLOSEUP** (sehr stark für LinkedIn)
    "Close-up portrait of a [age + role + setting], face expressing [emotion],
    eyes [reaction detail], lit by [single dramatic light source], background
    [out of focus context detail]."
@@ -659,7 +659,7 @@ K1 — **HUMAN-REACTION-CLOSEUP** (sehr stark fuer LinkedIn)
    lamp, background blurred workshop tools, shot on Sony A7 IV 50mm f/1.4,
    moody warm color grading."
 
-K2 — **MONEY-DESTRUCTION** (fuer Budget/Verschwendung-Topics)
+K2 — **MONEY-DESTRUCTION** (für Budget/Verschwendung-Topics)
    "[Bills/coins] [physical action: burning, shredding, falling, blowing away,
    torn], shot at [camera angle], [lighting], with [unexpected detail]."
    Beispiel: "Stack of 50 EUR bills crumbling into burning ash inside a metal
@@ -676,7 +676,7 @@ K3 — **OBJECT-IN-WRONG-CONTEXT** (sehr LinkedIn-thumbnail-friendly)
    harsh fluorescent overhead light, single fly hovering above, photorealistic
    editorial-news photography style."
 
-K4 — **SPLIT-SCREEN BEFORE/AFTER** (fuer Vergleichs-Topics)
+K4 — **SPLIT-SCREEN BEFORE/AFTER** (für Vergleichs-Topics)
    "Split-screen composition: left half shows [chaos/old way], right half shows
    [clean/new way], dividing line is [creative element], same lighting style
    on both sides, photographed straight-on."
@@ -686,7 +686,7 @@ K4 — **SPLIT-SCREEN BEFORE/AFTER** (fuer Vergleichs-Topics)
    warm light, identical eye-level perspective on both halves, shot on
    Hasselblad medium format."
 
-K5 — **MACRO-VISIBLE-DETAIL** (fuer Tech / QR / Data-Topics)
+K5 — **MACRO-VISIBLE-DETAIL** (für Tech / QR / Data-Topics)
    "Extreme macro shot of [specific small object], showing [unexpected detail],
    shallow depth of field, [light source], [color contrast]."
    Beispiel: "Extreme macro shot of a single QR code printed on a torn corner
@@ -695,7 +695,7 @@ K5 — **MACRO-VISIBLE-DETAIL** (fuer Tech / QR / Data-Topics)
    background, lit by overcast natural daylight, cool blue tones contrasting
    with poster's red ink."
 
-K6 — **PHYSICAL-METAPHOR-FOR-DATA** (fuer DSGVO / Privacy / Tracking-Topics)
+K6 — **PHYSICAL-METAPHOR-FOR-DATA** (für DSGVO / Privacy / Tracking-Topics)
    "[Physical object representing data/privacy] in [setting that makes the
    metaphor clear], [unexpected detail showing the problem]."
    Beispiel: "An open suitcase filled with hundreds of small photo prints of
@@ -704,7 +704,7 @@ K6 — **PHYSICAL-METAPHOR-FOR-DATA** (fuer DSGVO / Privacy / Tracking-Topics)
    low angle in dramatic blue-hour light with American flag silhouette in
    background, cinematic 35mm."
 
-K7 — **HIGH-EMOTION-MOMENT-CAPTURED** (fuer Behind-Scenes / Founder-Stories)
+K7 — **HIGH-EMOTION-MOMENT-CAPTURED** (für Behind-Scenes / Founder-Stories)
    "Person in middle of [authentic emotional moment], [body posture/gesture],
    [environment context that explains the moment], [lighting that emphasizes
    emotion]."
@@ -715,7 +715,7 @@ K7 — **HIGH-EMOTION-MOMENT-CAPTURED** (fuer Behind-Scenes / Founder-Stories)
    Leica M11 28mm f/1.4."
 
 ----------------------------------------
-PFLICHT-ATTRIBUTE FUER JEDEN PROMPT (alle 8 erfuellen)
+PFLICHT-ATTRIBUTE FUER JEDEN PROMPT (alle 8 erfüllen)
 ----------------------------------------
 
   [ ] (a) Konkrete sichtbare Person ODER konkretes sichtbares Objekt
@@ -738,7 +738,7 @@ PILLAR → KONZEPT-EMPFEHLUNG
 - Attribution: K4 (Split-screen) ODER K3 (Object-in-context)
 - Behind-Scenes: K7 (High-emotion-moment) ODER K1 (Human-Reaction)
 
-ABER: lies zuerst den Hook deines Blogs und ueberleg welches Konzept am
+ABER: lies zuerst den Hook deines Blogs und überleg welches Konzept am
 staerksten zum konkreten Bild passt. Pillar-Empfehlung ist nur Default.
 
 ----------------------------------------
@@ -760,14 +760,14 @@ LAENGE
 60-120 Worte. Lieber zu lang als zu kurz.
 Konkrete Details > vage Adjektive.
 
-Output-Format — KRITISCH WICHTIG (Parser haengt sonst):
+Output-Format — KRITISCH WICHTIG (Parser hängt sonst):
 
 ---META---
 slug: kurz-knackig-url-friendly
-description: 1-2 Saetze SEO max 155 Zeichen, mit Wow-Hook
+description: 1-2 Sätze SEO max 155 Zeichen, mit Wow-Hook
 tags: Tag1, Tag2, Tag3
-image_prompt: [ENGLISCHER DALL-E/Midjourney-Prompt, ein zusammenhaengender Satz, ~50-80 Worte, KEINE Quotes]
-image_alt: [deutscher Alt-Text fuer Accessibility, max 120 Zeichen]
+image_prompt: [ENGLISCHER DALL-E/Midjourney-Prompt, ein zusammenhängender Satz, ~50-80 Worte, KEINE Quotes]
+image_alt: [deutscher Alt-Text für Accessibility, max 120 Zeichen]
 ---BODY---
 [FULL MARKDOWN HIER, ohne ## Titel-Headline am Anfang]
 
@@ -782,8 +782,8 @@ WICHTIG:
 }
 
 /**
- * Parser fuer ---META---...---BODY---...-Format.
- * Tolerant gegenueber leichten Format-Abweichungen.
+ * Parser für ---META---...---BODY---...-Format.
+ * Tolerant gegenüber leichten Format-Abweichungen.
  */
 function parseMetaBodyBlock(text: string, fallbackTitle: string): ExpandedBlog {
   const metaIdx = text.indexOf('---META---');
@@ -828,7 +828,7 @@ function parseMetaBodyBlock(text: string, fallbackTitle: string): ExpandedBlog {
 }
 
 function fallbackImagePrompt(title: string): string {
-  // Clickbait-Thumbnail-Style Fallback. Hash auf Titel waehlt Konzept-Familie
+  // Clickbait-Thumbnail-Style Fallback. Hash auf Titel wählt Konzept-Familie
   // damit Fallbacks variieren wenn Claude keinen image_prompt liefert.
   const concepts = [
     // K2 — Money destruction
