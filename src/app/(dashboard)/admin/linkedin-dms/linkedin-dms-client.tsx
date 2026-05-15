@@ -144,10 +144,14 @@ export function LinkedinDmsClient() {
             Generiere personalisierte Opener für deine Outbound-Leads. Kein Auto-DM — Copy-Paste in LinkedIn (ToS-konform).
           </p>
           <div className="mt-3 max-w-2xl rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-[12px] text-amber-200">
-            <strong className="block mb-1 text-amber-100">Wie LinkedIn-Cold-Outreach funktioniert</strong>
-            "Nachricht" geht nur an Verbindungen 1. Grades. Für Cold-Outreach: <strong>Vernetzen → Notiz hinzufügen → Opener einfügen → Senden</strong>.
-            Der generierte Opener ist mit ~170 Zeichen unter dem 300-Zeichen-Limit für Connection-Notes.
-            Neue LinkedIn-Konten haben ~100 Requests/Woche Limit — 15-20/Tag bleibt safe.
+            <strong className="block mb-1 text-amber-100">Wie LinkedIn-Cold-Outreach funktioniert (kein Premium nötig)</strong>
+            "Nachricht" geht nur an 1st-degree Connections. Für Cold-Outreach: <strong>Vernetzen → Notiz hinzufügen → Opener einfügen → Senden</strong>.
+            Opener mit ~170 Zeichen passt ins 300-Zeichen-Notiz-Limit.
+            <br /><br />
+            <strong className="text-amber-100">Anonymisierung umgehen:</strong> Bei 3rd-degree zeigt LinkedIn "LinkedIn Mitglied" + Sales-Nav-Paywall.
+            Der Button öffnet automatisch eine Google-Suche (<code className="text-amber-100">site:linkedin.com/in/</code>) — Google indexiert Profile öffentlich, du landest auf der echten Person mit funktionierendem "Vernetzen"-Button.
+            <br /><br />
+            Neue LinkedIn-Konten: ~100 Requests/Woche Limit — <strong>15-20/Tag bleibt safe</strong>.
           </div>
         </div>
         <div className="flex gap-2">
@@ -271,20 +275,21 @@ function LeadCard({
   }
 
   /**
-   * Oeffnet direkt LinkedIn People-Search (User ist eh eingeloggt fuer DM).
-   * Query: "{Firmenname}" {Stadt} (Inhaber|Geschaeftsfuehrer|Gruender|Founder|CEO)
+   * Google-bypass fuer LinkedIn-Profile.
    *
-   * Vorteile vs. Google: User landet auf LinkedIn-Personenliste mit Filter.
-   * Founder/Inhaber-Profile stehen typischerweise oben durch Keyword-Match.
-   * Bindestrich im Firmennamen wird nicht als Minus-Operator missinterpretiert.
+   * LinkedIn anonymisiert 3rd-degree-Profile als "LinkedIn Mitglied" + Sales-Nav-
+   * Paywall. Google indexiert die Profile aber oeffentlich -- Suche via Google
+   * mit site:linkedin.com/in/ liefert echte Namen + direkte Profil-URLs zum
+   * Anklicken (umgehen die Anonymisierung).
+   *
+   * Query: site:linkedin.com/in/ "{Firmenname}" {Stadt} (Rollen-Keywords)
    */
   function searchLinkedIn() {
-    // Firmenname clean: Sonderzeichen weg, in Anfuehrungszeichen fuer Phrase-Match
     const cleanName = lead.name.replace(/["“”„″]/g, '').trim();
     const cityPart = lead.city ? ` ${lead.city}` : '';
-    const rolePart = ' (Inhaber OR Geschaeftsfuehrer OR Gruender OR Founder OR CEO OR Owner)';
-    const keywords = encodeURIComponent(`"${cleanName}"${cityPart}${rolePart}`);
-    window.open(`https://www.linkedin.com/search/results/people/?keywords=${keywords}`, '_blank');
+    const rolePart = ' (Inhaber OR Gruender OR Founder OR Owner OR CEO OR "Geschaeftsfuehrer")';
+    const q = encodeURIComponent(`site:linkedin.com/in/ "${cleanName}"${cityPart}${rolePart}`);
+    window.open(`https://www.google.com/search?q=${q}`, '_blank');
   }
 
   /**
@@ -309,7 +314,7 @@ function LeadCard({
     toast.success(
       hasDirectUrl
         ? 'Opener kopiert. Auf LinkedIn: Vernetzen → Notiz hinzufügen → Strg+V → Senden.'
-        : 'Opener kopiert. LinkedIn-Personensuche offen: Inhaber/Founder anklicken → Vernetzen → Notiz hinzufügen → Strg+V → Senden.',
+        : 'Opener kopiert. Google-Suche offen: ersten LinkedIn-Treffer klicken → Vernetzen → Notiz hinzufügen → Strg+V → Senden.',
       {
         duration: 16000,
         action: {
