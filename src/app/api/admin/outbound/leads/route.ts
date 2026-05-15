@@ -27,9 +27,17 @@ export async function GET(request: NextRequest) {
 
   const params = request.nextUrl.searchParams;
   const segment = params.get('segment') as OutboundSegment | null;
-  const status = params.get('status') as LeadStatus | null;
+  // Multi-Status: kommagetrennte Liste ("new,contacted,replied"). Einzelner Wert
+  // weiter unterstuetzt (legacy + Backwards-compat).
+  const statusParam = params.get('status');
+  const statuses: LeadStatus[] | null = statusParam
+    ? (statusParam.split(',').map((s) => s.trim()).filter(Boolean) as LeadStatus[])
+    : null;
   const hasEmail = params.get('hasEmail');
   const hasWebsite = params.get('hasWebsite');
+  // Suche: ILIKE auf name, email, city — case-insensitive. Wird serverseitig
+  // ausgewertet, damit auch Leads ausserhalb der ersten Seite gefunden werden.
+  const q = params.get('q')?.trim() ?? '';
   const limit = Math.min(parseInt(params.get('limit') ?? '50', 10), 200);
   const offset = parseInt(params.get('offset') ?? '0', 10);
 
@@ -48,11 +56,19 @@ export async function GET(request: NextRequest) {
     .range(offset, offset + limit - 1);
 
   if (segment) query = query.eq('segment', segment);
-  if (status) query = query.eq('status', status);
+  if (statuses && statuses.length > 0) {
+    if (statuses.length === 1) query = query.eq('status', statuses[0]);
+    else query = query.in('status', statuses);
+  }
   if (hasEmail === 'true') query = query.not('email', 'is', null);
   if (hasEmail === 'false') query = query.is('email', null);
   if (hasWebsite === 'true') query = query.not('website', 'is', null);
   if (hasWebsite === 'false') query = query.is('website', null);
+  if (q) {
+    // PostgREST ".or" mit ILIKE — Suche in name/email/city
+    const escaped = q.replace(/[%,]/g, ' ');
+    query = query.or(`name.ilike.%${escaped}%,email.ilike.%${escaped}%,city.ilike.%${escaped}%`);
+  }
 
   const { data, error, count } = await query;
   if (error) {

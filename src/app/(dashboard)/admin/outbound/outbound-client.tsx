@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
@@ -16,6 +16,9 @@ import {
   ArrowLeft,
   Search,
   RefreshCcw,
+  X,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 type Totals = {
@@ -87,11 +90,30 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function OutboundClient() {
   const [segmentFilter, setSegmentFilter] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  // Multi-Status: Set fuer schnelle has/add/remove. Leer = "Alle Status".
+  const [statusFilters, setStatusFilters] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState<number>(10);
+  // Debounced search — vermeidet API-Spam waehrend Tippen
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [hasEmailFilter, setHasEmailFilter] = useState<'all' | 'yes' | 'no'>('all');
+  const [pageSize, setPageSize] = useState<number>(25);
+  const [offset, setOffset] = useState<number>(0);
   const [compact, setCompact] = useState<boolean>(false);
   const [hoveredDay, setHoveredDay] = useState<{ date: string; sent: number; opened: number; clicked: number; replied: number } | null>(null);
+
+  // 300 ms Debounce — die meisten Tipper haben kleine Pause beim Tippen
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+      setOffset(0); // Bei neuer Suche immer auf Seite 1
+    }, 300);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  // Bei Filter-Wechsel: zurueck auf Seite 1
+  useEffect(() => {
+    setOffset(0);
+  }, [segmentFilter, statusFilters, hasEmailFilter, pageSize]);
 
   const { data: stats, refetch: refetchStats } = useQuery<Stats>({
     queryKey: ['outbound-stats'],
@@ -103,12 +125,16 @@ export function OutboundClient() {
     refetchInterval: 15_000,
   });
 
-  const { data: leadsData, refetch: refetchLeads } = useQuery<LeadsResponse>({
-    queryKey: ['outbound-leads', segmentFilter, statusFilter, pageSize],
+  const statusFilterKey = Array.from(statusFilters).sort().join(',');
+  const { data: leadsData, refetch: refetchLeads, isFetching: leadsLoading } = useQuery<LeadsResponse>({
+    queryKey: ['outbound-leads', segmentFilter, statusFilterKey, hasEmailFilter, pageSize, offset, debouncedSearch],
     queryFn: async () => {
-      const params = new URLSearchParams({ limit: String(pageSize) });
+      const params = new URLSearchParams({ limit: String(pageSize), offset: String(offset) });
       if (segmentFilter) params.set('segment', segmentFilter);
-      if (statusFilter) params.set('status', statusFilter);
+      if (statusFilters.size > 0) params.set('status', Array.from(statusFilters).join(','));
+      if (hasEmailFilter === 'yes') params.set('hasEmail', 'true');
+      if (hasEmailFilter === 'no') params.set('hasEmail', 'false');
+      if (debouncedSearch) params.set('q', debouncedSearch);
       const r = await fetch('/api/admin/outbound/leads?' + params);
       if (!r.ok) throw new Error('Leads failed');
       return r.json();
@@ -121,18 +147,35 @@ export function OutboundClient() {
     refetchLeads();
   };
 
+  function toggleStatus(s: string) {
+    setStatusFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(s)) next.delete(s);
+      else next.add(s);
+      return next;
+    });
+  }
+
+  function resetAllFilters() {
+    setSegmentFilter('');
+    setStatusFilters(new Set());
+    setHasEmailFilter('all');
+    setSearch('');
+    setOffset(0);
+  }
+
+  const hasActiveFilters =
+    Boolean(segmentFilter) ||
+    statusFilters.size > 0 ||
+    hasEmailFilter !== 'all' ||
+    Boolean(debouncedSearch);
+
   const t = stats?.totals;
   const r = stats?.rates;
-
-  const filteredLeads = (leadsData?.leads ?? []).filter((l) => {
-    if (!search) return true;
-    const s = search.toLowerCase();
-    return (
-      l.name.toLowerCase().includes(s) ||
-      l.email?.toLowerCase().includes(s) ||
-      l.city?.toLowerCase().includes(s)
-    );
-  });
+  const leads = leadsData?.leads ?? [];
+  const total = leadsData?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const currentPage = Math.floor(offset / pageSize) + 1;
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl space-y-8">
@@ -194,16 +237,27 @@ export function OutboundClient() {
       </div>
 
       {/* Filters + Leads Table */}
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[200px]">
+      <div className="space-y-3">
+        {/* Hauptzeile: Search + Segment + Email-Filter + Listen-Optionen */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[220px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Name, Email oder Stadt"
-              className="w-full pl-8 pr-3 py-1.5 text-sm bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="Name, Email oder Stadt suchen…"
+              className="w-full pl-8 pr-8 py-1.5 text-sm bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground"
+                aria-label="Suche loeschen"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
           <select
             value={segmentFilter}
@@ -216,14 +270,14 @@ export function OutboundClient() {
             ))}
           </select>
           <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            value={hasEmailFilter}
+            onChange={(e) => setHasEmailFilter(e.target.value as 'all' | 'yes' | 'no')}
             className="px-3 py-1.5 text-sm bg-card border border-border rounded-lg"
+            title="Nur Leads mit/ohne Email-Adresse"
           >
-            <option value="">Alle Status</option>
-            {Object.entries(STATUS_LABELS).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
-            ))}
+            <option value="all">Email: Alle</option>
+            <option value="yes">Nur mit Email</option>
+            <option value="no">Nur ohne Email</option>
           </select>
           <select
             value={pageSize}
@@ -231,11 +285,11 @@ export function OutboundClient() {
             className="px-3 py-1.5 text-sm bg-card border border-border rounded-lg"
             title="Anzahl Leads pro Seite"
           >
-            <option value="10">10 Leads</option>
-            <option value="25">25 Leads</option>
-            <option value="50">50 Leads</option>
-            <option value="100">100 Leads</option>
-            <option value="200">200 Leads</option>
+            <option value="10">10 / Seite</option>
+            <option value="25">25 / Seite</option>
+            <option value="50">50 / Seite</option>
+            <option value="100">100 / Seite</option>
+            <option value="200">200 / Seite</option>
           </select>
           <button
             type="button"
@@ -247,9 +301,125 @@ export function OutboundClient() {
           </button>
         </div>
 
-        <LeadsTable leads={filteredLeads} total={leadsData?.total ?? 0} compact={compact} />
+        {/* Status-Multi-Select als Pills — Mehrfachauswahl */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] uppercase tracking-wide text-muted-foreground mr-1">Status:</span>
+          {Object.entries(STATUS_LABELS).map(([k, v]) => {
+            const active = statusFilters.has(k);
+            return (
+              <button
+                key={k}
+                type="button"
+                onClick={() => toggleStatus(k)}
+                className={
+                  'rounded-full border px-2.5 py-0.5 text-[12px] font-medium transition-colors ' +
+                  (active
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground')
+                }
+              >
+                {v}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Aktive-Filter-Anzeige mit Reset */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-border bg-muted/20 px-3 py-2">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Aktive Filter:</span>
+            {debouncedSearch && (
+              <FilterChip label={`Suche: "${debouncedSearch}"`} onRemove={() => setSearch('')} />
+            )}
+            {segmentFilter && (
+              <FilterChip
+                label={`Segment: ${SEGMENT_LABELS[segmentFilter] ?? segmentFilter}`}
+                onRemove={() => setSegmentFilter('')}
+              />
+            )}
+            {Array.from(statusFilters).map((s) => (
+              <FilterChip
+                key={s}
+                label={`Status: ${STATUS_LABELS[s] ?? s}`}
+                onRemove={() => toggleStatus(s)}
+              />
+            ))}
+            {hasEmailFilter !== 'all' && (
+              <FilterChip
+                label={hasEmailFilter === 'yes' ? 'Nur mit Email' : 'Nur ohne Email'}
+                onRemove={() => setHasEmailFilter('all')}
+              />
+            )}
+            <button
+              type="button"
+              onClick={resetAllFilters}
+              className="ml-auto text-[11.5px] font-medium text-muted-foreground hover:text-foreground"
+            >
+              Alle zurücksetzen
+            </button>
+          </div>
+        )}
+
+        <LeadsTable
+          leads={leads}
+          total={total}
+          compact={compact}
+          loading={leadsLoading}
+          hasFilters={hasActiveFilters}
+          onReset={resetAllFilters}
+        />
+
+        {/* Pagination */}
+        {total > pageSize && (
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2 text-sm">
+            <div className="text-muted-foreground tabular-nums text-[12px]">
+              Zeige <span className="font-semibold text-foreground">{offset + 1}</span>–
+              <span className="font-semibold text-foreground">{Math.min(offset + pageSize, total)}</span>
+              {' '}von <span className="font-semibold text-foreground">{total}</span> Leads
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setOffset(Math.max(0, offset - pageSize))}
+                disabled={offset === 0}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1 text-[12px] font-medium hover:bg-muted/40 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+                Zurück
+              </button>
+              <span className="px-2 text-[12px] tabular-nums text-muted-foreground">
+                Seite <span className="font-semibold text-foreground">{currentPage}</span> / {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setOffset(offset + pageSize)}
+                disabled={offset + pageSize >= total}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2.5 py-1 text-[12px] font-medium hover:bg-muted/40 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Weiter
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[11.5px] font-medium text-primary">
+      {label}
+      <button
+        type="button"
+        onClick={onRemove}
+        className="-mr-0.5 rounded-full p-0.5 hover:bg-primary/20"
+        aria-label={`${label} entfernen`}
+      >
+        <X className="h-3 w-3" />
+      </button>
+    </span>
   );
 }
 
@@ -443,11 +613,33 @@ function StatusBreakdown({ byStatus }: { byStatus: Record<string, number> }) {
   );
 }
 
-function LeadsTable({ leads, total, compact }: { leads: Lead[]; total: number; compact: boolean }) {
+function LeadsTable({
+  leads,
+  total,
+  compact,
+  loading,
+  hasFilters,
+  onReset,
+}: {
+  leads: Lead[];
+  total: number;
+  compact: boolean;
+  loading?: boolean;
+  hasFilters?: boolean;
+  onReset?: () => void;
+}) {
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
       <div className="px-4 py-3 border-b border-border bg-muted/20 text-xs uppercase tracking-wide text-muted-foreground flex items-center justify-between">
-        <span>Leads · {leads.length} von {total}</span>
+        <span className="inline-flex items-center gap-2">
+          Leads · {leads.length} von {total}
+          {loading && (
+            <span className="inline-flex items-center gap-1 text-[10px] normal-case tracking-normal text-muted-foreground/70">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+              lädt…
+            </span>
+          )}
+        </span>
         <span className="text-[10px] normal-case tracking-normal opacity-70">Auto-refresh alle 15s</span>
       </div>
       <div className="overflow-x-auto">
@@ -469,10 +661,19 @@ function LeadsTable({ leads, total, compact }: { leads: Lead[]; total: number; c
             {leads.map((l) => (
               <LeadRow key={l.id} lead={l} compact={compact} />
             ))}
-            {leads.length === 0 && (
+            {leads.length === 0 && !loading && (
               <tr>
-                <td colSpan={compact ? 7 : 9} className="text-center text-muted-foreground py-12 text-sm">
-                  Keine Leads gefunden
+                <td colSpan={compact ? 7 : 9} className="text-center py-12 text-sm">
+                  <div className="text-muted-foreground">Keine Leads gefunden</div>
+                  {hasFilters && onReset && (
+                    <button
+                      type="button"
+                      onClick={onReset}
+                      className="mt-2 inline-flex items-center gap-1 text-[12px] font-medium text-primary hover:underline"
+                    >
+                      Alle Filter zurücksetzen
+                    </button>
+                  )}
                 </td>
               </tr>
             )}
