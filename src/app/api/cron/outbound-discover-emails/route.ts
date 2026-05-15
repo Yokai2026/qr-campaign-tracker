@@ -17,7 +17,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await discoverEmailsForLeadBatch({ limit: 30 });
+    // Batch-Size auf 8 limitiert weil Vercel-Hobby Functions
+    // nach 60s gekillt werden — 8 Leads × ~6s = ~48s, passt sauber.
+    // Pipeline laeuft sowieso taeglich, ueber 5 Tage werden 40 Leads pro
+    // Cluster bearbeitet — bei aktuell ~150 pending reicht das fuer 4 Wochen.
+    const result = await discoverEmailsForLeadBatch({ limit: 8 });
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
     return NextResponse.json(
