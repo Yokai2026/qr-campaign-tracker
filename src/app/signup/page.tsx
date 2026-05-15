@@ -221,19 +221,20 @@ export default function SignupPage() {
                   className="mt-0.5 shrink-0"
                   required
                 />
-                <Label
+                <label
                   htmlFor="accept-terms"
-                  className="text-[12px] font-normal leading-relaxed text-muted-foreground cursor-pointer"
+                  className="block text-[12px] font-normal leading-relaxed text-muted-foreground cursor-pointer select-none"
                 >
                   Ich akzeptiere die{' '}
                   <Link href="/agb" target="_blank" className="font-medium text-foreground underline underline-offset-2 hover:text-brand">
                     AGB
-                  </Link>{' '}
-                  und die{' '}
+                  </Link>
+                  {' '}und die{' '}
                   <Link href="/datenschutz" target="_blank" className="font-medium text-foreground underline underline-offset-2 hover:text-brand">
                     Datenschutzerklärung
-                  </Link>.
-                </Label>
+                  </Link>
+                  .
+                </label>
               </div>
               <Button
                 type="submit"
