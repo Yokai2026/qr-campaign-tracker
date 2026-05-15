@@ -16,14 +16,12 @@ const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
 
 /**
- * Web-Search ist standardmaessig AN — schaltbar via CONTENT_DISABLE_WEB_SEARCH=1.
- * Bringt aktuelle DACH-Marketing-News / DSGVO-Urteile / Wettbewerbs-Pricing
- * in die Generation rein.
+ * Web-Search ist standardmaessig AUS — schaltbar via CONTENT_ENABLE_WEB_SEARCH=1.
+ * Reason: auf Vercel Hobby (60s maxDuration) sind Web-Search-Calls riskant
+ * (40s+ pro Generation). Auf Pro mit 300s maxDuration kann man's einschalten.
+ * Auch ohne Web-Search hat der Prompt Gold-Standard-Hooks + 8-Punkt-Arc.
  */
-const WEB_SEARCH_ENABLED = process.env.CONTENT_DISABLE_WEB_SEARCH !== '1';
-// Default 2 statt 5 — eine Generation mit 5 Searches dauert ~40s und kann das
-// Vercel-Hobby-60s-Timeout reissen. Mit 2 Searches sind wir bei ~20s.
-// Auf Pro-Plan kann via Env-Var hochgezogen werden.
+const WEB_SEARCH_ENABLED = process.env.CONTENT_ENABLE_WEB_SEARCH === '1';
 const WEB_SEARCH_MAX_USES = Number(process.env.CONTENT_WEB_SEARCH_MAX_USES ?? '2');
 
 /**

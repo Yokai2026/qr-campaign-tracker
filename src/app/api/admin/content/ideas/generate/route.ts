@@ -34,10 +34,16 @@ export async function POST(request: NextRequest) {
   const count = Math.max(5, Math.min(20, body.count ?? 15));
 
   let ideas;
+  const generateStart = Date.now();
   try {
     ideas = await generateIdeasForCluster(cluster, count);
+    console.log(`[ideas-generate] cluster=${cluster} count=${ideas.length} took=${Date.now() - generateStart}ms`);
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : 'unknown' }, { status: 500 });
+    const msg = e instanceof Error ? e.message : 'unknown';
+    const stack = e instanceof Error ? e.stack : '';
+    console.error(`[ideas-generate FAIL] cluster=${cluster} took=${Date.now() - generateStart}ms err=${msg}`);
+    if (stack) console.error(stack.slice(0, 1000));
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 
   if (!ideas.length) return NextResponse.json({ generated: 0, ideas: [] });
