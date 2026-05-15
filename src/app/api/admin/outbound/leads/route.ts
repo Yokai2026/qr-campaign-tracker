@@ -38,9 +38,12 @@ export async function GET(request: NextRequest) {
   }
 
   const sb = await createServiceClient();
+  // Sort: zuerst angeschriebene/replied (juengstes contacted_at oben),
+  // dann neu gescrapte. So sieht der Admin Engagement-Leads sofort.
   let query = sb
     .from('outbound_leads')
     .select('*', { count: 'exact' })
+    .order('contacted_at', { ascending: false, nullsFirst: false })
     .order('scraped_at', { ascending: false })
     .range(offset, offset + limit - 1);
 

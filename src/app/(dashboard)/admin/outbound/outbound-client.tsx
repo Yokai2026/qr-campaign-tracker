@@ -89,6 +89,9 @@ export function OutboundClient() {
   const [segmentFilter, setSegmentFilter] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [search, setSearch] = useState('');
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [compact, setCompact] = useState<boolean>(false);
+  const [hoveredDay, setHoveredDay] = useState<{ date: string; sent: number; opened: number; clicked: number; replied: number } | null>(null);
 
   const { data: stats, refetch: refetchStats } = useQuery<Stats>({
     queryKey: ['outbound-stats'],
@@ -97,20 +100,20 @@ export function OutboundClient() {
       if (!r.ok) throw new Error('Stats failed');
       return r.json();
     },
-    refetchInterval: 30_000,
+    refetchInterval: 15_000,
   });
 
   const { data: leadsData, refetch: refetchLeads } = useQuery<LeadsResponse>({
-    queryKey: ['outbound-leads', segmentFilter, statusFilter],
+    queryKey: ['outbound-leads', segmentFilter, statusFilter, pageSize],
     queryFn: async () => {
-      const params = new URLSearchParams({ limit: '50' });
+      const params = new URLSearchParams({ limit: String(pageSize) });
       if (segmentFilter) params.set('segment', segmentFilter);
       if (statusFilter) params.set('status', statusFilter);
       const r = await fetch('/api/admin/outbound/leads?' + params);
       if (!r.ok) throw new Error('Leads failed');
       return r.json();
     },
-    refetchInterval: 60_000,
+    refetchInterval: 15_000,
   });
 
   const refreshAll = () => {
@@ -180,7 +183,9 @@ export function OutboundClient() {
       <FunnelBar totals={t} />
 
       {/* Daily Chart */}
-      {stats?.daily && stats.daily.length > 0 && <DailyChart daily={stats.daily} />}
+      {stats?.daily && stats.daily.length > 0 && (
+        <DailyChart daily={stats.daily} hovered={hoveredDay} setHovered={setHoveredDay} />
+      )}
 
       {/* Segment-Verteilung */}
       <div className="grid md:grid-cols-2 gap-6">
@@ -220,9 +225,29 @@ export function OutboundClient() {
               <option key={k} value={k}>{v}</option>
             ))}
           </select>
+          <select
+            value={pageSize}
+            onChange={(e) => setPageSize(parseInt(e.target.value, 10))}
+            className="px-3 py-1.5 text-sm bg-card border border-border rounded-lg"
+            title="Anzahl Leads pro Seite"
+          >
+            <option value="10">10 Leads</option>
+            <option value="25">25 Leads</option>
+            <option value="50">50 Leads</option>
+            <option value="100">100 Leads</option>
+            <option value="200">200 Leads</option>
+          </select>
+          <button
+            type="button"
+            onClick={() => setCompact((v) => !v)}
+            className={`px-3 py-1.5 text-sm bg-card border border-border rounded-lg hover:bg-muted/40 ${compact ? 'ring-1 ring-primary/40 text-primary' : ''}`}
+            title="Compact-Modus: weniger Spalten anzeigen"
+          >
+            {compact ? '◫ Detailliert' : '⊟ Kompakt'}
+          </button>
         </div>
 
-        <LeadsTable leads={filteredLeads} total={leadsData?.total ?? 0} />
+        <LeadsTable leads={filteredLeads} total={leadsData?.total ?? 0} compact={compact} />
       </div>
     </div>
   );
@@ -299,51 +324,74 @@ function FunnelBar({ totals }: { totals: Totals | undefined }) {
 
 function DailyChart({
   daily,
+  hovered,
+  setHovered,
 }: {
   daily: Array<{ date: string; sent: number; opened: number; clicked: number; replied: number }>;
+  hovered: { date: string; sent: number; opened: number; clicked: number; replied: number } | null;
+  setHovered: (d: { date: string; sent: number; opened: number; clicked: number; replied: number } | null) => void;
 }) {
   const max = Math.max(1, ...daily.map((d) => Math.max(d.sent, d.opened, d.clicked, d.replied)));
   return (
     <div className="rounded-xl border border-border bg-card p-4">
-      <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
-        Letzte 14 Tage
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-xs uppercase tracking-wide text-muted-foreground">Letzte 14 Tage</div>
+        <div className="text-xs text-muted-foreground tabular-nums min-h-[16px]">
+          {hovered
+            ? `${hovered.date} · Sent ${hovered.sent} · Opened ${hovered.opened} · Clicked ${hovered.clicked} · Replied ${hovered.replied}`
+            : 'Hover über einen Tag für Details'}
+        </div>
       </div>
       <div className="flex items-end justify-between gap-1 h-32">
-        {daily.map((d) => (
-          <div key={d.date} className="flex-1 flex flex-col items-center justify-end gap-1 group">
-            <div className="w-full flex flex-col items-stretch gap-0.5">
-              <div
-                className="bg-slate-500 rounded-sm"
-                style={{ height: (d.sent / max) * 80 + 'px' }}
-                title={`Sent: ${d.sent}`}
-              />
-              {d.opened > 0 && (
+        {daily.map((d) => {
+          const active = hovered?.date === d.date;
+          return (
+            <div
+              key={d.date}
+              className="flex-1 flex flex-col items-center justify-end gap-1 cursor-pointer"
+              onMouseEnter={() => setHovered(d)}
+              onMouseLeave={() => setHovered(null)}
+            >
+              <div className={`w-full flex flex-col items-stretch gap-0.5 transition-opacity ${active ? '' : hovered ? 'opacity-40' : ''}`}>
                 <div
-                  className="bg-emerald-500 rounded-sm"
-                  style={{ height: (d.opened / max) * 80 + 'px' }}
-                  title={`Opened: ${d.opened}`}
+                  className="bg-slate-500 rounded-sm"
+                  style={{ height: (d.sent / max) * 80 + 'px' }}
                 />
-              )}
-              {d.replied > 0 && (
-                <div
-                  className="bg-amber-500 rounded-sm"
-                  style={{ height: (d.replied / max) * 80 + 'px' }}
-                  title={`Replied: ${d.replied}`}
-                />
-              )}
+                {d.opened > 0 && (
+                  <div
+                    className="bg-emerald-500 rounded-sm"
+                    style={{ height: (d.opened / max) * 80 + 'px' }}
+                  />
+                )}
+                {d.clicked > 0 && (
+                  <div
+                    className="bg-purple-500 rounded-sm"
+                    style={{ height: (d.clicked / max) * 80 + 'px' }}
+                  />
+                )}
+                {d.replied > 0 && (
+                  <div
+                    className="bg-amber-500 rounded-sm"
+                    style={{ height: (d.replied / max) * 80 + 'px' }}
+                  />
+                )}
+              </div>
+              <div className={`text-[9px] -rotate-45 origin-top-left translate-x-1 ${active ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>
+                {d.date.slice(5)}
+              </div>
             </div>
-            <div className="text-[9px] text-muted-foreground -rotate-45 origin-top-left translate-x-1">
-              {d.date.slice(5)}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-      <div className="flex items-center gap-4 mt-3 text-[11px] text-muted-foreground">
+      <div className="flex items-center gap-4 mt-3 text-[11px] text-muted-foreground flex-wrap">
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-2 h-2 bg-slate-500 rounded-sm" /> Sent
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-2 h-2 bg-emerald-500 rounded-sm" /> Opened
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block w-2 h-2 bg-purple-500 rounded-sm" /> Clicked
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block w-2 h-2 bg-amber-500 rounded-sm" /> Replied
@@ -395,11 +443,12 @@ function StatusBreakdown({ byStatus }: { byStatus: Record<string, number> }) {
   );
 }
 
-function LeadsTable({ leads, total }: { leads: Lead[]; total: number }) {
+function LeadsTable({ leads, total, compact }: { leads: Lead[]; total: number; compact: boolean }) {
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="px-4 py-3 border-b border-border bg-muted/20 text-xs uppercase tracking-wide text-muted-foreground">
-        Leads · {leads.length} von {total}
+      <div className="px-4 py-3 border-b border-border bg-muted/20 text-xs uppercase tracking-wide text-muted-foreground flex items-center justify-between">
+        <span>Leads · {leads.length} von {total}</span>
+        <span className="text-[10px] normal-case tracking-normal opacity-70">Auto-refresh alle 15s</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -407,8 +456,8 @@ function LeadsTable({ leads, total }: { leads: Lead[]; total: number }) {
             <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground border-b border-border">
               <th className="px-4 py-2 font-medium">Name</th>
               <th className="px-4 py-2 font-medium">Email</th>
-              <th className="px-4 py-2 font-medium">Segment</th>
-              <th className="px-4 py-2 font-medium">Stadt</th>
+              {!compact && <th className="px-4 py-2 font-medium">Segment</th>}
+              {!compact && <th className="px-4 py-2 font-medium">Stadt</th>}
               <th className="px-4 py-2 font-medium">Status</th>
               <th className="px-4 py-2 font-medium">Versendet</th>
               <th className="px-4 py-2 font-medium">Geöffnet</th>
@@ -418,11 +467,11 @@ function LeadsTable({ leads, total }: { leads: Lead[]; total: number }) {
           </thead>
           <tbody>
             {leads.map((l) => (
-              <LeadRow key={l.id} lead={l} />
+              <LeadRow key={l.id} lead={l} compact={compact} />
             ))}
             {leads.length === 0 && (
               <tr>
-                <td colSpan={9} className="text-center text-muted-foreground py-12 text-sm">
+                <td colSpan={compact ? 7 : 9} className="text-center text-muted-foreground py-12 text-sm">
                   Keine Leads gefunden
                 </td>
               </tr>
@@ -434,7 +483,7 @@ function LeadsTable({ leads, total }: { leads: Lead[]; total: number }) {
   );
 }
 
-function LeadRow({ lead }: { lead: Lead }) {
+function LeadRow({ lead, compact }: { lead: Lead; compact: boolean }) {
   const { data: messages } = useQuery<{
     messages: Array<{
       id: string;
@@ -468,8 +517,8 @@ function LeadRow({ lead }: { lead: Lead }) {
     <tr className="border-b border-border/50 hover:bg-muted/20">
       <td className="px-4 py-3 font-medium truncate max-w-[200px]" title={lead.name}>{lead.name}</td>
       <td className="px-4 py-3 text-muted-foreground text-xs">{lead.email || '—'}</td>
-      <td className="px-4 py-3 text-xs">{SEGMENT_LABELS[lead.segment] ?? lead.segment}</td>
-      <td className="px-4 py-3 text-xs text-muted-foreground">{lead.city || '—'}</td>
+      {!compact && <td className="px-4 py-3 text-xs">{SEGMENT_LABELS[lead.segment] ?? lead.segment}</td>}
+      {!compact && <td className="px-4 py-3 text-xs text-muted-foreground">{lead.city || '—'}</td>}
       <td className="px-4 py-3 text-xs">
         <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] ${statusClass(lead.status)}`}>
           {STATUS_LABELS[lead.status] ?? lead.status}
