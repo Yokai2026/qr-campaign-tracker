@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase/server';
 import { getStripe, priceToTierViaProduct, mapStripeStatus } from '@/lib/billing/stripe';
 import { notifyAdminPayment, notifyAdminCancellation } from '@/lib/email/admin-notify';
 import { notifyLifecycle } from '@/lib/notify/webhook';
+import { trackMetaPurchase } from '@/lib/conversion/meta-capi';
 import type Stripe from 'stripe';
 
 function planFromPriceId(priceId: string | null | undefined): 'monthly' | 'yearly' | 'unknown' {
@@ -103,6 +104,19 @@ export async function POST(request: NextRequest) {
       const profile = await lookupUserForNotification(supabase, userId);
       if (profile && plan !== 'unknown') {
         const amount = plan === 'yearly' ? 8.99 : 12.99;
+        // Server-side Conversion-Tracking via Meta CAPI — no-op wenn nicht konfiguriert.
+        // Event-ID = subscription.id sorgt fuer Dedup falls Pixel spaeter dazukommt.
+        void trackMetaPurchase({
+          eventId: subscription.id,
+          value: plan === 'yearly' ? 107.88 : amount, // yearly = einmaliger Jahresumsatz
+          contentName: plan,
+          user: {
+            email: profile.email,
+            externalId: userId,
+            ipAddress: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null,
+            userAgent: request.headers.get('user-agent') ?? null,
+          },
+        });
         void notifyAdminPayment({
           email: profile.email,
           username: profile.username,
