@@ -7,6 +7,7 @@ import { Radio, Smartphone, Monitor, Tablet, Link2, ArrowRight } from 'lucide-re
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { QrPreview } from '@/components/shared/qr-preview';
+import { ActivityHistorySheet } from '@/components/shared/activity-history-sheet';
 
 type RawScanEvent = {
   id: string;
@@ -113,6 +114,10 @@ export function LiveScanFeed({
 }: Props = {}) {
   const [events, setEvents] = useState<ScanEvent[]>([]);
   const [connected, setConnected] = useState(false);
+  // "Mehr anzeigen" oeffnet einen Side-Sheet mit dem vollen Verlauf
+  // (statt zu /analytics zu springen). User bleibt auf dem Dashboard,
+  // kann scrollen und Zeitraum waehlen.
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   // Event-Typen, die wir abonnieren / abfragen
   const eventTypes =
@@ -173,15 +178,11 @@ export function LiveScanFeed({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [source, limit]);
 
-  // Defaults fuer Titel + Mehr-Link je nach Source
+  // Defaults fuer Titel je nach Source.
+  // (Der frueher hier berechnete `resolvedMoreHref` ist obsolet — "Mehr anzeigen"
+  //  oeffnet jetzt ein internes Sheet, kein Link.)
+  void moreHref;
   const resolvedTitle = title ?? (source === 'link' ? 'Live Klicks' : source === 'qr' ? 'Live Scans' : 'Live Aktivität');
-  const resolvedMoreHref =
-    moreHref ??
-    (source === 'link'
-      ? '/analytics?source=link'
-      : source === 'qr'
-        ? '/analytics?source=qr'
-        : '/analytics');
   const emptyLabel = source === 'link' ? 'Noch keine Klicks.' : source === 'qr' ? 'Noch keine Scans.' : 'Noch keine Aktivität.';
 
   return (
@@ -189,14 +190,17 @@ export function LiveScanFeed({
       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
         <h3 className="text-[13.5px] font-semibold tracking-tight">{resolvedTitle}</h3>
         <div className="flex items-center gap-3">
-          {/* "Mehr anzeigen" — fuehrt zum Analytics-Verlauf mit passendem Filter */}
-          <Link
-            href={resolvedMoreHref}
-            className="inline-flex items-center gap-1 text-[11.5px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+          {/* "Mehr anzeigen" — oeffnet den vollen Verlauf in einem Side-Sheet
+              statt zu /analytics zu springen. So bleibt der User auf dem Dashboard
+              und kann Zeitraum (7T/14T/30T/1J/Alle) bequem auswaehlen. */}
+          <button
+            type="button"
+            onClick={() => setHistoryOpen(true)}
+            className="inline-flex items-center gap-1 rounded-md px-1 -mx-1 text-[11.5px] font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             Mehr anzeigen
             <ArrowRight className="h-3 w-3" />
-          </Link>
+          </button>
           <span className="flex items-center gap-1.5">
             {connected ? (
               <span className="relative flex h-1.5 w-1.5">
@@ -282,6 +286,10 @@ export function LiveScanFeed({
           </p>
         )}
       </div>
+
+      {/* Side-Sheet mit vollem Verlauf — Open/Close gesteuert durch
+          "Mehr anzeigen"-Button im Header. */}
+      <ActivityHistorySheet open={historyOpen} onOpenChange={setHistoryOpen} source={source} />
     </div>
   );
 }
