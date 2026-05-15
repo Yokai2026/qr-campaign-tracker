@@ -378,26 +378,85 @@ Bevor du loslegst, beantworte dir SELBST:
 5. Welche Diskussions-Frage am Ende provoziert echte Antworten?
 
 ----------------------------------------
-HOOK-ABSATZ (Zeile 1-4)
+HOOK-ABSATZ (Zeile 1-4) — CATCH-LEVEL: MAXIMAL HART
 ----------------------------------------
-PFLICHT: Erster Satz folgt einem der 6 Patterns aus PART 7 (Hook-Quality-Test).
-PFLICHT: Mindestens ein direkter Satz in Anfuehrungszeichen ("...") im ersten Drittel.
-PFLICHT: Konkreter Ort, Tag, Person oder Zahl in den ersten 4 Saetzen.
 
-Beispiel-Eroeffnungen (nach diesem Vibe schreiben):
+Die ersten 5-12 Worte entscheiden, ob der Leser weiterscrollt.
+Wenn der Hook nicht VISZERAL trifft — Blog ist tot.
 
-  "Eine Marketing-Chefin gestern: 'Wir nutzen das seit 6 Jahren. Keiner weiss,
-  ob das legal ist.' Sie hatte recht.
+PFLICHT-CHECKLISTE fuer den ERSTEN SATZ (jede Box muss erfuellt sein):
 
-  Wir sassen in ihrem Buero in Duesseldorf. ..."
+  [ ] (1) Maximal 12 Worte
+  [ ] (2) Enthaelt mind. EIN viszerales Wort:
+          [Muell, Asche, weg, verbrannt, kaputt, blind, tot, leer, vergessen,
+           verloren, draufgegangen, verpufft, geplatzt, leer, Papierkorb,
+           verschwunden, eiskalt, schockiert]
+  [ ] (3) Enthaelt mind. eines:
+          - Konkrete Zahl (47, 50.000, 6 Wochen, 18%)
+          - Konkreter Ort (Duesseldorf, Frankfurt, Hannover)
+          - Pattern-Break ("...und keiner traut sich")
+          - Direkter Dialog ("'Keine Ahnung', sagte sie.")
+  [ ] (4) Triggert MINDESTENS 1 Emotion sofort:
+          [Schock, Empoerung, Verlustangst, Mitleid, Identifikation]
 
-  "Donnerstag, 14:30, Buero eines Mittelstaendlers in Hamburg.
+REFERENZ-OPENER (David's echter LinkedIn-Post, 171 Impressions + Quality-Discussion):
 
-  Sie zeigte mir ihre Tracking-Statistik — sauber, alles vermessen. Dann
-  stellte ich eine Frage. Drei Minuten Stille. ..."
+  "Dein Plakat-Budget verschwindet grade in der Luft. Und niemand traut sich,
+  es auszusprechen."
 
-  "Ich hatte sechs Wochen gebraucht, um eine Sache zu verstehen, die mir ein
-  Anwalt in 90 Sekunden erklaerte. ..."
+  Warum es hittet:
+  - Wort 1-3: "Dein Plakat-Budget" → direkte Adressierung
+  - Wort 4-7: "verschwindet grade in der Luft" → viszerales Bild
+  - Wort 8-12: "niemand traut sich, es auszusprechen" → Tabubruch + Identifikation
+
+Weitere Beispiele die ALLE Boxen abhaken:
+
+  GUT:
+  "Drei Wochen. 500 Postkarten. Muell."
+  "120 Euro Druck. 180 Euro Porto. Resultat: vielleicht."
+  "Dein Budget sitzt grade im Papierkorb. Du weisst es."
+  "Dein Mailing landet im Muell. Bevor jemand es gesehen hat."
+  "47 Plakate. Drei funktionieren. 44 verbrennen Geld."
+  "Vier Wochen Print-Kampagne. 0 Anfragen. Du auch?"
+  "Eine Marketing-Direktorin gestern: 'Wir laufen seit Jahren blind.'"
+  "Sechs Jahre Daten. Falsches Land. Und keiner fragte."
+
+  SCHLECHT (zu zahm, neu schreiben):
+  "Print-Marketing in Deutschland steht vor Herausforderungen." → BORING
+  "Viele Marketer haben das Problem, dass..." → ABSTRAKT
+  "Lass uns ueber Plakatwerbung sprechen." → SCHWACH
+  "Ein interessanter Fall aus der Praxis..." → MARKETING-FLOSKEL
+
+----------------------------------------
+SATZ 2-4 (Druck halten)
+----------------------------------------
+Nach dem Killer-Opener: SOFORT konkret werden.
+Wer? Wo? Wann? Mit welcher Zahl? Mit welchem Zitat?
+
+PFLICHT:
+- Satz 2 oder 3 enthaelt direkten Dialog in Anfuehrungszeichen
+- Satz 2-4 enthaelt mind. 1 konkrete Zahl
+- Satz 2-4 enthaelt mind. 1 konkreten Ort (Stadt) ODER Rolle (Sanitaerbetrieb,
+  Marketing-Chefin, B2B-SaaS, Restaurant-Inhaber, etc.)
+
+VIBE:
+- Kurze Saetze (3-12 Worte). Wechsel mit 1-Wort-Punchlines ("Muell.")
+- Wirkt wie gesprochen, nicht wie geschrieben
+- Frust + Beobachtung + Faktum mischen
+
+REFERENZ (aus David's Post):
+"Mein Kunde zahlte 50.000 Euro monatlich fuer 47 Plakat-Standorte. Dann fragte
+ich: 'Welche drei funktionieren am besten?' Antwort: 'Keine Ahnung.' Das war
+der Moment, wo mir klar wurde — Print-Marketing laeuft in Deutschland komplett
+blind."
+
+Beachte:
+- Satz 1 = konkrete Zahl + Person (50k € + 47 Plakate + Kunde)
+- Satz 2 = direkte Frage in Anfuehrungszeichen
+- Satz 3 = direkte Antwort ("Keine Ahnung.")
+- Satz 4 = Insight-Pivot ("Das war der Moment, wo mir klar wurde...")
+
+Genau dieser Vier-Satz-Bogen — mach das in DEINEM Blog gleich.
 
 VERBOTEN (Instant-Fail):
 - "In diesem Artikel zeige ich dir..."
@@ -405,6 +464,8 @@ VERBOTEN (Instant-Fail):
 - "In der heutigen Zeit ist es wichtig..."
 - "Lass uns gemeinsam einen Blick werfen..."
 - "Hier sind 5 Tipps..."
+- Lange einleitende Saetze ueber das Thema im Allgemeinen
+- "Bevor wir in die Details gehen, lass uns kurz festhalten..."
 
 ----------------------------------------
 STRUKTUR
@@ -475,44 +536,177 @@ Pruefe nach dem Schreiben:
 
 Wenn irgendwas davon fehlt — Text ist zu generisch. Spezifik einbauen.
 
-ZUSAETZLICH generiere einen DALL-E/Midjourney-tauglichen ENGLISCHEN Image-Prompt fuer ein **clickbait-Hero-Bild** das auf Social-Media stoppen laesst.
+==========================================
+IMAGE-PROMPT — CLICKBAIT-THUMBNAIL-STYLE
+==========================================
+Generiere einen ENGLISCHEN Image-Prompt (60-120 Worte) fuer einen Bild-Generator
+(ChatGPT/DALL-E 3 / Midjourney / Gemini Imagen).
 
-**WICHTIG — Wiederhol-Verbot:** GENERIERE NICHT IMMER "marketing analyst at desk reviewing dashboard". WAEHLE BEWUSST eine andere visuelle Konzept-Familie passend zum Topic:
+ZIEL: Ein THUMBNAIL das aussieht wie eine virale YouTube/LinkedIn-Vorschau.
+Nicht editorial-Fotografie. Nicht Stockfoto. Nicht "premium SaaS dashboard".
 
-VISUAL-KONZEPT-POOL (waehle 1, optional kombiniert):
+ES SOLL HITTEN. Wenn jemand auf LinkedIn scrollt und das Bild sieht, soll er
+stoppen. Konkret. Visuell. Emotional. Mit einem Wow-Moment.
 
-A. **Cinematic Detail-Shot** — Macro-Closeup einer relevanten Sache (z.B. "extreme close-up of finger pointing at single tiny QR code on cluttered street poster wall, shallow depth of field, neon-purple street reflection")
+----------------------------------------
+WAS EIN CATCHY THUMBNAIL HAT (alle 7 Punkte einbauen)
+----------------------------------------
 
-B. **Dramatic Portrait** — Person mit starker Emotion (z.B. "tired marketing manager rubbing forehead at 11pm office desk, frustrated expression, glowing screen reflected in glasses, cinematic chiaroscuro")
+1) **EINE klare zentrale Idee** — der Bildinhalt sollte sich in 1 Satz erklaeren
+   lassen ("Geld brennt", "Mann schockiert vor Bildschirm", "Plakat im Muelleimer")
 
-C. **Wide-Shot Berlin/DACH Cityscape** — Plakatwaende, Strassen-Werbung, Tracking-Theme (z.B. "rainy Berlin underground station with row of backlit advertising posters, lone person scanning one with smartphone, moody blue-purple lighting")
+2) **HOHE EMOTION** — wenn Person im Bild: starke Mimik
+   [shocked face / mouth slightly open / wide eyes / facepalm / disbelief]
+   Wenn kein Mensch: dramatische Bewegung
+   [paper mid-tear / coins falling / fire crackling / spotlight cutting darkness]
 
-D. **Conceptual Money/Burning** — wenn Budget/Verschwendung-Topic (z.B. "stack of 50 EUR notes catching fire in glass ashtray, paper edges curling, smoke wisp, dark wooden table, candlelit warm tones contrasted with cyan screen glow")
+3) **HOHE FARBSAETTIGUNG + KONTRAST** — Thumbnail-Look, nicht subtil
+   - Mind. EINE knall-Farbe (warm fire-orange / electric cyan / hazard yellow /
+     deep red)
+   - Dunkler Hintergrund (black, deep navy, dark wood) fuer Pop
+   - Strong rim light auf Hauptmotiv
 
-E. **Before/After Split** — wenn Vergleichs-Topic (z.B. "split-screen composition: left side chaotic paper documents covering desk, right side single clean glowing tablet with charts, dramatic divider")
+4) **VISUELLE METAPHER zum Blog-Thema** — das Bild "uebersetzt" den Hook
+   - Wenn Hook "Budget verbrennt" → physisches Feuer / Asche
+   - Wenn Hook "blind laufen" → Augen geschlossen / Augenbinde / Dunkelheit
+   - Wenn Hook "Schreddert Geld" → Geldscheine in Schredder
+   - Wenn Hook "Daten in USA" → US-Flagge mit Pixeln / Datenstrom transatlantisch
+   - Wenn Hook "QR-Code unsichtbar" → winzige QR auf riesiger Werbeflaeche
 
-F. **Tech-Macro / Isometric** — fuer technisch/DSGVO-Themen (z.B. "isometric view of stylized server rack glowing cyan in a dark room with EU flag stars subtly visible in background bokeh")
+5) **EIN UNERWARTETES DETAIL** — der "Wait, what?"-Effekt
+   - Brennende Geldscheine in der Hand einer Person
+   - Plakatwand komplett leer ausser einem einzigen QR-Code
+   - Marketing-Manager schlaeft im Buero, Bildschirm zeigt rote Zahlen
+   - Schredder spuckt Asche statt Papier
 
-G. **Symbolic Object** — abstrakte Bedeutung (z.B. "single magnifying glass over physical printed receipt on dark wooden table, purple desk lamp casting circular light, mystery noir feel")
+6) **CAMERA + LIGHTING SPEC** (Pflicht in jedem Prompt)
+   Waehle pro Bild einen Stil:
+   - "shot on Sony A7 IV, 35mm lens, shallow depth of field"
+   - "cinematic wide angle, 24mm, dramatic golden-hour rim light"
+   - "macro shot 100mm, soft natural window light"
+   - "low-angle dramatic shot, 14mm wide, hard noon shadow"
 
-H. **Busy Scene** — Restaurant/Event/Office mit Leuten (z.B. "bustling restaurant evening service, server holding qr-code menu, candle-lit ambiance, depth of field on the menu detail, warm cinematic tone")
+7) **BLOG-KONSISTENZ** — Das Bild MUSS zum Blog-Hook passen
+   - Hook nennt "Postkarten" → Postkarten visualisieren
+   - Hook nennt "Plakat" → Plakatwand
+   - Hook nennt "Datenschutz" → Schloss / EU-Flagge / Frankfurt-Server
+   - Hook nennt "Restaurant" → Tisch / QR-Karte / Service
+   Generiere NIE generische Bilder die zum Hook nicht passen.
 
-DURCHGAENGIGE REGELN fuer JEDES Konzept:
-- 16:9, photorealistic (NICHT illustration/cartoon — ausser explizit B/F)
-- Cinematische Belichtung: weiches Light, Bokeh wo passend
-- Subtile lila (#7C3AED) ODER cyan (#22d3ee) Akzent-Highlights (nicht beide)
-- "Editorial photography style" oder "premium SaaS landing-page" feel
-- NO TEXT visible (sonst macht KI haessliche Letter)
-- Hat einen "Wow-Moment" — ein unerwartetes Detail (z.B. brennende Notenscheine, einsame Person, dramatic light)
-- Auf englisch fuer beste KI-Resultate
+----------------------------------------
+KONZEPT-FAMILIEN (waehle 1, kombiniere wenn moeglich)
+----------------------------------------
 
-VARIATION-CHECK: Wenn der Pillar/Topic Marketing-ROI ist → bevorzuge D oder E.
-Wenn DSGVO-Privacy → F oder G.
-Wenn QR-Practices → A oder H.
-Wenn Behind-Scenes → B.
-Wenn Attribution → E oder G.
+K1 — **HUMAN-REACTION-CLOSEUP** (sehr stark fuer LinkedIn)
+   "Close-up portrait of a [age + role + setting], face expressing [emotion],
+   eyes [reaction detail], lit by [single dramatic light source], background
+   [out of focus context detail]."
+   Beispiel: "Close-up portrait of a 50-year-old male small-business owner in a
+   Hannover-style workshop, face expressing tired disbelief, eyes staring at a
+   pile of unopened postcards on the desk, lit by single overhead industrial
+   lamp, background blurred workshop tools, shot on Sony A7 IV 50mm f/1.4,
+   moody warm color grading."
 
-NICHT immer A oder default-"laptop-with-dashboard" nehmen — das ist langweilig und repetitiv.
+K2 — **MONEY-DESTRUCTION** (fuer Budget/Verschwendung-Topics)
+   "[Bills/coins] [physical action: burning, shredding, falling, blowing away,
+   torn], shot at [camera angle], [lighting], with [unexpected detail]."
+   Beispiel: "Stack of 50 EUR bills crumbling into burning ash inside a metal
+   industrial trash bin, low-angle close-up shot, harsh orange flame light
+   contrasting with cool blue office fluorescent reflection on the bin's edge,
+   one half-burnt euro note floating mid-air with the EU stars still visible,
+   shot on Canon EOS R5 24mm f/2.8."
+
+K3 — **OBJECT-IN-WRONG-CONTEXT** (sehr LinkedIn-thumbnail-friendly)
+   "[Object normally seen in business context] placed in [contrasting wrong
+   environment], visual joke that visualizes the article's point."
+   Beispiel: "A clean printed marketing report carefully placed inside a
+   household trash bin among coffee grounds and orange peels, top-down shot,
+   harsh fluorescent overhead light, single fly hovering above, photorealistic
+   editorial-news photography style."
+
+K4 — **SPLIT-SCREEN BEFORE/AFTER** (fuer Vergleichs-Topics)
+   "Split-screen composition: left half shows [chaos/old way], right half shows
+   [clean/new way], dividing line is [creative element], same lighting style
+   on both sides, photographed straight-on."
+   Beispiel: "Split-screen composition: left half shows 47 disorganized paper
+   marketing reports piled on a chaotic desk, right half shows a single clean
+   tablet displaying a sharp analytics chart, divided by a vertical beam of
+   warm light, identical eye-level perspective on both halves, shot on
+   Hasselblad medium format."
+
+K5 — **MACRO-VISIBLE-DETAIL** (fuer Tech / QR / Data-Topics)
+   "Extreme macro shot of [specific small object], showing [unexpected detail],
+   shallow depth of field, [light source], [color contrast]."
+   Beispiel: "Extreme macro shot of a single QR code printed on a torn corner
+   of a German A1 advertising poster, showing fine paper fibers and slight ink
+   bleed, deep depth of field that reveals out-of-focus city street in
+   background, lit by overcast natural daylight, cool blue tones contrasting
+   with poster's red ink."
+
+K6 — **PHYSICAL-METAPHOR-FOR-DATA** (fuer DSGVO / Privacy / Tracking-Topics)
+   "[Physical object representing data/privacy] in [setting that makes the
+   metaphor clear], [unexpected detail showing the problem]."
+   Beispiel: "An open suitcase filled with hundreds of small photo prints of
+   anonymous faces being loaded onto a transatlantic cargo plane on a foggy
+   tarmac, suitcase has 'Bitly Inc.' stenciled subtly on the side, shot from
+   low angle in dramatic blue-hour light with American flag silhouette in
+   background, cinematic 35mm."
+
+K7 — **HIGH-EMOTION-MOMENT-CAPTURED** (fuer Behind-Scenes / Founder-Stories)
+   "Person in middle of [authentic emotional moment], [body posture/gesture],
+   [environment context that explains the moment], [lighting that emphasizes
+   emotion]."
+   Beispiel: "A bearded male founder in his early 30s sits on the floor of an
+   empty office at 2am, laptop open on his lap displaying a single red dropped-
+   to-zero analytics chart, head in one hand, single desk lamp casting long
+   shadow, cinematic chiaroscuro lighting in warm tungsten color, shot on
+   Leica M11 28mm f/1.4."
+
+----------------------------------------
+PFLICHT-ATTRIBUTE FUER JEDEN PROMPT (alle 8 erfuellen)
+----------------------------------------
+
+  [ ] (a) Konkrete sichtbare Person ODER konkretes sichtbares Objekt
+  [ ] (b) Konkrete Emotion ODER konkrete Action im Bild
+  [ ] (c) Konkrete Camera-Spec (Kamera + Brennweite + Blende)
+  [ ] (d) Konkrete Lichtquelle / Lichtrichtung benannt
+  [ ] (e) Konkrete Farbpalette benannt (mind. 2 Farben mit Kontrast)
+  [ ] (f) Mindestens 1 unerwartetes Detail / Wow-Moment
+  [ ] (g) Klare Verbindung zum Blog-Hook erkennbar
+  [ ] (h) "no text visible", "no logos visible" am Ende — AI macht sonst
+          haessliche Buchstaben
+
+----------------------------------------
+PILLAR → KONZEPT-EMPFEHLUNG
+----------------------------------------
+
+- DSGVO/Privacy: K6 (Physical-Metaphor-for-Data) ODER K1 (Human-Reaction)
+- Offline-ROI: K2 (Money-Destruction) ODER K3 (Object-in-wrong-context)
+- QR-Practices: K5 (Macro-visible-detail) ODER K3 (Object-in-context)
+- Attribution: K4 (Split-screen) ODER K3 (Object-in-context)
+- Behind-Scenes: K7 (High-emotion-moment) ODER K1 (Human-Reaction)
+
+ABER: lies zuerst den Hook deines Blogs und ueberleg welches Konzept am
+staerksten zum konkreten Bild passt. Pillar-Empfehlung ist nur Default.
+
+----------------------------------------
+VERBOTEN IM IMAGE-PROMPT
+----------------------------------------
+- "Editorial photography" als alleinige Beschreibung (zu vage)
+- "Premium SaaS landing-page" als Style (das ist Layout, kein Bildmotiv)
+- "Marketing analyst at desk reviewing dashboard" (default, langweilig)
+- "Person looking at laptop" ohne Emotion / Kontext
+- "Modern office setting" (generisch)
+- Keine Specs (Kamera/Licht/Farbe muss IMMER drin sein)
+- Cartoon, illustration, isometric, 3D-render, flat-design (nicht thumbnail-ish)
+- "Beautiful", "stunning", "amazing" (KI-Floskeln, keine Information)
+- Text/Logos im Bild ("avoid all text, no logos visible" muss am Ende stehen)
+
+----------------------------------------
+LAENGE
+----------------------------------------
+60-120 Worte. Lieber zu lang als zu kurz.
+Konkrete Details > vage Adjektive.
 
 Output-Format — KRITISCH WICHTIG (Parser haengt sonst):
 
@@ -582,19 +776,28 @@ function parseMetaBodyBlock(text: string, fallbackTitle: string): ExpandedBlog {
 }
 
 function fallbackImagePrompt(title: string): string {
-  // Rotierende Konzepte damit auch Fallbacks variieren (Hash auf Titel waehlt Konzept)
+  // Clickbait-Thumbnail-Style Fallback. Hash auf Titel waehlt Konzept-Familie
+  // damit Fallbacks variieren wenn Claude keinen image_prompt liefert.
   const concepts = [
-    `extreme close-up shot of a single tiny QR code on a weathered Berlin street poster, shallow depth of field, cyan neon street reflection — symbolizes "${title.slice(0, 60)}"`,
-    `tired marketing manager rubbing forehead at 11pm office desk, frustrated expression, glowing laptop screen reflected in glasses, cinematic chiaroscuro, purple-accent lamp`,
-    `stack of 50 EUR notes catching fire in glass ashtray, paper edges curling, smoke wisp, dark wooden surface, candlelit warm tones contrasted with cyan screen glow in background`,
-    `split-screen composition: chaotic paper documents covering left half of desk, single clean glowing tablet with sharp analytics on right half, dramatic divider`,
-    `single magnifying glass over a printed receipt on dark wooden table, single purple desk lamp casting circular light, noir mystery aesthetic`,
-    `rainy Berlin underground station with row of backlit advertising posters, lone person scanning one with smartphone, moody blue-purple lighting, cinematic`,
+    // K2 — Money destruction
+    `Stack of 50 EUR bills mid-burn in an industrial metal trash bin, half-burnt euro note floating mid-air with EU stars still visible, harsh orange flame light contrasting cool blue office fluorescent reflection, low-angle close-up, shot on Canon EOS R5 24mm f/2.8, dramatic shallow depth of field, photorealistic editorial style`,
+    // K1 — Human reaction
+    `Close-up portrait of a 50-year-old male small-business owner in a Hannover-style workshop, face expressing tired disbelief and slight resignation, eyes staring down at a stack of unopened postcards on a worn wooden workbench, single overhead industrial pendant lamp casting hard shadow, background blurred workshop tools in warm tungsten light, shot on Sony A7 IV 50mm f/1.4, moody color grading with orange skin tones against deep teal background`,
+    // K3 — Object in wrong context
+    `A neatly printed marketing report carefully placed inside a household kitchen trash bin among coffee grounds and orange peels, top-down 90-degree overhead shot, harsh fluorescent overhead light, one fly hovering above, photorealistic news-editorial style, shot on Sony A7R V 35mm f/4, high contrast between clean white paper and dark organic waste`,
+    // K4 — Split-screen
+    `Split-screen composition: left half shows 47 disorganized paper marketing reports piled chaotically on a wooden desk, right half shows a single clean tablet displaying a sharp green analytics chart, divided by a vertical beam of warm golden light, identical eye-level perspective on both halves, shot on Hasselblad medium format 80mm f/2.8, photorealistic`,
+    // K5 — Macro detail
+    `Extreme macro shot of a single QR code printed on a torn corner of a German A1 advertising poster, showing fine paper fibers and slight ink bleed, deep depth of field revealing out-of-focus city street in background, overcast natural daylight, cool blue tones contrasting with poster's red ink, shot on Sony 100mm macro lens f/8`,
+    // K6 — Data metaphor
+    `An open vintage suitcase filled with hundreds of small photo prints of anonymous faces being loaded onto a transatlantic cargo plane on a foggy tarmac, low-angle dramatic shot in deep blue-hour light, distant American flag silhouette in background, suitcase has subtle 'Data' stenciled on side, shot on Canon R5 35mm f/2.8 cinematic style`,
+    // K7 — Founder moment
+    `A bearded male founder in his early 30s sits on the floor of an empty office at 2am, laptop open on his lap displaying a single red dropped-to-zero analytics chart, head in one hand, single desk lamp casting long shadow across dusty floor, cinematic chiaroscuro lighting in warm tungsten color, shot on Leica M11 28mm f/1.4 photorealistic`,
   ];
   let hash = 0;
   for (let i = 0; i < title.length; i++) hash = (hash * 31 + title.charCodeAt(i)) | 0;
   const idx = Math.abs(hash) % concepts.length;
-  return `Photorealistic 16:9 editorial hero image: ${concepts[idx]}. Premium SaaS landing-page feel, no text visible, cinematic light.`;
+  return `Clickbait-style 16:9 thumbnail image, photorealistic, high contrast, saturated color palette. Subject: ${concepts[idx]}. The image visually represents the blog headline "${title.slice(0, 80)}". No text visible, no logos visible, no watermarks.`;
 }
 
 function slugify(s: string): string {
