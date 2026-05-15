@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -964,6 +964,8 @@ function LeadsTable({
 }
 
 function LeadRow({ lead, compact }: { lead: Lead; compact: boolean }) {
+  const queryClient = useQueryClient();
+  const [marking, setMarking] = useState(false);
   const { data: messages } = useQuery<{
     messages: Array<{
       id: string;
@@ -982,7 +984,7 @@ function LeadRow({ lead, compact }: { lead: Lead; compact: boolean }) {
       if (!r.ok) return { messages: [] };
       return r.json();
     },
-    enabled: lead.status === 'contacted' || lead.status === 'replied' || lead.status === 'bounced',
+    enabled: lead.status === 'contacted' || lead.status === 'replied' || lead.status === 'bounced' || lead.status === 'engaged',
     refetchInterval: 30_000,
   });
 
@@ -992,6 +994,31 @@ function LeadRow({ lead, compact }: { lead: Lead; compact: boolean }) {
   const openCount = lastMsg?.open_count ?? 0;
   const clickedAt = lastMsg?.clicked_at;
   const repliedAt = lastMsg?.replied_at;
+  const canMarkReplied = !!sentAt; // erst nach versand sinnvoll
+
+  async function toggleReplied(undo: boolean) {
+    setMarking(true);
+    try {
+      const r = await fetch(`/api/admin/outbound/leads/${lead.id}/mark-replied`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ undo }),
+      });
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        alert(`Fehler: ${j.error ?? r.status}`);
+        return;
+      }
+      // Beide Caches invalidieren — Lead-Liste UND Messages dieses Leads
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['outbound-leads'] }),
+        queryClient.invalidateQueries({ queryKey: ['outbound-messages', lead.id] }),
+        queryClient.invalidateQueries({ queryKey: ['outbound-stats'] }),
+      ]);
+    } finally {
+      setMarking(false);
+    }
+  }
 
   return (
     <tr className="border-b border-border/50 hover:bg-muted/20">
@@ -1007,7 +1034,32 @@ function LeadRow({ lead, compact }: { lead: Lead; compact: boolean }) {
       <td className="px-4 py-3 text-xs">{sentAt ? formatDistanceToNow(new Date(sentAt), { locale: de, addSuffix: true }) : '—'}</td>
       <td className="px-4 py-3 text-xs">{openedAt ? <span className="text-emerald-500">✓ {openCount > 1 ? `${openCount}×` : ''}</span> : '—'}</td>
       <td className="px-4 py-3 text-xs">{clickedAt ? <span className="text-purple-500">✓</span> : '—'}</td>
-      <td className="px-4 py-3 text-xs">{repliedAt ? <span className="text-amber-500">✓</span> : '—'}</td>
+      <td className="px-4 py-3 text-xs">
+        {repliedAt ? (
+          <button
+            type="button"
+            disabled={marking}
+            onClick={() => toggleReplied(true)}
+            title="Reply-Markierung entfernen"
+            className="inline-flex items-center gap-1 text-amber-500 hover:text-amber-400 disabled:opacity-50"
+          >
+            <span>✓</span>
+            <span className="text-[10px] text-muted-foreground group-hover:text-foreground">(undo)</span>
+          </button>
+        ) : canMarkReplied ? (
+          <button
+            type="button"
+            disabled={marking}
+            onClick={() => toggleReplied(false)}
+            title="Lead hat in Gmail geantwortet → Status auf 'replied' setzen"
+            className="inline-flex items-center gap-1 rounded border border-amber-500/30 bg-amber-500/5 px-1.5 py-0.5 text-[10.5px] text-amber-500/90 hover:bg-amber-500/15 disabled:opacity-50"
+          >
+            {marking ? '…' : '+ Reply'}
+          </button>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
+      </td>
     </tr>
   );
 }
