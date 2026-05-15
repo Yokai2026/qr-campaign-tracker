@@ -1160,26 +1160,60 @@ AKT 3 — DAS FUNNY / WOW-ELEMENT (Pflicht — 20-40 Worte)
     Werbung)
   - Mini-Story-Detail (eine angebissene Brezel halb in dem Aktenstapel)
 
-AKT 4 — TEXT-OVERLAY (YouTube-Thumbnail-Headline)
-  GENAU EIN kurzer, deutscher Text-Overlay mit 1-3 Worten in BOLD CAPS
-  (DALL-E 3 / gpt-image-1 / Midjourney v6 können kurze Texte zuverlässig
-  rendern).
+AKT 4 — TEXT-OVERLAY (PFLICHT — YouTube-Thumbnail-Headline)
+  ════════════════════════════════════════════════════════════════════
+  DAS IST NICHT OPTIONAL. JEDER IMAGE-PROMPT ENTHÄLT GENAU EINEN
+  TEXT-OVERLAY. OHNE OVERLAY = OUTPUT IST FALSCH.
+  ════════════════════════════════════════════════════════════════════
 
-  Format im Prompt:
-  "with bold yellow sans-serif text reading exactly 'VERPUFFT.' overlaid
-   in the upper-left corner, slight rough handprinted texture, slight
-   shadow behind the letters"
+  EXAKTE SYNTAX im Prompt (genau so, kopier-paste-ready):
+  "Bold thick yellow stencil-grunge sans-serif text in all-caps reading
+   exactly '<HEADLINE>' overlaid in the upper-left corner, taking 18-22%
+   of the frame width, with slight rough hand-stamped paint texture,
+   subtle black drop-shadow underneath the letters for separation, slightly
+   weathered edges as if spray-stenciled, very high contrast against the
+   background"
 
-  Text-Auswahl-Regeln:
-  - 1-3 Worte MAX (länger = AI rendert falsch)
-  - DEUTSCH, in CAPS
-  - Triggert sofort einen emotionalen Stop: "VERPUFFT.", "WEG.",
-    "AUTSCH.", "BLIND.", "PEINLICH.", "47 BILLBOARDS.", "300€/MONAT.",
-    "0 SCANS.", "NIE WIEDER.", "OPS!", "OHA."
-  - MUSS zum Blog-Titel passen (extrahiere die punchigste Essenz)
-  - Style: Bold sans-serif (Impact / Helvetica Bold / Inter Black),
-    bevorzugt Gelb / Weiss / Hazard-Orange
-  - Position: Upper-Left ODER Upper-Right ODER Bottom-Center
+  TEXT-LÄNGE: 1 bis 7 deutsche Worte. Verteilt auf 1-2 Zeilen.
+    - 1 Wort:   "VERPUFFT."  /  "WEG."  /  "BLIND."  /  "OHA."  /  "AUTSCH."
+    - 2 Worte:  "NIE WIEDER."  /  "0 SCANS."  /  "47 BILLBOARDS."  /  "PROBLEM GELÖST."
+    - 3 Worte:  "300€ PRO MONAT."  /  "WIR DACHTEN. FALSCH."
+    - 2 Zeilen 5-7 Worte:  "WIR DACHTEN, ES FUNKTIONIERT. / FALSCH."
+                            "NIEMAND TRAUT SICH, / ES ZU SAGEN."
+                            "47 STANDORTE. / 3 FUNKTIONIERTEN."
+
+  HEADLINE MUSS ZUM BLOG-HOOK PASSEN. Beispiele Mapping:
+    Blog "47 Standorte. 3 funktionierten..." → "47 / 3 / NULL."  oder  "VERPUFFT."
+    Blog "Sechs Jahre Klick-Daten Atlantik" → "VERPUFFT."  oder  "WEG. SEIT 2018."
+    Blog "Bitly speichert in Virginia" → "USA. SEIT JAHREN."  oder  "OHA."
+    Blog "Ich war 6 Monate überzeugt..." → "FALSCH."  oder  "WIR DACHTEN. FALSCH."
+    Blog "Mein peinlichster Customer-Call" → "AUTSCH."  oder  "PEINLICH."
+    Blog "Cookie-Banner ist nicht das Problem" → "ABLENKUNG."  oder  "FALSCHE BAUSTELLE."
+    Blog "500 Postkarten, drei Anrufe" → "500 → 3."  oder  "VERPUFFT."
+
+  STYLE-SPEC (immer dieselben Worte verwenden):
+    Schrift:   "bold thick yellow stencil-grunge sans-serif" (NICHT thin, NICHT Serifen)
+    Farbe:     "saturated bright yellow (#F5C518 like cinema poster)"
+               ODER "warm bright cream-white" (selten)
+    Textur:    "slight rough hand-stamped paint texture, weathered edges"
+    Schatten:  "subtle black drop-shadow underneath letters for separation"
+    Position:  "upper-left corner" (Standard, immer)
+               Alternative: "centered along the bottom edge" (nur bei 2-Zeilen-Text)
+    Größe:     "taking 18-22% of the frame width" (groß genug zum Scrollen-Stoppen)
+
+  FORMULIERUNG-CHECKLIST (alle 6 müssen im Prompt stehen):
+    [ ] "Bold thick yellow stencil-grunge sans-serif text"
+    [ ] "in all-caps reading exactly '<HEADLINE>'"
+    [ ] "overlaid in the upper-left corner"
+    [ ] "with slight rough hand-stamped paint texture"
+    [ ] "subtle black drop-shadow underneath the letters"
+    [ ] "very high contrast against the background"
+
+  REFERENZ-VORBILD (so soll das Endbild aussehen):
+    - VICE Magazin Cover (bold yellow stenciled headline)
+    - National Geographic Documentary-Cover (high contrast)
+    - The Wire / Vice News Title Card
+    - YouTube Investigation-Doku Thumbnail mit fettem Statement
 
 AKT 5 — DIE TECHNIK + ABSCHLUSS (40-60 Worte)
   Camera + Brennweite + Blende ("shot on Canon EOS R5 24mm f/2.8").
