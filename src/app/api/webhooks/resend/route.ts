@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'node:crypto';
 import { createServiceClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
@@ -12,11 +13,79 @@ export const runtime = 'nodejs';
  * Subscribe to: email.sent, email.delivered, email.opened, email.clicked,
  *               email.bounced, email.complained, email.failed
  *
- * Optional Verification via RESEND_WEBHOOK_SECRET (Svix-Signatur).
+ * Signatur-Verifikation: wenn RESEND_WEBHOOK_SECRET gesetzt ist, werden die
+ * Svix-Header (svix-id, svix-timestamp, svix-signature) gegen den Secret
+ * geprueft. Ungueltige/fehlende Signaturen → 401. Verhindert Spoofing.
  */
+
+const SIGNATURE_TOLERANCE_SECONDS = 5 * 60;
+
+function verifySvixSignature(
+  payload: string,
+  svixId: string,
+  svixTimestamp: string,
+  svixSignature: string,
+  secret: string,
+): boolean {
+  // Timestamp-Tolerance: schuetzt vor Replay-Attacken
+  const ts = parseInt(svixTimestamp, 10);
+  if (!Number.isFinite(ts)) return false;
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - ts) > SIGNATURE_TOLERANCE_SECONDS) return false;
+
+  // Secret-Format: whsec_<base64> — der Teil nach 'whsec_' ist base64-encoded
+  const secretBytes = Buffer.from(secret.replace(/^whsec_/, ''), 'base64');
+  const signedContent = `${svixId}.${svixTimestamp}.${payload}`;
+  const expectedSig = crypto
+    .createHmac('sha256', secretBytes)
+    .update(signedContent)
+    .digest('base64');
+
+  // Header kann mehrere Signaturen enthalten (rotierende Keys), space-separated.
+  // Jede ist version-prefixed: "v1,<base64>".
+  const signatures = svixSignature
+    .split(' ')
+    .map((s) => s.trim().split(',')[1])
+    .filter(Boolean);
+
+  return signatures.some((sig) => {
+    if (sig.length !== expectedSig.length) return false;
+    try {
+      return crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expectedSig));
+    } catch {
+      return false;
+    }
+  });
+}
+
 export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => null);
-  if (!body || !body.type || !body.data) {
+  // Wir muessen den raw-body fuer die HMAC haben — req.json() wuerde ihn konsumieren.
+  const rawBody = await request.text();
+
+  // Signatur pruefen, falls Secret konfiguriert
+  const secret = process.env.RESEND_WEBHOOK_SECRET;
+  if (secret) {
+    const svixId = request.headers.get('svix-id');
+    const svixTimestamp = request.headers.get('svix-timestamp');
+    const svixSignature = request.headers.get('svix-signature');
+    if (!svixId || !svixTimestamp || !svixSignature) {
+      return NextResponse.json(
+        { error: 'missing_signature_headers' },
+        { status: 401 },
+      );
+    }
+    if (!verifySvixSignature(rawBody, svixId, svixTimestamp, svixSignature, secret)) {
+      return NextResponse.json({ error: 'invalid_signature' }, { status: 401 });
+    }
+  }
+
+  let body: unknown;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return NextResponse.json({ error: 'invalid_json' }, { status: 400 });
+  }
+  if (!body || typeof body !== 'object' || !('type' in body) || !('data' in body)) {
     return NextResponse.json({ error: 'invalid_payload' }, { status: 400 });
   }
 
