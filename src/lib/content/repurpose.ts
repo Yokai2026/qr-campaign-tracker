@@ -8,6 +8,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { ARTICLES } from '@/app/blog/articles';
+import { SPURIG_VOICE } from './spurig-voice';
 
 const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
@@ -151,7 +152,11 @@ export async function generateDraft(
 }
 
 function buildPrompt(channel: ContentChannel, blog: BlogContent): string {
-  const base = `Blog-Post:
+  const base = `${SPURIG_VOICE}
+
+---
+
+QUELL-BLOG:
 Titel: ${blog.title}
 Beschreibung: ${blog.description}
 Tags: ${blog.tags.join(', ')}
@@ -165,51 +170,46 @@ ${blog.body.slice(0, 6000)}
   if (channel === 'linkedin') {
     return `${base}
 
-Generiere einen LinkedIn-Post (deutsch, du-Form, 700-1200 Zeichen) der den Blog-Inhalt als persoenliche Lern-Geschichte rueberbringt — NICHT als Experten-Vortrag.
+Generiere einen LinkedIn-Post (deutsch, du-Form, 800-1300 Zeichen) der den Blog-Inhalt SOCIAL-MEDIA-tauglich rueberbringt — Schlagzeile-Hook, Lehr-Story, Diskussion-Ende.
 
-Struktur — Story-Format (kritisch!):
-- Zeile 1: persoenlicher Aufhaenger ("Letzte Woche...", "Vor 2 Jahren dachte ich noch...", "Ein Kunde fragte mich gestern...", "Ich hab das selbst lang falsch gemacht...")
-- Mittel-Teil: Was du gelernt hast, in 3-5 kurzen Absaetzen (je 1-2 Saetze). Inkl. EINE konkrete Zahl/Beispiel aus dem Blog
-- Selbstkritik-Moment: zeig dass du selbst mal anders gedacht hast ("Ich war ueberzeugt dass ... bis ich gemerkt habe ...")
-- Letzter Absatz: kurze Frage an den Leser (zur Diskussion, nicht zur Conversion)
-- "Voller Artikel mit Quellen: https://spurig.com/blog/${blog.slug}"
-- MAX 2 Hashtags am Ende — nur wirklich relevante (#DSGVO #Marketing). Wenn keine passen: keine.
+Format-Anforderungen:
+1) **Zeile 1 = Wow-Hook (max 100 Zeichen)** — eines davon:
+   - Konkrete Zahl die schockt ("40% der Werbebudgets verbrennen unsichtbar")
+   - Pattern-Break ("Bitly ist 2026 ein DSGVO-Problem. Hier was passierte als wir wechselten:")
+   - Konkrete persoenliche Behauptung ("Ich habe 6 Wochen ein Plakat getrackt. Das Ergebnis hat mich umgehauen.")
+   - Frage die der Leser sich nie gestellt hat ("Wie viel kostet dich Tracking, das du nicht hast?")
+2) **Leerzeile**, dann **2-4 kurze Absaetze** (je 1-3 Saetze) mit Story + Mini-Lernen
+3) **Mindestens 1 konkrete Zahl/Stat aus dem Blog**
+4) **Mindestens 1 kontroverser Take** ("Das wird kaum jemand sagen, aber...") ODER **Selbstkritik** ("Ich war 6 Monate ueberzeugt dass...")
+5) **Schluss: Diskussions-Frage** ("Wie machst du das?") + "Mehr im Blog: https://spurig.com/blog/${blog.slug}"
+6) **Max 2 Hashtags** — nur wirklich relevant (#DSGVO #Marketing). Lieber gar keine.
 
-Style — wichtig:
-- Erste Person ("Ich", "wir"), du-Form zum Leser
-- Klingt wie wenn du einem Kollegen beim Bier erzaehlst — nicht wie Marketing-Email
-- KURZE Saetze. Subjekt-Verb-Objekt. Keine verschachtelten Konstruktionen
-- Konkret: Namen, Zahlen, echte Situationen statt abstrakter Phrasen
-- Selbstkritik > Expertenstolz
-- VERBOTEN: "spannend", "ich freue mich", "Take", "Pro-Tipp", "Spoiler:", Marketing-Lehren-Floskeln
-- VERBOTEN: lange Absaetze, Aufzaehlungen, Bullet-Points
-- VERBOTEN: emotionaler Manipulationsstil ("Verlieren Sie nicht...")
+Lehrreich + Unterhaltsam + Authentisch — Spurig-DNA. KEIN Marketing-Speak.
 
-Antworte NUR mit dem Post-Text. Keine Erklaerung, keine Quotes.`;
+Antworte NUR mit dem Post-Text. Keine Erklaerung, keine Quotes, keine Code-Fences.`;
   }
 
   if (channel === 'twitter') {
     return `${base}
 
-Generiere einen Twitter/X-Thread (deutsch, du-Form, 6-8 Tweets) der diesen Blog-Post repurposed.
+Generiere einen Twitter/X-Thread (deutsch, du-Form, 5-7 Tweets) im Social-Media-Vibe.
 
 Format:
-- Tweet 1: Hook (max 270 Zeichen) mit konkreter Zahl oder Pattern-Break
-- Tweet 2-6: Je 1 Insight, je max 270 Zeichen
-- Letzter Tweet: Link zum Blog: "Voller Artikel: https://spurig.com/blog/${blog.slug}"
+- **Tweet 1 = Wow-Hook** (max 270 Zeichen). Pattern-Break oder konkrete Zahl. NICHT "Thread:", NICHT "1/".
+  Beispiel: "Bitly nutzt fast jede DACH-Marketing-Abteilung. Fast keine weiss dass das 2026 ein DSGVO-Bussgeld-Risiko ist."
+- **Tweet 2-5 = Mini-Insights** (je max 270 Zeichen). Eine Idee pro Tweet, mit konkreter Zahl oder Beispiel.
+- **Tweet 6/7 = Pointe + Link**: persoenlicher Take + "Voller Artikel: https://spurig.com/blog/${blog.slug}"
 
-Separator zwischen Tweets: "---"
+Separator zwischen Tweets: EINZIGE Zeile mit nur "---"
 
 Style:
-- Erster Tweet: persoenliche Beobachtung oder Frage, KEINE Statistik-Bombe
-- Schreibe als jemand der gerade was lernt — nicht als Lehrer
-- Kurze Saetze. Subjekt-Verb-Objekt.
-- Konkrete Zahlen + EINE eigene Anekdote
-- VERBOTEN: "Thread:", "1/", "Spoiler:", Hashtag-Spam, Emoji-Spam (0 Emojis bevorzugt, max 1 wenn wirklich passend)
-- VERBOTEN: "Pro-Tip", "Game Changer", "krass", marketing-floskeln
-- Klingt wie Bier-Gespraech, nicht wie Whitepaper
+- Jeder Tweet muss alleine klick-wuerdig sein (Twitter-User scrollt schnell)
+- Konkrete Zahlen, kontroverse Takes, eigene Erfahrung
+- KURZE Saetze. Subjekt-Verb-Objekt.
+- 0-1 Emoji im gesamten Thread. Default 0.
+- 0-3 Hashtags im LETZTEN Tweet, nur wenn wirklich relevant
 
-Antworte NUR mit dem Thread-Text (Tweets durch "---" getrennt).`;
+Antworte NUR mit dem Thread-Text (Tweets durch "---"-Zeile getrennt). Keine Erklaerung.`;
   }
 
   // reddit

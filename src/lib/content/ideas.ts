@@ -2,12 +2,15 @@
  * Content-Ideas-Generator + Blog-Expander via Claude.
  *
  * Pipeline:
- *  1. generateIdeasForCluster(cluster) -> 15 {title, outline, angle} Ideen
- *  2. expandIdeaToBlog(ideaId)          -> full Markdown-Blog (~1500-2000 Woerter)
- *                                          + Auto-Insert in content_blogs (DB)
+ *  1. generateIdeasForCluster(cluster) -> 15 Social-Media-vibrierende Ideen
+ *  2. expandIdeaToBlog(idea)            -> 900-1300 Worte Markdown-Blog
+ *
+ * Robust gegen Claude-JSON-Parse-Fails: Blog kommt im META/BODY-Block-Format
+ * (separater Body statt JSON-embedded markdown).
  */
 
-import { CLUSTER_DESCRIPTION, type ContentCluster } from './pillars';
+import { CLUSTER_DESCRIPTION, CLUSTER_LABEL, type ContentCluster } from './pillars';
+import { SPURIG_VOICE } from './spurig-voice';
 
 const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
@@ -38,33 +41,40 @@ export async function generateIdeasForCluster(
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
-  const prompt = `Du bist Content-Strategist fuer Spurig (DSGVO-konformes QR-Code & Kurzlink-Tracking-Tool fuer DACH-Marketing-Teams).
+  const prompt = `${SPURIG_VOICE}
 
-Generiere ${count} Content-Ideen fuer den Pillar "${cluster}":
+---
+
+Du bist Content-Strategist fuer Spurig. Generiere ${count} VIRALE Content-Ideen fuer den Pillar "${CLUSTER_LABEL[cluster]}":
 ${CLUSTER_DESCRIPTION[cluster]}
 
-Jede Idee soll:
-- Einen konkreten, klickbaren Blog-Titel haben (deutsch, max 80 Zeichen)
-- Einen persoenlichen Story-Aufhaenger ("Was ich gelernt habe...", "Vor 6 Monaten dachte ich...", "Ein Kunde fragte mich...")
-- Ein klares Audience-Problem loesen — keine generischen Themen wie "Was ist DSGVO"
-- Konkret + spezifisch sein — Zahlen, Beispiele, Anti-Patterns
+Jede Idee muss SOCIAL-MEDIA-tauglich sein:
+- **Titel** (max 70 Zeichen): Schlagzeile mit Wow-Effekt / Pattern-Break / Kontroverse / konkreter Zahl.
+  Beispiele guter Titel:
+  · "Was 90% der Marketing-Agenturen ueber DSGVO falsch verstehen"
+  · "Ich habe 6 Wochen mit Bitly gearbeitet. Hier was passierte."
+  · "27 Euro pro Plakat-Standort. So habe ich das gemessen."
+  · "Warum dein QR-Code mit Logo 30% weniger Scans bekommt"
+  Schlechte Titel (NICHT generieren):
+  · "5 Tipps fuer besseres DSGVO" (Listicle, generisch)
+  · "Was ist QR-Code-Tracking?" (zu basic)
+  · "Datensparsamkeit im Tracking" (klingt nach Whitepaper)
 
-Vermeide:
-- Generische "5 Tipps fuer..." Titel
-- Buzzwords ohne Substanz ("synergy", "leverage")
-- Themen die schon erschoepft sind ("Was ist QR-Code")
+- **angle** (Story-Hook fuer Intro, 1 Satz): persoenliche Beobachtung, eigene Fehleinschaetzung, oder echter Kunden-Moment.
+  Format: "Letzte Woche...", "Ein Kunde fragte mich...", "Bis vor 3 Monaten dachte ich..."
 
-Format: JSON-Array, ${count} Eintraege:
+- **outline** (2-3 Saetze): WAS im Post drin steht — konkrete Punkte, Zahlen, Beispiele.
+  Mindestens 1 kontroverser Take oder Insight gegen Mainstream.
+
+- **target_keywords** (2-4 SEO-Keywords kommagetrennt): natuerlich, nicht stuffed.
+
+Tonalitaet: jede Idee muss Spurig's "anti-Bitly + indie + ehrlich + lehrreich"-DNA tragen.
+
+Format: NUR JSON-Array, keine Markdown-Fences, kein Vorwort:
 [
-  {
-    "title": "...",
-    "outline": "1-2 Saetze Stichpunkt-Liste was im Post drinsteht",
-    "angle": "Der konkrete Story-Aufhaenger fuer den Intro",
-    "target_keywords": "2-4 SEO-Keywords kommagetrennt"
-  }
-]
-
-Antworte NUR mit dem JSON. Kein Markdown-Code-Block, kein Vorwort.`;
+  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "..."},
+  ...
+]`;
 
   const res = await fetch(ANTHROPIC_API, {
     method: 'POST',
@@ -88,8 +98,15 @@ Antworte NUR mit dem JSON. Kein Markdown-Code-Block, kein Vorwort.`;
   const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
   const text = data.content?.find((c) => c.type === 'text')?.text?.trim() ?? '';
 
-  // Robust-Parse: strip optional markdown-fences
-  const jsonText = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  // Robust-Parse
+  let jsonText = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  // Falls Claude doch Pre-Text: ersten [ bis letzten ] extrahieren
+  const firstBracket = jsonText.indexOf('[');
+  const lastBracket = jsonText.lastIndexOf(']');
+  if (firstBracket > 0 && lastBracket > firstBracket) {
+    jsonText = jsonText.slice(firstBracket, lastBracket + 1);
+  }
+
   let ideas: GeneratedIdea[];
   try {
     ideas = JSON.parse(jsonText);
@@ -102,7 +119,7 @@ Antworte NUR mit dem JSON. Kein Markdown-Code-Block, kein Vorwort.`;
 }
 
 // ---------------------------------------------------------------------------
-// Blog-Expander (Story-Mode)
+// Blog-Expander (META/BODY-Block-Format fuer Parse-Robustheit)
 // ---------------------------------------------------------------------------
 
 export async function expandIdeaToBlog(idea: {
@@ -115,43 +132,43 @@ export async function expandIdeaToBlog(idea: {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
-  const prompt = `Du schreibst einen Spurig-Blog-Post als Founder/Indie-Hacker im Story-Mode (persoenlich, mit Selbstkritik, lehrreich aber unaufdringlich).
+  const prompt = `${SPURIG_VOICE}
+
+---
+
+Du schreibst einen Spurig-Blog-Post zum Thema "${idea.title}".
 
 INPUT:
-- Titel: ${idea.title}
-- Story-Aufhaenger: ${idea.angle}
+- Story-Hook: ${idea.angle}
 - Outline: ${idea.outline}
 - SEO-Keywords: ${idea.target_keywords ?? 'keine vorgegeben'}
-- Pillar: ${idea.cluster}
+- Pillar: ${CLUSTER_LABEL[idea.cluster]}
 
-Schreibe einen 1500-2000 Worte Blog-Post in DEUTSCHEM Markdown.
+Schreibe einen 900-1300 Worte deutschen Markdown-Blog-Post mit Social-Media-Vibe (Schlagzeile-Feel, Wow-Hook, lehrreich + unterhaltsam).
 
 Struktur:
-1. Hook-Absatz (3-5 Saetze): persoenliche Geschichte aus dem Story-Aufhaenger. Keine Begruessung, kein Inhaltsverzeichnis.
-2. 4-6 Unterabschnitte mit ## H2-Headlines
-3. Jeder Abschnitt: 2-4 Absaetze, je 2-4 Saetze
-4. Konkrete Zahlen, Beispiele, eigene Beobachtungen (auch wenn fiktiv plausibel)
-5. Mindestens 1 Selbstkritik-Moment ("Ich dachte erst...", "Was ich erst spaet verstanden habe...")
-6. Letzter Abschnitt ## Fazit: 3-4 Saetze + 1 Frage an den Leser
-7. KEIN Aufrufung "Probier Spurig kostenlos!" — sei zurueckhaltend mit Eigenwerbung
+1. **Hook-Absatz** (3-5 Saetze): direkter Story-Einstieg aus dem angle. KEIN "In diesem Artikel...", keine Begruessung.
+2. **4-5 H2-Unterabschnitte** mit ## Headlines (max 50 Zeichen, knackig, "klick-mich"-Feel)
+3. **Jeder Abschnitt**: 2-4 Absaetze mit konkreten Zahlen, Anekdoten, eigenen Beobachtungen
+4. **Mindestens 1 kontroverser Take** ("Das wird dir niemand sagen, aber...", "Mainstream-Meinung ist X. Ich glaube...")
+5. **Mindestens 1 Selbstkritik** ("Ich dachte 6 Monate dass...", "Was ich erst nach 50 Kunden verstanden habe...")
+6. **Mindestens 2 konkrete Zahlen/Stats** (aus Spurig-Daten, plausibel)
+7. **Schluss-H2 "Fazit"** oder aehnlich: 2-3 Saetze + 1 Diskussions-Frage
 
-Style:
-- Erste Person ("ich", "wir bei Spurig"), du-Form an Leser
-- KURZE Saetze, Subjekt-Verb-Objekt
-- Klingt wie Founder der ehrlich reflektiert, nicht wie Marketing
-- VERBOTEN: "spannend", "Take", "Pro-Tipp", "leverage", "synergetisch", "Game Changer"
-- Verwende **bold** sparsam (max 5x), *italic* fuer Betonung
-- Code-Bloecke nur wenn wirklich relevant
+Output-Format — KRITISCH WICHTIG (Parser haengt sonst):
 
-Output-Format (JSON):
-{
-  "slug": "url-friendly-slug-aus-titel",
-  "description": "1-2 Saetze SEO-Description max 160 Zeichen",
-  "tags": ["Tag1", "Tag2", "Tag3"],
-  "body_md": "FULL MARKDOWN BODY hier rein, ohne ## Titel-Headline am Anfang (der kommt extern)"
-}
+---META---
+slug: kurz-knackig-url-friendly
+description: 1-2 Saetze SEO max 155 Zeichen, mit Wow-Hook
+tags: Tag1, Tag2, Tag3
+---BODY---
+[FULL MARKDOWN HIER, ohne ## Titel-Headline am Anfang]
 
-Antworte NUR mit dem JSON. Kein Markdown-Code-Block.`;
+WICHTIG:
+- Antworte mit GENAU diesem META/BODY-Format
+- Keine Code-Fences (\`\`\`) um den Body
+- Keine Quotes um die Werte
+- Nichts vor oder nach dem ---META--- und ---BODY---`;
 
   const res = await fetch(ANTHROPIC_API, {
     method: 'POST',
@@ -162,7 +179,7 @@ Antworte NUR mit dem JSON. Kein Markdown-Code-Block.`;
     },
     body: JSON.stringify({
       model: CLAUDE_MODEL,
-      max_tokens: 8000,
+      max_tokens: 5000,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
@@ -174,30 +191,51 @@ Antworte NUR mit dem JSON. Kein Markdown-Code-Block.`;
 
   const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
   const text = data.content?.find((c) => c.type === 'text')?.text?.trim() ?? '';
-  const jsonText = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
 
-  let parsed: {
-    slug?: string;
-    description?: string;
-    tags?: string[];
-    body_md?: string;
-  };
-  try {
-    parsed = JSON.parse(jsonText);
-  } catch (e) {
-    throw new Error(`Blog JSON parse failed: ${(e as Error).message}. First 300 chars: ${jsonText.slice(0, 300)}`);
+  return parseMetaBodyBlock(text, idea.title);
+}
+
+/**
+ * Parser fuer ---META---...---BODY---...-Format.
+ * Tolerant gegenueber leichten Format-Abweichungen.
+ */
+function parseMetaBodyBlock(text: string, fallbackTitle: string): ExpandedBlog {
+  const metaIdx = text.indexOf('---META---');
+  const bodyIdx = text.indexOf('---BODY---');
+  if (metaIdx < 0 || bodyIdx < 0 || bodyIdx <= metaIdx) {
+    throw new Error(
+      `Blog parse failed: META/BODY markers not found. First 200 chars: ${text.slice(0, 200)}`,
+    );
   }
 
-  if (!parsed.slug || !parsed.body_md || !parsed.description) {
-    throw new Error('Blog JSON missing required fields (slug/description/body_md)');
+  const metaBlock = text.slice(metaIdx + '---META---'.length, bodyIdx).trim();
+  let body = text.slice(bodyIdx + '---BODY---'.length).trim();
+
+  // Strip optional code-fence around body
+  body = body.replace(/^```(?:markdown|md)?\s*\n?/i, '').replace(/\s*```\s*$/i, '').trim();
+
+  const meta: Record<string, string> = {};
+  for (const line of metaBlock.split('\n')) {
+    const m = line.match(/^([a-z_]+):\s*(.+)$/i);
+    if (m) meta[m[1].toLowerCase()] = m[2].trim().replace(/^["']|["']$/g, '');
   }
+
+  if (!meta.slug || !body) {
+    throw new Error(`Blog parse failed: missing slug or body. Meta keys: ${Object.keys(meta).join(',')}, body len: ${body.length}`);
+  }
+
+  const tags = (meta.tags ?? '')
+    .split(/[,;]/)
+    .map((t) => t.trim().replace(/^["']|["']$/g, ''))
+    .filter(Boolean)
+    .slice(0, 6);
 
   return {
-    slug: slugify(parsed.slug),
-    title: idea.title,
-    description: parsed.description.slice(0, 200),
-    tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 6) : [],
-    body_md: parsed.body_md,
+    slug: slugify(meta.slug),
+    title: fallbackTitle,
+    description: (meta.description ?? '').slice(0, 200),
+    tags,
+    body_md: body,
   };
 }
 
