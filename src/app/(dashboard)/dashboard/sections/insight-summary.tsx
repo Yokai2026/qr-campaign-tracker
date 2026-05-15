@@ -105,6 +105,7 @@ export async function InsightSummary() {
       peakSlot={peakSlot}
       uniqueVisitors={uniqueVisitors}
       hasData={totalOpens > 0 || prevTotal > 0}
+      periodLabel="in den letzten 7 Tagen"
     />
   );
 }
