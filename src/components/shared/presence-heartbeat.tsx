@@ -6,33 +6,40 @@ const INTERVAL_MS = 30_000;
 const STORAGE_KEY = 'spurig-visitor-id';
 
 /**
- * Sendet alle 30s einen Heartbeat an /api/heartbeat — mit einer pro Browser
- * persistierten visitor_id (localStorage-UUID). Tracking aller Website-
- * Besucher, auch anonymer.
+ * Sendet alle 30s einen Heartbeat an /api/heartbeat — mit einer pro Tab
+ * eindeutigen visitor_id (sessionStorage-UUID). Tracking ALLER Website-
+ * Besucher (anonym + eingeloggt) und Sessions (jeder Tab = eigene ID).
  *
- * Pausiert wenn Tab im Hintergrund (Page Visibility API) — spart Server-Last
- * und stellt sicher dass "online" nur Tabs mit Fokus zaehlt.
+ * sessionStorage statt localStorage: ein Browser mit mehreren Tabs erzeugt
+ * mehrere visitor_ids — damit zaehlen Tab-2/3 nicht denselben Eintrag in DB,
+ * sondern je eine eigene Row. Stimmt mit der User-Intuition "wie oft jemand
+ * was" ueberein, statt "eindeutige Browser".
  *
- * Sollte im Root-Layout gemountet werden damit es auf jeder Page laeuft
- * (Landing, /r/, Dashboard, Admin etc.).
+ * visibilitychange:hidden stoppt nur den Heartbeat, sendet aber KEIN leave —
+ * der Eintrag altert nach 60s natuerlich aus. Sonst flackert die Anzeige
+ * brutal beim Tab-Wechsel (Hintergrund-Tab wuerde sofort als offline gelten).
+ * pagehide (echter Page-Close) sendet weiterhin leave.
+ *
+ * Sollte im Root-Layout gemountet werden damit es auf jeder Page laeuft.
  */
 export function PresenceHeartbeat() {
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null;
 
     function getVisitorId(): string {
+      const generate = () =>
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `v-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       try {
-        const existing = localStorage.getItem(STORAGE_KEY);
+        const existing = sessionStorage.getItem(STORAGE_KEY);
         if (existing && existing.length > 0) return existing;
-        const fresh =
-          typeof crypto !== 'undefined' && 'randomUUID' in crypto
-            ? crypto.randomUUID()
-            : `v-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-        localStorage.setItem(STORAGE_KEY, fresh);
+        const fresh = generate();
+        sessionStorage.setItem(STORAGE_KEY, fresh);
         return fresh;
       } catch {
-        // localStorage blockiert (Private Mode etc.) — fallback non-persistent
-        return `v-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        // sessionStorage blockiert (Private Mode etc.) — fallback non-persistent
+        return generate();
       }
     }
 
@@ -92,9 +99,11 @@ export function PresenceHeartbeat() {
       if (document.visibilityState === 'visible') {
         start();
       } else {
-        // Tab/App in Hintergrund → sofort als offline melden (Mobile Standby!).
+        // Tab/App in Hintergrund → nur Heartbeat stoppen, KEIN leave.
+        // last_seen_at altert dann nach 60s natuerlich aus. Sonst zaehlt
+        // jeder Tab-Wechsel sofort als offline (vor allem auf Mobile),
+        // was zu komplett falscher Live-Anzeige fuehrt.
         stop();
-        leave();
       }
     }
 

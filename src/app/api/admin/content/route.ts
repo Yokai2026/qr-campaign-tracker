@@ -23,22 +23,45 @@ export async function GET() {
   }
 
   const service = await createServiceClient();
-  const { data: drafts, error } = await service
-    .from('content_drafts')
-    .select('id, blog_slug, channel, draft_text, model, status, posted_at, external_url, notes, created_at, updated_at')
-    .order('updated_at', { ascending: false });
+  const [draftsRes, dbBlogsRes] = await Promise.all([
+    service
+      .from('content_drafts')
+      .select('id, blog_slug, channel, draft_text, model, status, posted_at, external_url, notes, created_at, updated_at')
+      .order('updated_at', { ascending: false }),
+    service
+      .from('content_blogs')
+      .select('slug, title, description, tags, cluster, created_at')
+      .order('created_at', { ascending: false }),
+  ]);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (draftsRes.error) return NextResponse.json({ error: draftsRes.error.message }, { status: 500 });
+
+  // Merge: file-based ARTICLES + DB content_blogs (DB-Blogs zuerst, neueste oben)
+  const fileArticles = ARTICLES.map((a) => ({
+    slug: a.slug,
+    title: a.title,
+    description: a.description,
+    publishedAt: a.publishedAt,
+    tags: a.tags,
+    source: 'file' as const,
+  }));
+  const dbArticles = (dbBlogsRes.data ?? []).map((b) => ({
+    slug: b.slug,
+    title: b.title,
+    description: b.description,
+    publishedAt: b.created_at.split('T')[0],
+    tags: b.tags ?? [],
+    source: 'db' as const,
+    cluster: b.cluster,
+  }));
+
+  // Dedup nach slug (DB wins)
+  const seen = new Set(dbArticles.map((a) => a.slug));
+  const merged = [...dbArticles, ...fileArticles.filter((a) => !seen.has(a.slug))];
 
   return NextResponse.json({
-    drafts: drafts ?? [],
-    articles: ARTICLES.map((a) => ({
-      slug: a.slug,
-      title: a.title,
-      description: a.description,
-      publishedAt: a.publishedAt,
-      tags: a.tags,
-    })),
+    drafts: draftsRes.data ?? [],
+    articles: merged,
   });
 }
 

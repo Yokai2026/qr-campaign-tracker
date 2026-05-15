@@ -321,7 +321,7 @@ export function AdminClient() {
                 <span className="tabular-nums font-semibold text-foreground">
                   {data.users.visitorsLifetime.toLocaleString('de-DE')}
                 </span>{' '}
-                <span className="text-muted-foreground">Besucher gesamt</span>
+                <span className="text-muted-foreground">Besuche gesamt</span>
               </>
             }
           />

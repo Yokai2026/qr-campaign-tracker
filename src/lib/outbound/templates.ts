@@ -73,6 +73,22 @@ const LINKEDIN_URL = 'https://www.linkedin.com/in/david-da-silva-gornik-59262b36
 const WEBSITE_URL = 'https://spurig.com';
 const LOGO_URL = 'https://spurig.com/email-assets/spurig-logo-glow.png';
 
+// Eigene Tracking-Domain — wird in jeden Outbound-Mail-Link injiziert,
+// damit wir Opens (Pixel) + Clicks (302-Redirect) unabhaengig von Resends
+// eingebauten Pixel-/Link-Wrappern tracken (Gmail blockt Resend oft).
+const TRACK_BASE = 'https://spurig.com/api/track/outbound';
+
+function openPixelUrl(messageId: string): string {
+  return `${TRACK_BASE}/${messageId}/open`;
+}
+
+function wrapClickUrl(messageId: string, targetUrl: string): string {
+  // Click-Handler whitelistet nur spurig.com Subdomains. Externe Links
+  // (LinkedIn, Impressum-extern) bleiben unwrapped — sonst landet der User
+  // bei spurig.com statt am Ziel.
+  return `${TRACK_BASE}/${messageId}/click?url=${encodeURIComponent(targetUrl)}`;
+}
+
 const HERO_IMAGES: Record<TemplateKey, string> = {
   marketing_agency_dsgvo_v2: 'https://spurig.com/email-assets/hero-dashboard.jpg',
   gastronomy_qr_v2: 'https://spurig.com/email-assets/hero-gastro.jpg',
@@ -193,6 +209,7 @@ const TEMPLATES: Record<TemplateKey, Template> = {
 export function buildMailForLead(
   lead: OutboundLead,
   unsubscribeUrl: string,
+  messageId: string,
 ): RenderedMail | null {
   if (!lead.email) return null;
   const template = pickTemplateForSegment(lead.segment);
@@ -221,8 +238,8 @@ export function buildMailForLead(
   return {
     templateKey: template.key,
     subject,
-    bodyText: buildTextVersion(greetingTarget, content),
-    bodyHtml: buildHtmlVersion(template.key, greetingTarget, content, unsubscribeUrl),
+    bodyText: buildTextVersion(greetingTarget, content, messageId),
+    bodyHtml: buildHtmlVersion(template.key, greetingTarget, content, unsubscribeUrl, messageId),
     personalizationHook: content.hook,
   };
 }
@@ -288,7 +305,9 @@ function openingHtmlFor(greeting: string): string {
     : `Hi <strong>${escapeHtml(greeting)}</strong>`;
 }
 
-function buildTextVersion(greeting: string, c: TemplateContent): string {
+function buildTextVersion(greeting: string, c: TemplateContent, messageId: string): string {
+  const ctaTracked = wrapClickUrl(messageId, c.ctaUrl);
+  const websiteTracked = wrapClickUrl(messageId, WEBSITE_URL);
   return `${openingFor(greeting)},
 
 ${c.hook}
@@ -302,12 +321,12 @@ ${c.comparison.map((row) => `  Bitly/Standard: ${row.bitlyOrAlt}\n  Spurig: ${ro
 
 ${c.closer}
 
-→ ${c.ctaText}: ${c.ctaUrl}
+→ ${c.ctaText}: ${ctaTracked}
 
 Beste Grüße
 David da Silva Gornik
 Spurig — DSGVO-konformes QR & Kurzlink-Tracking
-${WEBSITE_URL} · Made in Berlin
+${websiteTracked} · Made in Berlin
 LinkedIn: ${LINKEDIN_URL}
 
 ---
@@ -320,8 +339,12 @@ function buildHtmlVersion(
   greeting: string,
   c: TemplateContent,
   unsubscribeUrl: string,
+  messageId: string,
 ): string {
   const heroUrl = HERO_IMAGES[templateKey];
+  const ctaTracked = wrapClickUrl(messageId, c.ctaUrl);
+  const websiteTracked = wrapClickUrl(messageId, WEBSITE_URL);
+  const pixelUrl = openPixelUrl(messageId);
   void greeting; // greeting wird via openingHtmlFor inline genutzt
   const bulletItems = c.bullets
     .map(
@@ -436,7 +459,7 @@ function buildHtmlVersion(
           <!-- CTA Button -->
           <tr>
             <td style="padding:24px 32px;text-align:center">
-              <a href="${escapeAttr(c.ctaUrl)}" style="display:inline-block;padding:14px 28px;background:${BRAND.primary};color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;letter-spacing:-0.01em;box-shadow:0 2px 8px rgba(124,58,237,0.35)">
+              <a href="${escapeAttr(ctaTracked)}" style="display:inline-block;padding:14px 28px;background:${BRAND.primary};color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;letter-spacing:-0.01em;box-shadow:0 2px 8px rgba(124,58,237,0.35)">
                 ${escapeHtml(c.ctaText)} →
               </a>
               <div style="margin-top:10px;font-size:12px;color:${BRAND.textMuted}">14 Tage gratis · keine Kreditkarte · jederzeit kündbar</div>
@@ -459,7 +482,7 @@ function buildHtmlVersion(
                     <div style="font-size:14px;font-weight:600;color:${BRAND.text}">David da Silva Gornik</div>
                     <div style="font-size:13px;color:${BRAND.textMuted};margin-top:2px">Founder · Spurig</div>
                     <div style="margin-top:10px;font-size:13px">
-                      <a href="${WEBSITE_URL}" style="color:${BRAND.primary};text-decoration:none;font-weight:600">spurig.com</a>
+                      <a href="${escapeAttr(websiteTracked)}" style="color:${BRAND.primary};text-decoration:none;font-weight:600">spurig.com</a>
                       <span style="color:${BRAND.border};margin:0 8px">·</span>
                       <a href="${LINKEDIN_URL}" style="color:${BRAND.primary};text-decoration:none;font-weight:600">LinkedIn</a>
                       <span style="color:${BRAND.border};margin:0 8px">·</span>
@@ -484,6 +507,9 @@ function buildHtmlVersion(
       </td>
     </tr>
   </table>
+
+  <!-- Open-Tracking-Pixel — eigene Pipeline, unabhaengig von Resend -->
+  <img src="${escapeAttr(pixelUrl)}" alt="" width="1" height="1" border="0" style="display:block;width:1px;height:1px;border:0;overflow:hidden">
 
 </body>
 </html>`;

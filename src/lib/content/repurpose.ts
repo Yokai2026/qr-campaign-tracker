@@ -31,7 +31,34 @@ export type GeneratedDraft = {
 // Blog extraction
 // ---------------------------------------------------------------------------
 
+/**
+ * Liest Blog-Post-Content. Erst DB (content_blogs), dann File-System (legacy).
+ * Importer nimmt service-Client via Lazy-Import um Circular-Deps zu vermeiden.
+ */
 export async function readBlogPost(slug: string): Promise<BlogContent | null> {
+  // 1) DB-Lookup (neue Ideen-basierte Posts)
+  try {
+    const { createServiceClient } = await import('@/lib/supabase/server');
+    const sb = await createServiceClient();
+    const { data: dbPost } = await sb
+      .from('content_blogs')
+      .select('slug, title, description, tags, body_md')
+      .eq('slug', slug)
+      .maybeSingle();
+    if (dbPost) {
+      return {
+        slug: dbPost.slug,
+        title: dbPost.title,
+        description: dbPost.description,
+        body: dbPost.body_md,
+        tags: dbPost.tags ?? [],
+      };
+    }
+  } catch {
+    // ignore, fall back to file
+  }
+
+  // 2) File-based (existing legacy blog posts in src/app/blog/<slug>/page.tsx)
   const meta = ARTICLES.find((a) => a.slug === slug);
   if (!meta) return null;
 

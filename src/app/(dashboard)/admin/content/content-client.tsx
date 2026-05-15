@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { IdeasBacklog } from './ideas-backlog';
 
 type Channel = 'linkedin' | 'twitter' | 'reddit';
 type Status = 'draft' | 'edited' | 'posted' | 'skipped';
@@ -120,12 +121,16 @@ export function ContentClient() {
         <Link href="/admin" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-3 w-3" /> Admin Center
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">Content-Repurposing</h1>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight">Content-Maschine</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Jeder Blog-Post wird mit Claude zu LinkedIn-Post + Twitter-Thread + Reddit-Post umgewandelt.
-          Du reviewst, editierst, copyst, postest manuell.
+          5 Themen-Pillars → Claude generiert Ideen → 1-Click → Full Blog + LinkedIn + Twitter + Reddit Drafts.
+          Du reviewst, postest, oder editierst alles manuell vorher.
         </p>
       </div>
+
+      <IdeasBacklog />
+
+      <h2 className="mb-3 text-base font-semibold tracking-tight">Blog-Posts mit Drafts</h2>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
