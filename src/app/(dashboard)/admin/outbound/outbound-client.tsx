@@ -202,13 +202,32 @@ export function OutboundClient() {
             Cold-Mail-Funnel · Open + Click + Reply Tracking via Resend Webhook
           </p>
         </div>
-        <button
-          onClick={refreshAll}
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-sm hover:bg-muted/50"
-        >
-          <RefreshCcw className="h-3.5 w-3.5" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={async () => {
+              const res = await fetch('/api/admin/outbound/backfill', { method: 'POST' });
+              const j = await res.json();
+              if (res.ok) {
+                alert(`Backfill: ${j.updated}/${j.checked} aus Resend nachgezogen.`);
+                refreshAll();
+              } else {
+                alert(`Backfill-Error: ${j.error ?? 'unknown'}`);
+              }
+            }}
+            title="Synced Status fuer Mails die VOR Webhook-Setup versendet wurden — oder bei Webhook-Aussetzern."
+            className="inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-sm text-amber-300 hover:bg-amber-500/20"
+          >
+            <RefreshCcw className="h-3.5 w-3.5" />
+            Resend-Sync
+          </button>
+          <button
+            onClick={refreshAll}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 text-sm hover:bg-muted/50"
+          >
+            <RefreshCcw className="h-3.5 w-3.5" />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Funnel-Cards */}
