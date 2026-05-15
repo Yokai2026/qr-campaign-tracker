@@ -589,16 +589,166 @@ Prüfe nach dem Schreiben:
 Wenn irgendwas davon fehlt — Text ist zu generisch. Spezifik einbauen.
 
 ==========================================
-IMAGE-PROMPT — CLICKBAIT-THUMBNAIL-STYLE
+IMAGE-PROMPT — VIRAL THUMBNAIL (KEIN STOCKFOTO)
 ==========================================
-Generiere einen ENGLISCHEN Image-Prompt (60-120 Worte) für einen Bild-Generator
-(ChatGPT/DALL-E 3 / Midjourney / Gemini Imagen).
+Generiere einen ENGLISCHEN Image-Prompt (80-130 Worte) für ChatGPT/DALL-E 3/
+Midjourney/Gemini Imagen.
 
-ZIEL: Ein THUMBNAIL das aussieht wie eine virale YouTube/LinkedIn-Vorschau.
-Nicht editorial-Fotografie. Nicht Stockfoto. Nicht "premium SaaS dashboard".
+═══════════════════════════════════════════
+KRITISCHES VERBOT — NIE GENERIEREN:
+═══════════════════════════════════════════
+Diese Image-Konzepte sind STANDARD-AI-FALLBACK und uniformlangweilig:
 
-ES SOLL HITTEN. Wenn jemand auf LinkedIn scrollt und das Bild sieht, soll er
-stoppen. Konkret. Visuell. Emotional. Mit einem Wow-Moment.
+  ✗ "Close-up portrait of a [marketing director] in [office], face expressing
+    shocked disbelief, staring at [papers/screen/laptop], lit by overhead lamp"
+  ✗ "Person at desk with laptop, dramatic chiaroscuro lighting"
+  ✗ "Marketing analyst reviewing dashboard, glasses reflecting screen"
+  ✗ "Tired/frustrated/shocked professional in dimly lit office at night"
+  ✗ "Business person looking at documents with worried expression"
+
+WENN dein Image-Prompt mit "Close-up portrait of a [age]-year-old [role]" anfängt
+ODER "Person at desk" enthält ODER "office lighting" als Hauptmotiv hat → FALSCH.
+NEU SCHREIBEN mit einem anderen Konzept.
+
+═══════════════════════════════════════════
+KONZEPT-AUSWAHL: ZWANG ZU VARIATION
+═══════════════════════════════════════════
+1) Lies den Blog-Hook nochmal.
+2) Frage dich: Was ist das KONKRETE Objekt / die KONKRETE Szene in der Story?
+   (Postkarten, Plakatwand, QR-Codes, Schredder, Server, Restaurant-Tisch,
+    Suitcase mit Daten, brennende Geldscheine, Papierberg, leere Plakatwand)
+3) Bildidee MUSS dieses Objekt ZENTRAL zeigen, nicht eine Person die darüber
+   nachdenkt.
+4) WAEHLE BEWUSST eine Konzept-Familie K2-K7 (NICHT K1). K1 nur wenn der Hook
+   explizit eine emotionale Reaktion eines Menschen ist.
+
+ZIEL: Wenn jemand auf LinkedIn scrollt und das Bild sieht, soll er stoppen.
+Konkret. Visuell. Emotional. Mit einem Wow-Moment. Wie ein YouTube-Thumbnail
+mit hoher CTR — nicht wie ein Stockfoto.
+
+═══════════════════════════════════════════
+ZIELSTIL: PHOTOJOURNALISMUS, NICHT INFOGRAFIK
+═══════════════════════════════════════════
+Stell dir vor, ein VICE-Magazin-Fotograf oder NATIONAL GEOGRAPHIC-Reporter
+fotografiert die Szene aus dem Blog-Hook. Gritty. Real. Physisch. Mit Tonwerten
+und Schmutz. Mit echten Objekten in echten Umgebungen.
+
+NIE: "visualization", "infographic", "icon", "chart", "graph", "diagram",
+"map representation", "stylized illustration", "symbolic representation"
+
+NIE: Etwas das aussieht wie aus einer McKinsey-Praesentation, einem SaaS-
+Marketing-Deck oder einem LinkedIn-Karussell. WIR WOLLEN PHOTO. ECHT. GRITTY.
+
+═══════════════════════════════════════════
+REFERENZ-STYLE — DEIN OUTPUT MUSS SO AUSSEHEN
+═══════════════════════════════════════════
+
+REF 1 — Money-Destruction (Hook "Budget verbrennt"):
+"A stack of 50 EUR bills mid-burn inside a rust-streaked industrial trash bin
+in a workshop yard, flames curling and blackening the paper edges, ash
+particles suspended in golden afternoon light filtering through a chain-link
+fence, a single half-burnt bill floating mid-air with the EU stars still
+visible, low-angle close-up shot at 30cm distance, harsh diagonal shadow
+across the rusty bin, shot on Canon EOS R5 24mm f/2.8, deep amber-and-
+charcoal color grade, photorealistic gritty documentary style, no text
+visible, no logos visible."
+
+REF 2 — Wrong-Context-Object (Hook "deine Mailings landen im Muell"):
+"Aerial top-down 90 degree shot of approximately 500 unopened glossy A5
+postcards thrown into an open household kitchen trash bin among coffee
+grounds, eggshells, orange peels, and crumpled receipts, harsh fluorescent
+overhead kitchen light, a single housefly hovering above one card, shot on
+Sony A7R V 35mm f/4 from directly above on a tripod, high-contrast pure
+white postcard backs against dark organic waste, sharp focus throughout, no
+text visible, no logos visible, photorealistic editorial documentary style."
+
+REF 3 — Macro-Detail (Hook "QR-Code zu klein auf Plakat"):
+"Extreme close-up macro shot of a single tiny QR code printed on the bottom
+corner of a weathered Berlin street poster, paper fibers and ink bleed
+visible, raindrops on the surface, deep depth of field revealing the empty
+urban underpass behind the poster in soft bokeh, single overhead sodium-
+vapor street lamp casting orange-amber light, shot on Sony 100mm macro
+lens f/8 from 5cm distance, high contrast between the tiny black QR squares
+and the pale wet poster paper, no text visible (other than the QR code
+itself), no logos visible."
+
+REF 4 — Data-Metaphor (Hook "Daten ueber den Atlantik"):
+"An open vintage leather suitcase tipped sideways on a foggy tarmac at dusk,
+hundreds of small printed photos of anonymous faces spilling out across the
+wet concrete, a transatlantic cargo plane visible in the deep-blue distance
+taking off, harsh single industrial floodlight casting a long diagonal
+shadow, the suitcase has 'BL Inc.' stenciled in faded white on its side,
+shot low-angle on Canon R5 35mm f/2.8, deep-blue-hour with single warm-
+amber light source, cinematic documentary style, no text visible (other
+than the stenciled side), no logos visible."
+
+REF 5 — High-Emotion-Moment (Hook "Founder-Story"):
+"A bearded man in his early 30s sitting cross-legged on the dusty concrete
+floor of a completely empty office space at 2am, an open laptop balanced
+on his lap showing a single red analytics line dropping to zero, head in
+one hand, single overturned coffee mug beside him with a small puddle, one
+warm desk lamp casting his long shadow across the bare floor, broken
+ceiling tiles visible above, shot low-angle 25cm from the floor on Leica
+M11 28mm f/1.4, warm tungsten color grade against deep navy shadows,
+cinematic chiaroscuro, no text visible, no logos visible."
+
+═══════════════════════════════════════════
+HARTE VERBOTSLISTE — DIESE WORTE NICHT IN DEN PROMPT
+═══════════════════════════════════════════
+Wenn dein image-Prompt EINES dieser Worte enthält, IST ER FALSCH. Neu schreiben.
+
+  ✗ "visualization", "infographic", "data visualization", "stylized chart"
+  ✗ "icons", "icon", "symbolic representation", "abstract representation"
+  ✗ "diagram", "chart", "graph", "bar chart", "stacked bar"
+  ✗ "minimalist", "clean modern", "professional photography style"
+  ✗ "corporate", "business", "marketing context", "marketing analytics"
+  ✗ "modern office", "boardroom", "conference table", "meeting room"
+  ✗ "stock-photo", "editorial photography" (alleinstehend, zu vage)
+  ✗ "Cartoon", "illustration", "isometric", "3D-render", "flat-design"
+  ✗ "Person standing/sitting/looking" als einzige Aktion (zu vage)
+  ✗ "Mountains/cityscape/skyline" als Hauptmotiv (zu generisch)
+  ✗ "Split-screen visual metaphor" (zu konzeptionell, zu LinkedIn-Karussell)
+  ✗ "Map of Germany" / "geographic representation" (zu Infografik)
+  ✗ "Server racks" als sterile Tech-Visualisierung (nur in echter
+    photorealistischer Umgebung mit Drama erlaubt)
+
+═══════════════════════════════════════════
+PFLICHT-ELEMENTE — MIND. 3 davon im Prompt
+═══════════════════════════════════════════
+Das Bild MUSS mindestens 3 dieser Elemente enthalten:
+
+  PHYSISCHE-AKTION/-ZUSTAND:
+    fire crackling, smoke wisp, ash, charred, burning, melting,
+    torn paper mid-tear, ripped edges, paper shredder mid-action,
+    falling coins/bills, scattered documents,
+    crumpled paper, mountainous pile of paperwork,
+    submerged, soaked, water damage, mud, dust cloud,
+    sealed envelope being torn, postcards mid-flight,
+    glass shattering, bottle exploding,
+    overflowing trash bin, dumpster, garbage truck
+
+  DRAMATIC-LIGHT:
+    "harsh single overhead spotlight cutting through darkness",
+    "low-angle dramatic backlight",
+    "neon-orange flame illumination",
+    "blue police-light strobe effect",
+    "single beam of light through warehouse window dust",
+    "golden hour rim light through fog"
+
+  SATURIERTE-FARB-CONTRAST:
+    "deep red against pale blue",
+    "neon orange against charcoal black",
+    "electric cyan against blood red",
+    "hazard yellow against deep navy",
+    "burnt orange against forest green"
+
+  KAMERA-WINKEL (NICHT eye-level):
+    "extreme top-down aerial 90 degrees", "worm's-eye low-angle 15cm above ground",
+    "macro shot 5cm distance", "dutch tilt 30 degrees", "fisheye lens 14mm"
+
+  CAMERA-SPEC (Pflicht):
+    "shot on Canon EOS R5 24mm f/2.8", "Sony A7R V 100mm macro f/4",
+    "Hasselblad H6D 80mm f/4", "RED Komodo cinema camera 35mm"
 
 ----------------------------------------
 WAS EIN CATCHY THUMBNAIL HAT (alle 7 Punkte einbauen)
@@ -729,17 +879,55 @@ PFLICHT-ATTRIBUTE FUER JEDEN PROMPT (alle 8 erfüllen)
           haessliche Buchstaben
 
 ----------------------------------------
-PILLAR → KONZEPT-EMPFEHLUNG
+PILLAR → KONZEPT-PFLICHT (K1 fast immer verboten)
 ----------------------------------------
 
-- DSGVO/Privacy: K6 (Physical-Metaphor-for-Data) ODER K1 (Human-Reaction)
-- Offline-ROI: K2 (Money-Destruction) ODER K3 (Object-in-wrong-context)
-- QR-Practices: K5 (Macro-visible-detail) ODER K3 (Object-in-context)
-- Attribution: K4 (Split-screen) ODER K3 (Object-in-context)
-- Behind-Scenes: K7 (High-emotion-moment) ODER K1 (Human-Reaction)
+- DSGVO/Privacy:   K6 (Daten-Metapher: Suitcase, Flugzeug, Atlantik, Server-Raum)
+                   ODER K3 (Object-in-wrong-context: Akten in Karton "Air Freight USA")
+                   K1 NUR wenn Blog explizit ueber Anwalt-Gespraech / Compliance-Officer
 
-ABER: lies zuerst den Hook deines Blogs und überleg welches Konzept am
-staerksten zum konkreten Bild passt. Pillar-Empfehlung ist nur Default.
+- Offline-ROI:     K2 (Money-Destruction: brennende Geldscheine, Schredder, Asche)
+                   ODER K3 (Object-in-wrong-context: Plakat im Mülleimer, Flyer auf
+                   Schrottplatz, Postkarten in Reisswolf)
+                   K1 verboten — wer Geld brennt, sieht man brennen, nicht traurig sein
+
+- QR-Practices:    K5 (Macro-detail: einzelner QR auf riesiger Plakatwand, riesiger
+                   QR mit Logo-Mitte aufgerissen, QR auf Wäsche-Etikett, QR-Tattoo)
+                   ODER K3 (QR-Code in absurder Umgebung: auf Berg, auf Eisberg,
+                   unter Wasser, auf Pizza)
+
+- Attribution:     K4 (Split-Screen: chaotische Spuren links / saubere Daten rechts)
+                   ODER K3 (Detektiv-Lupe ueber Pinwand mit roten Faeden)
+                   ODER K6 (Datenstrom als physisches Objekt)
+
+- Behind-Scenes:   K7 (High-emotion-moment: Founder auf Boden um 2 Uhr nachts)
+                   K1 erlaubt — aber dann SEHR konkret und mit Wow-Detail
+
+K1 (Human-Reaction-Closeup) ist die LETZTE Option. Wenn du sie waehlst, MUSS
+das Bild ein massives Wow-Detail haben (z.B. ein einzelner brennender Geldschein
+in der Hand, eine Plakatwand komplett leer hinter der Person, etc.) — kein
+"Mann starrt auf Laptop".
+
+═══════════════════════════════════════════
+KONZEPT-DIVERSITY-CHECK
+═══════════════════════════════════════════
+Wenn der Output beginnen wuerde mit "Close-up portrait" oder "Person at desk" —
+STOP. Schreibe das Image-Prompt mit einem K2/K3/K5/K6 Konzept neu.
+
+Beispiel: Blog ueber "Sanitaerbetrieb verschickt 500 Postkarten — 0 Anfragen".
+  - SCHLECHT (K1): "Close-up portrait of a 50-year-old plumber, face expressing
+    disbelief, staring at postcards on desk."
+  - GUT (K3): "Aerial top-down shot of 500 unopened printed postcards thrown
+    into a large industrial paper shredder, mid-action, golden afternoon light
+    streaming through warehouse windows, paper scraps and dust particles
+    suspended in beams of light, deep red shredder housing contrasting against
+    pale-yellow postcards, shot from directly above on Hasselblad H6D 80mm
+    f/4, photorealistic editorial style, no text visible, no logos visible."
+  - GUT (K2): "Stack of 500 colorful A5 postcards burning in an industrial
+    metal trash bin in a workshop yard, flames curling paper edges, ash
+    floating in golden hour rays, dropped clipboard with marketing-budget
+    spreadsheet visible foreground, shot low-angle on Canon EOS R5 24mm f/2.8,
+    saturated orange-and-blue color grade, no text visible, no logos visible."
 
 ----------------------------------------
 VERBOTEN IM IMAGE-PROMPT
