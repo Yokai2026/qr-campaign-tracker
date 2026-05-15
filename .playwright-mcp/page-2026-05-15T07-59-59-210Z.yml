@@ -1,0 +1,26 @@
+- generic [active] [ref=e1]:
+  - link "Zum Inhalt springen" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - img "Spurig" [ref=e8]
+        - generic [ref=e9]: Willkommen zurück
+        - generic [ref=e10]: Melde dich an, um deine Kampagnen zu verwalten.
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - generic [ref=e14]: Benutzername oder E-Mail
+            - textbox "Benutzername oder E-Mail" [ref=e15]:
+              - /placeholder: name@beispiel.de oder benutzername
+          - generic [ref=e16]:
+            - generic [ref=e17]: Passwort
+            - textbox "Passwort" [ref=e18]
+          - button "Anmelden" [ref=e19]
+        - paragraph [ref=e20]:
+          - text: Noch kein Konto?
+          - link "14 Tage kostenlos testen" [ref=e21] [cursor=pointer]:
+            - /url: /signup
+    - paragraph [ref=e22]:
+      - link "← Zurück zur Startseite" [ref=e23] [cursor=pointer]:
+        - /url: /

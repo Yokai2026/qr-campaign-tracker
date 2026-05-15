@@ -110,3 +110,4 @@ NO people, NO 3D, NO cartoon.
 4. Test-Mail senden → in Gmail prüfen wie's wirkt.
 # pipeline activation marker Fri May 15 09:47:56     2026
 # trigger redeploy for RESEND_API_KEY Fri May 15 09:53:55     2026
+# pipeline limits adjusted Fri May 15 10:00:49     2026

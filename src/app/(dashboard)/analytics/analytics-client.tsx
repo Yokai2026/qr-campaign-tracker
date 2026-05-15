@@ -702,13 +702,22 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         </div>
       ) : (
         <>
-          {/* Reichweite — wie viele Aufrufe, wie viele echte Besucher */}
-          <section className="space-y-3">
-            <div>
-              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Reichweite</h2>
-              <p className="mt-0.5 text-[13px] text-muted-foreground">Wie oft wurden deine Codes und Links aufgerufen</p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
+          {/* 01 — Überblick: Reichweite + (conditional) Engagement zusammengefasst.
+              Statt zwei separater Sections direkt nebeneinander mit doppeltem Header
+              wird hier eine einheitliche "Überblick"-Section gerendert — die zwei
+              KPI-Gruppen werden durch einen Untertitel ("Reichweite" / "Engagement")
+              getrennt, nicht durch zwei volle Section-Header. */}
+          <section className="space-y-4 scroll-mt-24" aria-labelledby="section-uebersicht">
+            <AnalyticsSectionHeader
+              step="01 · Überblick"
+              title="Reichweite & Engagement"
+              description="Wie oft wurden deine Codes und Links aufgerufen und was tun Besucher danach"
+            />
+            <div className="space-y-2">
+              <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                Reichweite
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 stagger-children">
               <KPIStatCard
                 label="Aufrufe gesamt"
                 value={kpis.totalOpens}
@@ -755,7 +764,47 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                 deltaLabel="vs. Vorperiode"
                 onClick={() => setDrillDown('unique')}
               />
+              </div>
             </div>
+
+            {/* Engagement — Sub-Block der Überblick-Section, nur wenn Landing-Page-Tracking aktiv. */}
+            {(kpis.ctaClicks > 0 || kpis.formSubmits > 0) && (
+              <div className="space-y-2 pt-1">
+                <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                  Engagement auf der Zielseite
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
+                  <KPIStatCard
+                    label="CTA-Klicks"
+                    value={kpis.ctaClicks}
+                    icon={MousePointerClick}
+                    subtext="Klicks auf der Zielseite"
+                    hint="Klicks auf Buttons/Links auf deiner Zielseite (via Tracking-Script)."
+                    delta={deltas.ctaClicks}
+                    deltaLabel="vs. Vorperiode"
+                  />
+                  <KPIStatCard
+                    label="Formular-Abschlüsse"
+                    value={kpis.formSubmits}
+                    icon={FileText}
+                    subtext={kpis.formSubmits ? `${formRate}% der Besucher` : 'Noch keine Abschlüsse'}
+                    hint="Gesendete Formulare auf der Zielseite (z. B. Anmeldungen, Kontakte)."
+                    delta={deltas.formSubmits}
+                    deltaLabel="vs. Vorperiode"
+                  />
+                  <KPIStatCard
+                    label="Conversion-Rate"
+                    value={`${conversionRate}%`}
+                    icon={ArrowUpRight}
+                    subtext="CTA-Klicks ÷ Aufrufe"
+                    hint="Anteil der Aufrufe, die zu einer CTA-Aktion geführt haben."
+                    delta={deltas.conversionRate}
+                    deltaLabel="vs. Vorperiode"
+                  />
+                </div>
+              </div>
+            )}
+
             <ReachDetailDialog
               scope={drillDown}
               dateFrom={dateFrom}
@@ -772,118 +821,125 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             )}
           </section>
 
-          {/* Engagement — nur anzeigen wenn Landing-Page-Tracking aktiv */}
-          {(kpis.ctaClicks > 0 || kpis.formSubmits > 0) && (
-            <section className="space-y-3">
-              <div>
-                <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Engagement</h2>
-                <p className="mt-0.5 text-[13px] text-muted-foreground">Was die Besucher auf der Zielseite tun</p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
-                <KPIStatCard
-                  label="CTA-Klicks"
-                  value={kpis.ctaClicks}
-                  icon={MousePointerClick}
-                  subtext="Klicks auf der Zielseite"
-                  hint="Klicks auf Buttons/Links auf deiner Zielseite (via Tracking-Script)."
-                  delta={deltas.ctaClicks}
-                  deltaLabel="vs. Vorperiode"
-                />
-                <KPIStatCard
-                  label="Formular-Abschlüsse"
-                  value={kpis.formSubmits}
-                  icon={FileText}
-                  subtext={kpis.formSubmits ? `${formRate}% der Besucher` : 'Noch keine Abschlüsse'}
-                  hint="Gesendete Formulare auf der Zielseite (z. B. Anmeldungen, Kontakte)."
-                  delta={deltas.formSubmits}
-                  deltaLabel="vs. Vorperiode"
-                />
-                <KPIStatCard
-                  label="Conversion-Rate"
-                  value={`${conversionRate}%`}
-                  icon={ArrowUpRight}
-                  subtext="CTA-Klicks ÷ Aufrufe"
-                  hint="Anteil der Aufrufe, die zu einer CTA-Aktion geführt haben."
-                  delta={deltas.conversionRate}
-                  deltaLabel="vs. Vorperiode"
-                />
-              </div>
-            </section>
-          )}
-
-          {/* Analyse — Charts */}
-          <section className="space-y-3">
-            <div>
-              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Analyse</h2>
-              <p className="mt-0.5 text-[13px] text-muted-foreground">Zeitverlauf, Kampagnen und Geräteverteilung</p>
-            </div>
-          <ChartTransition transitionKey={chartTransitionKey}>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <ChartCard title="QR-Scans & Link-Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum" className="lg:col-span-2">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={timeSeriesData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
-                  <CartesianGrid {...GRID_STYLE} />
-                  <XAxis
-                    dataKey="date"
-                    {...AXIS_STYLE}
-                    tickFormatter={(d: string) => {
-                      const date = new Date(d);
-                      return date.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
-                    }}
-                    minTickGap={24}
-                  />
-                  <YAxis {...AXIS_STYLE} allowDecimals={false} />
-                  <Tooltip
-                    contentStyle={TOOLTIP_STYLE}
-                    cursor={{ stroke: 'var(--border)', strokeWidth: 1 }}
-                    labelFormatter={(d) =>
-                      typeof d === 'string'
-                        ? new Date(d).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long', year: 'numeric' })
-                        : String(d ?? '')
-                    }
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
-                  <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartCard>
-
-            <ChartCard title="Aufrufe pro Kampagne" empty={campaignData.length === 0}>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={campaignData} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-                  <CartesianGrid {...GRID_STYLE} horizontal={false} />
-                  <XAxis type="number" {...AXIS_STYLE} allowDecimals={false} />
-                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={90} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--muted)' }} />
-                  <Bar dataKey="opens" name="Aufrufe" fill={SERIES_COLORS.scans} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartCard>
-
-            <ChartCard title="Gerätetypen" empty={deviceData.length === 0}>
-              <ResponsiveContainer width="100%" height={280}>
-                <PieChart>
-                  <Pie data={deviceData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
-                    {deviceData.map((_, idx) => (
-                      <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={TOOLTIP_STYLE} />
-                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartCard>
-          </div>
-          </ChartTransition>
+          {/* 02 — Verlauf: Zeitreihen-Chart als eigener Block. Volle Breite,
+              ohne Konkurrenz durch andere Charts — das ist DER Trend-Indikator. */}
+          <section className="space-y-4 scroll-mt-24" aria-labelledby="section-verlauf">
+            <AnalyticsSectionHeader
+              step="02 · Verlauf"
+              title="Aufrufe im Zeitverlauf"
+              description="QR-Scans und Link-Klicks Tag für Tag — erkenne Spitzen, Wochen-Muster und Kampagnen-Effekte"
+            />
+            <ChartTransition transitionKey={chartTransitionKey}>
+              <ChartCard title="QR-Scans & Link-Klicks über Zeit" empty={timeSeriesData.length === 0} emptyText="Keine Daten im gewählten Zeitraum">
+                <ResponsiveContainer width="100%" height={320}>
+                  <LineChart data={timeSeriesData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+                    <CartesianGrid {...GRID_STYLE} />
+                    <XAxis
+                      dataKey="date"
+                      {...AXIS_STYLE}
+                      tickFormatter={(d: string) => {
+                        const date = new Date(d);
+                        return date.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+                      }}
+                      minTickGap={24}
+                    />
+                    <YAxis {...AXIS_STYLE} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={TOOLTIP_STYLE}
+                      cursor={{ stroke: 'var(--border)', strokeWidth: 1 }}
+                      labelFormatter={(d) =>
+                        typeof d === 'string'
+                          ? new Date(d).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long', year: 'numeric' })
+                          : String(d ?? '')
+                      }
+                    />
+                    <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+                    <Line type="monotone" dataKey="qr" name="QR-Scans" stroke={SERIES_COLORS.scans} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                    <Line type="monotone" dataKey="link" name="Link-Klicks" stroke={SERIES_COLORS.clicks} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </ChartTransition>
           </section>
 
-          {/* Zeiten — Stunden + Wochentage + Peak-Slot */}
-          <section className="space-y-3">
-            <div>
-              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Zeiten</h2>
-              <p className="mt-0.5 text-[13px] text-muted-foreground">Wann Aufrufe stattfinden — nach Stunde, Wochentag und Peak-Slot</p>
-            </div>
+          {/* 03 — Performance: Was läuft? Kampagnen-Ranking + Top-Platzierungen
+              gehören thematisch zusammen (beide beantworten "wer/was zieht Aufrufe").
+              Früher waren sie zwei weit entfernte Blöcke — jetzt nebeneinander. */}
+          <section className="space-y-4 scroll-mt-24" aria-labelledby="section-performance">
+            <AnalyticsSectionHeader
+              step="03 · Performance"
+              title="Was läuft am besten"
+              description="Top-Kampagnen und Top-Platzierungen im gewählten Zeitraum"
+            />
+            <ChartTransition transitionKey={chartTransitionKey + '-perf'}>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <ChartCard title="Aufrufe pro Kampagne" empty={campaignData.length === 0} emptyText="Keine Kampagnen-Daten">
+                  <ResponsiveContainer width="100%" height={Math.max(240, campaignData.length * 36)}>
+                    <BarChart data={campaignData} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+                      <CartesianGrid {...GRID_STYLE} horizontal={false} />
+                      <XAxis type="number" {...AXIS_STYLE} allowDecimals={false} />
+                      <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={90} />
+                      <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--muted)' }} />
+                      <Bar dataKey="opens" name="Aufrufe" fill={SERIES_COLORS.scans} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+
+                <ChartCard title="Top-Platzierungen" empty={placementData.length === 0} emptyText="Noch keine Scan-Daten">
+                  {/* Desktop: table with 4 columns */}
+                  <div className="hidden sm:block">
+                    <DataTableShell>
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
+                            <TableHead className="text-[12px] font-medium text-muted-foreground">#</TableHead>
+                            <TableHead className="text-[12px] font-medium text-muted-foreground">Platzierung</TableHead>
+                            <TableHead className="text-[12px] font-medium text-muted-foreground">Standort</TableHead>
+                            <TableHead className="text-right text-[12px] font-medium text-muted-foreground">Scans</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {placementData.map((p, i) => (
+                            <TableRow key={i} className="border-b border-border/60 transition-colors">
+                              <TableCell className="text-[13px] text-muted-foreground">{i + 1}</TableCell>
+                              <TableCell className="text-[13px] font-medium">{p.name}</TableCell>
+                              <TableCell className="text-[13px] text-muted-foreground">{p.location}</TableCell>
+                              <TableCell className="text-right text-[13px] font-semibold tabular-nums">{p.opens}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </DataTableShell>
+                  </div>
+                  {/* Mobile: card-list — readable without horizontal scroll */}
+                  <ul className="divide-y divide-border/60 sm:hidden">
+                    {placementData.map((p, i) => (
+                      <li key={i} className="flex items-center gap-3 py-3">
+                        <span className="tabular-nums flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-[12px] font-semibold text-muted-foreground">
+                          {i + 1}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-[13px] font-medium">{p.name}</div>
+                          {p.location && (
+                            <div className="mt-0.5 truncate text-[11.5px] text-muted-foreground">{p.location}</div>
+                          )}
+                        </div>
+                        <span className="tabular-nums text-[14px] font-semibold">{p.opens}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </ChartCard>
+              </div>
+            </ChartTransition>
+          </section>
+
+          {/* 04 — Zeitmuster: Stunden + Wochentage + Peak-Slot */}
+          <section className="space-y-4 scroll-mt-24" aria-labelledby="section-zeitmuster">
+            <AnalyticsSectionHeader
+              step="04 · Zeitmuster"
+              title="Wann Besucher aktiv sind"
+              description="Verteilung nach Tagesstunde, Wochentag und stärkster Aktivitätsphase"
+            />
             <ChartTransition transitionKey={chartTransitionKey + '-times'}>
             <div className="grid gap-4 lg:grid-cols-2">
               <ChartCard title="Verteilung über Tagesstunden" empty={hourlyData.every((h) => h.qr === 0 && h.link === 0)} emptyText="Keine Aufrufe im gewählten Zeitraum" className="lg:col-span-2">
@@ -943,65 +999,85 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
             </ChartTransition>
           </section>
 
-          {/* Technik — Browser & Betriebssystem */}
-          <section className="space-y-3">
-            <div>
-              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Technik</h2>
-              <p className="mt-0.5 text-[13px] text-muted-foreground">Welche Browser und Betriebssysteme deine Besucher nutzen</p>
-            </div>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <ChartCard title="Browser" empty={browserData.length === 0}>
-              <ResponsiveContainer width="100%" height={280}>
-                <PieChart>
-                  <Pie data={browserData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
-                    {browserData.map((_, idx) => (
-                      <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={TOOLTIP_STYLE} />
-                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartCard>
+          {/* 05 — Publikum: Geräte + Browser + OS zusammen in einer Section.
+              Vorher war "Gerätetypen" allein in "Analyse" und Browser/OS in "Technik" —
+              das war thematisch dasselbe ("wer ruft auf"). Jetzt 3-Spalten-Pies. */}
+          <section className="space-y-4 scroll-mt-24" aria-labelledby="section-publikum">
+            <AnalyticsSectionHeader
+              step="05 · Publikum"
+              title="Wer ruft auf"
+              description="Geräte, Browser und Betriebssysteme deiner Besucher"
+            />
+            <div className="grid gap-4 lg:grid-cols-3">
+              <ChartCard title="Gerätetypen" empty={deviceData.length === 0}>
+                <ResponsiveContainer width="100%" height={260}>
+                  <PieChart>
+                    <Pie data={deviceData} cx="50%" cy="50%" outerRadius={86} innerRadius={52} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
+                      {deviceData.map((_, idx) => (
+                        <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={TOOLTIP_STYLE} />
+                    <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
 
-            <ChartCard title="Betriebssystem" empty={osData.length === 0}>
-              <ResponsiveContainer width="100%" height={280}>
-                <PieChart>
-                  <Pie data={osData} cx="50%" cy="50%" outerRadius={92} innerRadius={56} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
-                    {osData.map((_, idx) => (
-                      <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={TOOLTIP_STYLE} />
-                  <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartCard>
-          </div>
+              <ChartCard title="Browser" empty={browserData.length === 0}>
+                <ResponsiveContainer width="100%" height={260}>
+                  <PieChart>
+                    <Pie data={browserData} cx="50%" cy="50%" outerRadius={86} innerRadius={52} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
+                      {browserData.map((_, idx) => (
+                        <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={TOOLTIP_STYLE} />
+                    <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+
+              <ChartCard title="Betriebssystem" empty={osData.length === 0}>
+                <ResponsiveContainer width="100%" height={260}>
+                  <PieChart>
+                    <Pie data={osData} cx="50%" cy="50%" outerRadius={86} innerRadius={52} dataKey="value" nameKey="name" label={false} stroke="var(--card)" strokeWidth={2} paddingAngle={1.5}>
+                      {osData.map((_, idx) => (
+                        <Cell key={idx} fill={CHART_PALETTE[idx % CHART_PALETTE.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={TOOLTIP_STYLE} />
+                    <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} iconType="circle" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
           </section>
 
-          {/* Geo: Scans by Country */}
-          {(countryData.length > 0 || unknownCountryCount > 0) && (
-            <section className="space-y-3">
-              <div>
-                <h2 className="text-[15px] font-semibold tracking-tight text-foreground">Geografie</h2>
-                <p className="mt-0.5 text-[13px] text-muted-foreground">Woher deine Besucher kommen</p>
-              </div>
+          {/* 06 — Herkunft: Wo kommen die Besucher her? Geo (Land, Karte) + Referrer
+              (Verweis-URLs) gehören thematisch zusammen. Vorher waren Geo eine Section
+              und Referrer ein standalone-Chart-Card ohne Section-Header → unfertig wirkend. */}
+          {(countryData.length > 0 || unknownCountryCount > 0 || referrerData.length > 0) && (
+            <section className="space-y-4 scroll-mt-24" aria-labelledby="section-herkunft">
+              <AnalyticsSectionHeader
+                step="06 · Herkunft"
+                title="Wo kommen Aufrufe her"
+                description="Geografische Verteilung und Verweis-Quellen (Referrer)"
+              />
 
               {countryData.length > 0 ? (
                 <div className="grid gap-4 lg:grid-cols-2">
-                  <ChartCard title="Weltkarte" className="lg:col-span-1">
+                  <ChartCard title="Weltkarte">
                     <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
                       <Globe className="h-3.5 w-3.5" />
                       Geografische Verteilung der Aufrufe
                     </div>
                     <WorldMap data={countryData} />
                   </ChartCard>
-                  <ChartCard title="Aufrufe nach Land" className="lg:col-span-1">
+                  <ChartCard title="Aufrufe nach Land">
                     <CountryChart data={countryData} />
                   </ChartCard>
                 </div>
-              ) : (
+              ) : unknownCountryCount > 0 ? (
                 <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-6 text-center">
                   <Globe className="mx-auto h-6 w-6 text-muted-foreground/60" />
                   <p className="mt-2 text-[13.5px] font-semibold">Noch keine Länder-Daten</p>
@@ -1009,6 +1085,24 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                     Sobald Aufrufe von echten Besuchern über das Internet eingehen, erscheinen hier Weltkarte und Länder-Statistik.
                   </p>
                 </div>
+              ) : null}
+
+              {referrerData.length > 0 && (
+                <ChartCard title="Top-Referrer">
+                  <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                    Externe Seiten, von denen Besucher zu deinen Links kamen
+                  </div>
+                  <ResponsiveContainer width="100%" height={Math.max(200, referrerData.length * 38)}>
+                    <BarChart data={referrerData} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+                      <CartesianGrid {...GRID_STYLE} horizontal={false} />
+                      <XAxis type="number" {...AXIS_STYLE} />
+                      <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={110} />
+                      <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--muted)' }} />
+                      <Bar dataKey="value" name="Klicks" fill={SERIES_COLORS.clicks} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartCard>
               )}
 
               {unknownCountryCount > 0 && (
@@ -1023,75 +1117,39 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               )}
             </section>
           )}
-
-          {/* Referrer Chart */}
-          {referrerData.length > 0 && (
-            <ChartCard title="Top-Referrer" className="lg:col-span-1">
-              <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
-                <ArrowUpRight className="h-3.5 w-3.5" />
-                Woher die Besucher kommen
-              </div>
-              <ResponsiveContainer width="100%" height={Math.max(200, referrerData.length * 38)}>
-                <BarChart data={referrerData} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-                  <CartesianGrid {...GRID_STYLE} horizontal={false} />
-                  <XAxis type="number" {...AXIS_STYLE} />
-                  <YAxis dataKey="name" type="category" {...AXIS_STYLE} width={110} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--muted)' }} />
-                  <Bar dataKey="value" name="Klicks" fill={SERIES_COLORS.clicks} radius={[0, 6, 6, 0]} maxBarSize={BAR_MAX_SIZE} />
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartCard>
-          )}
-
-          {/* Top Placements — Table on desktop, Card-List on mobile */}
-          <ChartCard title="Top-Platzierungen" empty={placementData.length === 0} emptyText="Noch keine Scan-Daten">
-            {/* Desktop: table with 4 columns */}
-            <div className="hidden sm:block">
-              <DataTableShell>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
-                      <TableHead className="text-[12px] font-medium text-muted-foreground">#</TableHead>
-                      <TableHead className="text-[12px] font-medium text-muted-foreground">Platzierung</TableHead>
-                      <TableHead className="text-[12px] font-medium text-muted-foreground">Standort</TableHead>
-                      <TableHead className="text-right text-[12px] font-medium text-muted-foreground">Scans</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {placementData.map((p, i) => (
-                      <TableRow key={i} className="border-b border-border/60 transition-colors">
-                        <TableCell className="text-[13px] text-muted-foreground">{i + 1}</TableCell>
-                        <TableCell className="text-[13px] font-medium">{p.name}</TableCell>
-                        <TableCell className="text-[13px] text-muted-foreground">{p.location}</TableCell>
-                        <TableCell className="text-right text-[13px] font-semibold tabular-nums">{p.opens}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </DataTableShell>
-            </div>
-
-            {/* Mobile: card-list — readable without horizontal scroll */}
-            <ul className="divide-y divide-border/60 sm:hidden">
-              {placementData.map((p, i) => (
-                <li key={i} className="flex items-center gap-3 py-3">
-                  <span className="tabular-nums flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-[12px] font-semibold text-muted-foreground">
-                    {i + 1}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-[13px] font-medium">{p.name}</div>
-                    {p.location && (
-                      <div className="mt-0.5 truncate text-[11.5px] text-muted-foreground">{p.location}</div>
-                    )}
-                  </div>
-                  <span className="tabular-nums text-[14px] font-semibold">{p.opens}</span>
-                </li>
-              ))}
-            </ul>
-          </ChartCard>
         </>
       )}
     </div>
+  );
+}
+
+/** Strukturierter Section-Header mit Eyebrow-Nummer, Titel und Beschreibung.
+    Schafft visuelle Hierarchie zwischen den Analytics-Bloecken — der User
+    sieht auf einen Blick "wo bin ich" und kann scannen. */
+function AnalyticsSectionHeader({
+  step,
+  title,
+  description,
+  action,
+}: {
+  step: string;
+  title: string;
+  description: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <header className="flex flex-col gap-2 border-b border-border/60 pb-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+      <div className="min-w-0">
+        <div className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand/80">
+          {step}
+        </div>
+        <h2 className="mt-1 text-[17px] font-semibold tracking-tight text-foreground sm:text-[18px]">
+          {title}
+        </h2>
+        <p className="mt-0.5 text-[12.5px] text-muted-foreground">{description}</p>
+      </div>
+      {action && <div className="shrink-0">{action}</div>}
+    </header>
   );
 }
 

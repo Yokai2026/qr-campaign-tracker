@@ -1,7 +1,10 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { requireAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { PrivacyBadge } from '@/components/shared/privacy-badge';
 import { LiveScanFeed } from '@/components/shared/live-scan-feed';
 import { Tour } from '@/components/onboarding/tour';
@@ -41,11 +44,13 @@ export default async function DashboardPage() {
   const showTour = tourProfile?.tour_completed_at === null;
 
   return (
-    <div className="space-y-6 animate-in-card">
+    <div className="space-y-8 animate-in-card">
       {showTour && <Tour username={tourProfile?.username ?? profile.display_name ?? null} autoStart={true} />}
-      {/* Header */}
+      {/* Header — primaerer CTA rechts neben PrivacyBadge: User landet hier
+          und soll direkt sehen wie er eine neue Kampagne startet, ohne erst
+          in die Sidebar greifen zu muessen. */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-[22px] font-semibold tracking-[-0.015em] sm:text-[26px]">
             Willkommen, {profile.display_name || profile.email}
           </h1>
@@ -53,7 +58,13 @@ export default async function DashboardPage() {
             Übersicht deiner QR-Kampagnen
           </p>
         </div>
-        <PrivacyBadge />
+        <div className="flex items-center gap-2 sm:shrink-0">
+          <PrivacyBadge />
+          <Button variant="brand" size="sm" render={<Link href="/campaigns/new" />}>
+            <Plus className="mr-1.5 h-3.5 w-3.5" />
+            Neue Kampagne
+          </Button>
+        </div>
       </div>
 
       {/* Attention — conditional, nach ganz oben: wenn was brennt soll
