@@ -181,21 +181,40 @@ ${blog.body.slice(0, 6000)}
   if (channel === 'linkedin') {
     return `${base}
 
-Generiere einen LinkedIn-Post (deutsch, du-Form, 800-1300 Zeichen) der den Blog-Inhalt SOCIAL-MEDIA-tauglich rueberbringt — Schlagzeile-Hook, Lehr-Story, Diskussion-Ende.
+Generiere einen LinkedIn-Post (deutsch, du-Form, 900-1400 Zeichen) der LinkedIn-Algorithmus liebt — Stop-Scroll-Hook, persoenliche Lern-Story, MASSIVE Diskussions-Provokation.
 
-Format-Anforderungen:
-1) **Zeile 1 = Wow-Hook (max 100 Zeichen)** — eines davon:
-   - Konkrete Zahl die schockt ("40% der Werbebudgets verbrennen unsichtbar")
-   - Pattern-Break ("Bitly ist 2026 ein DSGVO-Problem. Hier was passierte als wir wechselten:")
-   - Konkrete persoenliche Behauptung ("Ich habe 6 Wochen ein Plakat getrackt. Das Ergebnis hat mich umgehauen.")
-   - Frage die der Leser sich nie gestellt hat ("Wie viel kostet dich Tracking, das du nicht hast?")
-2) **Leerzeile**, dann **2-4 kurze Absaetze** (je 1-3 Saetze) mit Story + Mini-Lernen
-3) **Mindestens 1 konkrete Zahl/Stat aus dem Blog**
-4) **Mindestens 1 kontroverser Take** ("Das wird kaum jemand sagen, aber...") ODER **Selbstkritik** ("Ich war 6 Monate ueberzeugt dass...")
-5) **Schluss: Diskussions-Frage** ("Wie machst du das?") + "Mehr im Blog: https://spurig.com/blog/${blog.slug}"
-6) **Max 2 Hashtags** — nur wirklich relevant (#DSGVO #Marketing). Lieber gar keine.
+LINKEDIN-ALGORITHMUS-REGELN (Pflicht, vor 2026 getestet):
+1) **Zeile 1 = STOP-SCROLL-HOOK (max 100 Zeichen)** — eines davon:
+   - Konkrete Zahl die schockt ("40% deines Werbebudgets sind unsichtbar tot.")
+   - Anti-Mainstream-Statement ("Bitly ist eine DSGVO-Falle. Niemand sagt's.")
+   - Persoenliche Fail-Story ("6 Wochen, 450 € — und ich habe NICHTS gelernt.")
+   - Provokante Frage ("Warum messt ihr eure Posts, aber nicht eure Plakate?")
+2) **Zeile 2 = LEER** (LinkedIn-Cut-Off-Trick — der erste Satz haengt allein da)
+3) **2-4 Absatz-Blocks** (je 1-3 Saetze, Leerzeile dazwischen):
+   - Block 1: Konkrete Story-Situation (Wer, Wann, Was)
+   - Block 2: Konkrete Zahl + persoenlicher Lern-Moment
+   - Block 3: Kontroverser Take ODER Selbstkritik ("Was ich falsch dachte:")
+   - Block 4: Praktischer Insight oder Anti-Pattern
+4) **Schluss-Block**: ECHTE Diskussions-Frage die Antworten provoziert. KEINE rhetorische Frage. KEINE "Was ist deine Meinung?". Beispiele:
+   - "Wer hat das letzte Mal pro Plakat-Standort gemessen statt pro Kampagne?"
+   - "Habt ihr Bitly noch in DACH-Kunden-Reports? Wie verteidigt ihr das?"
+   - "Was war dein groesster Werbe-Reinfall? Ich teile meinen."
+5) **Eine Leerzeile, dann nur** "https://spurig.com/blog/${blog.slug}"
+6) **0-2 Hashtags** ganz am Ende (nur wenn wirklich passend, lieber 0)
 
-Lehrreich + Unterhaltsam + Authentisch — Spurig-DNA. KEIN Marketing-Speak.
+LINKEDIN-VIBE (sehr wichtig):
+- KURZE Saetze. Subjekt-Verb-Objekt. Manchmal 2-3 Worte ("Klingt absurd. Ist Realitaet.")
+- Erste Person, du-Form an Leser direkt
+- Konkret + ehrlich, lieber unbequem als nett
+- Klingt wie Founder beim Bier, NICHT wie Corporate-Marketing-Mail
+
+VERBOTEN (instant fail):
+- "Spannend", "Take", "Pro-Tipp", "Spoiler:", "Hier sind 5 Tipps"
+- Generische Hooks ("Lass uns ueber X reden", "Kennen wir alle?")
+- "Was meint ihr?" als rhetorische Schluss-Floskel ohne Substanz
+- Emoji-Spam (max 0-1 wenn wirklich passend)
+- Hashtag-Salat
+- Lange Werbe-Sehnsuchts-Texte
 
 Antworte NUR mit dem Post-Text. Keine Erklaerung, keine Quotes, keine Code-Fences.`;
   }

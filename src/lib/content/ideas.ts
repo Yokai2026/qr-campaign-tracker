@@ -146,25 +146,69 @@ INPUT:
 - SEO-Keywords: ${idea.target_keywords ?? 'keine vorgegeben'}
 - Pillar: ${CLUSTER_LABEL[idea.cluster]}
 
-Schreibe einen 900-1300 Worte deutschen Markdown-Blog-Post mit Social-Media-Vibe (Schlagzeile-Feel, Wow-Hook, lehrreich + unterhaltsam).
+Schreibe einen 900-1300 Worte deutschen Markdown-Blog-Post — Stil = "Founder beim Bier mit Kollegen", maximales Engagement, persoenlich, diskussions-anregend.
+
+ENGAGEMENT-REGELN (Pflicht):
+- **Du-Form direkt** an Leser ("Kennst du das?", "Mach das nicht so wie ich", "Du wirst denken...")
+- **Mindestens 3 direkte Leser-Fragen** verteilt ueber den Text (nicht alle am Ende)
+- **Mindestens 1 kontroverse These** in ersten 2 Absaetzen ("Die meisten machen X. Das ist Bullshit. Hier warum:")
+- **Mindestens 1 Selbstkritik** ("Ich war ueberzeugt dass... bis...")
+- **Mindestens 1 "Aha"-Moment** ("Was ich nie verstand: ...")
+- **Sehr kurze Saetze**. 3-8 Worte. Manche 1 Wort. ("Klar. Logisch. Trotzdem falsch.")
+- **Konkrete Namen, Zahlen, Beispiele** statt abstrakter Phrasen
+- **Mind. 2 plausible Stats** ("Bei den 50 Marketing-Teams die ich gesprochen habe...")
 
 Struktur:
-1. **Hook-Absatz** (3-5 Saetze): direkter Story-Einstieg aus dem angle. KEIN "In diesem Artikel...", keine Begruessung.
-2. **4-5 H2-Unterabschnitte** mit ## Headlines (max 50 Zeichen, knackig, "klick-mich"-Feel)
-3. **Jeder Abschnitt**: 2-4 Absaetze mit konkreten Zahlen, Anekdoten, eigenen Beobachtungen
-4. **Mindestens 1 kontroverser Take** ("Das wird dir niemand sagen, aber...", "Mainstream-Meinung ist X. Ich glaube...")
-5. **Mindestens 1 Selbstkritik** ("Ich dachte 6 Monate dass...", "Was ich erst nach 50 Kunden verstanden habe...")
-6. **Mindestens 2 konkrete Zahlen/Stats** (aus Spurig-Daten, plausibel)
-7. **Schluss-H2 "Fazit"** oder aehnlich: 2-3 Saetze + 1 Diskussions-Frage
+1. **Hook-Absatz** (2-4 Saetze): konkrete Situation aus dem angle. Kein "In diesem Artikel". Pattern-Break in Zeile 1.
+2. **4-5 H2-Unterabschnitte** mit ## Headlines (max 45 Zeichen, klick-mich-Feel — am besten Fragen oder kontroverse Behauptungen)
+3. **Pro Abschnitt 2-4 Absaetze**, mit eingebauten Leser-Fragen + konkreten Beispielen
+4. **Schluss-Abschnitt** ## Was meinst du? oder ## Hab ich da was uebersehen? — endet mit ECHTER Diskussions-Frage die Antworten provoziert
 
-ZUSAETZLICH generiere einen DALL-E/Midjourney-tauglichen ENGLISCHEN Image-Prompt fuer ein Hero-Bild:
-- Photorealistic, 16:9 aspect ratio
-- Spurig-Brand: dark background (#0a0a0a or near-black), subtle purple (#7C3AED) + cyan (#22d3ee) accent lighting
-- Scene: konkret abgeleitet aus dem Blog-Thema (z.B. "marketing analyst at desk reviewing QR-code scan data on minimalist dark dashboard, German poster wall visible through window")
-- Editorial premium-SaaS landing-page feel
-- NO TEXT visible in image (kritisch — KI macht oft hässliche Letters)
-- Style: cinematic, minimalist, professional
-- Auf englisch fuer beste Image-AI-Ergebnisse
+VERBOTEN (instant fail):
+- "In diesem Artikel", "Hier sind 5 Tipps", "Lass uns einen Blick werfen"
+- Generische Hooks ("Hast du dir je gefragt...")
+- "Take", "Pro-Tipp", "Spoiler:", "innovativ", "revolutionaer"
+- Lange verschachtelte Saetze
+- Keine echte Frage am Ende (sonst keine Diskussion)
+
+ZUSAETZLICH generiere einen DALL-E/Midjourney-tauglichen ENGLISCHEN Image-Prompt fuer ein **clickbait-Hero-Bild** das auf Social-Media stoppen laesst.
+
+**WICHTIG — Wiederhol-Verbot:** GENERIERE NICHT IMMER "marketing analyst at desk reviewing dashboard". WAEHLE BEWUSST eine andere visuelle Konzept-Familie passend zum Topic:
+
+VISUAL-KONZEPT-POOL (waehle 1, optional kombiniert):
+
+A. **Cinematic Detail-Shot** — Macro-Closeup einer relevanten Sache (z.B. "extreme close-up of finger pointing at single tiny QR code on cluttered street poster wall, shallow depth of field, neon-purple street reflection")
+
+B. **Dramatic Portrait** — Person mit starker Emotion (z.B. "tired marketing manager rubbing forehead at 11pm office desk, frustrated expression, glowing screen reflected in glasses, cinematic chiaroscuro")
+
+C. **Wide-Shot Berlin/DACH Cityscape** — Plakatwaende, Strassen-Werbung, Tracking-Theme (z.B. "rainy Berlin underground station with row of backlit advertising posters, lone person scanning one with smartphone, moody blue-purple lighting")
+
+D. **Conceptual Money/Burning** — wenn Budget/Verschwendung-Topic (z.B. "stack of 50 EUR notes catching fire in glass ashtray, paper edges curling, smoke wisp, dark wooden table, candlelit warm tones contrasted with cyan screen glow")
+
+E. **Before/After Split** — wenn Vergleichs-Topic (z.B. "split-screen composition: left side chaotic paper documents covering desk, right side single clean glowing tablet with charts, dramatic divider")
+
+F. **Tech-Macro / Isometric** — fuer technisch/DSGVO-Themen (z.B. "isometric view of stylized server rack glowing cyan in a dark room with EU flag stars subtly visible in background bokeh")
+
+G. **Symbolic Object** — abstrakte Bedeutung (z.B. "single magnifying glass over physical printed receipt on dark wooden table, purple desk lamp casting circular light, mystery noir feel")
+
+H. **Busy Scene** — Restaurant/Event/Office mit Leuten (z.B. "bustling restaurant evening service, server holding qr-code menu, candle-lit ambiance, depth of field on the menu detail, warm cinematic tone")
+
+DURCHGAENGIGE REGELN fuer JEDES Konzept:
+- 16:9, photorealistic (NICHT illustration/cartoon — ausser explizit B/F)
+- Cinematische Belichtung: weiches Light, Bokeh wo passend
+- Subtile lila (#7C3AED) ODER cyan (#22d3ee) Akzent-Highlights (nicht beide)
+- "Editorial photography style" oder "premium SaaS landing-page" feel
+- NO TEXT visible (sonst macht KI haessliche Letter)
+- Hat einen "Wow-Moment" — ein unerwartetes Detail (z.B. brennende Notenscheine, einsame Person, dramatic light)
+- Auf englisch fuer beste KI-Resultate
+
+VARIATION-CHECK: Wenn der Pillar/Topic Marketing-ROI ist → bevorzuge D oder E.
+Wenn DSGVO-Privacy → F oder G.
+Wenn QR-Practices → A oder H.
+Wenn Behind-Scenes → B.
+Wenn Attribution → E oder G.
+
+NICHT immer A oder default-"laptop-with-dashboard" nehmen — das ist langweilig und repetitiv.
 
 Output-Format — KRITISCH WICHTIG (Parser haengt sonst):
 
@@ -255,7 +299,19 @@ function parseMetaBodyBlock(text: string, fallbackTitle: string): ExpandedBlog {
 }
 
 function fallbackImagePrompt(title: string): string {
-  return `Photorealistic 16:9 hero image, dark background (#0a0a0a) with subtle purple (#7C3AED) and cyan (#22d3ee) accent lighting, minimalist editorial scene related to "${title.slice(0, 80)}", no text visible, premium SaaS landing-page aesthetic, cinematic depth of field.`;
+  // Rotierende Konzepte damit auch Fallbacks variieren (Hash auf Titel waehlt Konzept)
+  const concepts = [
+    `extreme close-up shot of a single tiny QR code on a weathered Berlin street poster, shallow depth of field, cyan neon street reflection — symbolizes "${title.slice(0, 60)}"`,
+    `tired marketing manager rubbing forehead at 11pm office desk, frustrated expression, glowing laptop screen reflected in glasses, cinematic chiaroscuro, purple-accent lamp`,
+    `stack of 50 EUR notes catching fire in glass ashtray, paper edges curling, smoke wisp, dark wooden surface, candlelit warm tones contrasted with cyan screen glow in background`,
+    `split-screen composition: chaotic paper documents covering left half of desk, single clean glowing tablet with sharp analytics on right half, dramatic divider`,
+    `single magnifying glass over a printed receipt on dark wooden table, single purple desk lamp casting circular light, noir mystery aesthetic`,
+    `rainy Berlin underground station with row of backlit advertising posters, lone person scanning one with smartphone, moody blue-purple lighting, cinematic`,
+  ];
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) hash = (hash * 31 + title.charCodeAt(i)) | 0;
+  const idx = Math.abs(hash) % concepts.length;
+  return `Photorealistic 16:9 editorial hero image: ${concepts[idx]}. Premium SaaS landing-page feel, no text visible, cinematic light.`;
 }
 
 function slugify(s: string): string {
