@@ -44,7 +44,18 @@ export type OutboundLead = {
   replied_at: string | null;
   created_at: string;
   updated_at: string;
+  // LinkedIn-DM-Helper (Migration 034)
+  linkedin_url?: string | null;
+  linkedin_first_name?: string | null;
+  dm_opener?: string | null;
+  dm_opener_model?: string | null;
+  dm_opener_generated_at?: string | null;
+  dm_status?: DmStatus;
+  dm_sent_at?: string | null;
+  dm_replied_at?: string | null;
 };
+
+export type DmStatus = 'pending' | 'ready' | 'sent' | 'replied' | 'skipped';
 
 export type LeadInsert = Omit<
   OutboundLead,

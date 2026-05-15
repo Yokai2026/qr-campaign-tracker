@@ -1241,6 +1241,14 @@ function Header({ lastUpdated }: { lastUpdated: number | null }) {
       </div>
       <div className="flex items-center gap-3">
         <Link
+          href="/admin/linkedin-dms"
+          className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-[11.5px] font-semibold text-blue-400 hover:bg-blue-500/20 transition-colors"
+        >
+          <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-[3px] bg-blue-500 text-[8px] font-bold text-white">in</span>
+          LinkedIn-DMs
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+        <Link
           href="/admin/outbound"
           className="inline-flex items-center gap-1.5 rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-[11.5px] font-semibold text-purple-400 hover:bg-purple-500/20 transition-colors"
         >
