@@ -254,11 +254,10 @@ PRO IDEE LIEFERST DU 4 FELDER
   - Long-Tail bevorzugt ("DSGVO-konformes Link-Tracking" > "Tracking")
 
 ==========================================
-IDEA-CATEGORY-WHEEL — PFLICHT-DIVERSITY
+IDEA-CATEGORY-WHEEL — PFLICHT-DIVERSITY (14 Kategorien)
 ==========================================
-Über die ${count} Ideen MUSS jede der folgenden 10 Kategorien mindestens 1x
-auftauchen (wenn count<10, dann mind. 8 verschiedene Kategorien). MAX 2 Ideen
-in derselben Kategorie.
+Über die ${count} Ideen MUSS Diversität herrschen. MAX 1 Idee pro Kategorie
+(bei count>14 max 2). Mind. (count - 2) verschiedene Kategorien benutzen.
 
   C1 — HIDDEN COST / WAS DICH WIRKLICH KOSTET
        "Was dich Bitly tatsächlich pro Jahr kostet (nicht der Preis auf der Webseite)"
@@ -268,41 +267,80 @@ in derselben Kategorie.
        "Warum große QR-Codes weniger gescannt werden als kleine (Eye-Tracking-Daten)"
        "Cookie-Banner senken deine Conversion um 23%. Niemand redet darüber."
 
-  C3 — FUNNY FAILURE / LUSTIGE PEINLICHKEIT
+  C3 — FUNNY FAILURE / LUSTIGE PEINLICHKEIT (Pflicht: 1-2 Ideen)
        "Mein erster Sales-Call: ich habe 'Frankfurt' dreimal falsch ausgesprochen"
        "Mein Kunde hat Bitly drei Jahre lang als 'Bittlee' ausgesprochen"
+       "Mein Lieblings-Feature hab ich nach 2 Wochen gekillt. Niemand hatte es benutzt."
 
   C4 — INDUSTRY-INSIDER REVEAL / WAS NIEMAND SAGT
        "Was Marketing-Agenturen ihren Kunden NICHT über Bitly erzählen"
-       "Der eine Vertrag den DSGVO-Anwälte nie zuerst prüfen — und warum das fatal ist"
 
-  C5 — DID YOU KNOW? / FAKTEN-REVEAL
-       "Wusstest du: Bitly speichert auch Geräte-Hashes deiner Klicker"
+  C5 — DID YOU KNOW? / FAKTEN-REVEAL (Pflicht: 1-2 Ideen)
        "Wusstest du: Plakatwerbung kommt für 17% der DACH-Online-Conversions auf"
 
   C6 — COMPARISON / DIREKTER VERGLEICH
        "Bitly Free vs Spurig: das eine kostet 0 Euro. Das andere 800 Euro pro Jahr verstecktes Risiko."
-       "Plakat vs Instagram-Ad: pro Conversion ist Plakat günstiger. Mit einem Trick."
 
   C7 — PERSONAL REVEAL / DAVID-STORY
        "Ich habe Spurig in 8 Wochen gebaut. 3 Sachen die mich fast aufgeben ließen"
-       "Mein größter Fehler beim Solo-Building: Feature gebaut, das niemand wollte"
 
   C8 — DATA / NUMBERS-PUNCH
        "8.247 QR-Code-Scans in 30 Tagen. Hier was wir gelernt haben."
-       "Aus 100 Cold-Mails kamen 4 Antworten. Eine davon wurde Kunde."
 
   C9 — CONTRARIAN TAKE / KONTROVERSE
-       "QR-Codes sind nicht 'wieder' im Trend. Sie waren nie weg. Ihr habt nur nicht gemessen."
-       "DSGVO ist gut. Anwälte machen sie schlecht. Hier mein Take."
+       "QR-Codes sind nicht 'wieder' im Trend. Sie waren nie weg."
 
   C10 — BEHIND-THE-SCENES / HOW IT REALLY WORKS
-       "Was bei einem Bitly-Klick wirklich passiert — Schritt für Schritt"
        "So bauen wir die Tracking-Pipeline bei Spurig (öffentlich)"
+
+  C11 — MONEY-REVEAL / TRANSPARENTE ZAHLEN (Pflicht: 1-2 Ideen)
+       "Mein Stripe-Dashboard nach Monat 1: 47 Euro MRR. Hier was ich draus gelernt habe."
+       "Was Spurig im Monat kostet zu betreiben — die echten Zahlen"
+       "Mein Vercel-Hobby-Bill diesen Monat: 0 Euro. Aber 4 Stunden Debug pro Woche."
+       "12.000 Euro Anwaltskosten für DSGVO. Aber ich war einfach zu paranoid."
+       "Wie ich aus 47 Euro MRR auf 800 in 4 Monaten kam — und was nicht funktioniert hat"
+
+  C12 — ALLTAGSDUSSELHEIT / RELATABLE EVERYDAY-FAIL (Pflicht: 1-2 Ideen)
+       "Mein peinlichster Customer-Support-Moment: ich habe die Mail an mich selbst geschickt"
+       "Die DSGVO-Email an meine Schwiegermutter — und ihre Antwort"
+       "Mein Kunde fragte mich gestern: 'Kann das auch Faxe tracken?' Ich war kurz still."
+       "Ich hab 3 Wochen für eine Funktion gebraucht, die mein Praktikant in 2h gebaut hätte"
+       "Was ich falsch über deutsche Steuerberater gedacht habe (Spoiler: alles)"
+
+  C13 — MICRO-DOCUMENTARY / ZOOM IN ON ONE TINY MOMENT
+       "Die 23 Sekunden nach dem ersten echten Kunden-Klick — was bei mir im Kopf passierte"
+       "Eine E-Mail, die ich seit 6 Wochen aufschiebe — und warum sie wichtig ist"
+       "Der Moment beim 4. Kaffee, als ich realisierte, dass ich Bitly nicht hasse — ich hasse den Default"
+
+  C14 — TIKTOK-STYLE QUICK-REVEAL / 2-SEKUNDEN-PAYOFF
+       "Du machst Marketing? Du machst wahrscheinlich diesen Fehler. Hier wie du's testet."
+       "Eine Sache, die deinen Print-ROI verdoppelt. Spoiler: es ist NICHT Design."
+       "Drei Worte, die jeder DACH-Marketer einmal pro Jahr hören sollte: 'Wir messen es.'"
 
 WICHTIG: Markiere im "angle"-Feld in eckigen Klammern die Kategorie:
 "[C5: Did-you-know] Wusstest du, dass..."
-"[C7: Personal Reveal] Bei meinem ersten Sales-Call..."
+"[C11: Money-Reveal] Mein Stripe-Dashboard zeigte..."
+"[C12: Alltagsdusselheit] Mein peinlichster Moment..."
+
+PFLICHT-ANTEILE pro Batch (count=10):
+  - Mind. 1 Idee aus C3 (Funny Failure)
+  - Mind. 1 Idee aus C5 (Did-you-know)
+  - Mind. 1 Idee aus C11 (Money-Reveal)
+  - Mind. 1 Idee aus C12 (Alltagsdusselheit)
+  - Mind. 1 Idee aus C13 oder C14 (Micro-Doc oder TikTok-Quick)
+
+ANTI-WIEDERHOLUNG (zusätzlich):
+  - KEINE zwei Ideen mit demselben Sub-Thema (z.B. NICHT 2x "Bitly speichert Daten in
+    den USA")
+  - JEDE Idee MUSS einen anderen Sub-Aspekt anpacken
+  - Wenn der Pillar DSGVO ist: variiere — manchmal Cookie-Banner, manchmal AVV-Vertrag,
+    manchmal Schrems-II, manchmal IP-Hashing, manchmal Server-Standort, manchmal Audit-
+    Behörde, manchmal Bußgeld-Höhe, manchmal Beschäftigten-Pflichten
+  - Wenn Pillar Offline-ROI: variiere — Plakat / Flyer / Visitenkarte / Postkarte /
+    Speisekarte / Mailing / Tankstelle / Veranstaltung / Tisch-Aufsteller / Plastik-Tüte
+  - Wenn Pillar QR-Practices: variiere — Größe / Position / Logo / Farbe / Print-Material
+    / Lichtverhältnis / Smartphone-Modell / Scanner-Verhalten / Print-Qualität /
+    Anti-Pattern / Edge-Case
 
 ----------------------------------------
 HOOK-FIRST-WORDS-TEST (Pflicht pro Idee)
