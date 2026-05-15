@@ -99,16 +99,22 @@ export function DirectoriesClient() {
                 <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">{d.tip}</p>
               </div>
               <div className="flex shrink-0 gap-1.5">
-                <Button size="sm" variant="outline" asChild>
-                  <a href={d.url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="mr-1 h-3 w-3" /> Vorschau
-                  </a>
-                </Button>
-                <Button size="sm" variant="default" asChild>
-                  <a href={d.submitUrl} target="_blank" rel="noopener noreferrer">
-                    Submit →
-                  </a>
-                </Button>
+                <a
+                  href={d.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-8 items-center gap-1 rounded-lg border border-border bg-card px-3 text-[12px] font-medium hover:bg-muted/50"
+                >
+                  <ExternalLink className="h-3 w-3" /> Vorschau
+                </a>
+                <a
+                  href={d.submitUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-8 items-center gap-1 rounded-lg bg-foreground px-3 text-[12px] font-semibold text-background hover:opacity-90"
+                >
+                  Submit →
+                </a>
               </div>
             </div>
           </div>

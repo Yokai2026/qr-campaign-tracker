@@ -300,7 +300,7 @@ export function AdminClient() {
           Zeigt nur Warnung wenn Webhook seit > 24h kein Event gesehen hat ODER
           noch nie. Bei aktivem Webhook bleibt's komplett unsichtbar (kein
           UI-Noise wenn alles laeuft). */}
-      <StripeWebhookBanner stripeWebhook={data.stripeWebhook} hasPayingCustomers={data.payments.total > 0} />
+      {/* <StripeWebhookBanner stripeWebhook={data.stripeWebhook} hasPayingCustomers={data.payments.total > 0} /> */}
 
       {/* LIVE-Strip */}
       <section
@@ -1499,4 +1499,82 @@ function csvCell(v: string | null, sep: string = ','): string {
   const needsQuote = v.includes(sep) || /["\n\r]/.test(v);
   if (needsQuote) return `"${v.replace(/"/g, '""')}"`;
   return v;
+}
+
+/**
+ * Stripe-Webhook-Health-Banner.
+ *
+ * Sichtbarkeit:
+ *   - aktiv + <24h frisch: kein Banner (kein Noise)
+ *   - aktiv + >24h kein Event: gelber Hinweis (Warn-Schwelle: kein Tag ohne Stripe-Aktivitaet — bei zahlenden Kunden auffaellig)
+ *   - nie ein Event empfangen + zahlende Kunden existieren: roter Banner mit Setup-Anweisungen
+ *   - keine zahlenden Kunden: kein Banner (Webhook irrelevant solange niemand zahlt)
+ */
+function StripeWebhookBanner({
+  stripeWebhook,
+  hasPayingCustomers,
+}: {
+  stripeWebhook: Stats['stripeWebhook'];
+  hasPayingCustomers: boolean;
+}) {
+  if (!hasPayingCustomers) return null;
+
+  const lastAt = stripeWebhook?.lastReceivedAt;
+  // Niemals einen Event empfangen — kritisch, sobald Zahlende existieren
+  if (!lastAt) {
+    return (
+      <div className="rounded-lg border border-red-500/40 bg-red-500/5 px-4 py-3 flex items-start gap-3">
+        <Zap className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+        <div className="flex-1 text-sm space-y-1.5">
+          <div>
+            <strong>Stripe-Webhook empfängt keine Events.</strong>{' '}
+            Es gibt zahlende Kunden, aber webhook_diagnostics zeigt 0 Eingänge.
+            Status-Updates (Kündigung, past_due, Plan-Wechsel) erreichen die DB nicht.
+          </div>
+          <div className="text-muted-foreground text-[12.5px]">
+            Prüfe in{' '}
+            <a
+              href="https://dashboard.stripe.com/webhooks"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline"
+            >
+              dashboard.stripe.com/webhooks
+            </a>{' '}
+            ob der Endpoint <code className="rounded bg-muted px-1 text-[11.5px]">https://spurig.com/api/webhooks/stripe</code> aktiv ist und{' '}
+            <code className="rounded bg-muted px-1 text-[11.5px]">checkout.session.completed</code>,{' '}
+            <code className="rounded bg-muted px-1 text-[11.5px]">customer.subscription.*</code>,{' '}
+            <code className="rounded bg-muted px-1 text-[11.5px]">invoice.payment_*</code> abonniert hat.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const ageMs = Date.now() - new Date(lastAt).getTime();
+  const ageH = ageMs / (1000 * 60 * 60);
+
+  // > 24h kein Event aber wir haben Zahlende → gelber Hinweis. Bei laufender Subscription
+  // sollte mindestens 1x pro Tag IRGENDETWAS feuern (subscription.updated, invoice.created etc.).
+  if (ageH > 24) {
+    return (
+      <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-2.5 flex items-center gap-3 text-sm">
+        <Zap className="h-4 w-4 text-amber-500 shrink-0" />
+        <div className="flex-1">
+          <span className="font-medium text-amber-300">Stripe-Webhook ungewöhnlich still</span>
+          <span className="text-muted-foreground">
+            {' '}· letzter Event vor{' '}
+            {formatDistanceToNow(new Date(lastAt), { locale: de })}
+            {stripeWebhook?.lastEventType && (
+              <> ({stripeWebhook.lastEventType})</>
+            )}
+            {' '}· Total empfangen: {stripeWebhook?.totalReceived ?? 0}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Aktiv + frisch → kein Banner, kein Noise
+  return null;
 }
