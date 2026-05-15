@@ -5,9 +5,13 @@ import QRCode from 'qrcode';
 import { cn } from '@/lib/utils';
 
 /** Modul-weiter Cache fuer fertig generierte Data-URLs.
- *  Selber Short-Code muss nicht mehrfach gerendert werden — spart CPU bei
- *  vielen QR-Vorschau-Rows (z. B. Live-Feed, Top-Performer). */
+ *  Key: shortCode + fg + bg + size (jede Variante separat). Selber Code mit
+ *  selben Farben muss nicht zweimal gerendert werden — spart CPU bei
+ *  vielen QR-Vorschau-Rows (z. B. Live-Feed, Top-Performer, Liste). */
 const dataUrlCache = new Map<string, string>();
+
+const DEFAULT_FG = '#0f172a';
+const DEFAULT_BG = '#ffffff';
 
 type Props = {
   /** Short-Code des QR — wird zur Generierung der Redirect-URL genutzt */
@@ -18,6 +22,10 @@ type Props = {
   className?: string;
   /** Quadratisch eckig + abgerundet — schickere Optik in Listen */
   rounded?: boolean;
+  /** Vordergrund (Dots). Default: dunkles Slate. */
+  fg?: string | null;
+  /** Hintergrund. Default: weiss. */
+  bg?: string | null;
 };
 
 /**
@@ -31,12 +39,24 @@ type Props = {
  * PNG-Variante (Data-URL) statt SVG: vermeidet dangerouslySetInnerHTML und
  * laesst sich beliebig via CSS skalieren.
  */
-export function QrPreview({ shortCode, size = 28, className, rounded = true }: Props) {
-  const [dataUrl, setDataUrl] = useState<string | null>(() => dataUrlCache.get(shortCode) ?? null);
+export function QrPreview({
+  shortCode,
+  size = 28,
+  className,
+  rounded = true,
+  fg,
+  bg,
+}: Props) {
+  // Normalisierte Farben — defaults wenn null/leer
+  const fgColor = fg && /^#[0-9A-Fa-f]{6}$/.test(fg) ? fg : DEFAULT_FG;
+  const bgColor = bg && /^#[0-9A-Fa-f]{6}$/.test(bg) ? bg : DEFAULT_BG;
+  const cacheKey = `${shortCode}|${fgColor}|${bgColor}|${size}`;
+
+  const [dataUrl, setDataUrl] = useState<string | null>(() => dataUrlCache.get(cacheKey) ?? null);
 
   useEffect(() => {
-    if (dataUrlCache.has(shortCode)) {
-      setDataUrl(dataUrlCache.get(shortCode)!);
+    if (dataUrlCache.has(cacheKey)) {
+      setDataUrl(dataUrlCache.get(cacheKey)!);
       return;
     }
     let cancelled = false;
@@ -50,11 +70,11 @@ export function QrPreview({ shortCode, size = 28, className, rounded = true }: P
       margin: 1,
       // Render in 4x der Anzeigegroesse fuer scharfes Hi-DPI
       width: size * 4,
-      color: { dark: '#0f172a', light: '#ffffff' },
+      color: { dark: fgColor, light: bgColor },
     })
       .then((d) => {
         if (cancelled) return;
-        dataUrlCache.set(shortCode, d);
+        dataUrlCache.set(cacheKey, d);
         setDataUrl(d);
       })
       .catch(() => {
@@ -63,17 +83,17 @@ export function QrPreview({ shortCode, size = 28, className, rounded = true }: P
     return () => {
       cancelled = true;
     };
-  }, [shortCode, size]);
+  }, [cacheKey, shortCode, size, fgColor, bgColor]);
 
   return (
     <span
       aria-hidden
       className={cn(
-        'relative inline-block shrink-0 overflow-hidden border border-border/40 bg-white',
+        'relative inline-block shrink-0 overflow-hidden border border-border/40',
         rounded ? 'rounded-md' : '',
         className,
       )}
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size, background: bgColor }}
     >
       {dataUrl ? (
         // eslint-disable-next-line @next/next/no-img-element -- Data-URL, kein next/image-Vorteil

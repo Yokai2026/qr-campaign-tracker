@@ -207,7 +207,12 @@ export function QrCodeList({ qrCodes }: QrCodeListProps) {
         // immer zuverlaessig clientseitig — fuer die Listen-Vorschau ist das
         // optimal (Detail-Seite zeigt weiterhin den echten gestylten Code).
         <Link href={`/qr-codes/${row.original.id}`} className="inline-block">
-          <QrPreview shortCode={row.original.short_code} size={40} />
+          <QrPreview
+            shortCode={row.original.short_code}
+            size={40}
+            fg={row.original.qr_fg_color}
+            bg={row.original.qr_bg_color}
+          />
         </Link>
       ),
       meta: { className: 'w-16' },

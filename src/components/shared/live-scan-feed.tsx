@@ -24,6 +24,9 @@ type ScanEvent = RawScanEvent & {
   hasSemanticTitle: boolean;
   /** Deep-Link zur Detail-Seite, null falls Quelle nicht mehr existiert */
   href: string | null;
+  /** QR-Farben fuer die Mini-Vorschau (nur fuer event_type='qr_open' gesetzt) */
+  qrFg: string | null;
+  qrBg: string | null;
 };
 
 const DEVICE_ICONS: Record<string, typeof Smartphone> = {
@@ -45,7 +48,7 @@ async function enrichEvents(sb: Supabase, raw: RawScanEvent[]): Promise<ScanEven
     qrCodes.length > 0
       ? sb
           .from('qr_codes')
-          .select('id, short_code, note, placement:placements(name)')
+          .select('id, short_code, note, qr_fg_color, qr_bg_color, placement:placements(name)')
           .in('short_code', qrCodes)
       : Promise.resolve({ data: [] }),
     linkCodes.length > 0
@@ -59,6 +62,8 @@ async function enrichEvents(sb: Supabase, raw: RawScanEvent[]): Promise<ScanEven
     id: string;
     short_code: string;
     note: string | null;
+    qr_fg_color: string | null;
+    qr_bg_color: string | null;
     placement: { name: string } | { name: string }[] | null;
   };
   type LinkRow = { id: string; short_code: string; title: string | null };
@@ -82,6 +87,8 @@ async function enrichEvents(sb: Supabase, raw: RawScanEvent[]): Promise<ScanEven
         title,
         hasSemanticTitle: Boolean(placement || note),
         href: q ? `/qr-codes/${q.id}` : null,
+        qrFg: q?.qr_fg_color ?? null,
+        qrBg: q?.qr_bg_color ?? null,
       };
     }
     const l = linkMap.get(e.short_code);
@@ -91,6 +98,8 @@ async function enrichEvents(sb: Supabase, raw: RawScanEvent[]): Promise<ScanEven
       title: linkTitle || 'Kurzlink',
       hasSemanticTitle: Boolean(linkTitle),
       href: l ? `/links/${l.id}` : null,
+      qrFg: null,
+      qrBg: null,
     };
   });
 }
@@ -239,7 +248,12 @@ export function LiveScanFeed({
                   </span>
                 ) : (
                   <span className="relative">
-                    <QrPreview shortCode={event.short_code} size={28} />
+                    <QrPreview
+                      shortCode={event.short_code}
+                      size={28}
+                      fg={event.qrFg}
+                      bg={event.qrBg}
+                    />
                   </span>
                 )}
                 <div className="relative flex min-w-0 flex-1 flex-col">

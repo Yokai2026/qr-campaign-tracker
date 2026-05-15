@@ -17,6 +17,9 @@ type Entry = {
    *  Benutzt nur fuer die "QR-Codes"-Spalte — die anderen Top-Listen
    *  haben keinen Code, der visualisiert werden koennte. */
   previewCode?: string;
+  /** Optional: gespeicherte Farben des QR-Codes, damit Vorschau echt aussieht. */
+  previewFg?: string | null;
+  previewBg?: string | null;
 };
 
 export async function TopPerformers() {
@@ -59,9 +62,11 @@ export async function TopPerformers() {
       .gte('created_at', weekAgoIso),
     // Top-QR-Codes: redirect_events haben short_code, aber kein qr_codes_id-FK
     // — wir greifen ueber qr_code_id (existiert auf redirect_events).
+    // qr_fg_color/qr_bg_color werden mitgezogen, damit die Mini-Vorschau
+    // die echten gespeicherten Farben des Codes verwendet.
     supabase
       .from('redirect_events')
-      .select('qr_code_id, qr_codes!inner(id, short_code, note)')
+      .select('qr_code_id, qr_codes!inner(id, short_code, note, qr_fg_color, qr_bg_color)')
       .eq('event_type', 'qr_open')
       .eq('is_bot', false)
       .not('qr_code_id', 'is', null)
@@ -121,18 +126,34 @@ export async function TopPerformers() {
     }));
 
   // Aggregate QR-Codes — Note dient als Display-Name, Fallback short_code
-  const qrMap: Record<string, { count: number; title: string; subtitle: string; shortCode: string }> = {};
+  // fg/bg werden mitgenommen, damit die Mini-Vorschau die echten Farben zeigt.
+  type QrAgg = {
+    count: number;
+    title: string;
+    subtitle: string;
+    shortCode: string;
+    fg: string | null;
+    bg: string | null;
+  };
+  const qrMap: Record<string, QrAgg> = {};
   (qrCodesData.data ?? []).forEach((e: Record<string, unknown>) => {
     const qid = e.qr_code_id as string;
     if (!qid) return;
     if (!qrMap[qid]) {
-      const q = e.qr_codes as { short_code: string; note: string | null } | null;
+      const q = e.qr_codes as {
+        short_code: string;
+        note: string | null;
+        qr_fg_color: string | null;
+        qr_bg_color: string | null;
+      } | null;
       const code = q?.short_code ?? '';
       qrMap[qid] = {
         count: 0,
         title: q?.note?.trim() || code || 'QR-Code',
         subtitle: q?.note?.trim() ? code : '',
         shortCode: code,
+        fg: q?.qr_fg_color ?? null,
+        bg: q?.qr_bg_color ?? null,
       };
     }
     qrMap[qid].count++;
@@ -148,6 +169,8 @@ export async function TopPerformers() {
       delta: null,
       href: `/qr-codes/${id}`,
       previewCode: info.shortCode || undefined,
+      previewFg: info.fg,
+      previewBg: info.bg,
     }));
 
   // Aggregate campaigns
@@ -232,7 +255,7 @@ function RankCard({
                   die Listen-Position bereits sichtbar — auf die Nummer verzichten
                   wir hier zugunsten der Wiedererkennbarkeit. */}
               {e.previewCode ? (
-                <QrPreview shortCode={e.previewCode} size={28} />
+                <QrPreview shortCode={e.previewCode} size={28} fg={e.previewFg} bg={e.previewBg} />
               ) : (
                 <span className="tabular-nums flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-[11px] font-semibold text-muted-foreground">
                   {idx + 1}

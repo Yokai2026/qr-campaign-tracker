@@ -43,6 +43,8 @@ type RawEvent = {
 type ActivityEvent = RawEvent & {
   title: string;
   href: string | null;
+  qrFg: string | null;
+  qrBg: string | null;
 };
 
 /** Identische Titel-Resolution wie im LiveScanFeed:
@@ -55,7 +57,10 @@ async function enrichEvents(sb: Supabase, raw: RawEvent[]): Promise<ActivityEven
 
   const [qrRes, linkRes] = await Promise.all([
     qrCodes.length > 0
-      ? sb.from('qr_codes').select('id, short_code, note, placement:placements(name)').in('short_code', qrCodes)
+      ? sb
+          .from('qr_codes')
+          .select('id, short_code, note, qr_fg_color, qr_bg_color, placement:placements(name)')
+          .in('short_code', qrCodes)
       : Promise.resolve({ data: [] }),
     linkCodes.length > 0
       ? sb.from('short_links').select('id, short_code, title').in('short_code', linkCodes)
@@ -66,6 +71,8 @@ async function enrichEvents(sb: Supabase, raw: RawEvent[]): Promise<ActivityEven
     id: string;
     short_code: string;
     note: string | null;
+    qr_fg_color: string | null;
+    qr_bg_color: string | null;
     placement: { name: string } | { name: string }[] | null;
   };
   type LinkRow = { id: string; short_code: string; title: string | null };
@@ -78,13 +85,21 @@ async function enrichEvents(sb: Supabase, raw: RawEvent[]): Promise<ActivityEven
       const placementNode = q?.placement;
       const placementName = Array.isArray(placementNode) ? placementNode[0]?.name : placementNode?.name;
       const title = placementName?.trim() || q?.note?.trim() || 'QR-Code';
-      return { ...e, title, href: q ? `/qr-codes/${q.id}` : null };
+      return {
+        ...e,
+        title,
+        href: q ? `/qr-codes/${q.id}` : null,
+        qrFg: q?.qr_fg_color ?? null,
+        qrBg: q?.qr_bg_color ?? null,
+      };
     }
     const l = linkMap.get(e.short_code);
     return {
       ...e,
       title: l?.title?.trim() || 'Kurzlink',
       href: l ? `/links/${l.id}` : null,
+      qrFg: null,
+      qrBg: null,
     };
   });
 }
@@ -214,7 +229,12 @@ export function ActivityHistorySheet({ open, onOpenChange, source }: Props) {
                         <Link2 className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.8} />
                       </span>
                     ) : (
-                      <QrPreview shortCode={event.short_code} size={28} />
+                      <QrPreview
+                        shortCode={event.short_code}
+                        size={28}
+                        fg={event.qrFg}
+                        bg={event.qrBg}
+                      />
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-[12.5px] font-medium leading-tight">

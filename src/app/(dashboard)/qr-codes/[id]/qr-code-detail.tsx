@@ -38,6 +38,7 @@ import { AbResultsChart } from '@/components/ab-testing/ab-results-chart';
 import { QrDesignStudio } from '@/components/qr-design/qr-design-studio';
 import { PageHeader } from '@/components/shared/page-header';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { QrPreview } from '@/components/shared/qr-preview';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -165,6 +166,13 @@ export function QrCodeDetail({ qrCode, history, redirectCount, redirectRules, ab
     },
   });
 
+  // Live-Watch der Farben — fuer die Preview-Card oben links, damit man
+  // Farbaenderungen sofort sieht, noch bevor man "Speichern" klickt.
+  const watchedFg = editForm.watch('qr_fg_color');
+  const watchedBg = editForm.watch('qr_bg_color');
+  const previewFg = showEdit ? watchedFg : qrCode.qr_fg_color;
+  const previewBg = showEdit ? watchedBg : qrCode.qr_bg_color;
+
   function handleSave(data: EditFormValues) {
     startTransition(async () => {
       try {
@@ -237,7 +245,19 @@ export function QrCodeDetail({ qrCode, history, redirectCount, redirectRules, ab
               <CardTitle>QR-Code</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
-              {qrCode.qr_png_url ? (
+              {/* Beim Editieren: live-gerenderte Vorschau mit aktuellen Form-Farben,
+                  damit Farbaenderungen SOFORT sichtbar sind (kein Save noetig).
+                  Sonst: gespeichertes PNG (mit ggf. Logo/Stil aus dem Design-Studio).
+                  Fallback: live-Render mit gespeicherten Farben. */}
+              {showEdit ? (
+                <QrPreview
+                  shortCode={qrCode.short_code}
+                  size={256}
+                  fg={previewFg}
+                  bg={previewBg}
+                  className="!rounded-lg"
+                />
+              ) : qrCode.qr_png_url ? (
                 <Image
                   src={qrCode.qr_png_url}
                   alt={`QR-Code ${qrCode.short_code}`}
@@ -247,9 +267,13 @@ export function QrCodeDetail({ qrCode, history, redirectCount, redirectRules, ab
                   unoptimized
                 />
               ) : (
-                <div className="flex h-64 w-64 items-center justify-center rounded-lg border bg-muted text-muted-foreground">
-                  Kein QR-Code
-                </div>
+                <QrPreview
+                  shortCode={qrCode.short_code}
+                  size={256}
+                  fg={previewFg}
+                  bg={previewBg}
+                  className="!rounded-lg"
+                />
               )}
 
               {/* Short link */}
