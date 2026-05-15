@@ -129,7 +129,9 @@ export async function GET() {
     sb.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo),
     sb.from('profiles').select('id', { count: 'exact', head: true }).gte('last_seen_at', twoMinAgo),
     sb.from('visitor_heartbeats').select('visitor_id', { count: 'exact', head: true }).gte('last_seen_at', twoMinAgo),
-    sb.from('visitor_heartbeats').select('visitor_id', { count: 'exact', head: true }).gte('last_seen_at', twoMinAgo).not('user_id', 'is', null),
+    // Eingeloggt-Counter: holen wir distinkt nach user_id ein, sonst zaehlt
+    // jeder Tab eines Users separat (1 Person mit 2 Tabs ergaebe '2 eingeloggt').
+    sb.from('visitor_heartbeats').select('user_id').gte('last_seen_at', twoMinAgo).not('user_id', 'is', null),
     // Gesamt-Besucher-Zaehler: COUNT(*) der visitor_heartbeats. Nach Wechsel
     // auf sessionStorage ist 1 Row = 1 Tab-Session, NICHT eindeutige Person.
     // Wir holen daher zusaetzlich die distinct user_agents als Device-Proxy
@@ -218,10 +220,16 @@ export async function GET() {
       newToday: profilesTodayRes.count ?? 0,
       newThisWeek: profilesWeekRes.count ?? 0,
       onlineNow: onlineNowRes.count ?? 0,
-      // Live-Presence (visitor_heartbeats): alle Besucher + nur die mit user_id (= eingeloggt)
+      // Live-Presence (visitor_heartbeats): Sessions gesamt + DISTINKTE eingeloggte
+      // User. So zaehlt 1 Person mit 3 offenen Tabs als '1 eingeloggt' statt '3'.
       visitorsOnline: visitorsTotalRes.count ?? 0,
-      loggedInOnline: visitorsLoggedInRes.count ?? 0,
-      anonymousOnline: Math.max(0, (visitorsTotalRes.count ?? 0) - (visitorsLoggedInRes.count ?? 0)),
+      loggedInOnline: new Set(
+        (visitorsLoggedInRes.data ?? []).map((r) => r.user_id).filter(Boolean),
+      ).size,
+      anonymousOnline: Math.max(
+        0,
+        (visitorsTotalRes.count ?? 0) - (visitorsLoggedInRes.data ?? []).length,
+      ),
       // Lifetime: jede visitor_id ist ein einzigartiger Browser-Tab seit Tracking-Start.
       visitorsLifetime: visitorsLifetimeRes.count ?? 0,
       // Device-Proxy: distinkte User-Agents (= naeherungsweise Anzahl verschiedener
