@@ -15,6 +15,91 @@ import { SPURIG_VOICE } from './spurig-voice';
 const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
 
+/**
+ * Web-Search ist standardmaessig AN — schaltbar via CONTENT_DISABLE_WEB_SEARCH=1.
+ * Bringt aktuelle DACH-Marketing-News / DSGVO-Urteile / Wettbewerbs-Pricing
+ * in die Generation rein.
+ */
+const WEB_SEARCH_ENABLED = process.env.CONTENT_DISABLE_WEB_SEARCH !== '1';
+const WEB_SEARCH_MAX_USES = Number(process.env.CONTENT_WEB_SEARCH_MAX_USES ?? '5');
+
+/**
+ * Server-side Web-Search-Tool (Anthropic built-in). Claude fuehrt die Search
+ * selbst aus und faedelt die Ergebnisse in die Antwort ein. Der finale Text-Block
+ * enthaelt die synthetisierte Antwort.
+ *
+ * Die Tool-Version 20250305 ist die aktuell stabile GA-Version.
+ */
+const WEB_SEARCH_TOOL = {
+  type: 'web_search_20250305',
+  name: 'web_search',
+  max_uses: WEB_SEARCH_MAX_USES,
+  user_location: {
+    type: 'approximate',
+    country: 'DE',
+    timezone: 'Europe/Berlin',
+  },
+} as const;
+
+type ClaudeContentBlock = {
+  type: string;
+  text?: string;
+};
+
+/**
+ * Ruft Claude auf. Bei aktiviertem Web-Search wird das Tool mitgeschickt;
+ * Claude fuehrt die Searches server-side aus und liefert am Ende den finalen
+ * Text-Block.
+ *
+ * Bei Web-Search-Antworten gibt es mehrere Content-Blocks: server_tool_use,
+ * web_search_tool_result und mehrere text-Blocks. Wir nehmen den LETZTEN
+ * text-Block (= finale Antwort nach allen Searches).
+ *
+ * Faellt automatisch auf non-search-Call zurueck wenn Anthropic 4xx mit
+ * tool-unbekannt zurueckliefert.
+ */
+async function callClaude(
+  apiKey: string,
+  prompt: string,
+  opts: { maxTokens: number; useSearch?: boolean },
+): Promise<string> {
+  const useSearch = (opts.useSearch ?? true) && WEB_SEARCH_ENABLED;
+
+  const body: Record<string, unknown> = {
+    model: CLAUDE_MODEL,
+    max_tokens: opts.maxTokens,
+    messages: [{ role: 'user', content: prompt }],
+  };
+  if (useSearch) body.tools = [WEB_SEARCH_TOOL];
+
+  const res = await fetch(ANTHROPIC_API, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    // Web-Search nicht verfuegbar / nicht freigeschaltet → Retry ohne Tool
+    if (useSearch && (res.status === 400 || res.status === 403) && err.includes('web_search')) {
+      return callClaude(apiKey, prompt, { ...opts, useSearch: false });
+    }
+    throw new Error(`Claude API ${res.status}: ${err.slice(0, 300)}`);
+  }
+
+  const data = (await res.json()) as { content?: ClaudeContentBlock[] };
+  const textBlocks = (data.content ?? []).filter((c) => c.type === 'text' && c.text);
+  if (textBlocks.length === 0) {
+    throw new Error('Claude response contains no text blocks');
+  }
+  // Finale Antwort ist der LETZTE text-Block (nach allen Tool-Roundtrips)
+  return textBlocks[textBlocks.length - 1].text!.trim();
+}
+
 export type GeneratedIdea = {
   title: string;
   outline: string;
@@ -56,12 +141,49 @@ Jede Idee muss Hook-Quality-Test (PART 7) bestehen und mind. 3 psychologische
 Hebel (PART 3) einbauen.
 
 ----------------------------------------
+RESEARCH-FIRST-PROTOKOLL (Pflicht — vor jeder Idee)
+----------------------------------------
+Du hast Zugriff auf web_search. **Nutze es BEVOR du Ideen generierst.**
+
+Fuer den Pillar "${CLUSTER_LABEL[cluster]}" fuehre 3-5 gezielte Searches durch.
+Suche nach AKTUELLEN, KONKRETEN, DEUTSCHEN Themen — nicht generischen Konzepten.
+
+Such-Beispiele je nach Pillar:
+- DSGVO/Privacy: "DSGVO Bußgeld 2026 Tracking", "Schrems II URTEIL 2026 marketing",
+  "BfDI Bitly Verfahren", "Bayerisches Landesamt fuer Datenschutz Marketing"
+- Offline-ROI: "Plakatwerbung ROI 2026 DACH", "Out-of-Home Werbung Effekt Messung",
+  "DOOH Marktanteile Deutschland 2026"
+- QR-Practices: "QR Code Scan Statistik DACH 2026", "QR Code Plakat Conversion Rate",
+  "QR-Code in der Gastronomie 2026"
+- Attribution: "Last-Click Attribution Tot 2026", "Multi-Touch DACH Marketing",
+  "Cookie-less Tracking DACH"
+- Behind-Scenes: "DACH Solopreneur SaaS 2026", "Indie Hacker Deutschland Stripe",
+  "Build in Public DACH"
+
+Ziel der Searches:
+- 3 KONKRETE Fakten / Zahlen / News-Geschichten der LETZTEN 90 TAGE finden
+- 2 echte Firmen / Behoerden / Personen die zitiert werden koennen
+- 1 aktuelle Debatte / Kontroverse / Urteil das gerade laeuft
+- Wettbewerbs-Pricing-Updates (Bitly Preisaenderungen, Rebrandly Pricing Changes)
+- Reale Bußgeld-Faelle / DSGVO-Verfahren der letzten Monate
+
+VERWENDE die Such-Ergebnisse in den Ideen:
+- Zitiere konkrete Quellen, Daten, Behoerden in den "outline"-Feldern
+- Mache Ideen TOPICAL ("Die ['Bußgeld-Fall XYZ'] zeigt: jeder DACH-Marketer mit
+  Bitly hat ein Problem.")
+- Wenn ein konkreter Fall in den News ist → eine Idee MUSS darauf basieren
+
+NICHT generische Konzept-Ideen ohne aktuellen Bezug generieren wenn echte News
+verfuegbar sind.
+
+----------------------------------------
 PRE-WRITING-ANALYSE (denk SELBER durch, vor dem Generieren)
 ----------------------------------------
-Bevor du schreibst, finde fuer den Pillar:
+NACH der Web-Research, mit den Ergebnissen im Kopf:
 - 5 echte Situationen die ein DACH-Marketer / Founder / Restaurant-Besitzer wirklich erlebt
-- 3 Mainstream-Annahmen die FALSCH sind (kontroverse Takes)
-- 3 konkrete Zahlen / Marken / Fakten die ueberraschen
+- 3 Mainstream-Annahmen die FALSCH sind (kontroverse Takes), idealerweise durch
+  News-Findings belegt
+- 3 konkrete Zahlen / Marken / Fakten aus der Web-Research die ueberraschen
 - 2 Original-Saetze die ein Profi-Insider sagen wuerde
 Erst dann: Ideen formulieren.
 
@@ -168,27 +290,7 @@ NUR JSON-Array. Keine Markdown-Fences. Kein Vorwort. Kein Nachwort.
 Jetzt liefere die ${count} besten Ideen — und mach sie so, dass sie den
 HOOK-QUALITY-TEST jedes einzeln bestehen.`;
 
-  const res = await fetch(ANTHROPIC_API, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: CLAUDE_MODEL,
-      max_tokens: 4000,
-      messages: [{ role: 'user', content: prompt }],
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Claude API ${res.status}: ${err.slice(0, 300)}`);
-  }
-
-  const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
-  const text = data.content?.find((c) => c.type === 'text')?.text?.trim() ?? '';
+  const text = await callClaude(apiKey, prompt, { maxTokens: 4000, useSearch: true });
 
   // Robust-Parse
   let jsonText = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
@@ -238,6 +340,30 @@ Pillar: ${CLUSTER_LABEL[idea.cluster]}
 
 Schreibe einen 900-1300 Worte deutschen Markdown-Blog-Post nach dem 8-Punkt-
 Storytelling-Arc (PART 6 oben) und mit MASSIVER Retention (PART 8 oben).
+
+----------------------------------------
+RESEARCH-FIRST-PROTOKOLL (Pflicht — vor dem Schreiben)
+----------------------------------------
+Du hast Zugriff auf web_search. **Nutze es BEVOR du den Blog schreibst.**
+
+Such 2-4 mal gezielt nach:
+- AKTUELLEN Fakten / Zahlen / Faellen zum Thema (letzte 6 Monate)
+- KONKRETEN Namen von Behoerden / Firmen / Studien die du zitieren kannst
+- ECHTEN News / Urteilen / Pricing-Updates der Wettbewerber
+- Sub-Topics die im Outline nicht stehen aber stark relevant sind
+
+Was du finden willst:
+- Mindestens 2 zitierbare konkrete Fakten aus echten Quellen
+- Mindestens 1 News-Geschichte die du als Aufhaenger nutzen kannst
+- Wettbewerbs-Pricing-Updates wenn Topic Bitly/Rebrandly betrifft
+- Konkrete Bußgeld-Faelle / Behoerden-Verfahren wenn DSGVO-Topic
+
+Verwende die Findings:
+- Webe sie natuerlich in den Text ein (nicht als Zitate-Liste)
+- Mach den Blog TOPICAL ("Letzte Woche hat das LfDI Niedersachsen..." statt
+  "Es gibt Faelle wo...")
+- Verlinke nicht — der Leser kommt auf den Blog, nicht auf externe Seiten
+- Wenn du keinen konkreten News findest: weiter mit Story-Mode, kein Problem
 
 ----------------------------------------
 PRE-WRITING-PRUEFUNG (mental durchspielen)
@@ -405,28 +531,7 @@ WICHTIG:
 - Keine Quotes um die Werte
 - Nichts vor oder nach dem ---META--- und ---BODY---`;
 
-  const res = await fetch(ANTHROPIC_API, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: CLAUDE_MODEL,
-      max_tokens: 5000,
-      messages: [{ role: 'user', content: prompt }],
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Claude API ${res.status}: ${err.slice(0, 300)}`);
-  }
-
-  const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
-  const text = data.content?.find((c) => c.type === 'text')?.text?.trim() ?? '';
-
+  const text = await callClaude(apiKey, prompt, { maxTokens: 5000, useSearch: true });
   return parseMetaBodyBlock(text, idea.title);
 }
 
