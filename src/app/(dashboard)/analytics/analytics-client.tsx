@@ -998,7 +998,11 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
               {/* Fokussierte Einzel-Charts: gleicher Zeitraum, aber QR und Link
                   je in einem eigenen Bar-Chart. Macht es einfacher den isolierten
                   Trend einer Quelle zu lesen, ohne dass die jeweils andere stoert. */}
-              <div className="mt-2 grid gap-4 lg:grid-cols-2">
+              {/* Wenn der User auf eine Quelle filtert (QR oder Link), zeigt der
+                  Detail-Block nur den passenden Chart in voller Breite — der jeweils
+                  andere wuerde nur leere Balken zeigen. */}
+              <div className={`mt-2 grid gap-4 ${source === 'all' ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
+                {source !== 'link' && (
                 <ChartCard title="QR-Scans im Verlauf" empty={timeSeriesData.length === 0 || timeSeriesData.every((d) => d.qr === 0)} emptyText="Keine QR-Scans im Zeitraum">
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={timeSeriesData} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
@@ -1027,7 +1031,9 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartCard>
+                )}
 
+                {source !== 'qr' && (
                 <ChartCard title="Link-Klicks im Verlauf" empty={timeSeriesData.length === 0 || timeSeriesData.every((d) => d.link === 0)} emptyText="Keine Link-Klicks im Zeitraum">
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={timeSeriesData} margin={{ top: 10, right: 12, left: -10, bottom: 0 }}>
@@ -1056,6 +1062,7 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartCard>
+                )}
               </div>
             </ChartTransition>
           </section>

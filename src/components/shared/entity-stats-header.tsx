@@ -1,18 +1,12 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { formatDistanceToNow } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { EntityStatsHeaderClient, type StatsScope as ClientScope } from './entity-stats-header-client';
 
 /**
  * Scope for a stats-header query. Each entity-type maps to a different column
  * on redirect_events. Locations aggregate across multiple placements.
  */
-export type StatsScope =
-  | { kind: 'qr_code'; id: string }
-  | { kind: 'short_link'; id: string }
-  | { kind: 'campaign'; id: string }
-  | { kind: 'placement'; id: string }
-  | { kind: 'location'; placementIds: string[] };
+export type StatsScope = ClientScope;
 
 type Props = {
   scope: StatsScope;
@@ -23,39 +17,22 @@ type Props = {
 /**
  * Sticky quick-stats bar for entity-detail pages. Renders on top of the
  * detail view so the mobile user sees "Scans today / 7d / last scan" without
- * scrolling. Queries are cheap: two counts + one newest-row select.
+ * scrolling.
+ *
+ * Server-Component holt initiale Werte (cheap counts), uebergibt sie an die
+ * Client-Variante die anschliessend Supabase-Realtime fuer redirect_events
+ * abonniert — neue Scans erscheinen damit ohne Page-Reload.
  */
 export async function EntityStatsHeader({ scope, label }: Props) {
   noStore();
   const { today, sevenDays, lastScan } = await fetchStats(scope);
 
   return (
-    <div className="sticky top-0 z-10 -mx-4 border-b border-border bg-background/90 px-4 py-2.5 backdrop-blur supports-[backdrop-filter]:bg-background/70 sm:-mx-6 sm:px-6">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-5 overflow-x-auto text-[12px] sm:gap-7">
-          <Stat label="Heute" value={today} />
-          <Stat label="7 Tage" value={sevenDays} />
-          <Stat
-            label="Letzter Scan"
-            value={lastScan ? `vor ${formatDistanceToNow(new Date(lastScan), { locale: de })}` : '–'}
-          />
-        </div>
-        {label && (
-          <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10.5px] font-medium uppercase tracking-wider text-muted-foreground">
-            {label}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="shrink-0">
-      <div className="text-[10.5px] uppercase tracking-[0.08em] text-muted-foreground">{label}</div>
-      <div className="mt-0.5 tabular-nums text-[15px] font-semibold tracking-tight">{value}</div>
-    </div>
+    <EntityStatsHeaderClient
+      scope={scope}
+      label={label}
+      initial={{ today, sevenDays, lastScan }}
+    />
   );
 }
 
