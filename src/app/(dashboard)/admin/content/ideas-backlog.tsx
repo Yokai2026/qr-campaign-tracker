@@ -190,6 +190,55 @@ export function IdeasBacklog() {
     } else toast.error('Skip fehlgeschlagen');
   }
 
+  async function batchSkip() {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    const loadingId = toast.loading(`Skippe ${ids.length} Ideen…`);
+    let done = 0;
+    let failed = 0;
+    for (const id of ids) {
+      try {
+        const r = await fetch('/api/admin/content/ideas', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, status: 'skipped' }),
+          credentials: 'include',
+        });
+        if (r.ok) done++; else failed++;
+      } catch {
+        failed++;
+      }
+    }
+    toast.dismiss(loadingId);
+    queryClient.invalidateQueries({ queryKey: ['content-ideas'] });
+    setSelected(new Set());
+    toast.success(`${done} geskippt${failed ? `, ${failed} fehlgeschlagen` : ''}`);
+  }
+
+  async function batchDelete() {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (!confirm(`${ids.length} Ideen WIRKLICH löschen? Geht nicht rückgängig.`)) return;
+    const loadingId = toast.loading(`Lösche ${ids.length} Ideen…`);
+    let done = 0;
+    let failed = 0;
+    for (const id of ids) {
+      try {
+        const r = await fetch(`/api/admin/content/ideas?id=${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+        if (r.ok) done++; else failed++;
+      } catch {
+        failed++;
+      }
+    }
+    toast.dismiss(loadingId);
+    queryClient.invalidateQueries({ queryKey: ['content-ideas'] });
+    setSelected(new Set());
+    toast.success(`${done} gelöscht${failed ? `, ${failed} fehlgeschlagen` : ''}`);
+  }
+
   function toggleSelect(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -267,9 +316,17 @@ export function IdeasBacklog() {
             {selectedAcrossClusters.length > 1 ? 'n' : ''} ausgewählt
             <span className="ml-2 text-muted-foreground">· ~{selectedAcrossClusters.length * 30}s Generierung</span>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button size="sm" variant="ghost" onClick={clearSelection}>
-              Auswahl löschen
+              Auswahl aufheben
+            </Button>
+            <Button size="sm" variant="ghost" onClick={batchSkip} className="text-amber-500 hover:bg-amber-500/10">
+              <X className="mr-1.5 h-3.5 w-3.5" />
+              {selectedAcrossClusters.length} skippen
+            </Button>
+            <Button size="sm" variant="ghost" onClick={batchDelete} className="text-destructive hover:bg-destructive/10">
+              <X className="mr-1.5 h-3.5 w-3.5" />
+              {selectedAcrossClusters.length} löschen
             </Button>
             <Button size="sm" variant="default" onClick={batchExpand}>
               <BookText className="mr-1.5 h-3.5 w-3.5" />
