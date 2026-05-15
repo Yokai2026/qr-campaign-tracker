@@ -320,8 +320,13 @@ function LeadCard({
    */
   function searchLinkedIn() {
     const cleanName = cleanCompanyName(lead.name);
-    const rolePart = ' (Inhaber OR Inhaberin OR Gründer OR Gründerin OR Founder OR Owner OR CEO)';
-    const q = encodeURIComponent(`site:linkedin.com/in/ "${cleanName}"${rolePart}`);
+    // Phrase-Match nur fuer distinctive Namen (>= 2 Wörter, eindeutig).
+    // Sonst lockere AND-Suche damit Google fuzzy matchen kann.
+    const distinctive = cleanName.split(/\s+/).filter((w) => w.length > 3).length >= 2;
+    const namePart = distinctive ? `"${cleanName}"` : cleanName;
+    const cityPart = lead.city ? ` ${lead.city}` : '';
+    const rolePart = ' (Inhaber OR Gründer OR Founder OR Owner OR CEO)';
+    const q = encodeURIComponent(`site:linkedin.com/in/ ${namePart}${cityPart}${rolePart}`);
     window.open(`https://www.google.com/search?q=${q}`, '_blank');
   }
 
