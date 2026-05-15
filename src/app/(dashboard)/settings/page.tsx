@@ -20,6 +20,7 @@ import { CustomDomains } from '@/components/settings/custom-domains';
 import { ApiTokens } from '@/components/settings/api-tokens';
 import { SubscriptionCard } from '@/components/settings/subscription-card';
 import { PageHeader } from '@/components/shared/page-header';
+import { trackGoogleAdsPurchase } from '@/lib/conversion/google-ads';
 import type { Profile, Subscription } from '@/types';
 
 type ProfileFormValues = {
@@ -56,6 +57,23 @@ export default function SettingsPage() {
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 350);
     return () => clearTimeout(t);
+  }, []);
+
+  // Stripe-Checkout-Erfolg: redirect target ist /settings?upgraded=1. Wir
+  // feuern hier ein Google-Ads-Purchase-Conversion-Event (clientseitig,
+  // no-op wenn keine Ads-ID konfiguriert). Value=12.99 default fuer monthly;
+  // yearly waere genauer ueber die Profile/Subscription auslesbar, aber fuer
+  // Ads-Optimization reicht ein Naeherungswert.
+  useEffect(() => {
+    if (searchParams.get('upgraded') !== '1') return;
+    trackGoogleAdsPurchase({ value: 12.99 });
+    // URL bereinigen damit der Event nicht beim Reload neu feuert
+    if (typeof window !== 'undefined' && window.history.replaceState) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('upgraded');
+      window.history.replaceState({}, '', url.toString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { register, handleSubmit, reset } = useForm<ProfileFormValues>({

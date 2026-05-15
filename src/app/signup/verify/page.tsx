@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MailCheck, Loader2 } from 'lucide-react';
 import { triggerWelcomeEmail } from '@/lib/auth/welcome-action';
+import { trackGoogleAdsSignup } from '@/lib/conversion/google-ads';
 
 const PIN_LENGTH = 6;
 
@@ -119,6 +120,10 @@ function SignupVerifyInner() {
     // Welcome-Mail im Hintergrund anstossen (fire-and-forget).
     // Cookies sind nach verifyOtp gesetzt, die Server Action erbt sie.
     void triggerWelcomeEmail();
+
+    // Google-Ads Conversion-Event: Signup-Verify abgeschlossen = Lead.
+    // No-op wenn NEXT_PUBLIC_GOOGLE_ADS_ID nicht gesetzt.
+    trackGoogleAdsSignup();
 
     // Harte Navigation statt router.push: Browser uebernimmt das
     // Lade-Indikator, die Verify-Page unmountet sofort, Dashboard

@@ -3,6 +3,7 @@ import { Inter, Geist_Mono } from 'next/font/google';
 import { CookieBanner } from '@/components/layout/cookie-banner';
 import { ThemeProvider } from '@/components/theme-provider';
 import { PresenceHeartbeat } from '@/components/shared/presence-heartbeat';
+import { GoogleAdsScript } from '@/components/marketing/google-ads-script';
 import './globals.css';
 
 const inter = Inter({
@@ -86,6 +87,8 @@ export default function RootLayout({
           {/* Live-Presence-Tracking auf JEDER Page (auch Landing/Public).
               Erfasst anonyme Besucher + eingeloggte User getrennt. */}
           <PresenceHeartbeat />
+          {/* Google-Ads-Tag (gtag.js). Rendert nichts wenn NEXT_PUBLIC_GOOGLE_ADS_ID nicht gesetzt ist. */}
+          <GoogleAdsScript />
         </ThemeProvider>
       </body>
     </html>
