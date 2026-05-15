@@ -587,8 +587,9 @@ export function AnalyticsClient({ campaigns, districts }: Props) {
         }
       />
 
-      {/* Filters */}
-      <div className="rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-xs)]">
+      {/* Filters — sticky am oberen Rand, bleibt beim Scrollen sichtbar.
+          backdrop-blur sorgt fuer "Frosted-Glass"-Effekt sobald Content drunter durchscrollt. */}
+      <div className="sticky top-2 z-20 rounded-2xl border border-border bg-card/95 p-4 shadow-[var(--shadow-sm)] backdrop-blur-md supports-[backdrop-filter]:bg-card/80">
         {/* Date-Preset Chips — always visible */}
         <DatePresetRow
           dateFrom={dateFrom}

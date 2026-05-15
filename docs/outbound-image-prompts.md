@@ -109,3 +109,4 @@ NO people, NO 3D, NO cartoon.
    Dann im HTML-Builder `<img src="${HERO_IMAGES[template.key]}" width="600" alt="Spurig">` ganz oben einbauen.
 4. Test-Mail senden → in Gmail prüfen wie's wirkt.
 # pipeline activation marker Fri May 15 09:47:56     2026
+# trigger redeploy for RESEND_API_KEY Fri May 15 09:53:55     2026
