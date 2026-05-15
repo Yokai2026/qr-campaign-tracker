@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
 import { sendEmail } from '@/lib/email/send';
+import { sendTrialUpsell, type TrialUpsellStage } from '@/lib/email/trial-upsell';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 /**
- * Sendet Reminder-Mails an User deren Trial in den nächsten 24-48h endet.
- * Idempotent: Markiert User mit `trial_reminder_sent_at` damit kein User
- * mehrfach getriggert wird.
+ * Trial-Lifecycle-Mails. Idempotent via Marker-Columns auf profiles.
  *
- * Aufruf: Vercel-Cron täglich 09:00 UTC.
+ * Stages:
+ *  - d3:   Day 3 Value-Reminder + Feature-Tipp           (trial_upsell_d3_sent_at)
+ *  - d7:   Day 7 Case-Study + Social-Proof               (trial_upsell_d7_sent_at)
+ *  - d12:  Day 12 Letzter Tag + Discount                 (trial_upsell_d12_sent_at)
+ *  - end:  24-48h vor Trial-Ende "endet morgen"          (trial_reminder_sent_at)
+ *
+ * Aufruf: n8n-Cron taeglich 09:00 UTC (Vercel-Hobby triggert nicht zuverlaessig).
+ * Authentication: Bearer CRON_SECRET.
  */
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
@@ -21,10 +27,96 @@ export async function GET(request: NextRequest) {
 
   const sb = await createServiceClient();
   const now = Date.now();
+
+  const stagesResult = {
+    d3: await runUpsellStage(sb, 'd3', now),
+    d7: await runUpsellStage(sb, 'd7', now),
+    d12: await runUpsellStage(sb, 'd12', now),
+    end: await runEndReminder(sb, now),
+  };
+
+  return NextResponse.json(stagesResult);
+}
+
+// ---------------------------------------------------------------------------
+// D3 / D7 / D12 Upsell-Stages
+// ---------------------------------------------------------------------------
+
+type SupabaseLike = Awaited<ReturnType<typeof createServiceClient>>;
+
+type StageConfig = {
+  dayOffset: number;          // Tag im Trial (3, 7, 12)
+  windowDays: number;         // Wie weit ueber den Tag hinaus noch eligible (Cron-Resilienz)
+  markerColumn: 'trial_upsell_d3_sent_at' | 'trial_upsell_d7_sent_at' | 'trial_upsell_d12_sent_at';
+};
+
+const STAGE_CONFIG: Record<TrialUpsellStage, StageConfig> = {
+  d3:  { dayOffset: 3,  windowDays: 2, markerColumn: 'trial_upsell_d3_sent_at' },
+  d7:  { dayOffset: 7,  windowDays: 2, markerColumn: 'trial_upsell_d7_sent_at' },
+  d12: { dayOffset: 12, windowDays: 1, markerColumn: 'trial_upsell_d12_sent_at' },
+};
+
+async function runUpsellStage(sb: SupabaseLike, stage: TrialUpsellStage, now: number) {
+  const cfg = STAGE_CONFIG[stage];
+  const day = 86_400_000;
+  // Eligibility-Fenster ueber created_at:
+  //   created_at <= now - dayOffset * day        (Tag erreicht)
+  //   created_at >  now - (dayOffset + windowDays) * day   (nicht zu alt)
+  const upperCreated = new Date(now - cfg.dayOffset * day).toISOString();
+  const lowerCreated = new Date(now - (cfg.dayOffset + cfg.windowDays) * day).toISOString();
+
+  const { data: candidates, error } = await sb
+    .from('profiles')
+    .select('id, email, username, trial_ends_at, created_at')
+    .lte('created_at', upperCreated)
+    .gt('created_at', lowerCreated)
+    .gt('trial_ends_at', new Date(now).toISOString())   // Trial laeuft noch
+    .is(cfg.markerColumn, null);
+
+  if (error) return { error: error.message, sent: 0 };
+  if (!candidates || candidates.length === 0) return { checked: 0, sent: 0 };
+
+  // Aktive Subs ausschliessen (Trial bezahlt = keine Upsell-Spam)
+  const userIds = candidates.map((c) => c.id);
+  const { data: subs } = await sb
+    .from('subscriptions')
+    .select('user_id, status')
+    .in('user_id', userIds)
+    .in('status', ['active', 'past_due']);
+  const paid = new Set((subs ?? []).map((s) => s.user_id));
+  const eligible = candidates.filter((c) => !paid.has(c.id) && c.email);
+
+  let sent = 0;
+  const errors: string[] = [];
+  for (const u of eligible) {
+    try {
+      await sendTrialUpsell({
+        to: u.email,
+        username: u.username,
+        stage,
+        trialEndsAt: u.trial_ends_at,
+      });
+      await sb
+        .from('profiles')
+        .update({ [cfg.markerColumn]: new Date().toISOString() })
+        .eq('id', u.id);
+      sent++;
+    } catch (e) {
+      errors.push(`${u.email}: ${e instanceof Error ? e.message : 'unknown'}`);
+    }
+  }
+
+  return { checked: candidates.length, eligible: eligible.length, sent, errors };
+}
+
+// ---------------------------------------------------------------------------
+// End-of-Trial Reminder (24-48h vorher) — bestehend, leicht aufgeraeumt
+// ---------------------------------------------------------------------------
+
+async function runEndReminder(sb: SupabaseLike, now: number) {
   const in24h = new Date(now + 24 * 3_600_000).toISOString();
   const in48h = new Date(now + 48 * 3_600_000).toISOString();
 
-  // User die im Fenster 24-48h Trial-Ende haben UND noch keine Sub UND noch nicht erinnert wurden
   const { data: candidates, error } = await sb
     .from('profiles')
     .select('id, email, username, trial_ends_at, trial_reminder_sent_at')
@@ -32,38 +124,32 @@ export async function GET(request: NextRequest) {
     .lte('trial_ends_at', in48h)
     .is('trial_reminder_sent_at', null);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-  if (!candidates || candidates.length === 0) {
-    return NextResponse.json({ checked: 0, sent: 0 });
-  }
+  if (error) return { error: error.message, sent: 0 };
+  if (!candidates || candidates.length === 0) return { checked: 0, sent: 0 };
 
-  // Filter: nur ohne aktive Sub
   const userIds = candidates.map((c) => c.id);
   const { data: subs } = await sb
     .from('subscriptions')
     .select('user_id, status')
     .in('user_id', userIds)
-    .in('status', ['active', 'on_trial', 'past_due']);
-  const usersWithSub = new Set((subs ?? []).map((s) => s.user_id));
-  const toRemind = candidates.filter((c) => !usersWithSub.has(c.id));
+    .in('status', ['active', 'past_due']);
+  const paid = new Set((subs ?? []).map((s) => s.user_id));
+  const eligible = candidates.filter((c) => !paid.has(c.id) && c.email);
 
   let sent = 0;
   const errors: string[] = [];
-  for (const u of toRemind) {
+  for (const u of eligible) {
     try {
       const trialEnd = new Date(u.trial_ends_at!);
       const dateLabel = trialEnd.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
       await sendEmail({
         to: u.email,
         subject: 'Dein Spurig-Trial endet morgen',
-        html: buildTrialReminderHtml({
+        html: buildEndReminderHtml({
           username: u.username ?? '',
           trialEndDate: dateLabel,
         }),
       });
-      // Marker setzen
       await sb
         .from('profiles')
         .update({ trial_reminder_sent_at: new Date().toISOString() })
@@ -74,15 +160,10 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({
-    checked: candidates.length,
-    eligible: toRemind.length,
-    sent,
-    errors,
-  });
+  return { checked: candidates.length, eligible: eligible.length, sent, errors };
 }
 
-function buildTrialReminderHtml(input: { username: string; trialEndDate: string }): string {
+function buildEndReminderHtml(input: { username: string; trialEndDate: string }): string {
   const greeting = input.username ? `Hi ${input.username}` : 'Hi';
   return `<!DOCTYPE html>
 <html lang="de">
