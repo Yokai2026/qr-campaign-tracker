@@ -129,6 +129,32 @@ export async function generateIdeasForCluster(
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
+  const researchSection = WEB_SEARCH_ENABLED ? `
+----------------------------------------
+RESEARCH-FIRST-PROTOKOLL (Pflicht — vor jeder Idee)
+----------------------------------------
+Du hast Zugriff auf web_search. **Nutze es BEVOR du Ideen generierst.**
+
+Fuer den Pillar "${CLUSTER_LABEL[cluster]}" fuehre 2-3 gezielte Searches durch.
+Suche nach AKTUELLEN, KONKRETEN, DEUTSCHEN Themen — nicht generischen Konzepten.
+
+Such-Beispiele je nach Pillar:
+- DSGVO/Privacy: "DSGVO Bußgeld 2026 Tracking", "Schrems II 2026 marketing"
+- Offline-ROI: "Plakatwerbung ROI 2026 DACH", "DOOH Deutschland 2026"
+- QR-Practices: "QR Code Scan Statistik DACH 2026"
+- Attribution: "Last-Click Attribution 2026", "Cookie-less Tracking DACH"
+- Behind-Scenes: "DACH Solopreneur SaaS 2026"
+
+Ziel der Searches:
+- Konkrete Fakten / Zahlen / News-Geschichten der letzten 90 Tage
+- Echte Firmen / Behoerden / Personen zum Zitieren
+- Wettbewerbs-Pricing-Updates wenn relevant
+- Reale Bußgeld-Faelle / DSGVO-Verfahren wenn DSGVO-Topic
+
+VERWENDE die Such-Ergebnisse in den outline-Feldern (zitiere Quellen, Daten,
+Behoerden). Mach Ideen TOPICAL ("Die [Bußgeld-Fall XYZ] zeigt:...").
+` : '';
+
   const prompt = `${SPURIG_VOICE}
 
 ========================================
@@ -140,51 +166,14 @@ Pillar-Scope: ${CLUSTER_DESCRIPTION[cluster]}
 Generiere ${count} CONTENT-IDEEN nach dem Elite-Psychologie-Framework oben.
 Jede Idee muss Hook-Quality-Test (PART 7) bestehen und mind. 3 psychologische
 Hebel (PART 3) einbauen.
-
-----------------------------------------
-RESEARCH-FIRST-PROTOKOLL (Pflicht — vor jeder Idee)
-----------------------------------------
-Du hast Zugriff auf web_search. **Nutze es BEVOR du Ideen generierst.**
-
-Fuer den Pillar "${CLUSTER_LABEL[cluster]}" fuehre 3-5 gezielte Searches durch.
-Suche nach AKTUELLEN, KONKRETEN, DEUTSCHEN Themen — nicht generischen Konzepten.
-
-Such-Beispiele je nach Pillar:
-- DSGVO/Privacy: "DSGVO Bußgeld 2026 Tracking", "Schrems II URTEIL 2026 marketing",
-  "BfDI Bitly Verfahren", "Bayerisches Landesamt fuer Datenschutz Marketing"
-- Offline-ROI: "Plakatwerbung ROI 2026 DACH", "Out-of-Home Werbung Effekt Messung",
-  "DOOH Marktanteile Deutschland 2026"
-- QR-Practices: "QR Code Scan Statistik DACH 2026", "QR Code Plakat Conversion Rate",
-  "QR-Code in der Gastronomie 2026"
-- Attribution: "Last-Click Attribution Tot 2026", "Multi-Touch DACH Marketing",
-  "Cookie-less Tracking DACH"
-- Behind-Scenes: "DACH Solopreneur SaaS 2026", "Indie Hacker Deutschland Stripe",
-  "Build in Public DACH"
-
-Ziel der Searches:
-- 3 KONKRETE Fakten / Zahlen / News-Geschichten der LETZTEN 90 TAGE finden
-- 2 echte Firmen / Behoerden / Personen die zitiert werden koennen
-- 1 aktuelle Debatte / Kontroverse / Urteil das gerade laeuft
-- Wettbewerbs-Pricing-Updates (Bitly Preisaenderungen, Rebrandly Pricing Changes)
-- Reale Bußgeld-Faelle / DSGVO-Verfahren der letzten Monate
-
-VERWENDE die Such-Ergebnisse in den Ideen:
-- Zitiere konkrete Quellen, Daten, Behoerden in den "outline"-Feldern
-- Mache Ideen TOPICAL ("Die ['Bußgeld-Fall XYZ'] zeigt: jeder DACH-Marketer mit
-  Bitly hat ein Problem.")
-- Wenn ein konkreter Fall in den News ist → eine Idee MUSS darauf basieren
-
-NICHT generische Konzept-Ideen ohne aktuellen Bezug generieren wenn echte News
-verfuegbar sind.
-
+${researchSection}
 ----------------------------------------
 PRE-WRITING-ANALYSE (denk SELBER durch, vor dem Generieren)
 ----------------------------------------
-NACH der Web-Research, mit den Ergebnissen im Kopf:
+Bevor du Ideen formulierst, ueberlege intern:
 - 5 echte Situationen die ein DACH-Marketer / Founder / Restaurant-Besitzer wirklich erlebt
-- 3 Mainstream-Annahmen die FALSCH sind (kontroverse Takes), idealerweise durch
-  News-Findings belegt
-- 3 konkrete Zahlen / Marken / Fakten aus der Web-Research die ueberraschen
+- 3 Mainstream-Annahmen die FALSCH sind (kontroverse Takes)
+- 3 konkrete Zahlen / Marken / Fakten die ueberraschen
 - 2 Original-Saetze die ein Profi-Insider sagen wuerde
 Erst dann: Ideen formulieren.
 
@@ -276,30 +265,37 @@ Ueber die ${count} Ideen verteilt:
 - Variiere Hook-Patterns A-F
 - Mische emotionale Trigger (Wut, Neugier, Identifikation, Status, Verlustangst)
 
-----------------------------------------
-OUTPUT-FORMAT (strikt einhalten — Parser bricht sonst)
-----------------------------------------
+==========================================
+OUTPUT-FORMAT (STRIKT EINHALTEN — sonst Parser-Crash)
+==========================================
 
-NUR JSON-Array. Keine Markdown-Fences. Kein Vorwort. Kein Nachwort.
+ANTWORTE AUSSCHLIESSLICH MIT JSON.
+KEIN Vorwort. KEIN "Ich starte mit...". KEINE Research-Notes.
+KEINE Markdown-Code-Fences (kein \`\`\`json).
+KEIN Erklaerungstext nach dem JSON.
 
+Format (genau so):
 [
   {"title": "...", "angle": "...", "outline": "...", "target_keywords": "..."},
-  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "..."},
-  ...
+  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "..."}
 ]
 
-Jetzt liefere die ${count} besten Ideen — und mach sie so, dass sie den
-HOOK-QUALITY-TEST jedes einzeln bestehen.`;
+Dein erster ausgegebener Charakter MUSS "[" sein.
+Dein letzter ausgegebener Charakter MUSS "]" sein.
+
+Jetzt liefere die ${count} besten Ideen.`;
 
   const text = await callClaude(apiKey, prompt, { maxTokens: 4000, useSearch: true });
 
-  // Robust-Parse
-  let jsonText = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
-  // Falls Claude doch Pre-Text: ersten [ bis letzten ] extrahieren
-  const firstBracket = jsonText.indexOf('[');
+  // Robust-Parse — selbst wenn Claude Pre-Text liefert, extrahiere das JSON-Array
+  let jsonText = text.trim();
+  // Strip Markdown-Code-Fences wenn vorhanden
+  jsonText = jsonText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  // Finde das erste "[" + "{" gefolgt von Inhalt — robuster als nur indexOf
+  const arrayStart = jsonText.search(/\[\s*\{/);
   const lastBracket = jsonText.lastIndexOf(']');
-  if (firstBracket > 0 && lastBracket > firstBracket) {
-    jsonText = jsonText.slice(firstBracket, lastBracket + 1);
+  if (arrayStart >= 0 && lastBracket > arrayStart) {
+    jsonText = jsonText.slice(arrayStart, lastBracket + 1);
   }
 
   let ideas: GeneratedIdea[];
@@ -327,6 +323,17 @@ export async function expandIdeaToBlog(idea: {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
+  const blogResearchSection = WEB_SEARCH_ENABLED ? `
+----------------------------------------
+RESEARCH-FIRST-PROTOKOLL (Pflicht — vor dem Schreiben)
+----------------------------------------
+Du hast Zugriff auf web_search. **Nutze es BEVOR du den Blog schreibst.**
+
+Such 2-3 mal gezielt nach aktuellen Fakten / News-Geschichten / Behoerden-Verfahren
+zum Thema. Webe Findings natuerlich in den Text ein (kein Zitate-Listen-Format).
+Wenn du keinen konkreten News findest: weiter mit Story-Mode, kein Problem.
+` : '';
+
   const prompt = `${SPURIG_VOICE}
 
 ========================================
@@ -341,30 +348,7 @@ Pillar: ${CLUSTER_LABEL[idea.cluster]}
 
 Schreibe einen 900-1300 Worte deutschen Markdown-Blog-Post nach dem 8-Punkt-
 Storytelling-Arc (PART 6 oben) und mit MASSIVER Retention (PART 8 oben).
-
-----------------------------------------
-RESEARCH-FIRST-PROTOKOLL (Pflicht — vor dem Schreiben)
-----------------------------------------
-Du hast Zugriff auf web_search. **Nutze es BEVOR du den Blog schreibst.**
-
-Such 2-4 mal gezielt nach:
-- AKTUELLEN Fakten / Zahlen / Faellen zum Thema (letzte 6 Monate)
-- KONKRETEN Namen von Behoerden / Firmen / Studien die du zitieren kannst
-- ECHTEN News / Urteilen / Pricing-Updates der Wettbewerber
-- Sub-Topics die im Outline nicht stehen aber stark relevant sind
-
-Was du finden willst:
-- Mindestens 2 zitierbare konkrete Fakten aus echten Quellen
-- Mindestens 1 News-Geschichte die du als Aufhaenger nutzen kannst
-- Wettbewerbs-Pricing-Updates wenn Topic Bitly/Rebrandly betrifft
-- Konkrete Bußgeld-Faelle / Behoerden-Verfahren wenn DSGVO-Topic
-
-Verwende die Findings:
-- Webe sie natuerlich in den Text ein (nicht als Zitate-Liste)
-- Mach den Blog TOPICAL ("Letzte Woche hat das LfDI Niedersachsen..." statt
-  "Es gibt Faelle wo...")
-- Verlinke nicht — der Leser kommt auf den Blog, nicht auf externe Seiten
-- Wenn du keinen konkreten News findest: weiter mit Story-Mode, kein Problem
+${blogResearchSection}
 
 ----------------------------------------
 PRE-WRITING-PRUEFUNG (mental durchspielen)
