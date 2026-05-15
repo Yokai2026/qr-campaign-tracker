@@ -45,38 +45,128 @@ export async function generateIdeasForCluster(
 
   const prompt = `${SPURIG_VOICE}
 
----
+========================================
+DEINE AUFGABE — IDEEN-GENERIERUNG FUER PILLAR "${CLUSTER_LABEL[cluster]}"
+========================================
 
-Du bist Content-Strategist fuer Spurig. Generiere ${count} VIRALE Content-Ideen fuer den Pillar "${CLUSTER_LABEL[cluster]}":
-${CLUSTER_DESCRIPTION[cluster]}
+Pillar-Scope: ${CLUSTER_DESCRIPTION[cluster]}
 
-Jede Idee muss SOCIAL-MEDIA-tauglich sein:
-- **Titel** (max 70 Zeichen): Schlagzeile mit Wow-Effekt / Pattern-Break / Kontroverse / konkreter Zahl.
-  Beispiele guter Titel:
-  · "Was 90% der Marketing-Agenturen ueber DSGVO falsch verstehen"
-  · "Ich habe 6 Wochen mit Bitly gearbeitet. Hier was passierte."
-  · "27 Euro pro Plakat-Standort. So habe ich das gemessen."
-  · "Warum dein QR-Code mit Logo 30% weniger Scans bekommt"
-  Schlechte Titel (NICHT generieren):
-  · "5 Tipps fuer besseres DSGVO" (Listicle, generisch)
-  · "Was ist QR-Code-Tracking?" (zu basic)
-  · "Datensparsamkeit im Tracking" (klingt nach Whitepaper)
+Generiere ${count} CONTENT-IDEEN nach dem Elite-Psychologie-Framework oben.
+Jede Idee muss Hook-Quality-Test (PART 7) bestehen und mind. 3 psychologische
+Hebel (PART 3) einbauen.
 
-- **angle** (Story-Hook fuer Intro, 1 Satz): persoenliche Beobachtung, eigene Fehleinschaetzung, oder echter Kunden-Moment.
-  Format: "Letzte Woche...", "Ein Kunde fragte mich...", "Bis vor 3 Monaten dachte ich..."
+----------------------------------------
+PRE-WRITING-ANALYSE (denk SELBER durch, vor dem Generieren)
+----------------------------------------
+Bevor du schreibst, finde fuer den Pillar:
+- 5 echte Situationen die ein DACH-Marketer / Founder / Restaurant-Besitzer wirklich erlebt
+- 3 Mainstream-Annahmen die FALSCH sind (kontroverse Takes)
+- 3 konkrete Zahlen / Marken / Fakten die ueberraschen
+- 2 Original-Saetze die ein Profi-Insider sagen wuerde
+Erst dann: Ideen formulieren.
 
-- **outline** (2-3 Saetze): WAS im Post drin steht — konkrete Punkte, Zahlen, Beispiele.
-  Mindestens 1 kontroverser Take oder Insight gegen Mainstream.
+----------------------------------------
+HOOK-QUALITAETS-SCHWELLE PRO IDEE
+----------------------------------------
+Bevor du eine Idee aufnimmst, pruefe den Titel gegen DIESEN Test:
 
-- **target_keywords** (2-4 SEO-Keywords kommagetrennt): natuerlich, nicht stuffed.
+Wuerde ein DACH-Marketer beim Scrollen auf LinkedIn / Reddit anhalten und denken
+EINEN dieser Saetze:
+  - "Das fuehle ich gerade."
+  - "Das ist mir auch passiert."
+  - "Wait, mache ich das auch?"
+  - "Krass, daran hatte ich nie gedacht."
+  - "Das wuerd ich kommentieren wollen."
 
-Tonalitaet: jede Idee muss Spurig's "anti-Bitly + indie + ehrlich + lehrreich"-DNA tragen.
+Wenn NEIN → Idee verwerfen, neu schreiben.
+Wenn JA → behalten.
 
-Format: NUR JSON-Array, keine Markdown-Fences, kein Vorwort:
+----------------------------------------
+TITEL-PATTERNS (Pflicht: nutze unterschiedliche Patterns ueber die ${count} Ideen verteilt)
+----------------------------------------
+
+PATTERN A — Echter Dialog (sehr stark):
+- "Ein Anwalt sagte mir gestern einen Satz, der mich nicht loslaesst."
+- "Eine Marketing-Chefin: 'Wir nutzen das seit 6 Jahren. Niemand weiss, ob das legal ist.'"
+
+PATTERN B — Persoenlicher Fail / Selbstkritik:
+- "Ich hab 8 Wochen das falsche Feature gebaut. Hier was ich uebersah."
+- "27 Euro pro Plakat. Vier Standorte. Ich war schockiert."
+
+PATTERN C — Konkrete Zahl + Pattern-Break:
+- "23 von 47 Marketing-Teams: kein AV-Vertrag mit Bitly."
+- "Drei Minuten Stille. Dann sagte sie: 'Ashburn, Virginia.'"
+
+PATTERN D — Verlustangst + Specificity:
+- "Sechs Jahre Klick-Daten. Ueber den Atlantik. Ohne Vertrag."
+- "Was bei einem Bitly-Klick im Hintergrund passiert, bevor du auf der Seite landest."
+
+PATTERN E — Provokante Behauptung:
+- "Cookie-Banner sind nicht das DSGVO-Problem in deinem Marketing."
+- "Bitly ist eine Falle. Jeder weiss es. Keiner sagt's."
+
+PATTERN F — Hyper-spezifische Mini-Story:
+- "Donnerstag 14:30. Ihr Buero in Duesseldorf. Sie konnte die Frage nicht beantworten."
+- "Ein Restaurant-Besitzer aus Koeln zeigte mir seine QR-Code-Statistik. Eine Spalte fehlte."
+
+NICHT generieren (Instant-Fail):
+- "5 Tipps fuer besseres DSGVO-Tracking" (Listicle)
+- "Was ist QR-Code-Tracking?" (Anfaenger-Frage)
+- "Datensparsamkeit im modernen Marketing" (Whitepaper-Tone)
+- "Tracking 101" / "Der ultimative Guide zu..." / "Alles was du wissen musst"
+- Alles mit "innovativ", "revolutionaer", "Game Changer", "Spoiler:"
+
+----------------------------------------
+PRO IDEE LIEFERST DU 4 FELDER
+----------------------------------------
+
+* **title** (max 80 Zeichen):
+  - Folgt einem der Patterns A-F
+  - Besteht den Hook-Quality-Test (PART 7)
+  - Hyper-spezifisch (Zahl ODER Ort ODER Marke ODER Rolle ODER Zeitpunkt)
+
+* **angle** (Story-Hook fuer Intro, 1-2 Saetze):
+  - Persoenliche Beobachtung mit echtem konkreten Moment
+  - Idealerweise mit Dialog ("Sie sagte gestern: '...'")
+  - Format: "Letzte Woche saß ich mit...", "Ein Kunde rief an...", "Bis vor drei Monaten dachte ich..."
+  - NIE: generisches "In der heutigen Zeit..." oder "Viele Marketer fragen sich..."
+
+* **outline** (3-5 Saetze):
+  - WAS konkret im Post drin steht (mit konkreten Zahlen, Marken, Beispielen)
+  - MINDESTENS eine kontroverse Aussage oder Anti-Mainstream-These
+  - MINDESTENS einen "Aha"-Moment den der Leser nicht erwartet
+  - Konkrete Action-Steps oder Insider-Wissen
+  - Schluss-Frage / Diskussions-Trigger
+
+* **target_keywords** (2-4 SEO-Keywords kommagetrennt):
+  - Natuerlich, nicht stuffed
+  - DACH-Suchterme (deutsch wo moeglich)
+  - Long-Tail bevorzugt ("DSGVO-konformes Link-Tracking" > "Tracking")
+
+----------------------------------------
+VARIATIONS-PFLICHT
+----------------------------------------
+Ueber die ${count} Ideen verteilt:
+- NICHT alle mit "Bitly" im Titel (max 30%)
+- NICHT alle als "Ich"-Story (max 50%, Rest echter Dialog / Kunden-Story)
+- NICHT alle mit Zahl am Anfang (max 30%)
+- Variiere Hook-Patterns A-F
+- Mische emotionale Trigger (Wut, Neugier, Identifikation, Status, Verlustangst)
+
+----------------------------------------
+OUTPUT-FORMAT (strikt einhalten — Parser bricht sonst)
+----------------------------------------
+
+NUR JSON-Array. Keine Markdown-Fences. Kein Vorwort. Kein Nachwort.
+
 [
   {"title": "...", "angle": "...", "outline": "...", "target_keywords": "..."},
+  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "..."},
   ...
-]`;
+]
+
+Jetzt liefere die ${count} besten Ideen — und mach sie so, dass sie den
+HOOK-QUALITY-TEST jedes einzeln bestehen.`;
 
   const res = await fetch(ANTHROPIC_API, {
     method: 'POST',
@@ -136,40 +226,128 @@ export async function expandIdeaToBlog(idea: {
 
   const prompt = `${SPURIG_VOICE}
 
----
+========================================
+DEINE AUFGABE — BLOG-POST SCHREIBEN
+========================================
 
-Du schreibst einen Spurig-Blog-Post zum Thema "${idea.title}".
+Thema: "${idea.title}"
+Story-Hook: ${idea.angle}
+Outline: ${idea.outline}
+SEO-Keywords: ${idea.target_keywords ?? 'keine vorgegeben'}
+Pillar: ${CLUSTER_LABEL[idea.cluster]}
 
-INPUT:
-- Story-Hook: ${idea.angle}
-- Outline: ${idea.outline}
-- SEO-Keywords: ${idea.target_keywords ?? 'keine vorgegeben'}
-- Pillar: ${CLUSTER_LABEL[idea.cluster]}
+Schreibe einen 900-1300 Worte deutschen Markdown-Blog-Post nach dem 8-Punkt-
+Storytelling-Arc (PART 6 oben) und mit MASSIVER Retention (PART 8 oben).
 
-Schreibe einen 900-1300 Worte deutschen Markdown-Blog-Post — Stil = "Founder beim Bier mit Kollegen", maximales Engagement, persoenlich, diskussions-anregend.
+----------------------------------------
+PRE-WRITING-PRUEFUNG (mental durchspielen)
+----------------------------------------
+Bevor du loslegst, beantworte dir SELBST:
+1. Welche EINE Emotion will ich primaer triggern? (Empoerung, Identifikation,
+   Verlustangst, Aha-Moment, Neugier)
+2. Wer ist die EINE konkrete Person im Mittelpunkt der Story?
+   (Name oder Rolle + Ort. KEINE "viele Marketer".)
+3. Welcher konkrete Moment ist das Hook? (Tag, Uhrzeit, Ort, direkter Satz)
+4. Was ist die punchige Schluss-Zeile, an die der Leser sich morgen noch erinnert?
+5. Welche Diskussions-Frage am Ende provoziert echte Antworten?
 
-ENGAGEMENT-REGELN (Pflicht):
-- **Du-Form direkt** an Leser ("Kennst du das?", "Mach das nicht so wie ich", "Du wirst denken...")
-- **Mindestens 3 direkte Leser-Fragen** verteilt ueber den Text (nicht alle am Ende)
-- **Mindestens 1 kontroverse These** in ersten 2 Absaetzen ("Die meisten machen X. Das ist Bullshit. Hier warum:")
-- **Mindestens 1 Selbstkritik** ("Ich war ueberzeugt dass... bis...")
-- **Mindestens 1 "Aha"-Moment** ("Was ich nie verstand: ...")
-- **Sehr kurze Saetze**. 3-8 Worte. Manche 1 Wort. ("Klar. Logisch. Trotzdem falsch.")
-- **Konkrete Namen, Zahlen, Beispiele** statt abstrakter Phrasen
-- **Mind. 2 plausible Stats** ("Bei den 50 Marketing-Teams die ich gesprochen habe...")
+----------------------------------------
+HOOK-ABSATZ (Zeile 1-4)
+----------------------------------------
+PFLICHT: Erster Satz folgt einem der 6 Patterns aus PART 7 (Hook-Quality-Test).
+PFLICHT: Mindestens ein direkter Satz in Anfuehrungszeichen ("...") im ersten Drittel.
+PFLICHT: Konkreter Ort, Tag, Person oder Zahl in den ersten 4 Saetzen.
 
-Struktur:
-1. **Hook-Absatz** (2-4 Saetze): konkrete Situation aus dem angle. Kein "In diesem Artikel". Pattern-Break in Zeile 1.
-2. **4-5 H2-Unterabschnitte** mit ## Headlines (max 45 Zeichen, klick-mich-Feel — am besten Fragen oder kontroverse Behauptungen)
-3. **Pro Abschnitt 2-4 Absaetze**, mit eingebauten Leser-Fragen + konkreten Beispielen
-4. **Schluss-Abschnitt** ## Was meinst du? oder ## Hab ich da was uebersehen? — endet mit ECHTER Diskussions-Frage die Antworten provoziert
+Beispiel-Eroeffnungen (nach diesem Vibe schreiben):
 
-VERBOTEN (instant fail):
-- "In diesem Artikel", "Hier sind 5 Tipps", "Lass uns einen Blick werfen"
-- Generische Hooks ("Hast du dir je gefragt...")
-- "Take", "Pro-Tipp", "Spoiler:", "innovativ", "revolutionaer"
-- Lange verschachtelte Saetze
-- Keine echte Frage am Ende (sonst keine Diskussion)
+  "Eine Marketing-Chefin gestern: 'Wir nutzen das seit 6 Jahren. Keiner weiss,
+  ob das legal ist.' Sie hatte recht.
+
+  Wir sassen in ihrem Buero in Duesseldorf. ..."
+
+  "Donnerstag, 14:30, Buero eines Mittelstaendlers in Hamburg.
+
+  Sie zeigte mir ihre Tracking-Statistik — sauber, alles vermessen. Dann
+  stellte ich eine Frage. Drei Minuten Stille. ..."
+
+  "Ich hatte sechs Wochen gebraucht, um eine Sache zu verstehen, die mir ein
+  Anwalt in 90 Sekunden erklaerte. ..."
+
+VERBOTEN (Instant-Fail):
+- "In diesem Artikel zeige ich dir..."
+- "Hast du dich schon mal gefragt..."
+- "In der heutigen Zeit ist es wichtig..."
+- "Lass uns gemeinsam einen Blick werfen..."
+- "Hier sind 5 Tipps..."
+
+----------------------------------------
+STRUKTUR
+----------------------------------------
+
+1. **HOOK-ABSATZ** (siehe oben — 2-4 Saetze, mit Specificity + Dialog)
+
+2. **RELATABLE-MOMENT-ABSATZ** (3-5 Saetze):
+   Ausweitung der Situation. Der Leser denkt: "Das koennte mir genauso passieren."
+   Konkret bleiben. Eine Person, ein Ort, eine Beobachtung.
+
+3. **4-5 H2-UNTERABSCHNITTE** mit ## Headlines:
+   - Headlines max 50 Zeichen
+   - Headlines folgen Pattern: Frage ("Wo stehen eure Server?") ODER Behauptung
+     ("Sechs Jahre. Niemand fragte.") ODER Pattern-Break ("Das eigentliche Problem
+     ist nicht Bitly.")
+   - Headlines DUERFEN provokant / kontrovers sein
+   - KEINE Headlines wie "Was ist X?" / "Die Vorteile von X" / "Tipps fuer X"
+
+4. **PRO H2-ABSCHNITT (Inhalt)**:
+   - 2-4 kurze Absaetze
+   - MINDESTENS 1 konkrete Zahl / Name / Zitat pro Abschnitt
+   - MINDESTENS 1 Mini-Cliffhanger oder Open-Loop
+   - MINDESTENS 1 direkte Leser-Adresse ("du", "fragst du jetzt...")
+   - Saetze meist kurz (3-12 Worte), gelegentlich 1-Wort-Punchlines ("Klingt absurd.")
+
+5. **MITTE-DES-TEXTES-BOLD-LINE**: irgendwo in der Mitte EIN fett gesetzter Satz
+   (mit **...**) der zentralen Insight zusammenfasst und visuell den Lesefluss bricht.
+
+6. **PRAKTISCHER MEHRWERT**: irgendwo ein Block mit konkreten Action-Steps (nicht als
+   stumpfe Liste mit "1, 2, 3" — sondern als Empfehlung im Erzaehlfluss).
+   Beispiel: "Falls du jetzt selbst kurz tippst — frag dein Marketing-Team drei
+   Dinge. Welches Tool. Wo Server. Gibt's einen AV-Vertrag. Das reicht."
+
+7. **SCHLUSS-ABSCHNITT** (## Headline, gerne ohne klassische Floskel):
+   - Punchige Schluss-Zeile, memorable
+   - ENDET mit ECHTER Diskussions-Frage die zum Kommentieren zwingt
+   - KEINE rhetorische Frage ("Was meint ihr?")
+   - KEINE Werbe-CTA
+   - Optional: PS mit dezenter Einladung ("PS. Falls dich das Setup interessiert
+     — schreib einfach.")
+
+----------------------------------------
+RETENTION-PFLICHT (PART 8 anwenden)
+----------------------------------------
+
+Pro 200 Worte mindestens EIN Retention-Hebel:
+  - Cliffhanger ("Drei Minuten Stille. Dann:")
+  - Offene Frage ("Was sie als naechstes sagte, war neu fuer mich.")
+  - Mini-Pattern-Interrupt ("Ich dachte das Gegenteil. Bis...")
+  - 1-Wort-Satz ("Stille.")
+  - Konkrete Andeutung ("Eine einzige Frage hat alles geaendert.")
+
+Wenn ein Absatz auch ohne den naechsten verstanden werden kann — er ist zu rund.
+Umschreiben mit Cliffhanger am Ende.
+
+----------------------------------------
+SPEZIFITAETS-CHECKLISTE (vor finalem Output)
+----------------------------------------
+
+Pruefe nach dem Schreiben:
+[ ] Mind. 2 konkrete Zahlen im Text (47 Mitarbeiter, 6 Jahre, etc.)
+[ ] Mind. 1 konkreter Ort (Duesseldorf, Frankfurt, Ashburn Virginia)
+[ ] Mind. 1 direkter Satz in Anfuehrungszeichen
+[ ] Mind. 1 namentlich benannte Rolle (Marketing-Chefin, DSGVO-Anwalt, CMO)
+[ ] Mind. 1 Marke / Tool / Service konkret genannt (Bitly, Ashburn AWS, Rebrandly)
+[ ] Mind. 1 konkrete Zeitangabe (Donnerstag, gestern, vor 6 Wochen)
+
+Wenn irgendwas davon fehlt — Text ist zu generisch. Spezifik einbauen.
 
 ZUSAETZLICH generiere einen DALL-E/Midjourney-tauglichen ENGLISCHEN Image-Prompt fuer ein **clickbait-Hero-Bild** das auf Social-Media stoppen laesst.
 

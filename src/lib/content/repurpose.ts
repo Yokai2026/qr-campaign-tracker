@@ -181,39 +181,110 @@ ${blog.body.slice(0, 6000)}
   if (channel === 'linkedin') {
     return `${base}
 
-Generiere einen LinkedIn-Post (deutsch, du-Form, 900-1400 Zeichen) der LinkedIn-Algorithmus liebt — Stop-Scroll-Hook, persoenliche Lern-Story, MASSIVE Diskussions-Provokation.
+========================================
+DEINE AUFGABE — LINKEDIN-POST AUS DEM BLOG
+========================================
 
-LINKEDIN-ALGORITHMUS-REGELN (Pflicht, vor 2026 getestet):
-1) **Zeile 1 = STOP-SCROLL-HOOK (max 100 Zeichen)** — eines davon:
-   - Konkrete Zahl die schockt ("40% deines Werbebudgets sind unsichtbar tot.")
-   - Anti-Mainstream-Statement ("Bitly ist eine DSGVO-Falle. Niemand sagt's.")
-   - Persoenliche Fail-Story ("6 Wochen, 450 € — und ich habe NICHTS gelernt.")
-   - Provokante Frage ("Warum messt ihr eure Posts, aber nicht eure Plakate?")
-2) **Zeile 2 = LEER** (LinkedIn-Cut-Off-Trick — der erste Satz haengt allein da)
-3) **2-4 Absatz-Blocks** (je 1-3 Saetze, Leerzeile dazwischen):
-   - Block 1: Konkrete Story-Situation (Wer, Wann, Was)
-   - Block 2: Konkrete Zahl + persoenlicher Lern-Moment
-   - Block 3: Kontroverser Take ODER Selbstkritik ("Was ich falsch dachte:")
-   - Block 4: Praktischer Insight oder Anti-Pattern
-4) **Schluss-Block**: ECHTE Diskussions-Frage die Antworten provoziert. KEINE rhetorische Frage. KEINE "Was ist deine Meinung?". Beispiele:
-   - "Wer hat das letzte Mal pro Plakat-Standort gemessen statt pro Kampagne?"
-   - "Habt ihr Bitly noch in DACH-Kunden-Reports? Wie verteidigt ihr das?"
-   - "Was war dein groesster Werbe-Reinfall? Ich teile meinen."
-5) **Eine Leerzeile, dann nur** "https://spurig.com/blog/${blog.slug}"
-6) **0-2 Hashtags** ganz am Ende (nur wenn wirklich passend, lieber 0)
+Generiere EINEN LinkedIn-Post (deutsch, du-Form, 900-1500 Zeichen total) der nach
+dem 8-Punkt-Storytelling-Arc (PART 6 oben) gebaut ist und alle Pattern-Checks
+aus PART 7 + 8 besteht.
 
-LINKEDIN-VIBE (sehr wichtig):
-- KURZE Saetze. Subjekt-Verb-Objekt. Manchmal 2-3 Worte ("Klingt absurd. Ist Realitaet.")
-- Erste Person, du-Form an Leser direkt
-- Konkret + ehrlich, lieber unbequem als nett
-- Klingt wie Founder beim Bier, NICHT wie Corporate-Marketing-Mail
+----------------------------------------
+PRE-WRITING-PRUEFUNG (mental durchspielen)
+----------------------------------------
+1. Welche EINE Story im Blog ist die staerkste? (eine konkrete Person, ein
+   konkreter Moment)
+2. Was ist die punchige Schluss-Zeile?
+3. Welche Diskussions-Frage provoziert echte DACH-Marketer-Antworten?
 
-VERBOTEN (instant fail):
-- "Spannend", "Take", "Pro-Tipp", "Spoiler:", "Hier sind 5 Tipps"
-- Generische Hooks ("Lass uns ueber X reden", "Kennen wir alle?")
-- "Was meint ihr?" als rhetorische Schluss-Floskel ohne Substanz
-- Emoji-Spam (max 0-1 wenn wirklich passend)
-- Hashtag-Salat
+Den Blog NICHT zusammenfassen. Den Blog als Material nutzen, daraus EINE Story
+extrahieren und dramatisch verdichten.
+
+----------------------------------------
+LINKEDIN-FORMAT (strikt)
+----------------------------------------
+
+ZEILE 1 (STOP-SCROLL-HOOK, max 100 Zeichen):
+Nutze einen der Hook-Patterns aus PART 7:
+  A. Echter Dialog: "Eine Marketing-Chefin gestern: 'Wir nutzen das seit 6 Jahren...'"
+  B. Persoenlicher Fail: "Ich hab 8 Wochen das falsche Feature gebaut."
+  C. Konkrete Zahl + Pattern-Break: "47 Marketing-Mitarbeiter. Keiner stellte die Frage."
+  D. Verlustangst + Specificity: "Sechs Jahre Daten. Server in Ashburn, Virginia. Kein AV-Vertrag."
+  E. Provokante Behauptung: "Cookie-Banner sind nicht das DSGVO-Problem."
+  F. Hyper-spezifische Mini-Story: "Donnerstag 14:30. Buero in Duesseldorf. Drei Minuten Stille."
+
+ZEILE 2: LEER (LinkedIn-Cut-Off-Trick — der Hook haengt allein, der "weiter lesen"-Klick faellt)
+
+BLOCK 2-4 (Story-Aufbau, je 2-4 Zeilen, mit Leerzeile dazwischen):
+
+  Block A — Relatable Moment: konkrete Situation, Wer/Wann/Wo, mit Specificity.
+    (z.B. "Wir sassen in ihrem Buero. Sie zeigte mir ihre Funnel — sauber gebaut,
+    jeder Touchpoint vermessen.")
+
+  Block B — Konflikt: die Wendung, die Ueberraschung, mit Mini-Cliffhanger.
+    (z.B. "Ich hab eine einzige Frage gestellt. Drei Minuten Tippen. Stille.
+    Dann: 'Ashburn, Virginia.'")
+
+  Block C — Insight + Selbstkritik / Kontroverse: was die Geschichte fuer ALLE
+    bedeutet. Eine starke These oder Selbst-Eingestaendnis.
+    (z.B. "Das eigentliche Problem ist nicht Bitly. Es ist, dass niemand fragt.")
+
+  Block D (optional) — Praktischer Mehrwert: was der Leser KONKRET tun kann,
+    in 1-2 Saetzen, NICHT als Liste. Nahtlos im Lesefluss.
+
+SCHLUSS-BLOCK (separater Absatz, kurz):
+  - Punchige Schluss-Zeile, memorable
+  - DANN ECHTE Diskussions-Frage:
+    * "Wer hat in den letzten 6 Monaten den AV-Vertrag mit seinem Link-Tool geprueft?"
+    * "Welches Tracking-Tool nutzt ihr aktuell — und wuerdet ihr's einem
+       Datenschutzbeauftragten erklaeren koennen?"
+    * "Was war dein groesster Marketing-Reinfall? Ich teil meinen."
+  - KEINE rhetorische Frage ("Was meint ihr?")
+  - KEINE Werbe-CTA
+
+NACH LEERZEILE: Der Link zum vollen Blog:
+"https://spurig.com/blog/${blog.slug}"
+
+Optional 0-2 Hashtags am Ende (wenn wirklich passend, default 0).
+
+----------------------------------------
+RETENTION-CHECKS (PART 8)
+----------------------------------------
+- Mind. 1 Cliffhanger ("Drei Minuten Stille. Dann:")
+- Mind. 1 direkter Satz in Anfuehrungszeichen
+- Mind. 2 sehr kurze Saetze (3-6 Worte) als Pattern-Interrupt
+- Mind. 1 konkrete Zahl/Ort/Person/Marke
+
+----------------------------------------
+LINKEDIN-VIBE (Bier-mit-Founder, nicht Corporate)
+----------------------------------------
+- Kurze Saetze. Subjekt-Verb-Objekt. Keine Verschachtelung.
+- Erste Person, direkte Du-Adresse an Leser
+- Konkret + ehrlich + manchmal unbequem
+- Wechsel zwischen Beobachtung und Konfrontation
+- KEINE Marketing-Brand-Voice
+
+----------------------------------------
+SPEZIFITAETS-CHECKLISTE (vor Output)
+----------------------------------------
+[ ] Mind. 1 konkrete Zahl
+[ ] Mind. 1 konkreter Ort ODER Rolle ODER Zeitpunkt
+[ ] Mind. 1 direkter Satz in Anfuehrungszeichen
+[ ] Mind. 1 Marke / Tool konkret genannt
+[ ] Schluss-Frage ist KEINE rhetorische Floskel
+
+Wenn irgendwas fehlt: ueberarbeiten.
+
+----------------------------------------
+VERBOTEN (Instant-Fail)
+----------------------------------------
+- "Spannend", "innovativ", "revolutionaer", "Game Changer"
+- "Take:", "Pro-Tipp:", "Spoiler:", "TL;DR:"
+- "In der heutigen Zeit", "Heutzutage", "In einer Welt in der..."
+- "Hast du dich schon mal gefragt..."
+- "Hier sind 5 Tipps..."
+- "Was meint ihr?" als Schluss-Floskel
+- Emoji-Spam, Hashtag-Salat
 - Lange Werbe-Sehnsuchts-Texte
 
 Antworte NUR mit dem Post-Text. Keine Erklaerung, keine Quotes, keine Code-Fences.`;
