@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { expandIdeaToBlog } from '@/lib/content/ideas';
 import { generateDraft, readBlogPost } from '@/lib/content/repurpose';
+import { notifySearchEngines } from '@/lib/seo/indexing';
 import type { ContentCluster } from '@/lib/content/pillars';
 
 export const dynamic = 'force-dynamic';
@@ -96,6 +97,10 @@ export async function POST(request: NextRequest) {
       status: 'expanded',
       expanded_blog_id: blog.id,
     }).eq('id', idea.id);
+
+    // SEO: Bing IndexNow + Google Sitemap-Ping fire-and-forget
+    const blogUrl = `https://spurig.com/blog/${blog.slug}`;
+    void notifySearchEngines([blogUrl]);
   }
 
   // Auto-Repurpose (3 Channels)

@@ -11,6 +11,7 @@
  */
 
 import type { OutboundSegment, OutboundLead } from './types';
+import { addUtm } from '@/lib/attribution/utm';
 
 export type TemplateKey =
   | 'marketing_agency_dsgvo_v2'
@@ -234,6 +235,15 @@ export function buildMailForLead(
     .replace('{city}', lead.city ?? 'eurer Region');
 
   const content = template.build(input);
+
+  // UTM-Attribution: jeder ctaUrl bekommt utm_source=cold_email + segment + lead-id
+  // -> bei Signup landen wir in profiles.attribution_source = 'cold_email'.
+  content.ctaUrl = addUtm(content.ctaUrl, {
+    source: 'cold_email',
+    medium: 'cold',
+    campaign: lead.segment,
+    content: lead.id,
+  });
 
   return {
     templateKey: template.key,

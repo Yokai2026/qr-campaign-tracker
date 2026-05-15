@@ -9,6 +9,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { ARTICLES } from '@/app/blog/articles';
 import { SPURIG_VOICE } from './spurig-voice';
+import { addUtmToAllLinks } from '@/lib/attribution/utm';
 
 const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
@@ -146,7 +147,17 @@ export async function generateDraft(
   }
 
   const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
-  const text = data.content?.find((c) => c.type === 'text')?.text?.trim();
+  let text = data.content?.find((c) => c.type === 'text')?.text?.trim();
+
+  // UTM-Anreicherung: jeder spurig.com-Link im Draft bekommt utm_source = channel etc.
+  // -> bei Signup wird attribution_source = 'linkedin' / 'twitter' / 'reddit'.
+  if (text) {
+    text = addUtmToAllLinks(text, {
+      source: channel,
+      medium: 'social',
+      campaign: blog.slug,
+    });
+  }
   if (!text) throw new Error('Empty response from Claude');
   return text;
 }
