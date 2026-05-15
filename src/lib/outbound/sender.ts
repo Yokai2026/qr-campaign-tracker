@@ -133,6 +133,12 @@ export async function sendOutboundBatch(
             { name: 'segment', value: lead.segment },
             { name: 'template', value: mail.templateKey },
           ],
+          // Open + Click Tracking via Resend (Pixel + Link-Wrap).
+          // Engagement-Events laufen ueber /api/webhooks/resend in outbound_messages.
+          tracking: {
+            opens: true,
+            clicks: true,
+          },
         }),
       });
 
