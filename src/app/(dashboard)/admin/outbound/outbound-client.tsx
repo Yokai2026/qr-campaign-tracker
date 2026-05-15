@@ -48,6 +48,9 @@ type Stats = {
   segments: Record<string, number>;
   byStatus: Record<string, number>;
   daily: Array<{ date: string; sent: number; opened: number; clicked: number; replied: number }>;
+  /** Zeitstempel des juengsten Webhook-Events (delivered/opened/clicked/bounced/complained).
+   *  null = es ist NIE ein Webhook-Event angekommen → Resend-Webhook nicht konfiguriert. */
+  lastWebhookAt: string | null;
 };
 
 type Lead = {
@@ -221,6 +224,10 @@ export function OutboundClient() {
           </div>
         </div>
       )}
+
+      {/* Webhook-Diagnose: wenn Mails versendet sind aber noch nie ein Webhook-
+          Event ankam → roter Setup-Banner mit konkreten Anweisungen. */}
+      {stats && <WebhookStatusBanner sent={t?.sent ?? 0} lastWebhookAt={stats.lastWebhookAt} />}
 
       {/* Funnel Bar */}
       <FunnelBar totals={t} />
@@ -402,6 +409,88 @@ export function OutboundClient() {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Zeigt prominent an, ob der Resend-Webhook funktioniert.
+ *
+ * 3 Zustaende:
+ *  - sent==0: noch keine Mails versendet → kein Banner
+ *  - sent>0 + lastWebhookAt!=null: Webhook funktioniert → kleiner gruener Hinweis
+ *  - sent>0 + lastWebhookAt==null: PROBLEM → grosser roter Banner mit Setup-Anleitung
+ */
+function WebhookStatusBanner({
+  sent,
+  lastWebhookAt,
+}: {
+  sent: number;
+  lastWebhookAt: string | null;
+}) {
+  if (sent === 0) return null;
+
+  if (lastWebhookAt) {
+    return (
+      <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-4 py-2.5 flex items-center gap-3 text-sm">
+        <span className="relative flex h-2 w-2 shrink-0">
+          <span className="absolute inline-flex h-full w-full animate-[pulseDot_1.6s_ease-in-out_infinite] rounded-full bg-emerald-400/60" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+        </span>
+        <div>
+          <span className="font-medium">Resend-Webhook aktiv</span>
+          <span className="text-muted-foreground">
+            {' '}· letzter Event{' '}
+            {formatDistanceToNow(new Date(lastWebhookAt), { locale: de, addSuffix: true })}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // sent > 0 + kein Webhook-Event je → Konfigurationsproblem
+  return (
+    <div className="rounded-lg border border-red-500/40 bg-red-500/5 px-4 py-3 flex items-start gap-3">
+      <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+      <div className="flex-1 text-sm space-y-2">
+        <div>
+          <strong>Resend-Webhook empfängt keine Events.</strong>
+          {' '}{sent} Mail{sent === 1 ? '' : 's'} wurden versendet, aber bisher kam kein einziges
+          Delivered/Opened/Clicked/Bounced-Event an. Solange der Webhook nicht konfiguriert ist,
+          bleiben diese Zahlen für immer auf 0.
+        </div>
+        <div className="text-muted-foreground">
+          <strong className="text-foreground">So richtest du den Webhook ein:</strong>
+          <ol className="mt-1 ml-4 list-decimal space-y-0.5 text-[12.5px]">
+            <li>
+              Öffne{' '}
+              <a
+                href="https://resend.com/webhooks"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                resend.com/webhooks
+              </a>
+            </li>
+            <li>Klick „Add Endpoint"</li>
+            <li>
+              URL:{' '}
+              <code className="rounded bg-muted px-1.5 py-0.5 text-[11.5px]">
+                https://spurig.com/api/webhooks/resend
+              </code>
+            </li>
+            <li>
+              Subscribed Events anhaken:
+              <code className="ml-1 rounded bg-muted px-1.5 py-0.5 text-[11.5px]">
+                email.sent, email.delivered, email.opened, email.clicked, email.bounced,
+                email.complained, email.failed
+              </code>
+            </li>
+            <li>Speichern — nächste Mail wird komplett getrackt.</li>
+          </ol>
+        </div>
       </div>
     </div>
   );

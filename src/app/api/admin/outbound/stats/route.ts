@@ -44,6 +44,10 @@ export async function GET() {
     leadsBySegment,
     leadsByStatus,
     last14d,
+    // Wann wurde der letzte Webhook-Event empfangen? Wenn null → Resend-Webhook
+    // ist gar nicht konfiguriert. Wichtige Diagnose damit der Admin weiss
+    // ob die fehlenden delivered/opened-Zahlen vom Webhook kommen.
+    lastWebhook,
   ] = await Promise.all([
     sb.from('outbound_leads').select('id', { count: 'exact', head: true }),
     sb.from('outbound_leads').select('id', { count: 'exact', head: true }).eq('email_status', 'discovered'),
@@ -65,6 +69,15 @@ export async function GET() {
       .from('outbound_messages')
       .select('sent_at, opened_at, clicked_at, replied_at')
       .gte('sent_at', new Date(Date.now() - 14 * 86_400_000).toISOString()),
+    // Latest webhook events — wir nehmen das hoechste von delivered/opened/clicked/bounced/complained.
+    // Wenn alle null → kein Webhook hat je gefeuert.
+    Promise.all([
+      sb.from('outbound_messages').select('delivered_at').not('delivered_at', 'is', null).order('delivered_at', { ascending: false }).limit(1).maybeSingle(),
+      sb.from('outbound_messages').select('opened_at').not('opened_at', 'is', null).order('opened_at', { ascending: false }).limit(1).maybeSingle(),
+      sb.from('outbound_messages').select('clicked_at').not('clicked_at', 'is', null).order('clicked_at', { ascending: false }).limit(1).maybeSingle(),
+      sb.from('outbound_messages').select('bounced_at').not('bounced_at', 'is', null).order('bounced_at', { ascending: false }).limit(1).maybeSingle(),
+      sb.from('outbound_messages').select('complained_at').not('complained_at', 'is', null).order('complained_at', { ascending: false }).limit(1).maybeSingle(),
+    ]),
   ]);
 
   const sent = msgSent.count ?? 0;
@@ -143,5 +156,18 @@ export async function GET() {
   }
   const daily = Array.from(days.values());
 
-  return NextResponse.json({ totals, rates, segments, byStatus, daily });
+  // Hoechstes Webhook-Event-Timestamp ermitteln
+  const webhookTimestamps: string[] = [];
+  const [d, o, c, b, cm] = lastWebhook;
+  if (d.data?.delivered_at) webhookTimestamps.push(d.data.delivered_at as string);
+  if (o.data?.opened_at) webhookTimestamps.push(o.data.opened_at as string);
+  if (c.data?.clicked_at) webhookTimestamps.push(c.data.clicked_at as string);
+  if (b.data?.bounced_at) webhookTimestamps.push(b.data.bounced_at as string);
+  if (cm.data?.complained_at) webhookTimestamps.push(cm.data.complained_at as string);
+  const lastWebhookAt =
+    webhookTimestamps.length > 0
+      ? webhookTimestamps.sort().slice(-1)[0]
+      : null;
+
+  return NextResponse.json({ totals, rates, segments, byStatus, daily, lastWebhookAt });
 }
