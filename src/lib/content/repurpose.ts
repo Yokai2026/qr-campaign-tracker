@@ -138,20 +138,25 @@ ${blog.body.slice(0, 6000)}
   if (channel === 'linkedin') {
     return `${base}
 
-Generiere einen LinkedIn-Post (deutsch, du-Form, max 1300 Zeichen) der diesen Blog-Post repurposed.
+Generiere einen LinkedIn-Post (deutsch, du-Form, 700-1200 Zeichen) der den Blog-Inhalt als persoenliche Lern-Geschichte rueberbringt — NICHT als Experten-Vortrag.
 
-Struktur:
-- Hook in Zeile 1: kontroverse These oder konkrete Zahl die scrollen stoppt
-- 3-5 Absaetze mit Value (1-2 Saetze pro Absatz, Leerzeilen dazwischen)
-- Concrete number/example aus dem Artikel
-- Endet mit "Mehr im Blog: https://spurig.com/blog/${blog.slug}" und 1 Frage an den Leser
-- 3-5 Hashtags am Ende (z.B. #Marketing #DSGVO #Print)
+Struktur — Story-Format (kritisch!):
+- Zeile 1: persoenlicher Aufhaenger ("Letzte Woche...", "Vor 2 Jahren dachte ich noch...", "Ein Kunde fragte mich gestern...", "Ich hab das selbst lang falsch gemacht...")
+- Mittel-Teil: Was du gelernt hast, in 3-5 kurzen Absaetzen (je 1-2 Saetze). Inkl. EINE konkrete Zahl/Beispiel aus dem Blog
+- Selbstkritik-Moment: zeig dass du selbst mal anders gedacht hast ("Ich war ueberzeugt dass ... bis ich gemerkt habe ...")
+- Letzter Absatz: kurze Frage an den Leser (zur Diskussion, nicht zur Conversion)
+- "Voller Artikel mit Quellen: https://spurig.com/blog/${blog.slug}"
+- MAX 2 Hashtags am Ende — nur wirklich relevante (#DSGVO #Marketing). Wenn keine passen: keine.
 
-Style:
-- Erste Person ("Wir haben...", "Mein Take:")
-- Keine "Hier sind 5 Tipps"-Listen — Storytelling-Format
-- Keine Marketing-Phrasen wie "spannend", "ich freue mich"
-- Konkret und ehrlich
+Style — wichtig:
+- Erste Person ("Ich", "wir"), du-Form zum Leser
+- Klingt wie wenn du einem Kollegen beim Bier erzaehlst — nicht wie Marketing-Email
+- KURZE Saetze. Subjekt-Verb-Objekt. Keine verschachtelten Konstruktionen
+- Konkret: Namen, Zahlen, echte Situationen statt abstrakter Phrasen
+- Selbstkritik > Expertenstolz
+- VERBOTEN: "spannend", "ich freue mich", "Take", "Pro-Tipp", "Spoiler:", Marketing-Lehren-Floskeln
+- VERBOTEN: lange Absaetze, Aufzaehlungen, Bullet-Points
+- VERBOTEN: emotionaler Manipulationsstil ("Verlieren Sie nicht...")
 
 Antworte NUR mit dem Post-Text. Keine Erklaerung, keine Quotes.`;
   }
@@ -169,10 +174,13 @@ Format:
 Separator zwischen Tweets: "---"
 
 Style:
-- Kurze Saetze, kein Marketing-Speech
-- Konkrete Zahlen, Beispiele aus dem Artikel
-- Erste Person
-- Kein "Thread:", kein "1/", kein Emoji-Spam (max 1 Emoji pro Thread)
+- Erster Tweet: persoenliche Beobachtung oder Frage, KEINE Statistik-Bombe
+- Schreibe als jemand der gerade was lernt — nicht als Lehrer
+- Kurze Saetze. Subjekt-Verb-Objekt.
+- Konkrete Zahlen + EINE eigene Anekdote
+- VERBOTEN: "Thread:", "1/", "Spoiler:", Hashtag-Spam, Emoji-Spam (0 Emojis bevorzugt, max 1 wenn wirklich passend)
+- VERBOTEN: "Pro-Tip", "Game Changer", "krass", marketing-floskeln
+- Klingt wie Bier-Gespraech, nicht wie Whitepaper
 
 Antworte NUR mit dem Thread-Text (Tweets durch "---" getrennt).`;
   }
@@ -188,10 +196,12 @@ Format:
 - Endet mit Link zum Blog: "Voller Artikel mit Quellen + Tabellen: https://spurig.com/blog/${blog.slug}"
 
 Style:
-- Reddit-Tone: ehrlich, keine Werbung, Selbstkritik OK
-- Markdown-Formatierung (## fuer Sub-Headers, **bold**, - fuer Listen)
+- Reddit-Tone: ehrlich, leicht selbstironisch, KEINE Werbung — du bist hier ein User, kein Marketer
+- Erste Person, vergangenheits-Form ("Ich hatte das Problem...", "Ich hab probiert...")
+- Markdown (## Sub-Headers, **bold** sparsam, - Listen wo's passt)
+- Mind. EINE Stelle wo du eigene Fehleinschaetzung zugibst ("Ich dachte erst...")
 - Subreddits-Empfehlung am Ende: "Passt zu r/de_EDV, r/Marketing, r/dsgvo"
-- Keine direkten CTAs, kein Salesy-Style
+- VERBOTEN: CTAs, Werbe-Phrasen, "Spoiler:", emotionale Manipulation
 
 Antworte mit:
 Titel: [Reddit-Post-Titel]
