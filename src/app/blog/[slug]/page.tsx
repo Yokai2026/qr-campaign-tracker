@@ -4,6 +4,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import { createServiceClient } from '@/lib/supabase/server';
 import { ArticleLayout } from '@/components/blog/article-layout';
 import { LeadMagnetCTA } from '@/components/blog/lead-magnet-cta';
+import { RelatedPosts } from '@/components/blog/related-posts';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -78,6 +79,11 @@ export default async function DbBlogPage({ params }: { params: Promise<Params> }
         dangerouslySetInnerHTML={{ __html: safeHtml }}
       />
       <LeadMagnetCTA />
+      <RelatedPosts
+        currentSlug={post.slug}
+        cluster={post.cluster ?? null}
+        tags={Array.isArray(post.tags) ? post.tags : []}
+      />
     </ArticleLayout>
   );
 }
