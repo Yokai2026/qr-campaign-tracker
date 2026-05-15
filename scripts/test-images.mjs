@@ -54,7 +54,18 @@ KRITISCHE OUTPUT-REGELN (verstoesse killen das Bild):
 
 4) Wähle EIN Konzept (K2/K3/K5/K6 — K1 nur Notfall) — KEIN Mix mit Split-Screen.
 
-5) Style: VICE Magazin / National Geographic Photojournalism. Gritty. Real. Photo.
+5) Style: VICE Magazin / National Geographic Photojournalism — ABER mit YouTube-
+   Thumbnail-Feel: TEXT-OVERLAY (1-3 deutsche Worte in BOLD CAPS) + funny/absurd
+   detail das das Auge zieht.
+
+6) TEXT-OVERLAY PFLICHT: ein kurzer deutscher Text in Anführungszeichen, z.B.
+   "with bold yellow sans-serif text reading exactly 'VERPUFFT.' overlaid in
+    the upper-left corner".
+   Auswahl: 'VERPUFFT.', 'WEG.', 'AUTSCH.', 'BLIND.', 'OHA.', 'NIE WIEDER.',
+   '0 SCANS.', '300€/MONAT.' etc.
+
+7) FUNNY-DETAIL PFLICHT: ein witziges Mini-Element (Brezel im Aktenstapel,
+   Smiley-Post-it auf brennendem Schein, Taube auf zerrissener Visitenkarte).
 
 Liefere AUSSCHLIESSLICH den ENGLISCHEN image-Prompt-String. KEIN "Hier ist:",
 keine Erklaerung, direkt los mit dem konkreten Objekt.`;
@@ -77,6 +88,12 @@ keine Erklaerung, direkt los mit dem konkreten Objekt.`;
     'map of germany',
   ];
   const violations = forbidden.filter(p => lower.includes(p));
+
+  // Check for new requirements: text overlay + funny element
+  const hasTextOverlay = /\b(text|headline|caption)\s+(reading|overlay|spelling|saying)\s+['"]/i.test(text) || /bold\s+(yellow|white|orange|red)\s+.{0,30}\bread/i.test(text);
+  const hasFunnyElement = /(funny|absurd|unexpected|juxtapos|whimsical|comical|cheeky)/i.test(text) || /(bratwurst|brezel|wurst|smiley|post-it|sticker|note|pigeon|cat |dog )/i.test(text);
+  if (hasTextOverlay) console.log(`  ✓ Text-Overlay erkennbar`); else console.log(`  ⚠ Kein Text-Overlay`);
+  if (hasFunnyElement) console.log(`  ✓ Funny-Element erkennbar`); else console.log(`  ⚠ Kein Funny-Element`);
   if (violations.length > 0) {
     console.log(`\n  ⚠ FORBIDDEN PATTERN: ${violations.join(', ')}`);
   } else {

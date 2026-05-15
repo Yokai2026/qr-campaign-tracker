@@ -1057,9 +1057,9 @@ VERBOTEN IM IMAGE-PROMPT
 - Text/Logos im Bild ("avoid all text, no logos visible" muss am Ende stehen)
 
 ═══════════════════════════════════════════
-3-AKT-BILD-KOMPOSITION (PFLICHT-Struktur des Prompts)
+4-AKT-BILD-KOMPOSITION (YOUTUBE-THUMBNAIL-STYLE)
 ═══════════════════════════════════════════
-Dein image-Prompt muss aus 3 Akten bestehen, in dieser Reihenfolge:
+Dein image-Prompt muss aus 4 Akten bestehen, in dieser Reihenfolge:
 
 AKT 1 — DAS HAUPTMOTIV (40-60 Worte)
   Was sieht der Betrachter zuerst? Konkretes Objekt oder Szene.
@@ -1067,23 +1067,55 @@ AKT 1 — DAS HAUPTMOTIV (40-60 Worte)
   weathered, glossy, charred), Zustand (mid-burn, falling, scattered,
   half-buried), Anzahl (5, 23, hundreds).
 
-AKT 2 — DIE UMGEBUNG + STIMMUNG (40-60 Worte)
+AKT 2 — DIE UMGEBUNG + STIMMUNG (30-50 Worte)
   Wo spielt das Bild? Konkreter Ort (workshop yard, Berlin underpass,
   industrial dumpster lot, kitchen, foggy tarmac).
-  Wetter / Tageszeit (golden hour, deep blue-hour, overcast, rain,
-  smoke-filled).
+  Wetter / Tageszeit (golden hour, deep blue-hour, overcast, rain).
   Sekundär-Elemente die die Story tragen (Passant unscharf im Hintergrund,
   überfließender Mülleimer, leeres Schwarz-Plakat).
 
-AKT 3 — DIE TECHNIK + DAS WOW-DETAIL (40-60 Worte)
+AKT 3 — DAS FUNNY / WOW-ELEMENT (Pflicht — 20-40 Worte)
+  EIN witziges, unerwartetes oder absurdes Detail das das Auge fängt:
+  - Lustige Juxtaposition (Wurst neben Anwalts-Akten)
+  - Personalisiertes Mini-Objekt (handgeschriebenes Post-it mit Smiley auf
+    einem brennenden 50€-Schein)
+  - Tier in unerwartetem Kontext (eine Taube sitzt auf der zerrissenen
+    Bitly-Visitenkarte)
+  - Übertriebener Kontrast (winziger QR neben riesiger Bratwurst-Plakat-
+    Werbung)
+  - Mini-Story-Detail (eine angebissene Brezel halb in dem Aktenstapel)
+
+AKT 4 — TEXT-OVERLAY (YouTube-Thumbnail-Headline)
+  GENAU EIN kurzer, deutscher Text-Overlay mit 1-3 Worten in BOLD CAPS
+  (DALL-E 3 / gpt-image-1 / Midjourney v6 können kurze Texte zuverlässig
+  rendern).
+
+  Format im Prompt:
+  "with bold yellow sans-serif text reading exactly 'VERPUFFT.' overlaid
+   in the upper-left corner, slight rough handprinted texture, slight
+   shadow behind the letters"
+
+  Text-Auswahl-Regeln:
+  - 1-3 Worte MAX (länger = AI rendert falsch)
+  - DEUTSCH, in CAPS
+  - Triggert sofort einen emotionalen Stop: "VERPUFFT.", "WEG.",
+    "AUTSCH.", "BLIND.", "PEINLICH.", "47 BILLBOARDS.", "300€/MONAT.",
+    "0 SCANS.", "NIE WIEDER.", "OPS!", "OHA."
+  - MUSS zum Blog-Titel passen (extrahiere die punchigste Essenz)
+  - Style: Bold sans-serif (Impact / Helvetica Bold / Inter Black),
+    bevorzugt Gelb / Weiss / Hazard-Orange
+  - Position: Upper-Left ODER Upper-Right ODER Bottom-Center
+
+AKT 5 — DIE TECHNIK + ABSCHLUSS (40-60 Worte)
   Camera + Brennweite + Blende ("shot on Canon EOS R5 24mm f/2.8").
-  Lichtquelle benannt + Richtung ("harsh diagonal late-afternoon sun
-  through workshop window").
-  Farbpalette mit 2-3 Kontrast-Farben ("burnt orange against deep charcoal
-  with cyan accent on a single bottle").
-  EIN UNERWARTETES Wow-Detail das die Story zementiert (z.B. "a single
-  half-burnt euro note floating mid-air with the EU stars still visible").
-  Ende mit "no text visible, no logos visible".
+  Lichtquelle benannt + Richtung ("harsh diagonal late-afternoon sun").
+  Farbpalette mit 2-3 Kontrast-Farben.
+  Style-Referenz benennen (VICE magazine reportage / NatGeo / noir editorial).
+  Ende mit: "no other text or logos visible besides the headline overlay".
+
+WICHTIG: Frueher stand "no text visible". JETZT ist EIN gezielter Text-Overlay
+(Akt 4) PFLICHT, um YouTube-Thumbnail-Feel zu erzeugen. Trotzdem KEINE anderen
+Texte / Logos / Wasserzeichen.
 
 ═══════════════════════════════════════════
 SHOCK-DETAIL-BANK (mind. 1 davon im Output)
