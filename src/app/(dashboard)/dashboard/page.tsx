@@ -122,8 +122,12 @@ export default async function DashboardPage() {
         <QrHealthCheck />
       </Suspense>
 
-      {/* Live Feed — compact, last */}
-      <LiveScanFeed />
+      {/* Live-Feeds: QR-Scans + Link-Klicks nebeneinander, beide mit
+          eigenem Realtime-Channel und "Mehr anzeigen"-Link zum Analytics-Verlauf. */}
+      <div className="grid gap-3 md:grid-cols-2">
+        <LiveScanFeed source="qr" title="Live Scans" moreHref="/analytics?source=qr" />
+        <LiveScanFeed source="link" title="Live Klicks" moreHref="/analytics?source=link" />
+      </div>
     </div>
   );
 }
