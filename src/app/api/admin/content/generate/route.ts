@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
-import { ARTICLES } from '@/app/blog/articles';
 import { readBlogPost, generateDraft, type ContentChannel } from '@/lib/content/repurpose';
 
 export const dynamic = 'force-dynamic';
@@ -34,16 +33,23 @@ export async function POST(request: NextRequest) {
   }
 
   const slug = body.slug;
-  if (!slug || !ARTICLES.find((a) => a.slug === slug)) {
-    return NextResponse.json({ error: 'slug not found' }, { status: 400 });
+  if (!slug) {
+    return NextResponse.json({ error: 'slug required' }, { status: 400 });
   }
 
   const channels = (body.channels?.length ? body.channels : CHANNELS).filter((c) =>
     CHANNELS.includes(c),
   );
 
+  // readBlogPost macht den Slug-Lookup (DB content_blogs zuerst, dann File ARTICLES).
+  // Wenn beide fehlschlagen -> Blog existiert wirklich nicht.
   const blog = await readBlogPost(slug);
-  if (!blog) return NextResponse.json({ error: 'blog post unreadable' }, { status: 500 });
+  if (!blog) {
+    return NextResponse.json(
+      { error: `Blog mit slug "${slug}" nicht gefunden (weder DB noch File)` },
+      { status: 404 },
+    );
+  }
 
   const service = await createServiceClient();
   const results: Array<{ channel: ContentChannel; ok: boolean; error?: string }> = [];

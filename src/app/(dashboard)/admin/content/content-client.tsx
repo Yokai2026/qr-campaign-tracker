@@ -91,13 +91,31 @@ export function ContentClient() {
         body: JSON.stringify({ slug }),
       });
       const j = await r.json();
-      const ok = (j.results ?? []).filter((x: { ok: boolean }) => x.ok).length;
-      const fail = (j.results ?? []).filter((x: { ok: boolean }) => !x.ok).length;
-      if (ok > 0) toast.success(`${ok} Drafts generiert${fail > 0 ? `, ${fail} fehlgeschlagen` : ''}`);
-      else toast.error('Generierung fehlgeschlagen');
+      if (!r.ok) {
+        toast.error(`HTTP ${r.status}: ${j.error ?? 'unknown'}`);
+        return;
+      }
+      const results = (j.results ?? []) as Array<{ channel: string; ok: boolean; error?: string }>;
+      const ok = results.filter((x) => x.ok).length;
+      const fails = results.filter((x) => !x.ok);
+      if (ok > 0) {
+        toast.success(`${ok} Drafts generiert${fails.length > 0 ? `, ${fails.length} fehlgeschlagen` : ''}`);
+        if (fails.length > 0) {
+          console.error('Channel-Fails:', fails);
+          fails.forEach((f) => toast.error(`${f.channel}: ${f.error?.slice(0, 80) ?? 'unknown'}`, { duration: 8000 }));
+        }
+      } else {
+        toast.error(
+          fails[0]?.error
+            ? `Alle Channels fehlgeschlagen. ${fails[0].channel}: ${fails[0].error.slice(0, 100)}`
+            : 'Generierung fehlgeschlagen — keine Antwort von Claude',
+          { duration: 12000 },
+        );
+        console.error('All channel fails:', fails);
+      }
       queryClient.invalidateQueries({ queryKey: ['content-drafts'] });
-    } catch {
-      toast.error('Generierung fehlgeschlagen');
+    } catch (e) {
+      toast.error(`Netzwerk-Fehler: ${e instanceof Error ? e.message : 'unknown'}`);
     } finally {
       setGeneratingSlug(null);
     }
