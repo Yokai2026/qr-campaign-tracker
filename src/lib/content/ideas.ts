@@ -882,70 +882,111 @@ Konkret. Visuell. Emotional. Mit einem Wow-Moment. Wie ein YouTube-Thumbnail
 mit hoher CTR — nicht wie ein Stockfoto.
 
 ═══════════════════════════════════════════
-ZIELSTIL: PHOTOJOURNALISMUS, NICHT INFOGRAFIK
+ZIELSTIL: BRIGHT-VIRAL-THUMBNAIL (NICHT noir, NICHT düster, NICHT McKinsey)
 ═══════════════════════════════════════════
-Stell dir vor, ein VICE-Magazin-Fotograf oder NATIONAL GEOGRAPHIC-Reporter
-fotografiert die Szene aus dem Blog-Hook. Gritty. Real. Physisch. Mit Tonwerten
-und Schmutz. Mit echten Objekten in echten Umgebungen.
+Stell dir die Mischung vor: ein VICE-Magazin-Fotograf trifft einen
+TOP-YOUTUBER (MrBeast / Mark Rober / Marques Brownlee). Photojournalistisch
+ECHT — aber HELL, SATURIERT, EYE-CATCHING. Wie ein Thumbnail das auf einem
+Phone-Screen sofort POPPT.
 
+PFLICHT-ATMOSPHÄRE in JEDEM Bild:
+  - HELLES NATURLICHES TAGESLICHT als Standard (nicht "dusk", nicht "deep
+    blue-hour", nicht "candlelit warm tones")
+  - HOHE SÄTTIGUNG (saturated, vivid, vibrant — nicht muted, desaturated)
+  - HOHER KONTRAST mit knallig-bunten Akzenten
+  - Mind. EINE FARB-EXPLOSION irgendwo im Frame
+    (knall-rot, electric-cyan, hot-pink, bright orange, lime-green)
+  - Hintergrund mit Bewegung / Energie (Passanten, Wind, Action)
+
+VERBOTEN — diese Düsternis-Patterns NICHT mehr verwenden:
+  ✗ "moody warm tones", "candlelit", "dusk", "blue-hour", "twilight"
+  ✗ "noir", "chiaroscuro", "shadows dominant"
+  ✗ "muted color palette", "desaturated", "vintage faded"
+  ✗ "grim", "somber", "melancholic", "quietly damning"
+  ✗ "harsh single overhead lamp" als einzige Lichtquelle (= Verhör-Stimmung)
+
+ERLAUBT — diese helle Atmosphäre IMMER bevorzugen:
+  ✓ "bright midday sunlight", "clear blue sky overhead"
+  ✓ "saturated cinematic color grade like a Wes Anderson film"
+  ✓ "vivid pop colors", "high-contrast Instagram aesthetic"
+  ✓ "MrBeast-thumbnail energy: bright, bold, high-saturation"
+  ✓ "Mark-Rober-style: clean daylight, vibrant colors, eye-catching detail"
+  ✓ "Casey-Neistat-style: sun-flooded, kinetic, real-world energy"
+
+REFERENZ-VORBILDER für die Atmosphäre:
+  - MrBeast YouTube Thumbnails (bright, high-saturation, pop-color accents)
+  - Mark Rober Engineering Videos (clean daylight + vivid object focus)
+  - Casey Neistat Vlogs (sun-flooded, kinetic)
+  - Wes Anderson Film-Stills (saturated palette, geometric, eye-popping)
+  - VICE Magazine COVER (bright + bold yellow text, NICHT das dunkle Innenfoto)
+
+═══════════════════════════════════════════
+PHOTOGRAFIE-STIL TROTZDEM PFLICHT
+═══════════════════════════════════════════
 NIE: "visualization", "infographic", "icon", "chart", "graph", "diagram",
 "map representation", "stylized illustration", "symbolic representation"
 
 NIE: Etwas das aussieht wie aus einer McKinsey-Praesentation, einem SaaS-
-Marketing-Deck oder einem LinkedIn-Karussell. WIR WOLLEN PHOTO. ECHT. GRITTY.
+Marketing-Deck oder einem LinkedIn-Karussell. WIR WOLLEN PHOTO. BRIGHT. POP.
 
 ═══════════════════════════════════════════
 REFERENZ-STYLE — DEIN OUTPUT MUSS SO AUSSEHEN
 ═══════════════════════════════════════════
 
-REF 1 — Money-Destruction (Hook "Budget verbrennt"):
-"A stack of 50 EUR bills mid-burn inside a rust-streaked industrial trash bin
-in a workshop yard, flames curling and blackening the paper edges, ash
-particles suspended in golden afternoon light filtering through a chain-link
-fence, a single half-burnt bill floating mid-air with the EU stars still
-visible, low-angle close-up shot at 30cm distance, harsh diagonal shadow
-across the rusty bin, shot on Canon EOS R5 24mm f/2.8, deep amber-and-
-charcoal color grade, photorealistic gritty documentary style, no text
-visible, no logos visible."
+REF 1 — Money-Destruction BRIGHT (Hook "Budget verbrennt"):
+"A stack of crisp 50 EUR bills mid-burn inside a vivid red metal trash bin
+sitting on a sunlit Berlin sidewalk, bright orange flames vivid against
+clear blue sky, ash particles glittering in midday sunlight, a single
+half-burnt bill floating mid-air with EU stars sharp and visible, a yellow
+construction sign blurred in the background, low-angle close-up at 30cm
+distance, vibrant high-saturation colors (red bin + orange flames + blue
+sky + yellow sign), shot on Canon EOS R5 24mm f/2.8 in clean midday light,
+MrBeast-thumbnail energy, no text or logos visible besides the planned
+yellow headline overlay."
 
-REF 2 — Wrong-Context-Object (Hook "deine Mailings landen im Muell"):
-"Aerial top-down 90 degree shot of approximately 500 unopened glossy A5
-postcards thrown into an open household kitchen trash bin among coffee
-grounds, eggshells, orange peels, and crumpled receipts, harsh fluorescent
-overhead kitchen light, a single housefly hovering above one card, shot on
-Sony A7R V 35mm f/4 from directly above on a tripod, high-contrast pure
-white postcard backs against dark organic waste, sharp focus throughout, no
-text visible, no logos visible, photorealistic editorial documentary style."
+REF 2 — Wrong-Context-Object BRIGHT (Hook "Mailings im Muell"):
+"Aerial top-down 90 degree shot of 500 unopened glossy hot-pink and lime-
+green A5 postcards spilling out of a vivid blue plastic recycling bin onto
+a sun-drenched white-tiled kitchen floor, sharp midday daylight from a
+large window, vivid color contrast between hot-pink cards, lime-green
+cards, deep-blue bin, and crisp white tile, shot on Sony A7R V 35mm f/4
+from directly above on tripod, sharp focus throughout, ultra-saturated
+Wes-Anderson aesthetic, no text or logos visible besides the planned
+yellow headline overlay."
 
-REF 3 — Macro-Detail (Hook "QR-Code zu klein auf Plakat"):
-"Extreme close-up macro shot of a single tiny QR code printed on the bottom
-corner of a weathered Berlin street poster, paper fibers and ink bleed
-visible, raindrops on the surface, deep depth of field revealing the empty
-urban underpass behind the poster in soft bokeh, single overhead sodium-
-vapor street lamp casting orange-amber light, shot on Sony 100mm macro
-lens f/8 from 5cm distance, high contrast between the tiny black QR squares
-and the pale wet poster paper, no text visible (other than the QR code
-itself), no logos visible."
+REF 3 — Macro-Detail BRIGHT (Hook "QR zu klein auf Plakat"):
+"Extreme close-up macro shot of a tiny QR code printed on the bottom-right
+corner of a vivid pink and yellow club poster on a sunlit Berlin brick
+wall, paper fibers visible, sharp midday sunlight casting clear shadow,
+deep depth of field revealing pedestrians blurred in vibrant outfits
+walking past in the background, ultra-high-saturation colors (hot-pink
+poster + yellow accents + warm-red brick + cyan-blue jacket of passerby),
+shot on Sony 100mm macro lens f/8 from 5cm distance, MrBeast-thumbnail
+energy, no text or logos visible besides the planned yellow headline
+overlay."
 
-REF 4 — Data-Metaphor (Hook "Daten ueber den Atlantik"):
-"An open vintage leather suitcase tipped sideways on a foggy tarmac at dusk,
-hundreds of small printed photos of anonymous faces spilling out across the
-wet concrete, a transatlantic cargo plane visible in the deep-blue distance
-taking off, harsh single industrial floodlight casting a long diagonal
-shadow, the suitcase has 'BL Inc.' stenciled in faded white on its side,
-shot low-angle on Canon R5 35mm f/2.8, deep-blue-hour with single warm-
-amber light source, cinematic documentary style, no text visible (other
-than the stenciled side), no logos visible."
+REF 4 — Data-Metaphor BRIGHT (Hook "Daten ueber den Atlantik"):
+"An open vintage red leather suitcase tipped sideways on a sun-flooded
+airport tarmac at clear noon, hundreds of small printed photos of
+anonymous faces spilling out in vivid colors across bright white concrete,
+a vivid white-and-blue cargo plane mid-takeoff visible against deep blue
+sky, harsh midday shadow, the suitcase has 'BL Inc.' stenciled in faded
+white, shot low-angle on Canon R5 35mm f/2.8, ultra-bright daylight
+saturated palette (red suitcase + blue sky + white tarmac + multi-colored
+photos), Wes-Anderson cinematic style, no text or logos visible besides
+the planned yellow headline overlay."
 
-REF 5 — High-Emotion-Moment (Hook "Founder-Story"):
-"A bearded man in his early 30s sitting cross-legged on the dusty concrete
-floor of a completely empty office space at 2am, an open laptop balanced
-on his lap showing a single red analytics line dropping to zero, head in
-one hand, single overturned coffee mug beside him with a small puddle, one
-warm desk lamp casting his long shadow across the bare floor, broken
-ceiling tiles visible above, shot low-angle 25cm from the floor on Leica
-M11 28mm f/1.4, warm tungsten color grade against deep navy shadows,
-cinematic chiaroscuro, no text visible, no logos visible."
+REF 5 — High-Emotion-Moment BRIGHT (Hook "Founder-Story / WTF-Reaction"):
+"A bearded man in his early 30s wearing a bright orange sweater, mouth
+slightly open in genuine surprised disbelief, eyes wide open looking down
+at his open laptop showing a single bright red analytics line dropping to
+zero, sitting at a sun-flooded white office desk by a large window,
+vibrant pink sticky notes scattered around the laptop, a vivid yellow
+coffee mug in foreground, midday natural light pouring in, shot at 45-
+degree angle on Leica M11 28mm f/1.4, ultra-saturated MrBeast-thumbnail
+palette (orange sweater + red chart + pink notes + yellow mug + white
+desk), no text or logos visible besides the planned yellow headline
+overlay."
 
 ═══════════════════════════════════════════
 HARTE VERBOTSLISTE — DIESE WORTE NICHT IN DEN PROMPT
