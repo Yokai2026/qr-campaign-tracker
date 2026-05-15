@@ -87,6 +87,7 @@ export function LinkedinDmsClient() {
   const [tab, setTab] = useState<DmStatus | 'all'>('ready');
   const [segment, setSegment] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery<ListResponse>({
@@ -159,18 +160,30 @@ export function LinkedinDmsClient() {
             LinkedIn-DM-Helper
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Generiere personalisierte Opener für deine Outbound-Leads. Kein Auto-DM — Copy-Paste in LinkedIn (ToS-konform).
+            Generiere personalisierte Opener für deine Outbound-Leads. Kein Auto-DM — Copy-Paste in LinkedIn (ToS-konform).{' '}
+            <button
+              onClick={() => setShowHelp((v) => !v)}
+              className="ml-1 underline underline-offset-2 hover:text-foreground"
+            >
+              {showHelp ? 'Hinweise ausblenden' : 'Wie funktioniert das?'}
+            </button>
           </p>
-          <div className="mt-3 max-w-2xl rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-[12px] text-amber-200">
-            <strong className="block mb-1 text-amber-100">Wie LinkedIn-Cold-Outreach funktioniert (kein Premium nötig)</strong>
-            "Nachricht" geht nur an 1st-degree Connections. Für Cold-Outreach: <strong>Vernetzen → Notiz hinzufügen → Opener einfügen → Senden</strong>.
-            Opener mit ~170 Zeichen passt ins 300-Zeichen-Notiz-Limit.
-            <br /><br />
-            <strong className="text-amber-100">Anonymisierung umgehen:</strong> Bei 3rd-degree zeigt LinkedIn "LinkedIn Mitglied" + Sales-Nav-Paywall.
-            Der Button öffnet automatisch eine Google-Suche (<code className="text-amber-100">site:linkedin.com/in/</code>) — Google indexiert Profile öffentlich, du landest auf der echten Person mit funktionierendem "Vernetzen"-Button.
-            <br /><br />
-            Neue LinkedIn-Konten: ~100 Requests/Woche Limit — <strong>15-20/Tag bleibt safe</strong>.
-          </div>
+          {showHelp && (
+            <div className="mt-3 max-w-2xl rounded-md border border-border bg-muted/30 p-3 text-[12px] text-muted-foreground">
+              <p>
+                <strong className="text-foreground">Cold-Outreach Workflow:</strong>{' '}
+                "Nachricht" geht nur an 1st-degree Connections. Für Cold-Outreach: <strong>Vernetzen → Notiz hinzufügen → Opener einfügen → Senden</strong>. Opener mit ~170 Zeichen passt ins 300-Zeichen-Notiz-Limit.
+              </p>
+              <p className="mt-2">
+                <strong className="text-foreground">Anonymisierung umgehen:</strong>{' '}
+                Bei 3rd-degree zeigt LinkedIn "LinkedIn Mitglied" + Sales-Nav-Paywall. Der Button öffnet automatisch Google-Suche (<code>site:linkedin.com/in/</code>) — Google indexiert Profile öffentlich, du landest auf der echten Person mit funktionierendem "Vernetzen"-Button.
+              </p>
+              <p className="mt-2">
+                <strong className="text-foreground">Limit:</strong>{' '}
+                Neue LinkedIn-Konten ~100 Connection-Requests/Woche — 15-20/Tag bleibt safe.
+              </p>
+            </div>
+          )}
         </div>
         <div className="flex gap-2">
           <Button
