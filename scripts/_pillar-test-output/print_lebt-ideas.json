@@ -1,0 +1,38 @@
+[
+  {
+    "title": "180 Flyer. Vier Anrufe. Niemand weiß, welche.",
+    "angle": "[C11: Money-Reveal / PATTERN-C] Ein Gastronomiechef aus Wien zeigte mir gestern sein Stripe-Dashboard. 12.400 Euro Druck-Budget im letzten Quartal. Ich fragte: 'Welche Flyer-Design bringt die meisten Reservierungen?' Seine Antwort: Stille. Drei Sekunden. 'Keine Ahnung.'",
+    "outline": "Die meisten Print-Kampagnen in DACH laufen blind. Ein Restaurant druckt 180 Flyer pro Monat, vier Design-Varianten, zahlt 12.400€ pro Quartal — misst aber nicht welche funktionieren. Mit einem QR-Code pro Variante sieht man sofort: Design A bringt 67% aller Reservierungen, die anderen drei zusammen 33%. Budget wird sofort umverteilt. CLEVER-TRICK: ein QR pro Design-Variante statt Generalisten-QR = plötzlich messbares Design-ROI. Diskussions-Trigger: Misst ihr auch blind, oder habt ihr schon ein System?",
+    "target_keywords": "Print-Marketing messen, Flyer-Tracking DSGVO, QR-Code Restaurant, Design-ROI"
+  },
+  {
+    "title": "Ein Steuerberater fragte mich: 'Kann das auch Faxe tracken?'",
+    "angle": "[C12: Alltagsdusselheit / PATTERN-A] Zwei Minuten Stille. Ich stand in seinem Büro in Hannover. Ein Tischkalender aus 1997 auf dem Schreibtisch. Er meinte es ernst.",
+    "outline": "Spurig-Onboarding mit einem klassischen Mittelständler (Steuerkanzlei, 9 Mitarbeiter). Der Senior-Partner fragt, ob das Tool auch Fax-Tracking kann. Das ist der Moment, wo ich begreife: für die traditionelle deutsche Wirtschaft ist 'Tracking' noch immer terra incognita. Die Kanzlei schickt 400 Musterbriefe pro Monat per Post — und hat keine Ahnung, wer anbeißt. Mit einem Kurzlink + QR auf dem Briefkopf: plötzlich Response-Rate messbar. 6 Wochen später: sie haben 23% ihrer Budget-Verschwendung identifiziert, ohne eine Anfrage zu verlieren. CLEVER-TRICK: ein Kurzlink pro Aktion statt auf alles (Brief, Email, Telefon) = niederschwellige Messung für Analog-Teams. Diskussions-Trigger: Was ist eure absurdeste Frage zu QR-Tracking gewesen?",
+    "target_keywords": "Offline-Tracking Mittelstand, QR-Codes Kanzlei, DSGVO-Link-Tracking, Print-Conversion"
+  },
+  {
+    "title": "67 Plakatstandorte. Nur eine Frage hätte 31.000 Euro gespart.",
+    "angle": "[C5: Did-you-know / PATTERN-D] Eine Marketing-Direktorin aus München sagte mir letzten Mittwoch: 'Wir buchen Plakate ein Jahr im Voraus. Keiner fragt nach, ob sie funktionieren.' Der Jahresetat: 89.600 Euro. Sie wusste von 3 Standorten, dass sie liefen.",
+    "outline": "Plakatwerbung in DACH: 2,4 Milliarden Euro pro Jahr. Schätzung: 40% der Budgets fließen in Standorte die nicht konvertieren. Ein mittelständischer B2B-Anbieter (Industriemaschinen) bucht 67 Plakatstellen bundesweit. Nach Einführung von QR-Codes pro Standort zeigt sich: 6 Standorte generieren 78% aller Leads. Der Rest? Marketingtheater. Budget wird auf 18 Standorte reduziert, Leads sinken um 4%, Kosteneffizienz steigt um 267%. CLEVER-TRICK: nicht 'Plakat-Standorte' buchen, sondern 'nach 6 Wochen messen, dann 80% killen'. Diskussions-Trigger: Habt ihr auch Plakate, die einfach 'immer schon da sind'?",
+    "target_keywords": "Plakatwerbung ROI, Standort-Messung QR, Offline-Marketing Effizienz, Print-Conversion B2B"
+  },
+  {
+    "title": "Wusstest du: Deine Hotjar-Seiten sind nicht DSGVO-konform.",
+    "angle": "[C2: Counter-intuitive-Fact / PATTERN-H] Ein Anwalt (spezialisiert auf Digital-Compliance) rief mich an. 'Ihr toolet noch mit Hotjar?' Ich sagte ja. Er: 'Ihr braucht einen AV-Vertrag. Habt ihr?'  Wir hatten nicht.",
+    "outline": "Session-Recording-Tools (Hotjar, LogRocket, Microsoft Clarity) gelten vielen DACH-Marketern als 'kleine, unkritische Tools'. Falsch. Hotjar USA, keine Sicherheitsvereinbarung mit 80% der Nutzer die sich anmelden — datenschutzrechtlich ein Problem. Fünf Marketing-Teams die ich Anfang 2025 gefragt habe: vier hatten keinen AV-Vertrag. Google Analytics 4 EU-Region speichert zwar in Irland, aber ohne explizite EU-Datenschutz-Einstellung läuft auch das schief. Wusstest du: Eine DSGVO-Abmahnung für Hotjar-Sessions kostet dich nicht die Session-Daten, sondern 5.000-15.000 Euro pro Betroffener? CLEVER-TRICK: Clarity (Microsoft) statt Hotjar + explizites EU-Datenhandling konfigurieren = 80% des Insights, 20% des Risikos. Diskussions-Trigger: Welche 'harmlosen' Tools nutzt ihr noch, ohne AV-Vertrag zu prüfen?",
+    "target_keywords": "Hotjar DSGVO AV-Vertrag, Session-Recording DSGVO, Google Analytics 4 EU, Datenschutz-Compliance Tools"
+  },
+  {
+    "title": "Mein Praktikant hat Spurig in einer Woche verstanden. Der CEO brauchte zwei Meetings.",
+    "angle": "[C3: Funny-Failure / PATTERN-L] Ich zeige Spurig immer erst dem jüngsten Team-Mitglied. Wenn der 'get it', ist das Tool gut genug. Bei diesem CEO (Baustoff-Handel, München) brauchte ich zwei Meetings plus eine Email-Dokumentation.",
+    "outline": "Die ironic truth: komplexe Enterprise-Tools sind oft einfacher zu verstehen als 'simple' SaaS für KMU. Warum? Weil Menschen zwischen ihrer mentalen Komplexität und der Produkt-Komplexität einen Match suchen. Ein CEO denkt in Jahresbudgets, Verträgen, Risiken. Ein QR-Code? Das ist 'so einfach, kann nicht sein.' Nach zwei Meetings verstand er: einfach = korrekt. Danach: Spurig wurde zum Lieblings-Tool, weil die Einfachheit *bedeutete*, dass endlich ein Mitarbeiter die Plakatstandorte ohne Erklär-Video tracken konnte. Schnellanleitung statt kompliziertes Onboarding. CLEVER-TRICK: nicht den CEO trainieren, sondern den Praktikant/die junge Mitarbeiterin. Wenn die sagt 'easy', kauft der Boss. Diskussions-Trigger: Wer nutzt in eurem Team die Tools WIRKLICH, und wer nur 'theoretisch'?",
+    "target_keywords": "SaaS-Adoption KMU, Benutzer-Onboarding, Usability B2B, Print-Tool einfach"
+  },
+  {
+    "title": "Cookie-Banner stoppen 19% der Konversionen. Niemand fragt, warum Bitly diese Zahl nie zeigt.",
+    "angle": "[C4: Industry-Insider-Reveal / PATTERN-K] Ein Datenschutz-Auditor zeigte mir seine Metriken. Websites MIT Cookie-Banner vor/nach Compliance-Umbau: durchschnittlich 19% weniger Clicks auf externe Links. Bitly? Keine Warnung dazu.",
+    "outline": "Das ist die unbequeme Wahrheit: Cookie-Banner reduzieren Conversions, nicht weil sie böse sind, sondern weil sie Friction aufbauen. Ein Besucher sieht Banner, 14% klicken weg, weitere 5% verzögern und vergessen die Aktion. Bitly vermarktet sich als 'kostenlos', versteckt aber diese Konversion-Kosten. Bei Spurig sagen wir: wir speichern in Frankfurt, kein Banner nötig, volle Konversion. Das ist nicht Marketing-Blablabla, das ist Architektur. Aber die Pointe: es ist unbequem für alle, die schon Bitly Free ohne Banner eingebaut haben. CLEVER-TRICK: wenn du eh auf EU-Lösung wechselst, spar dir die Banner-Komplexität, gewinne 19% Conversion zurück. Diskussions-Trigger: Wie viel Conversion habt ihr durch Cookie-Banners schon verloren, ohne es zu merken?",
+    "target_keywords": "Cookie-Banner Conversion, DSGVO-Konversion Verlust, Datenschutz-freundliches Tracking, EU-DSGVO Link-Shortener"
+  }
+]

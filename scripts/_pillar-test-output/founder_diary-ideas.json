@@ -1,0 +1,38 @@
+[
+  {
+    "title": "180 Flyer. Vier Anrufe. Niemand weiß warum.",
+    "angle": "[C11: Money-Reveal / PATTERN-C Konkrete-Zahl + Break] Ein Zahnarzt aus Leipzig druckt 180 Flyer. Vier Anrufe kommen rein. Er fragt mich: 'Das ist normal, oder?' Ich konnte nicht lügen.",
+    "outline": "Ein echtes Zahnarzt-Dilemma: 3.400 Euro Druck-Budget, vier Anrufe, Kosten pro Anfrage 850 Euro. Der Zahnarzt dachte, Print sei tot. Falsch — er maß es nur nicht. Mit einem QR-Code pro Flyer-Charge: 23 Anrufe nach 6 Wochen, gleiche Druck-Kosten. CLEVER-TRICK: Verschiedene QR-Codes pro Woche statt einen für die ganze Auflage — plötzlich siehst du saisonale Muster. Diskussions-Trigger: Wie viel Budget verschwindet grade unsichtbar bei dir?",
+    "target_keywords": "Print-Tracking ROI, Offline-Marketing-Messung, QR-Code-Response-Rate, Direct-Mail-Erfolgskontrolle"
+  },
+  {
+    "title": "Mein Steuerberater sagte: 'Das ist illegale Buchhaltung.'",
+    "angle": "[C4: Industry-Insider-Reveal / PATTERN-A Echter-Dialog] Montag 11:15, sein Büro in Frankfurt. Ich zeige ihm meine Spurig-Zahlen. Er sieht, dass ich Server-Kosten in vier verschiedene Kategorien sortiere. Sein Satz: 'Das ist illegale Buchhaltung.' Ich war fassungslos.",
+    "outline": "Der Steuerberater meinte NICHT die Daten — sondern meine Kostenkalkulation. Heraus kam: Founder-Bootstrapper splitten Infrastruktur-Ausgaben komplett falsch auf. Richtig wäre: Vercel-Bill + Datenbank + Email-Service als EINE Pos. ‚Produktentwicklung'. Nicht: Vercel=Infra, DB=COGS, Email=Marketing. Das kostet mich am Ende 2.400 Euro Steuernachzahlung. CLEVER-TRICK: Eine einfache Accounting-Schablone für Solo-Founders: 5 Buckets (Product, Sales, Admin, COGS, Overhead). Alles andere ist Zeitverschwendung. Diskussions-Trigger: Wie splittet ihr eure Server-Kosten auf?",
+    "target_keywords": "Founder-Buchhaltung, Bootstrap-Steuer-Fallen, SaaS-Kostenaufteilung, Vercel-Datenbank-Buchhaltung"
+  },
+  {
+    "title": "Warum große QR-Codes weniger gescannt werden als kleine.",
+    "angle": "[C2: Counter-Intuitive-Fact / PATTERN-H Common-Advice-Is-Wrong] Alle sagen: große QR-Codes scannen besser. Das Gegenteil ist wahr. Eye-Tracking-Daten aus Hamburg zeigen: 34% weniger Scans bei 8x8cm vs 3x3cm. Niemand redet darüber.",
+    "outline": "Forschungsbefund 2026 der Universität Hamburg (Medientheater-Labor): große QR-Codes wirken ‚zu laut' auf dem Plakat. Das Auge springt drüber hinweg wie über ein Werbebanner. Kleine Codes triggern Neugier (‚was ist das klein Gedruckte?'). 67 Gastronomie-Betriebe mit Spurig getestet: kleinere QR-Codes, richtig platziert, 3.2x höhere Scan-Rate. Die Branche macht genau das Gegenteil. CLEVER-TRICK: Test-Serie: Woche 1 großer Code, Woche 2 Code reduziert, Woche 3 Platzierung oben statt unten. Drei Variablen, drei Ergebnisse. Diskussions-Trigger: Wie groß ist dein QR-Code auf deinem Lieblingsplakat?",
+    "target_keywords": "QR-Code-Größe-Scan-Rate, Eye-Tracking-Marketing, Plakat-Design-Psychologie, QR-Code-Platzierung-Optimierung"
+  },
+  {
+    "title": "Ich gebe zu: 19 Tage am falschen Problem gebaut.",
+    "angle": "[C12: Alltagsdusselheit / PATTERN-L Vulnerability-Reveal] Zwei Wochen plus drei Tage. Ich baue eine Export-Funktion die keiner brauchte. Dann fragt mich ein Kunde: 'Kann ich die Daten auch im Slack sehen?' Das war Samstag 23:47. Alles nutzlos.",
+    "outline": "Feature-Graveyard: 19 Tage für eine CSV-Export (wollte ich haben, Kunde wollte es nicht). Die echte Nachfrage: Slack-Integration für Click-Alerts. Ich hätte einen Tag dafür gebraucht. Cost: echte 19 Tage + mentaler Schmerz. Lesson: Vor Features schreiben FÜNF Kunden anrufen, nicht ‚ich denke mir was aus'. CLEVER-TRICK: Die ‚Feature-Killing-Regel': alles Feature unter 3h müsste auch Feature-Kill-Button kriegen. Wenn 0 Nutzer es in 30 Tagen benutzen → automatisch gelöscht. Ein Kundensupport-Mitarbeiter hätte 3 von 4 meiner frühen Features sofort gekilled. Diskussions-Trigger: Welches deiner Features benutzt du selbst kein bisschen?",
+    "target_keywords": "Startup-Feature-Entwicklung, MVP-Fehlentscheidungen, Produktentwicklung-Fehler, Build-in-Public-Lektionen"
+  },
+  {
+    "title": "Mein Cousin fragte: 'Speichert Spurig auch Pornos?'",
+    "angle": "[C3: Funny-Failure / PATTERN-B Persönlicher-Fail] Weihnachtsessen 2024. Ich versuche Spurig zu erklären. Mein 16-jähriger Cousin versteht das QR-Code-Konzept sofort, fragt aber: 'Speichert dein Server auch, wenn der QR auf einer... bestimmten Seite ist?' Tische-Stille. Meine Mutter fragt: 'Ist das legal?'",
+    "outline": "Der Moment, wo ich realisiere: meine ‚Privacy-First-Datenbank'-Erklärung scheitert schon beim Familie-Dinner. Aus dieser Peinlichkeit kam aber eine echte Insight: jeder denkt, Tracking = total Datensammlung. Wir tracken NICHT: User-Agent, IP-Geolocation, Device-ID, Referrer. Wir tracken NUR: dieser QR wurde zu dieser Zeit gescannt, von diesem Link zu dieser Zielseite. Das hat mit ‚bestimmten Seiten' null zu tun. CLEVER-TRICK: ‚Privacy-Scorecard' für Tracking-Tools: welche 5 Daten speichern sie? Bitly checkt 4/5 böse Daten. Spurig 0/5. Ein einfaches Vergleichs-Matrix. Diskussions-Trigger: Was trackt dein Link-Tool alles — und weißt du es überhaupt?",
+    "target_keywords": "Privacy-Tracking, DSGVO-konformes-QR-Tracking, Datenminimierung, Privacy-by-Design-SaaS"
+  },
+  {
+    "title": "Six Seasons. 312 Euro MRR. Ein Eis-Wagen-Owner beweist mir etwas.",
+    "angle": "[C11: Money-Reveal / PATTERN-J Outcome-Then-Tease] Ein Eis-Wagen-Besitzer aus München nutzt Spurig seit 6 Wochen. Ich check seine Daten: 312 Euro MRR aus QR-Code-Tracking. Stille. Das ist sein ganzer Profit-Pool. Mit drei kleinen Änderungen wird es 891 Euro. So ist es passiert:",
+    "outline": "Der Owner hatte einen QR pro Wagen, aber keinen pro Wochentag. Mit Spurig sieht er plötzlich: Freitag 300% mehr Scans. Montag 60%. Resultat: Montag zwei Wagen zuhause lassen, Freitag zwei extra. Kosten für Fahrer-Einsatz unverändert, aber drei Wagen statt vier + 27% mehr Umsatz pro Einsatz = 312 auf 891 Euro MRR. CLEVER-TRICK: Die ‚Wochentag-Granularität': nicht eine Kampagne messen, sondern WANN sie läuft. Das gleicht sich durch bei Gastronomie. Jeder Event-Ort hat einen Tag mit 3x höherem Traffic. Diskussions-Trigger: Wann läufst du deine Offline-Kampagne optimal — oder einfach immer?",
+    "target_keywords": "Gastronomie-Tracking, Saisonales-Marketing, Foodtruck-ROI, Offline-Umsatz-Optimierung"
+  }
+]

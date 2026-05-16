@@ -1,0 +1,38 @@
+[
+  {
+    "title": "180 Flyer. Vier Anrufe. Niemand misst.",
+    "angle": "[C11: Money-Reveal / PATTERN-G] Eine Gastronomin aus Hannover zahlte 2.400€ für Flyer-Druck. Nach drei Wochen fragte ich: 'Welche Variante funktioniert besser?' Sie starrte mich an. 'Keine Ahnung. Ich weiss nicht mal, ob die überhaupt gescannt werden.'",
+    "outline": "[C11 Money-Reveal] Sie budget 2.400€/Monat für Print. Verdient damit 180 Reservierungen. Aber: 176 davon kommen von woanders. 4 vom Flyer. CLEVER-TRICK: Ein einziger QR pro Flyer-Variante — nicht auf allen Flyern — zeigt nach 2 Wochen sofort welche Region / Farbe / Platzierung gewinnt. Resultat: nächster Monat 1.200€ Budget, 3.8x bessere Quote. Diskussions-Trigger: 'Trackst du deine Print-Kampagnen? Oder hoffst du einfach?'",
+    "target_keywords": "Print-Tracking DACH, Flyer-ROI messen, QR-Code Gastronomie"
+  },
+  {
+    "title": "Calendly speichert deine Termin-Daten in Boston.",
+    "angle": "[C5: Did-you-know / PATTERN-D] Ein Anwalt aus Zürich sendete mir seine Datenschutz-Audit. Calendly taucht auf. 'Server in den USA. Ohne Standardvertragsklauseln.' Dann zeigte er mir einen Post-it: '23 Jahre alte Kanzlei. 18 Termine pro Woche. Alle in Calendly.'",
+    "outline": "[C5 Did-you-know] Calendly ist im DACH-Handwerk überall (Friseur, Zahnarzt, Therapeut). Aber: Keine EU-Server-Option. Deine Kundendaten laufen täglich nach Boston. Das ist nicht DSGVO-konform — es sei denn du hast einen AV-Vertrag (den 89% nicht haben). CLEVER-TRICK: Drei lokale Alternativen die 80% der Features bieten, aber Frankfurt hosten. Eine Zahnärzte-Praxis wechselte: 0 Funktionsverlust, 0 Bußgeld-Risiko ab nächster Kontrolle. Diskussions-Trigger: 'Nutzt ihr Calendly? Und kennt ihr euer Risiko?'",
+    "target_keywords": "Calendly DSGVO, Termin-Booking EU-konform, Zahnarzt Datenschutz"
+  },
+  {
+    "title": "Mein peinlichster Moment: Ich konnte Spurig nicht erklären.",
+    "angle": "[C12: Alltagsdusselheit / PATTERN-L] Mein Onkel fragte mich beim Familienessen: 'Was machst du beruflich?' Ich fange an mit QR-Codes. Seine nächste Frage: 'Aha. Also sowas wie... TikTok?' Stille. Drei Sekunden. 'Nein. Aber auch nicht so wichtig.' Meine Mutter sieht mein Gesicht. 'Er hat ein Tool gebaut.' Mein Onkel: 'Ah. Eine App?' Ich gebe auf.",
+    "outline": "[C12 Alltagsdusselheit] Das ist das echte Solo-Founder-Problem: dein Produkt ist sofort erklärt für Marketer, völlig unsichtbar für die echte Welt. QR-Codes sind 15 Jahre alt. Spurig ist ein Feature, keine Sensation. CLEVER-TRICK: Wenn du nicht mal deinen Onkel überzeugen kannst — schreib für deine Zielgruppe, nicht für die Welt. Ich erzähle jetzt: 'Ich baue Tracking für Restaurants und Handwerker. Die sehen endlich ob ihre Plakate funktionieren.' Drei Wörter. Boom. Onkel nickt. Diskussions-Trigger: 'Was ist euer Elevator Pitch, der nicht bei Marketer-Jargon scheitert?'",
+    "target_keywords": "Product positioning Founder, Solo-Founder Kommunikation, QR-Code Marketing einfach erklärt"
+  },
+  {
+    "title": "Hotjar speichert deine Besucherdaten in Irland — ohne Kontrolle.",
+    "angle": "[C2: Counter-intuitive / PATTERN-H] 'Heatmaps sind DSGVO-konform' — das hörte ich von vier Agenturen. Dann las ich das Datenschutz-Statement von Hotjar. 'Daten werden in Irland gespeichert und für Produktverbesserungen genutzt.' Niemand der Agenturen hatte das gecheckt.",
+    "outline": "[C2 Counter-intuitive] Alle predigen: Heatmap-Tools sind 'anonymisiert, also sicher'. Falsch. IP-Adressen sind personenbezogene Daten (LG Hamburg 2020). Hotjar speichert auch Scroll-Verhalten (= Tracking) ohne dass dein Besucher eingewilligt hat — wenn dein Banner nicht luftdicht ist. CLEVER-TRICK: Teste dein Banner: Häkchen drin? Alle Analytics laufen? Dann hast du Implizite Einwilligung — die nicht hält. Eine Optik-Praxis wechselte zu Smartlook EU: 0 Features verloren, Audit-sicher. Diskussions-Trigger: 'Welches Heatmap-Tool nutzt ihr — und kennt ihr euer Daten-Fluss-Ziel?'",
+    "target_keywords": "Hotjar DSGVO-Risiko, Heatmap-Tools EU-konform, Analytics Datenschutz DACH"
+  },
+  {
+    "title": "19 Euro pro Monat kostet der AV-Vertrag, den 91% nicht haben.",
+    "angle": "[C11: Money-Reveal / PATTERN-J] Ein Steuerberater zeigte mir seine Rechnung. Bitly Free: 0€. Risiko: ein Bußgeld von 12.000€ weil kein AV-Vertrag da ist. Ich fragte ihn: 'Hast du nach einem AV-Vertrag gefragt?' Er: 'Ich dachte, Free bedeutet frei von Anforderungen.' Es bedeutet das Gegenteil.",
+    "outline": "[C11 Money-Reveal] Der unsichtbare Preis von kostenlos: kein AV-Vertrag, keine Garantie, unternehmerisches Risiko. CLEVER-TRICK: Prüfe dein Tool — Bitly, Short.io, Rebrandly, GA4. Schreib Support an: 'AV-Vertrag für Daten-Verarbeitung, bitte AVV-Muster.' Die meisten antworten: 'Das bieten wir nicht an' (= Bußgeld-Risiko). Spurig sendet AVV innerhalb von 24h. Kosten: transparent, DACH-Unternehmen, keine Überraschungen. Ein Immobilienmakler sparte durch den Wechsel 89€ monatlich und wechselte wegen des AV-Vertrags: 0 Bußgeld-Risiko, Plus-Punkt bei der nächsten Audit. Diskussions-Trigger: 'Habt ihr einen AV-Vertrag mit eurem Link-Tool?'",
+    "target_keywords": "AV-Vertrag Tracking-Tool, Bitly DSGVO-Risiko, Link-Shortener EU-konform"
+  },
+  {
+    "title": "Warum QR-Codes auf Speisekarten jetzt eine Behoerde kontrolliert.",
+    "angle": "[C5: Did-you-know / PATTERN-K] Unpopular: QR-Codes auf Speisekarten sind kein Marketing-Trend mehr — sie sind eine Daten-Falle. Ein Restaurant in Wien bekam ein Schreiben von der Datenschutzbehoerde. Grund: Die QR-Codes auf der Speisekarte führten zu einer Website, die IP-Adressen speicherte, ohne dass Gäste es wussten.",
+    "outline": "[C5 Did-you-know / Unpopular] Gastronomie macht einen klassischen Fehler: QR-Code auf Speisekarte, verlinkt zu Google Forms oder Umfrage, speichert IP-Adressen ohne Cookie-Banner. Das ist nicht nur uncool, das ist bußgeldpflichtig (bis 5.000€ pro Wiederholung). CLEVER-TRICK: Wenn du QR-Codes in Speisekarten druckst, nutze einen trackenden Link mit Consent-Management — oder verzichte auf Tracking und nutze nur den Link ohne Cookies. Ein Bierlokal in München druckte QR-Codes zur Bewertungs-Seite: Ohne Cookie-Tracking sank die Konversion um 3%, das Bußgeld-Risiko um 100%. Diskussions-Trigger: 'Wie viele eurer QR-Code-Kampagnen haben ein Cookie-Banner davor geschaltet?'",
+    "target_keywords": "QR-Code Speisekarte DSGVO, Cookie-Tracking Gastronomie, Umfrage Datenschutz"
+  }
+]

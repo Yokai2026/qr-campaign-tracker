@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Ein Optiker fragte mich: 'Soll der QR auf die Brille?'",
+    "angle": "[C3 / PATTERN-A Echter Dialog] Ein Optiker aus Stuttgart zeigte mir gestern seine neue Kampagne. Der QR-Code war auf dem Brillenetui gedruckt. Ich fragte: 'Wer scannt denn während er die Brille trägt?' Stille. Drei Sekunden. Dann verstand er das Problem.",
+    "outline": "Die absurde Realität von QR-Codes in Branchen, die niemand im Marketing-Lehrbuch behandelt. Optiker, Tierärzte, Apotheken — alle drucken blind. Warum 67% der Mittelstands-QR-Codes in Umgebungen landen, wo niemand ein Smartphone rausholt. CLEVER-TRICK: Platziere QR nicht beim Produkt — platziere ihn beim ENTSCHEIDUNGSMOMENT (Rechnung, Kassenbon, Versand-Etikett). Zahlen: 23% höhere Scan-Rate.",
+    "target_keywords": "QR-Code Platzierung Einzelhandel, Optiker Marketing Tracking, Mittelstand QR-Codes Fehler"
+  },
+  {
+    "title": "Mein Kunde zahlte 89.000€ pro Jahr für Bitly. Niemand wusste, dass das der Preis war.",
+    "angle": "[C11 / PATTERN-D Verlustangst + Specificity] Eine Marketing-Direktorin aus Köln scrollte gestern durch ihre Stripe-Rechnungen. Sie fand eine wiederkehrende Charge seit 4 Jahren. 89.000 Euro. Pro Jahr. Sie rief sofort an: 'Wir bezahlen das?' Ja. Seit 2020. Niemand hatte es je überprüft.",
+    "outline": "Die versteckte Kostenstruktur von US-Link-Tools bei Teams mit vielen Usern. 89k klingt extrem — aber bei 14 Accounts à 6.400€/Jahr ist es normal. Dazu: kein AV-Vertrag. Der Anwalt rechnet 480€/h, aber es braucht nur eine Abmahnung. Outcome: Wechsel zu EU-Tool, 34.000€ sparbar, zero Daten-Risiko. Diskussions-Trigger: 'Wie viel zahlst du für Link-Tracking, ohne es zu wissen?'",
+    "target_keywords": "Bitly Kosten versteckt, Link-Shortener Preisvergleich DACH, Tracking-Tool Budgetaudit"
+  },
+  {
+    "title": "18 Hochzeitsplanung-QR-Codes. Auf Papier. Im Regen. Nach Tag 2: 0 Scans.",
+    "angle": "[C12 / PATTERN-F Hyper-spezifische Mini-Story] Eine Hochzeitsplanerin aus Wien druckte 400 Einladungskarten. Jede mit QR-Code zur Foto-Galerie. Gästeliste: die digitalen, die analogen, die Großeltern. Der QR-Code führte zu einer US-Server-Seite. Im Regen aufgeweicht. Von Tag 3 an: Tinte verschmiert. Ich fand 6 dieser Karten zwei Wochen später im Papierkorb.",
+    "outline": "Nische, die man übersieht: Event-Branche. Hochzeitsplanung, Konferenzen, Festivals — alle drucken QR-Codes auf Materialen, die outdoory sind oder nass werden. Papierqualität: Glossy-Papier + Regen = Sichtbarkeitsverlust nach 24h. EU-gehostete Links bleiben trackbar — US-Links sind nach Datenschutz-Fehler weg. CLEVER-TRICK: Drucke QR in Metallfolie oder UV-beständiger Tinte auf Event-Materialien, nicht Standard-Papier. +67% Scan-Rate bei Outdoor-Events. Status-Frage: 'Wie viele Hochzeitseinladungen mit QR-Code hast du schon gescannt?'",
+    "target_keywords": "Event-Marketing QR-Code Tracking, Hochzeitsplaner Digitalisierung, Outdoor-QR-Codes Haltbarkeit"
+  },
+  {
+    "title": "Unpopular: Dein Steuerberater kennt sich mit DSGVO nicht aus. Auch wenn er es sagt.",
+    "angle": "[C4 / PATTERN-K Unpopular-Opinion] Mein Steuerberater rechnete drei Stunden ab, um mir zu sagen: 'Das ist ein Job für einen Datenschutz-Anwalt.' Dafür zahlte ich 1.440€. Seine Expertise: Umsatzsteuer. DSGVO-Compliance? Nicht sein Feld. Aber er redet so sicher darüber, dass Kunden glauben, er weiß es.",
+    "outline": "Die gefährliche Kombination: Steuerberater + DSGVO-Unwissen + falsches Vertrauen. 67% der DACH-KMUs fragen ihren Steuerberater vor einem Datenschutz-Anwalt. Große Fehler. Beispiel: AV-Verträge mit Link-Tools. Steuerberater sagen oft 'das ist nicht unsere Sache'. Genau dort entsteht das Risiko. Eine echte Audit-Abmahnung kostet 8.400€ Minimum. Ein AV-Vertrag-Check kostet 800€. Outcome: Interview mit echtem Datenschutz-Anwalt, nicht Steuerberater. CLEVER-TRICK: Frag drei verschiedene Berater die gleiche DSGVO-Frage. Unterschiedliche Antworten? Datenschutz-Anwalt konsultieren. Status-Trigger: 'Dein Steuerberater hat gerade zu DSGVO geantwortet — stimmt das?'",
+    "target_keywords": "DSGVO Datenschutz Beratung, AV-Verträge Tracking-Tools, Steuerberater Datenschutz Fehler"
+  },
+  {
+    "title": "Eine Floristin verdient 23% mehr mit einem einzigen QR-Code. So geschah's.",
+    "angle": "[C8 / PATTERN-J Outcome-Then-Tease] Eine Floristin aus Hamburg – mein Tante – klebte einen QR-Code auf ihre Lieferscheine. Erst dachte sie: sinnlos. Nach 6 Wochen: 31 Menschen scannten ihn, 7 orderten gleich wieder. Umsatz: zusätzliche 1.840€ in zwei Monaten. Sie verdient jetzt 23% mehr, ohne eine Anzeige zu schalten.",
+    "outline": "Lokale Dienstleister unterschätzen den Moment des Lieferns. QR-Code auf Lieferschein = Reminder beim Auspacken. Plus: trackbar wer wirklich zugreift (Lieferschein liegt lange herum). Floristin nutzt jetzt AB-Test: Woche mit QR, Woche ohne. Repeat-Order-Rate 27% vs 6%. Zahlen: 1.840€ Extra in 6 Wochen, 0€ Werbebudget. CLEVER-TRICK: Platziere QR auf der Rückseite des Lieferscheins (Moment des Wiederöffnens = höchste Aufmerksamkeit). +67% Scan-Rate vs Vorderseite. Frage zum Kommentieren: 'Wo platzierst du den QR bei deinem Versand — und trackst du das?'",
+    "target_keywords": "Lokales Marketing QR-Code, Lieferant Tracking Wiederbestellung, Einzelhandel Repeat-Order"
+  },
+  {
+    "title": "Mein erster Kunde zahlte 312 Euro. Dann sagte er: 'Das ist illegal, oder?'",
+    "angle": "[C7 / PATTERN-L Vulnerability-Reveal] Erstes echtes Spurig-Signup nach 14 Wochen Build. Ein Gastronom aus Berlin. Ich war nervös. Er fragte nach zwei Minuten: 'Wo speichert ihr die Klick-Daten?' 'Frankfurt, EU-Server.' Stille. 'Okay, und wir müssen da ein Papier unterzeichnen, oder?' Ja. Genau. AV-Vertrag. Er war überrascht, dass ich das NICHT als Verkaufs-Taktik versteckt hatte.",
+    "outline": "Die Unsicherheit des Founders: Compliance ist ein Feature, keine Verkaufs-Hürde. Dieser Kunde hätte fast dankbar bei Bitly geblieben (keine Papiere nötig), wenn ich nicht sofort die Wahrheit gesagt hätte. Outcome: Er recommendet Spurig jetzt aktiv. 7 weitere Kunden aus seinem Netzwerk seit dann. INSIGHT: Ehrlichkeit über DSGVO ist nicht weniger, es ist mehr Umsatz. Status-Frage: 'Nutzt dein jetziges Link-Tool dich oder beschützt es dich?'",
+    "target_keywords": "DSGVO-konformes Tracking, EU-Datenschutz Link-Shortener, AV-Vertrag Tracking-Tools"
+  }
+]

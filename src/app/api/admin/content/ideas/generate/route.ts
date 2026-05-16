@@ -96,13 +96,17 @@ export async function POST(request: NextRequest) {
   // Hart-verboten: konkrete Tropes die immer wieder auftauchen weil sie in den
   // Prompt-Examples stehen. Verhindern dass die AI sie als Templates kopiert.
   const BANNED_TROPES: RegExp[] = [
-    /\b47\s*(plak|standort|euro|mitarbeiter|prozent)/i, // "47 Plakate", "47 Euro", "47 Standorte"
-    /\b500\s*postkarten/i,                              // "500 Postkarten"
-    /\b8\s*wochen.*falsch/i,                            // "8 Wochen am falschen Feature"
-    /stripe.dashboard.*47/i,                            // "Stripe-Dashboard 47 Euro"
-    /bruder.{0,20}(steuerberater|versteht)/i,           // "Bruder versteht Spurig nicht"
-    /(bitly|bittly).{0,40}(virginia|ashburn)/i,         // "Bitly Daten in Virginia"
-    /sechs jahre.*atlantik/i,                           // "Sechs Jahre Daten Atlantik"
+    /\b47\s*(plak|standort|euro|mitarbeiter|prozent)/i,    // "47 Plakate", "47 Euro", "47 Standorte"
+    /\b500\s*postkarten/i,                                  // "500 Postkarten"
+    /\b180\s*flyer/i,                                       // "180 Flyer" (neuer Sticky-Trope nach Example)
+    /\b(8|11|19)\s*(wochen|tage|monate).*falsch/i,         // "8/11/19 Wochen am falschen X"
+    /\bvier anrufe\b/i,                                     // "Vier Anrufe" (begleitet "180 Flyer")
+    /stripe.?dashboard.*\b(47|312)\b/i,                     // "Stripe-Dashboard 47/312 Euro"
+    /bruder.{0,20}(steuerberater|versteht|fragt)/i,         // "Bruder versteht/fragt"
+    /(bitly|bittly).{0,40}(virginia|ashburn)/i,             // "Bitly in Virginia"
+    /sechs jahre.*atlantik/i,                               // "Sechs Jahre Daten Atlantik"
+    /\b67\s*plakat/i,                                       // "67 Plakatstandorte" (auch sticky geworden)
+    /\b89(\.\d{3}|\.000)?\s*€\s*(jahr|pro jahr)?.*bitly/i, // "89.000€ für Bitly"
   ];
 
   let softDupCount = 0;

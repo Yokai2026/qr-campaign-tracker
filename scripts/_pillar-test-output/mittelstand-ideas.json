@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Ein Friseur aus Leipzig speichert Kundendaten seit 4 Jahren falsch.",
+    "angle": "[C5: Did-you-know / PATTERN-D Verlustangst] Ein Friseur aus Leipzig nutzt ein Buchungssystem mit QR-Code-Integration. Gestern sagte sein Anwalt einen Satz, der ihn erstarren ließ: 'Die Server stehen in Virginia. Ohne AV-Vertrag.' Vier Jahre. Tausende Kundennummern. Ein Land zu weit weg.",
+    "outline": "Der Blog folgt seiner echten Reaktion: Schock → Recherche → Erkenntnis, dass 60% der DACH-Handwerker-Software US-gehostet ist. Die praktische Frage: Wo stehen deine Kundendaten physisch? Ein einfacher Audit-Schritt den niemand macht. Schluss-Frage: 'Kennst du den Server-Standort deines Buchungssystems?'",
+    "target_keywords": "DSGVO Kundendaten Speicherort, Friseur-Software EU-konform, AV-Vertrag Handwerk"
+  },
+  {
+    "title": "Ich habe 11 Wochen am falschen Feature gebaut — ein Praktikant hätte es besser gewusst.",
+    "angle": "[C3: Funny Failure / PATTERN-B Persönlicher Fail] Donnerstag Mittag. Ich zeige mein neues Export-Feature. Mein Praktikant schaut mich 6 Sekunden an. Dann: 'Warum machen wir das nicht einfach über die API?' Ich hatte Recht. Er hatte mich gerade geschlagen.",
+    "outline": "CLEVER-TRICK eingebaut: Mini-Umfrage statt Feature-Bombe. Ein einfacher Slack-Poll hätte 11 Wochen Arbeit gespart. Die Insight: Solo-Founder bauen lieber als zu fragen. Der praktische Hack: Vor Code kommt Frage. Konkrete Zahl: 168 Stunden Zeit + 320€ Vercel-Kosten für etwas das 0€ wert war.",
+    "target_keywords": "Feature-Entwicklung agil, MVP-Validierung, Solo-Founder Fehler"
+  },
+  {
+    "title": "Ein Optiker aus München weiß nicht, wer sein Plakat sieht — seit 3 Jahren.",
+    "angle": "[C11: Money-Reveal / PATTERN-G Geld verbrennt] Die Optikerin hat ein Budget von 6.800€/Jahr für Print-Anzeigen. Jeden Monat zahlt sie. Niemand misst, ob es funktioniert. Gestern fragte sie mich: 'Ist das Marketing oder nur Gewohnheit?'",
+    "outline": "Ein Dialog-Drama: Sie rechnet durch. 6 Jahre × 6.800€ = 40.800€ ausgegeben. Null Daten. Ein QR-Code auf ihrer nächsten Anzeige — und plötzlich sieht sie, welche Ausgabe sich lohnt und welche nicht. Der praktische Hook: Print bleibt unsichtbar, weil niemand ein Tool benutzt. Outcome: Sie spart 3.400€/Jahr nicht, weil das Budget falsch ist, sondern weil sie jetzt misst.",
+    "target_keywords": "Print-Marketing ROI messen, QR-Code Plakat-Tracking, Offline-Conversion-Messung"
+  },
+  {
+    "title": "Unpopular Take: Deine Steuerberater-Email landet deshalb immer in Spam.",
+    "angle": "[C9: Contrarian Take / PATTERN-K Unpopular-Opinion] Ein Steuerberater aus Hamburg sendet Newsletter über ein US-Tool. Ich schaute sein Setup an. Drei DSGVO-Fehler in einer Konfiguration. Er wusste nichts davon. Sein Email-Öffnungsrate: 4%.",
+    "outline": "Die These: Nicht die Betreffzeile ist das Problem — es ist dein Server-Standort + dein AVV-Datei-Status. US-gehostete Newsletter-Tools landen im Spam, weil Google/Outlook EU-Regeln strenger kontrollieren als früher. Der praktische Weg: Ein EU-Server kostet nicht mehr, spart aber Ärger. Konkrete Alternative erwähnen ohne Verkaufen. Frage: 'Wo ist dein Newsletter-Provider gehostet?'",
+    "target_keywords": "Newsletter DSGVO-konform EU-Server, Email-Deliverability Deutschland, Spam-Filter EU-Richtlinie"
+  },
+  {
+    "title": "23 Plakat-Standorte. 4 funktionieren. Aber der Chef will nicht rechnen.",
+    "angle": "[C12: Alltagsdusselheit / PATTERN-F Hyper-spezifische Mini-Story] Dienstag 10:14. Im Büro einer Print-Agentur in Stuttgart. Der Geschäftsführer sagt zum Marketing-Chef: 'Auf welchen Plakaten sehen wir ROI?' Marketing-Chef: 'Äh... das können wir nicht messen.' Geschäftsführer: 'Aber ihr habt Budget dafür?' Stille. 47 Sekunden.",
+    "outline": "Das Drama entstand, weil Messung plötzlich unbequem wird. Mit QR-Codes wird klar: 19 Plakate sind tote Ausgaben. Der Geschäftsführer muss dann handeln — oder zugeben, dass das Geld rausgeworfen wird. Insight: Print-Unsicherheit ist nicht technisch, sondern politisch. Schluss: Ein einfacher Test mit 4 Standorten zeigt in 14 Tagen, ob die Strategie funktioniert.",
+    "target_keywords": "Plakat-Effektivität messen, Print-ROI Standort-Test, Werbebudget Optimierung"
+  },
+  {
+    "title": "Mein Stripe-Dashboard nach Monat 9: 1.247€ MRR. Was wirklich funktioniert hat.",
+    "angle": "[C11: Money-Reveal / PATTERN-J Outcome-Then-Tease] Nach 9 Monaten erreiche ich die Grenze, wo ich Spurig nicht mehr als Hobby-Projekt sehen kann. Das Dashboard zeigt 1.247€. Das ist konkret. Das ist nicht cool. Das ist Druck.",
+    "outline": "CLEVER-TRICK: Drei Dinge die null Geld gekostet haben (Blog zu DSGVO, LinkedIn Post über Bitly-Risiko, direkter Support-Dialog), brachten 68% der Kunden. Zwei Dinge mit 1.200€ Budget (PPC-Test, Influencer-Engagement) brachten 0 Kunden. Zahlen-Kaskade: 89€ MRR (Monat 1) → 312€ (Monat 3) → 891€ (Monat 6) → 1.247€ (Monat 9). Selbst-Eingeständnis: Ich dachte, größeres Marketing-Budget = schneller Growth. Falsch. Authentischer Content schlägt Spend.",
+    "target_keywords": "SaaS MRR-Wachstum Content-Marketing, Bootstrap-Strategie B2B, Founder-Revenue-Transparenz"
+  }
+]

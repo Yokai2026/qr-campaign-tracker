@@ -321,18 +321,45 @@ oben als Beispiele stehen. JEDE neue Idee MUSS andere Zahlen/Settings verwenden.
 
 VERBOTEN — NICHT GENERIEREN:
 - Magic-Zahl "47" in jeglicher Form (47 Plakate, 47 Standorte, 47 Euro, 47 Mitarbeiter, 47 MRR)
+- Magic-Zahl "180 Flyer" / "Vier Anrufe" (Recent-Sticky-Trope, wurde wegfilter)
 - "500 Postkarten" in jeglicher Form
-- "8 Wochen am falschen Feature" / "8 Wochen gebaut" in jeglicher Form
-- "Stripe-Dashboard nach Monat 1" / "47 Euro MRR" in jeglicher Form
-- "Mein Bruder versteht Spurig nicht / ist Steuerberater" in jeglicher Form
+- "8/11/19 Wochen/Tage am falschen Feature/Problem"
+- "Stripe-Dashboard nach Monat 1 mit 47/312 Euro MRR"
+- "Mein Bruder versteht Spurig nicht / ist Steuerberater / fragt mich"
+- "67 Plakatstandorte" (Recent-Sticky-Trope)
+- "89.000 Euro pro Jahr für Bitly" (Recent-Sticky-Trope)
 - "Bitly speichert Daten in Virginia/Ashburn" — andere DSGVO-Aufhänger
   (Cloudflare, Google Analytics 4 EU-Region, Hotjar Datenflüsse, Calendly USA)
 - "Sechs Jahre Klick-Daten" — andere Datenmengen + Zeiträume
 - "Wir laufen blind" / "Niemand traut sich" — andere Vokabel-Hooks
 - "Donnerstag 14:30 / 14:47 in Düsseldorf" — andere Wochentag-Stadt-Kombis
 
-REGEL FUER ZAHLEN: Bevor du eine Zahl schreibst, prüfe — ist es 47 / 500 / 8?
+REGEL FUER ZAHLEN: Bevor du eine Zahl schreibst, prüfe — ist es
+47 / 67 / 89 / 180 / 312 / 500 / 8 / 11 / 19?
 JA → andere Zahl wählen. NEIN → ok.
+
+═══════════════════════════════════════════════════════════════════
+PILLAR-SCOPE-ENFORCEMENT (kritisch — verhindert Cross-Pillar-Drift)
+═══════════════════════════════════════════════════════════════════
+Du generierst Ideen für EINEN spezifischen Pillar. Die Cluster-Description
+oben sagt was IM SCOPE und was NICHT IM SCOPE ist.
+
+JEDE Idee MUSS direkt mit dem Pillar-Thema verbunden sein.
+
+Prüfe pro Idee:
+- "Würde diese Idee für einen Leser, der nach diesem Pillar sucht, relevant sein?"
+- "Wenn ich diese Idee einem anderen Pillar zuordnen müsste — welcher passt besser?"
+  Wenn die Antwort ein anderer Pillar ist → falsch, schreibe um oder wähle anderes Thema.
+
+Konkrete Anti-Drift-Beispiele:
+- "180 Flyer. Vier Anrufe." gehört NUR in print_lebt — NICHT in compliance_lite, founder_diary, mittelstand
+- "Hotjar speichert in Irland" gehört NUR in compliance_lite — NICHT in print_lebt, qr_realtalk
+- "Mein Praktikant hat Spurig in einer Woche verstanden" gehört NUR in founder_diary — NICHT in print_lebt
+- "Eine Floristin verdient 23% mehr mit QR-Code" gehört in mittelstand ODER qr_realtalk — je nach Fokus
+
+Wenn der aktuelle Pillar "founder_diary" ist und du eine QR-Tipps-Idee schreibst → falsch.
+Wenn der aktuelle Pillar "compliance_lite" ist und du eine Print-Statistik schreibst → falsch.
+Wenn der aktuelle Pillar "mittelstand" ist und keine konkrete Branche+Stadt drin steht → falsch.
 
 ERLAUBTE FRISCHE ZAHLEN-POOL (würfle aus diesem Pool, oder generiere eigene
 plausible Zahlen, NUR NICHT die Verbots-Zahlen):
