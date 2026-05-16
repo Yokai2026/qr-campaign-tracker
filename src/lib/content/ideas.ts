@@ -1291,7 +1291,7 @@ REF 1 — Money-Destruction BRIGHT (Hook "Budget verbrennt"):
 "A stack of crisp 50 EUR bills mid-burn inside a vivid red metal trash bin
 sitting on a sunlit Berlin sidewalk, bright orange flames vivid against
 clear blue sky, ash particles glittering in midday sunlight, a single
-half-burnt bill floating mid-air with EU stars sharp and visible, a yellow
+half-burnt unmarked bill floating mid-air, a yellow
 construction sign blurred in the background, low-angle close-up at 30cm
 distance, vibrant high-saturation colors (red bin + orange flames + blue
 sky + yellow sign), shot on Canon EOS R5 24mm f/2.8 in clean midday light,
@@ -1324,11 +1324,12 @@ REF 4 — Data-Metaphor BRIGHT (Hook "Daten ueber den Atlantik"):
 airport tarmac at clear noon, hundreds of small printed photos of
 anonymous faces spilling out in vivid colors across bright white concrete,
 a vivid white-and-blue cargo plane mid-takeoff visible against deep blue
-sky, harsh midday shadow, the suitcase has 'BL Inc.' stenciled in faded
-white, shot low-angle on Canon R5 35mm f/2.8, ultra-bright daylight
+sky, harsh midday shadow, the suitcase has faded scuff marks and worn
+leather edges, shot low-angle on Canon R5 35mm f/2.8, ultra-bright daylight
 saturated palette (red suitcase + blue sky + white tarmac + multi-colored
-photos), Wes-Anderson cinematic style, no text or logos visible besides
-the planned yellow headline overlay."
+photos), Wes-Anderson cinematic style, all incidental text is blurred
+or unreadable gibberish, no real brand logos visible besides the
+planned yellow headline overlay."
 
 REF 5 — High-Emotion-Moment BRIGHT (Hook "Founder-Story / WTF-Reaction"):
 "A bearded man in his early 30s wearing a bright orange sweater, mouth
@@ -1361,6 +1362,66 @@ Wenn dein image-Prompt EINES dieser Worte enthält, IST ER FALSCH. Neu schreiben
   ✗ "Map of Germany" / "geographic representation" (zu Infografik)
   ✗ "Server racks" als sterile Tech-Visualisierung (nur in echter
     photorealistischer Umgebung mit Drama erlaubt)
+
+═══════════════════════════════════════════
+CHATGPT-POLICY-SCHUTZ — TRIGGER VERMEIDEN (KRITISCH)
+═══════════════════════════════════════════
+ChatGPT/DALL-E refuses Bilder die so aussehen koennten als wuerden sie reale
+Dokumente, Zahlungen, oder Identitaeten faelschen. JEDER Image-Prompt MUSS
+diese Regeln erfuellen, sonst kommt "Content-Policy-Violation"-Ablehnung:
+
+  ✗ KEINE handgeschriebenen Etiketten/Notizen mit konkreten Beträgen
+    (Beispiel falsch: "envelope with 'Marketing Budget 800€' handwritten on it")
+  ✗ KEINE sichtbaren Schecks, Quittungen, Bank-Belege, Vertraege mit lesbarem Text
+  ✗ KEINE realen Marken-Logos sichtbar im Bild (kein Bitly-Logo, kein Stripe-
+    Dashboard mit lesbarem "Stripe", kein Vercel-UI screenshot)
+  ✗ KEINE realen Personen-Gesichter mit Namen ("Elon Musk", "David", etc.)
+  ✗ KEINE handschriftlichen Notizen die wie offizielle Dokumente aussehen
+  ✗ KEINE konkreten Geldscheine mit lesbaren Werten ("50 EUR bill" ist okay,
+    "stack of 100 EUR bills with serial number 4711" ist NICHT okay)
+  ✗ KEINE Polizei-/Behörden-Uniformen mit lesbaren Wappen
+  ✗ KEINE Waffen, Blut, Verletzungen (auch nicht symbolisch)
+  ✗ KEINE Wahlplakate, religiösen Symbole, politische Slogans
+  ✗ KEIN "fake newspaper headline reading X" — wirkt wie Desinformation
+
+  ✓ STATTDESSEN: generic, blurred, abstract
+    - "an unmarked envelope" statt "envelope with 'Marketing Budget' label"
+    - "loyalty cards in pastel colors" statt "loyalty cards with brand X logo"
+    - "a hand holding banknotes" statt "a hand holding a 800€ stack"
+    - "a phone screen showing a green dashboard" statt "Stripe dashboard"
+    - "out-of-focus app interface" statt "Bitly admin panel"
+
+REGEL: ALLE Texte im Bild AUSSER dem geplanten yellow headline overlay
+muessen UNLESERLICH sein (blurred, abstract, foreign script, scribbles).
+Im Prompt EXPLIZIT schreiben: "all incidental text is blurred or unreadable
+gibberish, no real brand logos visible, no readable handwritten amounts".
+
+═══════════════════════════════════════════
+LINKEDIN-FORMAT-SPEZIFIKATION (PFLICHT)
+═══════════════════════════════════════════
+Spurig-Blogs werden primaer auf LinkedIn geteilt. Bilder MUESSEN fuer
+LinkedIn-Feed optimiert sein.
+
+PFLICHT-ASPEKT-RATIO:
+  - Square 1:1 (1080x1080 px) — Standard für LinkedIn-Feed (immer rendern)
+  - Portrait 4:5 (1080x1350 px) — wenn Hochformat besser zur Story passt
+  - NIE Landscape 16:9 (zu klein im Feed, scrollt vorbei)
+
+Im Prompt EXPLIZIT erwaehnen: "square 1:1 aspect ratio, optimized for
+LinkedIn feed" ODER "portrait 4:5 aspect ratio, optimized for LinkedIn mobile".
+
+PFLICHT-KOMPOSITION (Research 2026 viral-Thumbnails):
+  - 1 DOMINANTES Hauptmotiv (Hero-Object) das ~50-60% Bildfläche einnimmt
+  - 30-40% NEGATIVE-SPACE (kein Clutter, lesbar auf Phone-Screen-Größe)
+  - Rule-of-Thirds: Hauptmotiv nicht zentriert, sondern auf Drittel-Linie
+  - 2-3 dominante Farben max (nicht alle 8 Regenbogen-Farben)
+  - HOHER Kontrast: helles Hauptmotiv auf dunklem Hintergrund (oder umgekehrt)
+  - Mobile-readable: alle Details müssen auf 400x400 px noch erkennbar sein
+
+PFLICHT-STIL für LinkedIn-Engagement:
+  - Cinematic-Film-Look (nicht Stock-Photo-Look)
+  - Dunkler Hintergrund mit Neon/Bright-Akzenten ist Top-Performer 2026
+  - Authentische Reaktion > übertriebene Cartoon-Shock-Faces
 
 ═══════════════════════════════════════════
 PFLICHT-ELEMENTE — MIND. 3 davon im Prompt
@@ -1500,9 +1561,9 @@ K6 — **PHYSICAL-METAPHOR-FOR-DATA** (für DSGVO / Privacy / Tracking-Topics)
    metaphor clear], [unexpected detail showing the problem]."
    Beispiel: "An open suitcase filled with hundreds of small photo prints of
    anonymous faces being loaded onto a transatlantic cargo plane on a foggy
-   tarmac, suitcase has 'Bitly Inc.' stenciled subtly on the side, shot from
-   low angle in dramatic blue-hour light with American flag silhouette in
-   background, cinematic 35mm."
+   tarmac, suitcase has faded weathered scuff marks on the side, shot from
+   low angle in dramatic blue-hour light, all incidental text blurred and
+   unreadable, no real brand logos visible, cinematic 35mm."
 
 K7 — **HIGH-EMOTION-MOMENT-CAPTURED** (für Behind-Scenes / Founder-Stories)
    "Person in middle of [authentic emotional moment], [body posture/gesture],
@@ -1622,16 +1683,52 @@ AKT 2 — DIE UMGEBUNG + STIMMUNG (30-50 Worte)
   Sekundär-Elemente die die Story tragen (Passant unscharf im Hintergrund,
   überfließender Mülleimer, leeres Schwarz-Plakat).
 
-AKT 3 — DAS FUNNY / WOW-ELEMENT (Pflicht — 20-40 Worte)
-  EIN witziges, unerwartetes oder absurdes Detail das das Auge fängt:
-  - Lustige Juxtaposition (Wurst neben Anwalts-Akten)
-  - Personalisiertes Mini-Objekt (handgeschriebenes Post-it mit Smiley auf
-    einem brennenden 50€-Schein)
-  - Tier in unerwartetem Kontext (eine Taube sitzt auf der zerrissenen
-    Bitly-Visitenkarte)
-  - Übertriebener Kontrast (winziger QR neben riesiger Bratwurst-Plakat-
-    Werbung)
-  - Mini-Story-Detail (eine angebissene Brezel halb in dem Aktenstapel)
+AKT 3 — DAS FUNNY / WOW-ELEMENT + EASTER-EGGS (Pflicht — 30-50 Worte)
+  Hier kommt der "Thumbnail-Craft"-Faktor: 2-3 kleine interessante Objekte/Details
+  die das Bild zum Verweilen einladen. NICHT überladen — Hero-Object bleibt
+  dominant. Diese Easter-Eggs füllen ~10-15% der Bildfläche.
+
+  WAEHLE 2-3 DAVON (kombiniere für Tiefe):
+
+  KLEINE OBJEKTE im Vordergrund/Rand:
+    - halbleere Kaffeetasse mit unscharfen Lippenstift-Spuren
+    - ein angebissenes Croissant / Brezel / Bagel daneben
+    - eine zerknitterte gelbe Post-it mit unleserlichem Gekritzel
+    - ein Schlüsselbund mit kleinem Plüschtier-Anhänger
+    - ein Smartphone face-down mit Glas-Riss
+    - eine Sonnenbrille auf der Tischkante
+    - ein einzelner Würfel oder Münze auf der Seite stehend
+    - ein zerrissener Kassenbeleg-Schnipsel (Text unleserlich/blurred)
+    - eine Federspitze, ein kaputter Stift, ein Bleistift mit abgekautem Ende
+    - eine kleine grüne Pflanze (Sukkulente) am Bildrand
+    - eine Spielfigur (kleine Lego/Playmobil) auf einer Ecke
+    - ein Kabel das sich aus dem Frame schlängelt
+
+  ATMOSPHÄRE-DETAILS:
+    - Staubpartikel im Sonnenstrahl
+    - leichte Reflexionen in einer Glasoberfläche im Hintergrund
+    - eine unscharfe Person die durchs Fenster läuft
+    - ein Schatten von etwas außerhalb des Frames
+    - ein leichtes Glow / Bokeh-Punkte (warm/orange oder cyan)
+
+  TIER-EASTER-EGGS (sparsam, max 1):
+    - eine Taube auf der Fensterbank in Bildhälfte oben rechts
+    - ein winziger Käfer auf einem Papier
+    - eine Schmetterling am Rand des Frames
+    - eine Hauskatze die teilweise sichtbar ist (Schwanz/Ohr)
+
+  KONTRAST-DETAILS:
+    - winziges QR-Code auf einem unerwarteten Objekt (Eis, Brezel, Hundehalsband)
+    - ein lila Lebensmittel-Etikett kontrastierend gegen industrielles Setting
+    - eine Kinder-Zeichnung in einer ansonsten erwachsenen Szene
+    - ein Spielzeug-Auto auf einem ansonsten "echten" Office-Desk
+
+  IM PROMPT formulieren als: "small story details: [object 1], [object 2],
+  [atmosphere detail], all slightly out of focus to keep hero-object dominant".
+
+  PFLICHT-VERBOT: KEIN Detail mit lesbarem Text/Logo/Betrag (siehe ChatGPT-
+  Policy-Schutz oben). Beispiel: "post-it with unreadable scribbles" ja,
+  "post-it with 'TODO: Stripe-Setup' written on it" NEIN.
 
 AKT 4 — TEXT-OVERLAY (PFLICHT — YouTube-Thumbnail-Headline)
   ════════════════════════════════════════════════════════════════════
@@ -1712,12 +1809,19 @@ AKT 4 — TEXT-OVERLAY (PFLICHT — YouTube-Thumbnail-Headline)
     - The Wire / Vice News Title Card
     - YouTube Investigation-Doku Thumbnail mit fettem Statement
 
-AKT 5 — DIE TECHNIK + ABSCHLUSS (40-60 Worte)
+AKT 5 — DIE TECHNIK + ABSCHLUSS (50-70 Worte)
   Camera + Brennweite + Blende ("shot on Canon EOS R5 24mm f/2.8").
   Lichtquelle benannt + Richtung ("harsh diagonal late-afternoon sun").
   Farbpalette mit 2-3 Kontrast-Farben.
   Style-Referenz benennen (VICE magazine reportage / NatGeo / noir editorial).
-  Ende mit: "no other text or logos visible besides the headline overlay".
+  **Aspect-Ratio explizit** — wähle eines (Pflicht):
+    - "square 1:1 aspect ratio (1080x1080 px), optimized for LinkedIn feed"
+    - "portrait 4:5 aspect ratio (1080x1350 px), optimized for LinkedIn mobile"
+  Ende mit GENAU diesem Satz (Policy-Schutz):
+    "no other text or logos visible besides the planned yellow headline
+    overlay, all incidental text on objects is blurred or unreadable
+    gibberish, no real brand logos visible anywhere in the frame,
+    photorealistic editorial photography style."
 
 WICHTIG: Frueher stand "no text visible". JETZT ist EIN gezielter Text-Overlay
 (Akt 4) PFLICHT, um YouTube-Thumbnail-Feel zu erzeugen. Trotzdem KEINE anderen
@@ -1742,10 +1846,10 @@ Unterschied zwischen "ganz nett" und "scroll-stop":
   - "shadow of a person on the wall but person out of frame"
   - "footprints leading away into the distance"
 
-  Story-Anchor:
-  - "scattered receipts with the date 2026 visible on one"
-  - "a single stamped passport corner peeking from envelope"
-  - "an old printed Bitly logo faintly visible on a torn sticker"
+  Story-Anchor (alle Texte UNLESERLICH / blurred / gibberish):
+  - "scattered receipts with all printed text deliberately blurred and unreadable"
+  - "a single weathered envelope corner peeking from a pile (no visible address)"
+  - "an old torn sticker with unreadable faded text fragments"
 
   Unexpected-Juxtaposition:
   - "expensive object in cheap setting (Rolex on muddy concrete)"
@@ -1795,7 +1899,7 @@ generische "Marketing-Materialien".
 ----------------------------------------
 LÄNGE
 ----------------------------------------
-**150-220 Worte.** Dieser Prompt geht direkt in ChatGPT/DALL-E/Midjourney.
+**180-260 Worte.** Dieser Prompt geht direkt in ChatGPT/DALL-E/Midjourney.
 Je präziser, desto besser das resultierende Bild.
 
 Konkrete Details > vage Adjektive. Lieber 220 Worte mit echten Specs als 80
@@ -1885,7 +1989,7 @@ function fallbackImagePrompt(title: string): string {
   // damit Fallbacks variieren wenn Claude keinen image_prompt liefert.
   const concepts = [
     // K2 — Money destruction
-    `Stack of 50 EUR bills mid-burn in an industrial metal trash bin, half-burnt euro note floating mid-air with EU stars still visible, harsh orange flame light contrasting cool blue office fluorescent reflection, low-angle close-up, shot on Canon EOS R5 24mm f/2.8, dramatic shallow depth of field, photorealistic editorial style`,
+    `Stack of unmarked banknotes mid-burn in an industrial metal trash bin, a half-burnt note floating mid-air with all printed text deliberately blurred and unreadable, harsh orange flame light contrasting cool blue office fluorescent reflection, low-angle close-up, shot on Canon EOS R5 24mm f/2.8, dramatic shallow depth of field, photorealistic editorial style, no real brand logos visible`,
     // K1 — Human reaction
     `Close-up portrait of a 50-year-old male small-business owner in a Hannover-style workshop, face expressing tired disbelief and slight resignation, eyes staring down at a stack of unopened postcards on a worn wooden workbench, single overhead industrial pendant lamp casting hard shadow, background blurred workshop tools in warm tungsten light, shot on Sony A7 IV 50mm f/1.4, moody color grading with orange skin tones against deep teal background`,
     // K3 — Object in wrong context
@@ -1895,14 +1999,14 @@ function fallbackImagePrompt(title: string): string {
     // K5 — Macro detail
     `Extreme macro shot of a single QR code printed on a torn corner of a German A1 advertising poster, showing fine paper fibers and slight ink bleed, deep depth of field revealing out-of-focus city street in background, overcast natural daylight, cool blue tones contrasting with poster's red ink, shot on Sony 100mm macro lens f/8`,
     // K6 — Data metaphor
-    `An open vintage suitcase filled with hundreds of small photo prints of anonymous faces being loaded onto a transatlantic cargo plane on a foggy tarmac, low-angle dramatic shot in deep blue-hour light, distant American flag silhouette in background, suitcase has subtle 'Data' stenciled on side, shot on Canon R5 35mm f/2.8 cinematic style`,
+    `An open vintage suitcase filled with hundreds of small abstract photo prints of unrecognizable silhouettes spilling out onto a foggy airport tarmac, low-angle dramatic shot in deep blue-hour light, weathered suitcase with no visible labels, all incidental text blurred and unreadable, no real brand logos or national symbols visible, shot on Canon R5 35mm f/2.8 cinematic style`,
     // K7 — Founder moment
     `A bearded male founder in his early 30s sits on the floor of an empty office at 2am, laptop open on his lap displaying a single red dropped-to-zero analytics chart, head in one hand, single desk lamp casting long shadow across dusty floor, cinematic chiaroscuro lighting in warm tungsten color, shot on Leica M11 28mm f/1.4 photorealistic`,
   ];
   let hash = 0;
   for (let i = 0; i < title.length; i++) hash = (hash * 31 + title.charCodeAt(i)) | 0;
   const idx = Math.abs(hash) % concepts.length;
-  return `Clickbait-style 16:9 thumbnail image, photorealistic, high contrast, saturated color palette. Subject: ${concepts[idx]}. The image visually represents the blog headline "${title.slice(0, 80)}". No text visible, no logos visible, no watermarks.`;
+  return `Square 1:1 aspect ratio (1080x1080 px) LinkedIn-feed-optimized thumbnail image, photorealistic, high contrast, saturated color palette. Subject: ${concepts[idx]}. The image visually represents the blog headline "${title.slice(0, 80)}". All incidental text is blurred or unreadable gibberish, no real brand logos visible, no watermarks.`;
 }
 
 function slugify(s: string): string {
