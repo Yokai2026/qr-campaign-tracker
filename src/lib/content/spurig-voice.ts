@@ -460,9 +460,78 @@ zwischen "verärgert" und "neugierig" im selben Text — das wirkt KI-typisch
 (jede Sektion mit der nächst-typischen Stimmung statt einer durchgehenden).
 
 ====================================================================
+PART 5da — OPENING-PATTERN-ROTATION (kritisch — kein gleicher Anfang!)
+====================================================================
+Bisher startet fast jeder Blog mit "[Wochentag], [Uhrzeit]" weil das EIN
+Beispiel im Framework war. AB SOFORT: dieser Opener ist STRENG RESERVIERT
+fuer Archetype F (Founder-Diary). Für alle anderen Archetypen VERBOTEN.
+
+PFLICHT: wähle EINEN von diesen 7 Opener-Mustern (rotiere — KEIN Muster
+zweimal hintereinander über die letzten 5 Blogs):
+
+OPENER 1 — DIREKTER DIALOG ALS HOOK
+   Erste Zeile ist ein wörtlicher Satz in Anführungszeichen, gesprochen von
+   einer konkreten Person. Dann Erklärung wer das war.
+   Beispiel: "'Wir machen seit 14 Jahren Print. Niemand hat je gefragt wie
+   viel davon ankommt.' Sagte mir gestern ein Optiker aus Hannover."
+   Erlaubt fuer: A, D, E
+
+OPENER 2 — RHETORISCHE / ZWINGENDE FRAGE
+   Erste Zeile ist eine Frage die der Leser sofort beantworten will.
+   Beispiel: "Weißt du, wo deine Klick-Daten von letztem Monat physisch
+   liegen? Stadt. Land. Anbieter."
+   Erlaubt fuer: B, E, G
+
+OPENER 3 — VISZERALE BEHAUPTUNG / PROVOKATION
+   Eine starke Aussage gegen Mainstream, ohne Aufbau.
+   Beispiel: "Cookie-Banner sind nicht dein DSGVO-Problem."
+   Beispiel: "Print-Marketing in Deutschland ist tot. Behaupten die. Falsch."
+   Erlaubt fuer: B, K
+
+OPENER 4 — KONKRETES OBJEKT / SZENE OHNE TIMESTAMP
+   Eine konkrete physische Szene in 1-2 Sätzen, OHNE Datum/Uhrzeit.
+   Beispiel: "Auf dem Tisch lagen 47 Postkarten-Druckmuster, ineinander
+   geschoben wie ein verlorenes Kartenspiel."
+   Beispiel: "Der Kühlschrank summt. Mein Bildschirm zeigt eine rote Linie."
+   Erlaubt fuer: A, D, F
+
+OPENER 5 — ZAHLENPUNCHLINE (Fakt + Pause + Konsequenz)
+   3-Punkt-Fragmente in Reihe.
+   Beispiel: "180 Flyer. Vier Anrufe. Niemand weiß warum."
+   Beispiel: "23 Standorte. 4 funktionierten. 19 sind Asche."
+   Erlaubt fuer: A, C, J
+
+OPENER 6 — SELBST-EINGESTÄNDNIS
+   Erste Person, vergangen, mit Fehler.
+   Beispiel: "Ich war drei Jahre überzeugt, dass das funktioniert. Es hat
+   nicht funktioniert. Hier ist warum."
+   Beispiel: "Ich gebe es zu: ich verstehe eigentlich nicht, wie Bitly
+   Geld verdient."
+   Erlaubt fuer: B, F, L
+
+OPENER 7 — TIMESTAMP / DATUM (NUR fuer Archetype F)
+   "Mittwoch, 23:14. Küchentisch. Kalter Espresso."
+   STRENG NUR fuer Archetype F (Founder-Diary). NICHT für andere benutzen,
+   sonst wirken alle Blogs wie Geschwister.
+
+VERBOTEN als Opener:
+- "In der heutigen Zeit / Heutzutage..."
+- "Hast du dich schon mal gefragt..."
+- "Lass uns einen Blick werfen..."
+- "5 Tipps für besseres..."
+- "Hier sind die wichtigsten..."
+- "Wenn du an Marketing denkst..."
+- Timestamp-Opener fuer alles AUSSER Archetype F
+
+SELF-CHECK: Schau dir deine ersten 8 Wörter nochmal an. Sind sie:
+- Konkret? (Person/Objekt/Zahl/Zitat — nicht abstrakt)
+- Überraschend? (Pattern-Break — nicht erwartbar)
+- Unverwechselbar? (Wenn der Opener auch zu 5 anderen Blogs passen würde — falsch)
+
+====================================================================
 PART 5e — ANTI-TEMPLATE-LINTING (Schluss-Selbstprüfung)
 ====================================================================
-NACH dem Schreiben, BEVOR du ausgibst, prüfe diese 4 Fragen ehrlich:
+NACH dem Schreiben, BEVOR du ausgibst, prüfe diese 5 Fragen ehrlich:
 
 (1) "Wenn jemand 3 meiner Blogs nebeneinander legt — sehen sie aus wie
     Geschwister?" Wenn JA → die Struktur ist zu schablonenhaft.
@@ -475,6 +544,10 @@ NACH dem Schreiben, BEVOR du ausgibst, prüfe diese 4 Fragen ehrlich:
 
 (4) "Wäre dieser Blog von einem Menschen mit einer FESTEN STIMMUNG geschrieben
     oder fühlt er sich ausgewogen-neutral an?" Wenn neutral → Stimmung zuspitzen.
+
+(5) "Beginnt mein Blog mit '[Wochentag], [Uhrzeit]' obwohl Archetype != F?"
+    Wenn JA → kompletten Opener umschreiben mit einem anderen Pattern aus
+    PART 5da (Opener 1-6).
 
 Wenn auch nur EINE Antwort schlecht ist: 1-2 Absätze umschreiben, NICHT den
 ganzen Blog. Gezielt das Problem fixen.

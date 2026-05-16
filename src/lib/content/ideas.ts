@@ -587,7 +587,7 @@ PATTERN E — Provokante Behauptung:
 - "Bitly ist eine Falle. Jeder weiss es. Keiner sagt's."
 
 PATTERN F — Hyper-spezifische Mini-Story:
-- "Donnerstag 14:30. Ihr Büro in Düsseldorf. Sie konnte die Frage nicht beantworten."
+- "Ihr Büro in Düsseldorf. Drei Minuten Stille. Sie konnte die Frage nicht beantworten."
 - "Ein Restaurant-Besitzer aus Köln zeigte mir seine QR-Code-Statistik. Eine Spalte fehlte."
 
 PATTERN G — "Geld-verbrennt + niemand traut sich":
@@ -955,6 +955,7 @@ export async function expandIdeaToBlog(idea: {
   target_keywords?: string | null;
   cluster: ContentCluster;
   recentArchetypes?: BlogArchetype[];
+  recentOpeners?: string[];
   forceArchetype?: BlogArchetype;
   forceMood?: DavidMood;
 }): Promise<ExpandedBlog> {
@@ -980,6 +981,23 @@ zum Thema. Webe Findings natuerlich in den Text ein (kein Zitate-Listen-Format).
 Wenn du keinen konkreten News findest: weiter mit Story-Mode, kein Problem.
 ` : '';
 
+  const recentOpenersSection = (idea.recentOpeners ?? []).length > 0 ? `
+══════════════════════════════════════════════════════════════════════
+OPENER-ANTI-WIEDERHOLUNG (PFLICHT)
+══════════════════════════════════════════════════════════════════════
+Diese ${idea.recentOpeners!.length} Blog-Opener wurden GERADE benutzt.
+Schreibe deinen Blog mit einem ANDEREN Opener-Muster aus PART 5da.
+
+RECENT-OPENERS (NICHT diese Struktur kopieren):
+${idea.recentOpeners!.map((o, i) => `  ${i + 1}. "${o.slice(0, 100)}..."`).join('\n')}
+
+ANTI-WIEDERHOLUNGS-CHECK:
+- Wenn deine ersten 8 Wörter ähnlich aussehen wie einer der obigen Opener → falscher Opener, wähle aus PART 5da ein ANDERES Muster
+- Wenn alle obigen Opener mit "[Wochentag], [Uhrzeit]" anfangen UND dein Archetype != F → benutze KEIN Timestamp
+- Wenn alle obigen Opener mit Dialog ('"...") anfangen → benutze KEIN Dialog
+- Wenn die obigen einen Pattern teilen → wähle ein KOMPLETT anderes
+` : '';
+
   const archetypeAssignment = `
 ====================================================================
 ARCHETYPE-ZUWEISUNG für DIESEN Blog (KRITISCH — überschreibt generische Regeln)
@@ -997,7 +1015,10 @@ VERHALTENS-REGELN:
    - Mindestens 1 Satz über 30 Wörter (eine Beweisführung oder Beschreibung)
    - Mindestens 2 Fragmente (kein Verb, oder nur 1 Wort: "Asche.", "Sechs Jahre.")
    - Absatz-Längen ABSICHTLICH ungleich: 1-Zeiler und 5-7-Satz-Absätze mischen
-4. Anti-Template-Check (PART 5e) am Schluss: würde ein Leser den Blog
+4. OPENER-PFLICHT (PART 5da): wähle einen der 7 Opener-Muster (1-7).
+   Opener 7 (Timestamp "Mittwoch, 23:14") ist STRENG RESERVIERT fuer Archetype F.
+   Dein Archetype: ${archetype} → ${archetype === 'F' ? 'Opener 7 erlaubt (Timestamp)' : 'NICHT Opener 7, wähle aus Opener 1-6'}.
+5. Anti-Template-Check (PART 5e) am Schluss: würde ein Leser den Blog
    verwechseln können mit "irgendeinem anderen Spurig-Blog"? Wenn ja → die
    Stimmung zuspitzen, den Archetype klarer zeigen.
 
@@ -1007,7 +1028,7 @@ ${archetypeSpecificInstructions(archetype)}
 Die folgende HOOK-PFLICHT-CHECKLISTE und das KILLER-OPENER-DOGMA gelten NUR
 für Archetype A, B, D, G (viszerale Archetypes). Für deinen Archetype ${archetype}
 gilt sie ${['A', 'B', 'D', 'G'].includes(archetype) ? 'AUCH' : 'NICHT — verwende den Opening-Stil aus der Archetype-DNA oben'}.
-
+${recentOpenersSection}
 `;
 
   const prompt = `${SPURIG_VOICE}

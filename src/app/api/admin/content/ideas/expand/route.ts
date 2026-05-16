@@ -55,20 +55,29 @@ export async function POST(request: NextRequest) {
   }
 
   if (!blog) {
-    // Letzte 3 Archetypes aus DB ziehen, damit die Rotation nicht zwei gleiche
-    // hintereinander produziert. Archetype steckt als Tag "archetype:X" in tags.
+    // Letzte 5 Archetypes + Opener-Sätze aus DB ziehen.
+    // Archetype-Rotation: verhindert zwei gleiche hintereinander.
+    // Opener-Anti-Rep: zeigt der AI welche Anfänge gerade benutzt wurden,
+    //                  damit sie einen ANDEREN wählt (verhindert "Donnerstag 14:47"-Wiederholung).
     const { data: recentBlogs } = await service
       .from('content_blogs')
-      .select('tags')
+      .select('tags, body_md')
       .order('created_at', { ascending: false })
-      .limit(3);
+      .limit(5);
     const recentArchetypes: BlogArchetype[] = [];
+    const recentOpeners: string[] = [];
     for (const b of recentBlogs ?? []) {
       const tag = (b.tags as string[] | null)?.find((t) => t.startsWith('archetype:'));
       const code = tag?.slice('archetype:'.length) as BlogArchetype | undefined;
       if (code && ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(code)) {
         recentArchetypes.push(code);
       }
+      // Erste 1-2 Sätze als Opener-Signature extrahieren
+      const body = (b.body_md as string | null) ?? '';
+      // Strip H2-Headlines am Anfang, dann ersten ~120 chars nehmen
+      const cleaned = body.replace(/^(##\s+.*?\n+)+/m, '').trim();
+      const opener = cleaned.slice(0, 140).replace(/\s+/g, ' ').trim();
+      if (opener.length > 20) recentOpeners.push(opener);
     }
 
     let expanded;
@@ -79,7 +88,8 @@ export async function POST(request: NextRequest) {
         angle: idea.angle ?? '',
         target_keywords: idea.target_keywords,
         cluster: idea.cluster as ContentCluster,
-        recentArchetypes,
+        recentArchetypes: recentArchetypes.slice(0, 3),
+        recentOpeners,
       });
     } catch (e) {
       return NextResponse.json({ error: e instanceof Error ? e.message : 'expand-failed' }, { status: 500 });
