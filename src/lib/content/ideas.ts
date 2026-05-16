@@ -116,7 +116,102 @@ export type ExpandedBlog = {
   body_md: string;
   image_prompt: string;
   image_alt: string;
+  archetype: BlogArchetype;
+  mood: DavidMood;
 };
+
+// ---------------------------------------------------------------------------
+// Archetype + Stimmung-Rotation (verhindert dass alle Blogs gleich klingen)
+// ---------------------------------------------------------------------------
+
+export type BlogArchetype = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+export type DavidMood = 1 | 2 | 3 | 4 | 5 | 6;
+
+const ARCHETYPE_NAMES: Record<BlogArchetype, string> = {
+  A: 'Case-Study-Zwei-Akt (Goldstandard, Kunden-Story mit Outcome)',
+  B: 'Rant / Unpopular-Opinion (Branchen-Wahrheit ungeschönt)',
+  C: 'Tutorial-mit-Story-Wrap (How-to, ruhig-pragmatisch)',
+  D: 'Gespraechs-Mitschnitt / Dialog-Heavy (60-70% wörtliche Rede)',
+  E: 'Forensische Untersuchung (Journalist-Modus, Recherche-Pfad)',
+  F: 'Behind-the-Scenes / Founder-Diary (locker, müde-ehrlich)',
+  G: 'Vergleichs-Deep-Dive (fairer Pro/Contra, eigene Schwächen ehrlich)',
+};
+
+const MOOD_NAMES: Record<DavidMood, string> = {
+  1: 'Verärgert-Direkt (schroff, viele Imperative, kurze Sätze)',
+  2: 'Neugierig-Journalist (Fragen dominieren, "Ich wollte wissen...")',
+  3: 'Verletzlich-Ehrlich (Selbst-Eingeständnis, leichte Verzögerungen)',
+  4: 'Trocken-Ironisch (Untertreibung, Beobachtungs-Pointen)',
+  5: 'Pragmatisch-Lehrer (erklärend, "stell dir vor...", klare Übergänge)',
+  6: 'Staunend-Beobachtend (atmend, mit Bildern, "Das ist verrückt:")',
+};
+
+/** Welche Stimmungen passen "natürlich" zu welchem Archetype.
+ *  Andere Kombinationen sind erlaubt, aber diese sind die default. */
+const ARCHETYPE_DEFAULT_MOODS: Record<BlogArchetype, DavidMood[]> = {
+  A: [6, 3], // staunend / verletzlich
+  B: [1, 4], // verärgert / ironisch
+  C: [5, 4], // lehrer / ironisch
+  D: [6, 2], // staunend / neugierig
+  E: [2, 5], // journalist / lehrer
+  F: [3, 4], // verletzlich / ironisch
+  G: [5, 4], // lehrer / ironisch
+};
+
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+/** Konkrete Schreib-Anweisungen pro Archetype, in der Prompt-Sprache des
+ *  Modells. Diese werden in den Prompt eingebettet, ergänzend zu PART 5b. */
+export function archetypeSpecificInstructions(archetype: BlogArchetype): string {
+  switch (archetype) {
+    case 'A':
+      return `Du folgst dem Zwei-Akt-Bogen aus PART 6 + dem Goldstandard aus PART 7c. Hook = "Geld verbrennt"-Pattern. Zahl-Kaskade + Insider-Take + Selbst-Eingeständnis + quantifizierter Outcome + Status-Frage am Ende. Klassische Spurig-DNA.`;
+    case 'B':
+      return `Dies ist KEIN Goldstandard-Bogen. KEINE Zahl-Kaskade nötig. KEIN klassischer Insight-Pivot. Stattdessen: starte mit einer provokanten These ("Cookie-Banner sind nicht das DSGVO-Problem. Bitly ist es. Punkt."). Dann eine Argumentations-Kette warum die Branche es falsch macht. In der Mitte EINE kurze Anekdote (3-4 Sätze). Schließe MIT Position, nicht mit Frage. Erlaubt: rhetorische Wendung mitten im Text. Sätze dürfen länger werden wenn sie ein Argument tragen.`;
+    case 'C':
+      return `Tutorial-Modus. KEIN viszerales Vokabular. KEIN "Geld verbrennt"-Hook. Stattdessen: Mini-Anekdote als Eröffnung (3-4 Sätze, ruhig erzählt), dann "So habe ich es gemacht:" gefolgt von nummerierten Schritten (1-5) mit jeweils 2-4 Sätzen Erklärung. H2-Überschriften DÜRFEN klassisch sein ("Schritt 1: Audit der Subprozessoren"). Outro: 2-3 Sätze warum es funktioniert. Pragmatisch, kein Drama.`;
+    case 'D':
+      return `60-70% direkter Dialog. Der Blog IST ein Gespräch (z.B. mit einer Marketing-Chefin, einem Anwalt, einem Kunden). Erzähler-Stimme nur als kurze Regie-Anweisung dazwischen ("Sie lehnt sich zurück. Drei Sekunden Stille."). Sehr viele kurze Absätze. Anführungszeichen dominieren. Die Insight liegt IN dem was gesagt wird — NICHT in einem klassischen Pivot-Satz.`;
+    case 'E':
+      return `Journalist-Modus, KEIN Drama. Sachlich-beharrlich. Erste Zeile = eine Frage ("Wo liegen Bitlys Daten wirklich?"). Dann der Recherche-Pfad: "Ich rief X an. Sie sagte Y. Also las ich Z." Konkrete Funde mit Datum + Quelle + Zitat. Wenig "ich-Drama", viel "ich-fand-heraus". Schluss: nüchternes Resümee. KEIN viszerales Vokabular. KEINE Status-Frage am Ende.`;
+    case 'F':
+      return `Behind-the-Scenes / Founder-Diary. Beginne mit Datum + Zeitstempel ("Mittwoch, 23:14. Küchentisch. Vierter Espresso."). Was diese Woche im Spurig-Maschinenraum passiert ist — was schief lief, was ich gelernt habe. Vercel-Bill-Schmerz / Steuerberater-Anekdote / Espresso-Count sind erlaubt und passend. KEIN Insider-Take über die Branche. KEINE Status-Frage. Stattdessen: "Schreib mir wenn du das auch kennst, mein DM ist offen." Müde-ehrliche Atmosphäre.`;
+    case 'G':
+      return `Fairer Vergleich. Erste Zeile = eine Frage ("Bitly oder Spurig? Ich versuche es fair."). Dann FÜR/GEGEN-Analyse für beide Seiten. PFLICHT: erwähne ehrlich wo das ANDERE Tool BESSER ist (das macht dich glaubwürdig). Erst dann wo Spurig besser ist. Schluss: ein "es kommt drauf an"-Fazit, kein Sales-Push. KEIN viszerales Vokabular. KEIN "Geld verbrennt"-Hook.`;
+  }
+}
+
+/** Wählt Archetype + Stimmung deterministisch über title-hash.
+ *  Wenn recentArchetypes übergeben, werden diese ausgeschlossen falls möglich.
+ *  Override erlaubt explizit eine Wahl zu erzwingen (für Tests). */
+export function pickArchetypeAndMood(opts: {
+  title: string;
+  cluster: ContentCluster;
+  recentArchetypes?: BlogArchetype[];
+  forceArchetype?: BlogArchetype;
+  forceMood?: DavidMood;
+}): { archetype: BlogArchetype; mood: DavidMood } {
+  const all: BlogArchetype[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+  const recent = opts.recentArchetypes ?? [];
+  const available = all.filter((a) => !recent.includes(a));
+  const pool = available.length > 0 ? available : all;
+
+  const archetype = opts.forceArchetype ?? pool[hashString(opts.title + opts.cluster) % pool.length];
+
+  let mood: DavidMood;
+  if (opts.forceMood) {
+    mood = opts.forceMood;
+  } else {
+    const defaults = ARCHETYPE_DEFAULT_MOODS[archetype];
+    mood = defaults[hashString(opts.title) % defaults.length];
+  }
+
+  return { archetype, mood };
+}
 
 // ---------------------------------------------------------------------------
 // Ideas-Generator
@@ -167,11 +262,12 @@ Für den Pillar "${CLUSTER_LABEL[cluster]}" fuehre 2-3 gezielte Searches durch.
 Suche nach AKTUELLEN, KONKRETEN, DEUTSCHEN Themen — nicht generischen Konzepten.
 
 Such-Beispiele je nach Pillar:
-- DSGVO/Privacy: "DSGVO Bußgeld 2026 Tracking", "Schrems II 2026 marketing"
-- Offline-ROI: "Plakatwerbung ROI 2026 DACH", "DOOH Deutschland 2026"
-- QR-Practices: "QR Code Scan Statistik DACH 2026"
-- Attribution: "Last-Click Attribution 2026", "Cookie-less Tracking DACH"
-- Behind-Scenes: "DACH Solopreneur SaaS 2026"
+- QR-Realtalk: "QR-Code Studie 2026 Scan-Verhalten DACH", "Eye-Tracking QR-Größe", aktuelle viral-QR-Sichtungen
+- Print lebt: "Plakatwerbung ROI 2026 DACH", "DOOH Deutschland 2026", "Direktmailing Conversion 2026"
+- DSGVO ohne Anwalt: "DSGVO Bußgeld 2026 Tracking", "Schrems II 2026 marketing", neue Aufsichtsbehörden-Cases
+- Mittelstand-Stories: "DACH Mittelstand Marketing 2026", "Friseur Tierarzt Optiker Marketing"
+- Tracking-Tricks: "Last-Click Attribution 2026", "Cookie-less Tracking DACH", "Server-Side Pixel"
+- Founder-Tagebuch: "DACH Solopreneur SaaS 2026", "Indie Hacker DACH Bootstrapping"
 
 Ziel der Searches:
 - Konkrete Fakten / Zahlen / News-Geschichten der letzten 90 Tage
@@ -194,6 +290,185 @@ Pillar-Scope: ${CLUSTER_DESCRIPTION[cluster]}
 Generiere ${count} CONTENT-IDEEN nach dem Elite-Psychologie-Framework oben.
 Jede Idee muss Hook-Quality-Test (PART 7) bestehen und mind. 3 psychologische
 Hebel (PART 3) einbauen.
+
+══════════════════════════════════════════════════════════════════════
+CHEFREDAKTEUR-MODUS — DEINE ROLLE (PFLICHT, lies VOR allem anderen)
+══════════════════════════════════════════════════════════════════════
+Stell dir vor: Du bist Chefredakteur eines Magazins mit 30 Jahren Berufs-
+erfahrung. Spiegel-Online, Wired, oder Die-Zeit-Niveau. Du leitest ein Brain-
+storming-Meeting mit deinem Redaktions-Team.
+
+REGEL DEINER REDAKTION:
+"Wenn 3 Ideen wie Geschwister aussehen, fliegt eine raus. Wenn eine Idee wie
+2024-Recycling klingt, fliegt sie raus. Wenn ich eine Idee schon mal in der
+Zeitung gesehen habe, fliegt sie raus. Ich will UNTERHALTUNG. Ich will Geschichten
+die man nach 2 Wochen noch erzählt. Ich will Schenkelklopfer, ich will Aha-
+Momente, ich will dass mein Praktikant das beim Mittagessen zitiert."
+
+DEIN MASSSTAB beim Auswählen einer Idee:
+- "Würde mein dementer Onkel beim Frühstück die Headline laut vorlesen weil
+  sie ihn überrascht?" → JA = behalten, NEIN = raus
+- "Wenn ich diesen Titel auf einer LinkedIn-Timeline mit 47 anderen Print-
+  Marketing-Posts sähe — würde ich stoppen?" → JA = behalten
+- "Klingt das wie etwas das du schon mal von einem anderen LinkedIn-Founder
+  gelesen hast?" → JA = raus, neu schreiben
+
+══════════════════════════════════════════════════════════════════════
+HARTE VERBOTSLISTE — TROPES DIE NICHT MEHR AUFTAUCHEN DUERFEN
+══════════════════════════════════════════════════════════════════════
+Diese spezifischen Zahlen/Szenarien tauchen IMMER WIEDER auf weil sie weiter
+oben als Beispiele stehen. JEDE neue Idee MUSS andere Zahlen/Settings verwenden.
+
+VERBOTEN — NICHT GENERIEREN:
+- Magic-Zahl "47" in jeglicher Form (47 Plakate, 47 Standorte, 47 Euro, 47 Mitarbeiter, 47 MRR)
+- "500 Postkarten" in jeglicher Form
+- "8 Wochen am falschen Feature" / "8 Wochen gebaut" in jeglicher Form
+- "Stripe-Dashboard nach Monat 1" / "47 Euro MRR" in jeglicher Form
+- "Mein Bruder versteht Spurig nicht / ist Steuerberater" in jeglicher Form
+- "Bitly speichert Daten in Virginia/Ashburn" — andere DSGVO-Aufhänger
+  (Cloudflare, Google Analytics 4 EU-Region, Hotjar Datenflüsse, Calendly USA)
+- "Sechs Jahre Klick-Daten" — andere Datenmengen + Zeiträume
+- "Wir laufen blind" / "Niemand traut sich" — andere Vokabel-Hooks
+- "Donnerstag 14:30 / 14:47 in Düsseldorf" — andere Wochentag-Stadt-Kombis
+
+REGEL FUER ZAHLEN: Bevor du eine Zahl schreibst, prüfe — ist es 47 / 500 / 8?
+JA → andere Zahl wählen. NEIN → ok.
+
+ERLAUBTE FRISCHE ZAHLEN-POOL (würfle aus diesem Pool, oder generiere eigene
+plausible Zahlen, NUR NICHT die Verbots-Zahlen):
+  - Klein/Stueck: 6, 14, 18, 23, 29, 38, 53, 61, 67, 84, 91, 112
+  - Mittel: 184, 231, 312, 415, 627, 803, 1.247, 1.847, 2.400, 3.180
+  - Gross/Geld: 4.800, 7.300, 9.600, 12.400, 18.000, 24.500, 31.000, 89.000
+  - Prozent: 12%, 19%, 27%, 34%, 41%, 58%, 67%, 73%, 82%, 91%
+  - Zeit: 3 Tage, 9 Tage, 11 Wochen, 17 Wochen, 4 Monate, 7 Monate, 14 Monate, 2 Jahre, 4 Jahre
+  - Uhrzeiten: 07:42, 11:08, 16:23, 19:54, 22:11 (nicht 14:30/14:47)
+
+JEDE Idee mit konkreter Zahl MUSS aus diesem Pool ODER einer komplett anderen
+plausiblen Zahl kommen. KEINE 47/500/8 mehr. PUNKT.
+
+WENN DU EINE IDEE GENERIERST DIE EINE VERBOTSZAHL/-TROPE ENTHAELT → STREICHEN,
+NEUE schreiben.
+
+SELBST-CHECK NACH JEDER IDEE:
+Lies deine generierte Idee. Enthält der Titel oder die outline die Zahl 47 ODER
+500 ODER "8 Wochen" ODER "Stripe-Dashboard 47" ODER "Bruder Steuerberater"?
+Wenn JA → diese Idee ist DISQUALIFIZIERT, schreibe eine NEUE mit anderen Werten.
+
+══════════════════════════════════════════════════════════════════════
+EVERYDAY-OBSERVATION-LAYER — KONKRETE SZENEN AUS DEM LEBEN
+══════════════════════════════════════════════════════════════════════
+Eine gute Idee startet OFT mit einer absurd-konkreten Alltagsbeobachtung — etwas
+das einem 30-Jahre-Schriftsteller im Späti einfällt, nicht im Marketing-Meeting.
+
+Pool an konkreten Szenen die du verwenden kannst (variier sie, nicht 1:1):
+
+GASTRO/EVENTS:
+- Auf einer Hochzeit: jeder Tisch hat einen QR-Code zur Foto-Galerie. Wer scannt?
+- Berliner Späti mit handgeschriebener QR-Karte auf zerknittertem Pappkarton
+- Eisdiele in Hamburg: QR-Code auf Eisbecher-Deckel, aber bei -3°C frieren die Finger
+- Foodtruck-Festival: 14 Trucks, 14 QR-Codes, einer davon führt zur Konkurrenz
+- Hochzeitsplaner-Newsletter mit QR-Codes zum Geschenkewunsch in den USA gehostet
+- Brauerei-Etikett mit QR-Code unter dem nassen Daumen verschwommen
+- Speisekarte mit dem QR-Code unter dem Salzstreuer
+
+HANDWERK/MITTELSTAND (selten in Bitly-Diskursen):
+- Schreiner aus dem Bayerischen Wald druckt QR-Code auf Möbelstück — wird gescannt?
+- Friseurin in Leipzig: ihr Stempel auf der Kundenkarte hat einen QR-Code aber
+  kein Friseur-Kunde scannt einen Stempel
+- Sanitätshaus mit QR-Code auf Rezeptaufkleber, gelesen mit zitternder Hand
+- Optiker fragt: "Wie tracke ich, wer mit dem Newsletter wirklich ins Geschäft kommt?"
+- Tierarzt drückt einen Anti-Floh-Aufkleber mit QR-Code auf den Hund
+- Yogastudio mit QR-Code an der Matte, abgewischt vom Schweiss
+- Floristen mit QR-Code im Blumenbouquet — verwittert nach 2 Tagen
+
+DIGITAL-NIEDERSCHWELLIG:
+- Tatortreiniger der eine SaaS-Subscription seit 4 Jahren nicht gekündigt hat
+- Cousine spammt Familie-WhatsApp mit Affiliate-Links
+- Hostel-Rezeption: WLAN-Passwort als QR-Code, aber Backpacker fragen trotzdem
+- Reinigungskraft sieht QR-Code-Aufkleber im Treppenhaus — hat sie ihn schon?
+- Mein Praktikant fragt: "Was ist der Unterschied zu Linktree?"
+- LinkedIn-DM-Spam: 14 Connection-Requests, 3 echte
+- Marketing-Direktorin gibt zu: "Ich weiss nicht was Spurig ist, aber wir bezahlen
+  es seit 8 Monaten." (Geld-Reveal mit anderer Zahl als 47)
+
+ABSURDE/LUSTIGE BEOBACHTUNGEN:
+- Steuerberater fragt "kann das auch Faxe tracken?" (alternative Familien-Anekdote)
+- DSGVO-Audit-Email an die eigene Schwiegermutter geschickt
+- Customer fragt: "Bist du sicher dass das LEGAL ist?" — über Newsletter-Tracking
+- Restaurant-Inhaber misst die "Conversion" indem er die Servietten zählt
+- Marketing-Berater erklärt 30 Minuten lang DSGVO, dann sagt er "Cloudflare nutze
+  ich aber"
+- "Mein Vater hat noch einen Tab mit dem AGB-Generator offen seit 2023"
+- Anwalt rechnet mehr pro Stunde ab als das was sein Mandant pro MONAT verdient
+
+NUTZE diese Beobachtungen als STARTING POINTS. Generiere FRISCHE Variationen
+oder eigene absurde Szenen. NICHT 1:1 kopieren — INSPIRIEREN lassen.
+
+══════════════════════════════════════════════════════════════════════
+HUMOR-AXIS — PFLICHT, mind. 3 Ideen pro Batch mit echtem Lacher
+══════════════════════════════════════════════════════════════════════
+Research-Fakt 2026: Humor-Content wird 34% häufiger geteilt. B2B mit echter
+Komik ist selten — deshalb sticht es heraus.
+
+WAS humor-mäßig FUNKTIONIERT in DACH-B2B:
+- Trockene Beobachtung: "Mein Steuerberater liest LinkedIn nicht. Wahrscheinlich
+  zu seinem Glück."
+- Übertreibung mit Faktenbasis: "Ein Anwalt rechnet 480€ pro Stunde ab. Ich
+  weniger pro WOCHE."
+- Selbstironie aus konkretem Fail: "Mein erster Sales-Pitch endete mit dem
+  Kunden, der mir Tipps GAB statt zu kaufen."
+- Absurde Vergleiche: "Ein QR-Code auf einer Bratwurst hatte mehr Scans als
+  unsere Print-Kampagne."
+- Mini-Dialog mit Pointe: "'Was ist Spurig?' fragt mein Onkel. 'Software für
+  QR-Codes.' Pause. 'Sind das die mit dem Bargeld?'"
+- Subtile Pop-Culture-Referenzen (DACH-passend, nicht US-zentriert):
+  Tagesschau, Lindenstraße, Schimanski, Saturn-Wurfsendung, Bauhaus-Bohrmaschine,
+  Aldi vs Lidl, ICE-Verspätung, Berliner Flughafen, Cum-Ex.
+
+WAS humor-mäßig NICHT FUNKTIONIERT:
+- "LOL Marketer machen Fehler" (zu generisch)
+- "Hier 5 lustige Tipps" (Listicle-Witz)
+- Emojis als Witz-Ersatz
+- Wortspiele über Englisch-Begriffe ("Da-Tracker schlägt zu!")
+- Politik / Religion / Stereotypen
+
+Mind. 1 Idee pro Batch MUSS einen echten LACHER haben — nicht nur "lustige
+Beobachtung" sondern eine Pointe, bei der ein DACH-Founder beim Lesen wirklich
+laut lachen würde. Diese ist meist eine konkrete absurde Szene aus dem
+Everyday-Observation-Layer oben.
+
+══════════════════════════════════════════════════════════════════════
+NICHE-INDUSTRIE-DIVERSITY — Aus dem Print-Trampelpfad raus
+══════════════════════════════════════════════════════════════════════
+Bisher tauchen IMMER auf: Restaurants, Plakatwerbung, Bitly. Die DACH-Wirtschaft
+hat 100+ Branchen die alle das gleiche QR/Tracking-Problem haben.
+
+Pool an Branchen die du in den Ideen rotieren MUSST (mind. 5 verschiedene über
+10 Ideen):
+- Friseur / Barber Shop
+- Physiotherapie / Osteopathie
+- Tierarzt / Tierheim
+- Sanitätshaus / Apotheke
+- Yoga-Studio / Pilates / Crossfit-Box
+- Optiker
+- Steuerberater / Anwaltskanzlei
+- Hochzeitsplaner / Eventbüro
+- Hostel / Backpacker / Boutique-Hotel
+- Schreinerei / Tischlerei
+- Floristen / Gärtnerei
+- Foodtruck / Streetfood
+- Brauerei / Weingut
+- Schneiderei / Maßatelier
+- Putzfirma / Hausmeisterservice
+- Fahrschule
+- Hundeschule
+- Co-Working-Space / Shared-Office
+- Boutique / Concept-Store
+- Tattoo-Studio
+- Imkerei
+
+NICHT alle Ideen mit den gleichen 2-3 Branchen. Variieren ist Pflicht.
+
 ${existingSection}${researchSection}
 ══════════════════════════════════════════════════════════════════════
 YOUTUBE-CTR-TITLE-FORMELN (Research 2026 — 8%+ CTR validiert)
@@ -201,15 +476,16 @@ YOUTUBE-CTR-TITLE-FORMELN (Research 2026 — 8%+ CTR validiert)
 Top-7-Formeln die wirklich klicken erzeugen (kombiniere mit Hook-Patterns):
 
   F1 — SPECIFIC NUMBER + OUTCOME
-       "47 Plakate. 3 funktionierten. 22.000€/Monat gespart."
+       "23 Plakate. 4 funktionierten. 18.400€/Monat gespart."
        (Specificity = Credibility. +67% Klicks vs. generische Formulierung)
+       PFLICHT: verwende NICHT 47/500/8 — wähle frische Zahlen.
 
   F2 — CURIOSITY GAP
        "Ein Anwalt sagte mir gestern einen Satz. Er geht mir nicht aus dem Kopf."
        (Information bewusst zurückhalten. Klick = einzige Loesung)
 
   F3 — TRANSFORMATION PROMISE
-       "Von 0 auf 47€ MRR in 8 Wochen. Eine einzige Sache hat den Unterschied gemacht."
+       "Von 0 auf 89€ MRR in 11 Wochen. Eine einzige Sache hat den Unterschied gemacht."
        (Konkretes Vorher → Nachher mit Andeutung der Methode)
 
   F4 — WARNING PATTERN
@@ -221,10 +497,10 @@ Top-7-Formeln die wirklich klicken erzeugen (kombiniere mit Hook-Patterns):
        "Plakat vs Instagram-Ad: pro Conversion gewinnt das alte Medium."
 
   F6 — ACHIEVEMENT STORY
-       "Ich hab Spurig in 8 Wochen gebaut — und 3 Sachen falsch gemacht."
+       "Ich hab Spurig in 14 Wochen gebaut — und 3 Sachen falsch gemacht."
 
   F7 — UNUSUAL NUMBER + CLAIM
-       "23 von 47 DACH-Marketing-Teams: kein AV-Vertrag mit Bitly."
+       "31 von 67 DACH-Marketing-Teams: kein AV-Vertrag mit ihrem Link-Tool."
 
 ══════════════════════════════════════════════════════════════════════
 TITLE-LAENGE-WINDOW (Research 2026)
@@ -268,12 +544,12 @@ PATTERN A — Echter Dialog (sehr stark):
 - "Eine Marketing-Chefin: 'Wir nutzen das seit 6 Jahren. Niemand weiss, ob das legal ist.'"
 
 PATTERN B — Persoenlicher Fail / Selbstkritik:
-- "Ich hab 8 Wochen das falsche Feature gebaut. Hier was ich uebersah."
+- "Ich hab 11 Wochen am falschen Feature gebaut. Hier was ich uebersah."
 - "27 Euro pro Plakat. Vier Standorte. Ich war schockiert."
 
 PATTERN C — Konkrete Zahl + Pattern-Break:
-- "23 von 47 Marketing-Teams: kein AV-Vertrag mit Bitly."
-- "Drei Minuten Stille. Dann sagte sie: 'Ashburn, Virginia.'"
+- "31 von 67 Marketing-Teams: kein AV-Vertrag mit ihrem Link-Tool."
+- "Drei Minuten Stille. Dann sagte sie: 'Frankfurt? Oder Atlanta?'"
 
 PATTERN D — Verlustangst + Specificity:
 - "Sechs Jahre Klick-Daten. Über den Atlantik. Ohne Vertrag."
@@ -300,8 +576,8 @@ PATTERN I — "Stop-Doing-This":
 - "Hör auf, deine Druckkosten pro Plakat zu rechnen. Rechne pro Anfrage."
 
 PATTERN J — "Outcome-Then-Tease":
-- "47 Plakatstandorte auf 3 reduziert. 22.000 Euro/Monat gespart. So gings:"
-- "0 auf 47 Euro MRR in 8 Wochen. Eine einzige Sache hat den Unterschied gemacht:"
+- "67 Plakatstandorte auf 4 reduziert. 31.000 Euro/Monat gespart. So gings:"
+- "0 auf 89 Euro MRR in 11 Wochen. Eine einzige Sache hat den Unterschied gemacht:"
 
 PATTERN K — "Unpopular-Opinion":
 - "Unpopular: 90% der DACH-Cookie-Banner sind nicht DSGVO-konform. Hier was kommt:"
@@ -376,7 +652,7 @@ IDEA-CATEGORY-WHEEL — PFLICHT-DIVERSITY (14 Kategorien)
        "Bitly Free vs Spurig: das eine kostet 0 Euro. Das andere 800 Euro pro Jahr verstecktes Risiko."
 
   C7 — PERSONAL REVEAL / DAVID-STORY
-       "Ich habe Spurig in 8 Wochen gebaut. 3 Sachen die mich fast aufgeben ließen"
+       "Ich habe Spurig in 14 Wochen gebaut. 3 Sachen die mich fast aufgeben ließen"
 
   C8 — DATA / NUMBERS-PUNCH
        "8.247 QR-Code-Scans in 30 Tagen. Hier was wir gelernt haben."
@@ -388,11 +664,11 @@ IDEA-CATEGORY-WHEEL — PFLICHT-DIVERSITY (14 Kategorien)
        "So bauen wir die Tracking-Pipeline bei Spurig (öffentlich)"
 
   C11 — MONEY-REVEAL / TRANSPARENTE ZAHLEN (Pflicht: 1-2 Ideen)
-       "Mein Stripe-Dashboard nach Monat 1: 47 Euro MRR. Hier was ich draus gelernt habe."
+       "Mein Stripe-Dashboard nach Monat 3: 312 Euro MRR. Hier was ich draus gelernt habe."
        "Was Spurig im Monat kostet zu betreiben — die echten Zahlen"
-       "Mein Vercel-Hobby-Bill diesen Monat: 0 Euro. Aber 4 Stunden Debug pro Woche."
-       "12.000 Euro Anwaltskosten für DSGVO. Aber ich war einfach zu paranoid."
-       "Wie ich aus 47 Euro MRR auf 800 in 4 Monaten kam — und was nicht funktioniert hat"
+       "Mein Vercel-Bill diesen Monat: 23 Euro. Aber 4 Stunden Debug pro Woche."
+       "9.600 Euro Anwaltskosten für DSGVO. Aber ich war einfach zu paranoid."
+       "Wie ich aus 89 Euro MRR auf 1.247 in 4 Monaten kam — und was nicht funktioniert hat"
 
   C12 — ALLTAGSDUSSELHEIT / RELATABLE EVERYDAY-FAIL (Pflicht: 1-2 Ideen)
        "Mein peinlichster Customer-Support-Moment: ich habe die Mail an mich selbst geschickt"
@@ -474,14 +750,24 @@ ANTI-WIEDERHOLUNG (zusätzlich):
   - KEINE zwei Ideen mit demselben Sub-Thema (z.B. NICHT 2x "Bitly speichert Daten in
     den USA")
   - JEDE Idee MUSS einen anderen Sub-Aspekt anpacken
-  - Wenn der Pillar DSGVO ist: variiere — manchmal Cookie-Banner, manchmal AVV-Vertrag,
-    manchmal Schrems-II, manchmal IP-Hashing, manchmal Server-Standort, manchmal Audit-
-    Behörde, manchmal Bußgeld-Höhe, manchmal Beschäftigten-Pflichten
-  - Wenn Pillar Offline-ROI: variiere — Plakat / Flyer / Visitenkarte / Postkarte /
-    Speisekarte / Mailing / Tankstelle / Veranstaltung / Tisch-Aufsteller / Plastik-Tüte
-  - Wenn Pillar QR-Practices: variiere — Größe / Position / Logo / Farbe / Print-Material
-    / Lichtverhältnis / Smartphone-Modell / Scanner-Verhalten / Print-Qualität /
-    Anti-Pattern / Edge-Case
+  - Wenn der Pillar "DSGVO ohne Anwalt" (compliance_lite) ist: variiere — Cookie-Banner /
+    AVV-Vertrag / Schrems-II / IP-Hashing / Server-Standort / Audit-Behörde / Bußgeld-Höhe /
+    Beschäftigten-Pflichten / GA4-EU-Region / Hotjar / Calendly USA / EU-AI-Act
+  - Wenn Pillar "Print lebt" (print_lebt): variiere — Plakat / Flyer / Visitenkarte /
+    Postkarte / Speisekarte / Mailing / Tankstelle / Tisch-Aufsteller / Bierdeckel /
+    Bus-Wartehäuschen / U-Bahn / Hauswand-Sticker / Bahnhof-Litfaßsäule
+  - Wenn Pillar "QR-Realtalk" (qr_realtalk): variiere — Größe / Position / Logo / Farbe /
+    Material (Stoff/Holz/Pappe/Stein) / Lichtverhältnis / Smartphone-Modell / Scanner-
+    Verhalten / Print-Qualität / Anti-Pattern / Edge-Case (Friedhof, Tattoo, Eis, Pizza)
+  - Wenn Pillar "Mittelstand-Stories" (mittelstand): variiere — Branche (Friseur,
+    Schreiner, Optiker, Tierarzt, Apotheker, Yoga, Tattoo, Imker, Floristin, Foodtruck) +
+    Stadt (Leipzig, Hannover, Wien, Zürich, Köln, München, Hamburg, Stuttgart, Linz)
+  - Wenn Pillar "Tracking-Tricks" (tracking_tricks): variiere — Attribution-Modell /
+    UTM-Schema / Multi-Touch / Cookie-less / Server-Side-Pixel / Offline-Online-Bridge /
+    Heatmap-Hack / Conversion-Pfad-Forensik / Newsletter-Click-Maps
+  - Wenn Pillar "Founder-Tagebuch" (founder_diary): variiere — MRR-Reveal / Pricing-Wechsel /
+    Customer-Support-Peinlichkeit / gescheitertes Feature / Vercel-Bill / Cousin-versteht-
+    nicht / Sales-Call-Fail / Burnout / Konkurrenz-Beobachtung / Cold-Mail-Reply
 
 ----------------------------------------
 HOOK-FIRST-WORDS-TEST (Pflicht pro Idee)
@@ -492,11 +778,11 @@ Schau dir die ersten 5 Wörter deines Titels an. Wenn jemand NUR die liest — b
 er hängen? Will er weiterlesen?
 
 STARK (erste 5 Wörter packen):
-  - "500 Postkarten. Drei Anrufe. Niemand."
+  - "180 Flyer. Vier Anrufe. Niemand."
   - "Dein Plakat-Budget verschwindet grade."
   - "Ein Anwalt sagte mir gestern:"
-  - "Sechs Jahre. Falsches Land. Vergessen."
-  - "47 Standorte. 3 funktionierten. Null"
+  - "Vier Jahre. Falsches Land. Vergessen."
+  - "23 Standorte. 4 funktionierten. Null"
 
 SCHWACH (erste 5 Wörter zu generisch):
   - "Die wichtigsten Tipps für besseres..."  → BORING
@@ -641,9 +927,20 @@ export async function expandIdeaToBlog(idea: {
   angle: string;
   target_keywords?: string | null;
   cluster: ContentCluster;
+  recentArchetypes?: BlogArchetype[];
+  forceArchetype?: BlogArchetype;
+  forceMood?: DavidMood;
 }): Promise<ExpandedBlog> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
+
+  const { archetype, mood } = pickArchetypeAndMood({
+    title: idea.title,
+    cluster: idea.cluster,
+    recentArchetypes: idea.recentArchetypes,
+    forceArchetype: idea.forceArchetype,
+    forceMood: idea.forceMood,
+  });
 
   const blogResearchSection = WEB_SEARCH_ENABLED ? `
 ----------------------------------------
@@ -656,8 +953,38 @@ zum Thema. Webe Findings natuerlich in den Text ein (kein Zitate-Listen-Format).
 Wenn du keinen konkreten News findest: weiter mit Story-Mode, kein Problem.
 ` : '';
 
-  const prompt = `${SPURIG_VOICE}
+  const archetypeAssignment = `
+====================================================================
+ARCHETYPE-ZUWEISUNG für DIESEN Blog (KRITISCH — überschreibt generische Regeln)
+====================================================================
+Dein Archetype: **${archetype} — ${ARCHETYPE_NAMES[archetype]}**
+Deine Stimmung: **${mood} — ${MOOD_NAMES[mood]}**
 
+VERHALTENS-REGELN:
+1. Folge der DNA von Archetype ${archetype} aus PART 5b im SPURIG_VOICE-Framework
+   oben. NICHT der Goldstandard-Struktur aus PART 6/7c (außer Archetype = A).
+2. Bleib durchgängig in Stimmung ${mood} (PART 5d). Nicht zwischen Stimmungen
+   wechseln — sonst wirkt es KI-typisch.
+3. Variiere Satz-Rhythmus nach PART 5c (Provost-Regel):
+   - Mindestens 3 Sätze unter 6 Wörtern verteilt im Text
+   - Mindestens 1 Satz über 30 Wörter (eine Beweisführung oder Beschreibung)
+   - Mindestens 2 Fragmente (kein Verb, oder nur 1 Wort: "Asche.", "Sechs Jahre.")
+   - Absatz-Längen ABSICHTLICH ungleich: 1-Zeiler und 5-7-Satz-Absätze mischen
+4. Anti-Template-Check (PART 5e) am Schluss: würde ein Leser den Blog
+   verwechseln können mit "irgendeinem anderen Spurig-Blog"? Wenn ja → die
+   Stimmung zuspitzen, den Archetype klarer zeigen.
+
+WICHTIG zu Archetype ${archetype} SPEZIFISCH:
+${archetypeSpecificInstructions(archetype)}
+
+Die folgende HOOK-PFLICHT-CHECKLISTE und das KILLER-OPENER-DOGMA gelten NUR
+für Archetype A, B, D, G (viszerale Archetypes). Für deinen Archetype ${archetype}
+gilt sie ${['A', 'B', 'D', 'G'].includes(archetype) ? 'AUCH' : 'NICHT — verwende den Opening-Stil aus der Archetype-DNA oben'}.
+
+`;
+
+  const prompt = `${SPURIG_VOICE}
+${archetypeAssignment}
 ========================================
 DEINE AUFGABE — BLOG-POST SCHREIBEN
 ========================================
@@ -1178,26 +1505,38 @@ PFLICHT-ATTRIBUTE FUER JEDEN PROMPT (alle 8 erfüllen)
 PILLAR → KONZEPT-PFLICHT (K1 fast immer verboten)
 ----------------------------------------
 
-- DSGVO/Privacy:   K6 (Daten-Metapher: Suitcase, Flugzeug, Atlantik, Server-Raum)
-                   ODER K3 (Object-in-wrong-context: Akten in Karton "Air Freight USA")
-                   K1 NUR wenn Blog explizit ueber Anwalt-Gespraech / Compliance-Officer
+- DSGVO ohne Anwalt (compliance_lite):
+                   K6 (Daten-Metapher: Suitcase, Flugzeug, Atlantik, Server-Raum)
+                   ODER K3 (Object-in-wrong-context: Akten in Karton "Air Freight USA",
+                   AVV-Vertrag mit US-Flaggen-Stempel) ODER K1 wenn Anwalt-Szene zentral
 
-- Offline-ROI:     K2 (Money-Destruction: brennende Geldscheine, Schredder, Asche)
-                   ODER K3 (Object-in-wrong-context: Plakat im Mülleimer, Flyer auf
-                   Schrottplatz, Postkarten in Reisswolf)
-                   K1 verboten — wer Geld brennt, sieht man brennen, nicht traurig sein
+- Print lebt (print_lebt):
+                   K2 (Money-Destruction: brennende Geldscheine, Schredder, Asche)
+                   ODER K3 (Plakat im Mülleimer, Flyer auf Schrottplatz, Postkarten
+                   in Reisswolf, Bierdeckel im Regen)
+                   K1 verboten — Aktion zentral, nicht Mimik
 
-- QR-Practices:    K5 (Macro-detail: einzelner QR auf riesiger Plakatwand, riesiger
-                   QR mit Logo-Mitte aufgerissen, QR auf Wäsche-Etikett, QR-Tattoo)
-                   ODER K3 (QR-Code in absurder Umgebung: auf Berg, auf Eisberg,
-                   unter Wasser, auf Pizza)
+- QR-Realtalk (qr_realtalk):
+                   K5 (Macro-detail: QR auf Wäsche-Etikett, QR auf Bratwurst, QR auf
+                   Hochzeitstorte, QR auf Bestattungs-Schaufenster, QR-Tattoo)
+                   ODER K3 (QR in absurder Umgebung: Eis, Pizza, Friedhof, U-Bahn-Wand)
+                   ODER K7 (echte Reaktion einer Person beim Scannen)
 
-- Attribution:     K4 (Split-Screen: chaotische Spuren links / saubere Daten rechts)
-                   ODER K3 (Detektiv-Lupe ueber Pinwand mit roten Faeden)
-                   ODER K6 (Datenstrom als physisches Objekt)
+- Mittelstand-Stories (mittelstand):
+                   K7 (High-emotion: Friseurin schaut Stempel-Karte, Optikerin tippt
+                   Newsletter) ODER K1 (Portrait einer konkreten Person in ihrer
+                   Arbeitsumgebung — Schreinerei, Apotheke, Yoga-Studio) MIT konkretem
+                   Branchen-Detail im Hintergrund
 
-- Behind-Scenes:   K7 (High-emotion-moment: Founder auf Boden um 2 Uhr nachts)
-                   K1 erlaubt — aber dann SEHR konkret und mit Wow-Detail
+- Tracking-Tricks (tracking_tricks):
+                   K4 (Split-Screen: chaotische Spuren links / saubere Daten rechts)
+                   ODER K3 (Detektiv-Lupe ueber Pinwand mit roten Faeden, Daten-Spur
+                   physisch als Wollfaden) ODER K6 (Datenstrom als physisches Objekt)
+
+- Founder-Tagebuch (founder_diary):
+                   K7 (High-emotion: Founder am Küchentisch 23:14, kalter Espresso)
+                   K1 erlaubt — mit konkretem Wow-Detail (z.B. roter Stripe-Dashboard
+                   im Hintergrund, gelbe Post-its auf dem Bildschirm)
 
 K1 (Human-Reaction-Closeup) ist die LETZTE Option. Wenn du sie waehlst, MUSS
 das Bild ein massives Wow-Detail haben (z.B. ein einzelner brennender Geldschein
@@ -1281,22 +1620,45 @@ AKT 4 — TEXT-OVERLAY (PFLICHT — YouTube-Thumbnail-Headline)
    weathered edges as if spray-stenciled, very high contrast against the
    background"
 
-  TEXT-LÄNGE: 1 bis 7 deutsche Worte. Verteilt auf 1-2 Zeilen.
-    - 1 Wort:   "VERPUFFT."  /  "WEG."  /  "BLIND."  /  "OHA."  /  "AUTSCH."
-    - 2 Worte:  "NIE WIEDER."  /  "0 SCANS."  /  "47 BILLBOARDS."  /  "PROBLEM GELÖST."
-    - 3 Worte:  "300€ PRO MONAT."  /  "WIR DACHTEN. FALSCH."
-    - 2 Zeilen 5-7 Worte:  "WIR DACHTEN, ES FUNKTIONIERT. / FALSCH."
-                            "NIEMAND TRAUT SICH, / ES ZU SAGEN."
-                            "47 STANDORTE. / 3 FUNKTIONIERTEN."
+  TEXT-LÄNGE: 4 bis 12 deutsche Worte. Verteilt auf 2-3 Zeilen.
+  Der Overlay soll wie eine MAGAZINE-COVER-HEADLINE wirken (VICE / NatGeo) —
+  nicht wie ein 1-Wort-Shouter. Lang genug um Story-Arc zu transportieren,
+  kurz genug um in 2 Sekunden gelesen zu werden.
 
-  HEADLINE MUSS ZUM BLOG-HOOK PASSEN. Beispiele Mapping:
-    Blog "47 Standorte. 3 funktionierten..." → "47 / 3 / NULL."  oder  "VERPUFFT."
-    Blog "Sechs Jahre Klick-Daten Atlantik" → "VERPUFFT."  oder  "WEG. SEIT 2018."
-    Blog "Bitly speichert in Virginia" → "USA. SEIT JAHREN."  oder  "OHA."
-    Blog "Ich war 6 Monate überzeugt..." → "FALSCH."  oder  "WIR DACHTEN. FALSCH."
-    Blog "Mein peinlichster Customer-Call" → "AUTSCH."  oder  "PEINLICH."
-    Blog "Cookie-Banner ist nicht das Problem" → "ABLENKUNG."  oder  "FALSCHE BAUSTELLE."
-    Blog "500 Postkarten, drei Anrufe" → "500 → 3."  oder  "VERPUFFT."
+  EMPFOHLENE STRUKTUR (eine der drei):
+    A) 2-Zeilen-Konflikt:  "ZEILE-1-FAKT. / ZEILE-2-PUNCHLINE."
+       z.B. "DEINE PLAKATE FUNKTIONIEREN. / NIEMAND MISST DAS."
+       z.B. "BITLY IST KOSTENLOS. / DEIN VERTRAG IST ES NICHT."
+
+    B) 3-Zeilen-Zahlen-Drama: "ZAHL. / ZAHL. / KONSEQUENZ."
+       z.B. "180 FLYER. / 4 ANRUFE. / VERPUFFT."
+       z.B. "9 MONATE. / 0 SCANS. / DESIGN-PROBLEM."
+
+    C) Eine-Zeile-Provocation (5-9 Worte): kompletter Satz mit Kontrast/Drama
+       z.B. "ICH HAB DAS FALSCHE FEATURE GEBAUT."
+       z.B. "AVV-VERTRAG? NIEMAND HAT GEFRAGT."
+       z.B. "DIE 23 SEKUNDEN NACH DEM ERSTEN KUNDEN."
+
+  WICHTIG: Der Overlay-Text muss den Blog-HOOK reflektieren — nicht nur ein
+  Vibe-Word. Wenn der Hook 3 konkrete Fakten enthält, sollte der Overlay diese
+  einfangen. Wer den Overlay sieht (ohne den Blog zu lesen), soll WISSEN
+  worum es geht UND emotional getriggert sein.
+
+  HEADLINE MUSS ZUM BLOG-HOOK PASSEN. Beispiele Mapping (Hook → Overlay):
+    Hook "23 Plakate. 4 funktionierten." →
+      "23 PLAKATE. / 4 FUNKTIONIERTEN. / DER REST: ASCHE."
+    Hook "Bitly hat mir nicht geantwortet" →
+      "ICH FRAGTE NACH AVV. / BITLY ANTWORTETE NICHT. / SECHS WOCHEN."
+    Hook "Cookie-Banner sind nicht das Problem" →
+      "COOKIE-BANNER SIND NICHT DAS PROBLEM. / DEINE US-CLOUD IST ES."
+    Hook "Mein Stripe-Dashboard nach Monat 3" →
+      "MONAT 3. / 312 EURO MRR. / KEIN HYPE-DECK."
+    Hook "Mein Steuerberater versteht Datenschutz anders" →
+      "STEUERBERATER. / SCHWIEGERMUTTER. / DSGVO IM HAUSHALT."
+    Hook "Mein Kunde fragte: Kann das auch Faxe tracken?" →
+      "EIN KUNDE FRAGTE: / KANN DAS AUCH FAXE TRACKEN?"
+    Hook "QR-Code auf der Hochzeitstorte" →
+      "EIN QR-CODE / AUF DER HOCHZEITSTORTE. / WER SCANNT SO WAS?"
 
   STYLE-SPEC (LOCKED — keine Variationen erlaubt):
     Schrift:   "bold thick yellow stencil-grunge sans-serif" (NICHT thin, NICHT Serifen)
@@ -1430,14 +1792,19 @@ WICHTIG:
 - Nichts vor oder nach dem ---META--- und ---BODY---`;
 
   const text = await callClaude(apiKey, prompt, { maxTokens: 5000, useSearch: true });
-  return parseMetaBodyBlock(text, idea.title);
+  return parseMetaBodyBlock(text, idea.title, archetype, mood);
 }
 
 /**
  * Parser für ---META---...---BODY---...-Format.
  * Tolerant gegenüber leichten Format-Abweichungen.
  */
-function parseMetaBodyBlock(text: string, fallbackTitle: string): ExpandedBlog {
+function parseMetaBodyBlock(
+  text: string,
+  fallbackTitle: string,
+  archetype: BlogArchetype,
+  mood: DavidMood,
+): ExpandedBlog {
   const metaIdx = text.indexOf('---META---');
   const bodyIdx = text.indexOf('---BODY---');
   if (metaIdx < 0 || bodyIdx < 0 || bodyIdx <= metaIdx) {
@@ -1468,6 +1835,11 @@ function parseMetaBodyBlock(text: string, fallbackTitle: string): ExpandedBlog {
     .filter(Boolean)
     .slice(0, 6);
 
+  // Archetype als Tag mit-speichern, damit die Route später recentArchetypes
+  // aus content_blogs.tags fetchen kann ohne Schema-Migration.
+  const archetypeTag = `archetype:${archetype}`;
+  if (!tags.includes(archetypeTag)) tags.push(archetypeTag);
+
   return {
     slug: slugify(meta.slug),
     title: fallbackTitle,
@@ -1476,6 +1848,8 @@ function parseMetaBodyBlock(text: string, fallbackTitle: string): ExpandedBlog {
     body_md: body,
     image_prompt: meta.image_prompt ?? fallbackImagePrompt(fallbackTitle),
     image_alt: (meta.image_alt ?? fallbackTitle).slice(0, 160),
+    archetype,
+    mood,
   };
 }
 

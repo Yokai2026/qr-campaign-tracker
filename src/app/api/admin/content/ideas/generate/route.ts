@@ -37,17 +37,32 @@ export async function POST(request: NextRequest) {
   const hardCap = Number(process.env.CONTENT_IDEAS_MAX_COUNT ?? '10');
   const count = Math.max(5, Math.min(hardCap, body.count ?? 10));
 
-  // Existing titles per cluster — JETZT VORHER fetchen damit wir sie an den
-  // Generator weitergeben koennen (so dass Claude EXPLICIT vermeidet sie zu
-  // wiederholen statt nur nachher zu deduppen)
+  // Existing titles — JETZT cross-cluster + ALLE Statuses (inkl. deleted +
+  // expanded + skipped + posted-Blogs). So vermeidet die AI Themen die schon
+  // gepostet, geskippt oder geloescht wurden, nicht nur den aktiven Backlog.
   const service = await createServiceClient();
-  const { data: existing } = await service
-    .from('content_ideas')
-    .select('title')
-    .eq('cluster', cluster)
-    .order('created_at', { ascending: false })
-    .limit(50);
-  const existingTitles = (existing ?? []).map((r) => r.title);
+  const [{ data: existingIdeas }, { data: postedBlogs }] = await Promise.all([
+    service
+      .from('content_ideas')
+      .select('title, cluster, status')
+      .order('created_at', { ascending: false })
+      .limit(300),
+    service
+      .from('content_blogs')
+      .select('title')
+      .order('created_at', { ascending: false })
+      .limit(100),
+  ]);
+  // Reihenfolge: erst gleicher Cluster (relevanter), dann andere
+  const sameClusterTitles = (existingIdeas ?? [])
+    .filter((r) => r.cluster === cluster)
+    .map((r) => r.title);
+  const otherClusterTitles = (existingIdeas ?? [])
+    .filter((r) => r.cluster !== cluster)
+    .map((r) => r.title);
+  const publishedBlogTitles = (postedBlogs ?? []).map((r) => r.title);
+  // Reihenfolge: gepostete Blogs (TOP-priority weil schon raus) > Cluster-Ideen > andere
+  const existingTitles = [...publishedBlogTitles, ...sameClusterTitles, ...otherClusterTitles];
   const existingSet = new Set(existingTitles.map((t) => t.trim().toLowerCase()));
 
   let ideas;
@@ -76,13 +91,32 @@ export async function POST(request: NextRequest) {
     s.toLowerCase().split(/[^a-zäöüß0-9]+/).filter((w) => w.length >= 4 && !stopWords.has(w)),
   );
   const existingTokenSets = existingTitles.map(tokenize);
-  const SOFT_DUP_OVERLAP = 4; // 4 oder mehr gemeinsame Schlagwoerter = Duplikat
+  const SOFT_DUP_OVERLAP = 3; // 3+ gemeinsame Schlagwoerter = Duplikat (vorher 4 — zu lax)
+
+  // Hart-verboten: konkrete Tropes die immer wieder auftauchen weil sie in den
+  // Prompt-Examples stehen. Verhindern dass die AI sie als Templates kopiert.
+  const BANNED_TROPES: RegExp[] = [
+    /\b47\s*(plak|standort|euro|mitarbeiter|prozent)/i, // "47 Plakate", "47 Euro", "47 Standorte"
+    /\b500\s*postkarten/i,                              // "500 Postkarten"
+    /\b8\s*wochen.*falsch/i,                            // "8 Wochen am falschen Feature"
+    /stripe.dashboard.*47/i,                            // "Stripe-Dashboard 47 Euro"
+    /bruder.{0,20}(steuerberater|versteht)/i,           // "Bruder versteht Spurig nicht"
+    /(bitly|bittly).{0,40}(virginia|ashburn)/i,         // "Bitly Daten in Virginia"
+    /sechs jahre.*atlantik/i,                           // "Sechs Jahre Daten Atlantik"
+  ];
 
   let softDupCount = 0;
+  let bannedTropeCount = 0;
   const rows = ideas
     .filter((i) => {
       const newTitleLower = i.title.trim().toLowerCase();
       if (existingSet.has(newTitleLower)) return false;
+      // Banned-trope check auf Titel + Outline + Angle kombiniert
+      const fullText = `${i.title} ${i.outline ?? ''} ${i.angle ?? ''}`;
+      if (BANNED_TROPES.some((rx) => rx.test(fullText))) {
+        bannedTropeCount++;
+        return false;
+      }
       const newTokens = tokenize(i.title);
       for (const ex of existingTokenSets) {
         let overlap = 0;
@@ -102,7 +136,7 @@ export async function POST(request: NextRequest) {
       target_keywords: i.target_keywords ?? null,
       status: 'backlog' as const,
     }));
-  console.log(`[ideas-generate dedupe] hard-dups=${ideas.length - rows.length - softDupCount} soft-dups=${softDupCount} kept=${rows.length}`);
+  console.log(`[ideas-generate dedupe] hard-dups=${ideas.length - rows.length - softDupCount - bannedTropeCount} soft-dups=${softDupCount} banned-tropes=${bannedTropeCount} kept=${rows.length}`);
 
   if (rows.length === 0) {
     return NextResponse.json({ generated: 0, duplicates: ideas.length });

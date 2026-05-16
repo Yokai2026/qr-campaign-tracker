@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const cluster = url.searchParams.get('cluster');
   const status = url.searchParams.get('status');
+  const includeDeleted = url.searchParams.get('include_deleted') === '1';
 
   const service = await createServiceClient();
   let q = service
@@ -30,6 +31,7 @@ export async function GET(request: NextRequest) {
     .limit(500);
   if (cluster && CLUSTERS.includes(cluster as ContentCluster)) q = q.eq('cluster', cluster);
   if (status) q = q.eq('status', status);
+  else if (!includeDeleted) q = q.neq('status', 'deleted');
   const { data, error } = await q;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
@@ -87,8 +89,14 @@ export async function DELETE(request: NextRequest) {
   const id = url.searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 
+  // Soft-Delete: status='deleted' statt Hard-Delete, damit die AI die Idee in
+  // zukuenftigen Generate-Aufrufen NICHT erneut generiert. Anti-Wiederholungs-
+  // Liste enthaelt jetzt auch geloeschte Titel.
   const service = await createServiceClient();
-  const { error } = await service.from('content_ideas').delete().eq('id', id);
+  const { error } = await service
+    .from('content_ideas')
+    .update({ status: 'deleted' })
+    .eq('id', id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

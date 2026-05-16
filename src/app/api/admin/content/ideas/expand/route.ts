@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
-import { expandIdeaToBlog } from '@/lib/content/ideas';
+import { expandIdeaToBlog, type BlogArchetype } from '@/lib/content/ideas';
 import { generateDraft, readBlogPost } from '@/lib/content/repurpose';
 import { notifySearchEngines } from '@/lib/seo/indexing';
 import type { ContentCluster } from '@/lib/content/pillars';
@@ -55,6 +55,22 @@ export async function POST(request: NextRequest) {
   }
 
   if (!blog) {
+    // Letzte 3 Archetypes aus DB ziehen, damit die Rotation nicht zwei gleiche
+    // hintereinander produziert. Archetype steckt als Tag "archetype:X" in tags.
+    const { data: recentBlogs } = await service
+      .from('content_blogs')
+      .select('tags')
+      .order('created_at', { ascending: false })
+      .limit(3);
+    const recentArchetypes: BlogArchetype[] = [];
+    for (const b of recentBlogs ?? []) {
+      const tag = (b.tags as string[] | null)?.find((t) => t.startsWith('archetype:'));
+      const code = tag?.slice('archetype:'.length) as BlogArchetype | undefined;
+      if (code && ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(code)) {
+        recentArchetypes.push(code);
+      }
+    }
+
     let expanded;
     try {
       expanded = await expandIdeaToBlog({
@@ -63,6 +79,7 @@ export async function POST(request: NextRequest) {
         angle: idea.angle ?? '',
         target_keywords: idea.target_keywords,
         cluster: idea.cluster as ContentCluster,
+        recentArchetypes,
       });
     } catch (e) {
       return NextResponse.json({ error: e instanceof Error ? e.message : 'expand-failed' }, { status: 500 });

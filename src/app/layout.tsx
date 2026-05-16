@@ -52,10 +52,9 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
-  ],
+  // Dark als Default — Mobile-Browser-Chrome-Farbe matched die dunkle Seite
+  themeColor: '#0a0a0a',
+  colorScheme: 'dark',
 };
 
 export default function RootLayout({
@@ -67,14 +66,15 @@ export default function RootLayout({
     <html
       lang="de"
       data-scroll-behavior="smooth"
-      className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistMono.variable} h-full antialiased dark`}
+      style={{ colorScheme: 'dark' }}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <a

@@ -6,25 +6,27 @@ import { Sparkles, Loader2, BookText, X, CheckSquare, Square } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
-type Cluster = 'dsgvo_privacy' | 'offline_roi' | 'qr_practices' | 'attribution' | 'behind_scenes';
+type Cluster = 'qr_realtalk' | 'print_lebt' | 'compliance_lite' | 'mittelstand' | 'tracking_tricks' | 'founder_diary';
 
 const CLUSTER_LABEL: Record<Cluster, string> = {
-  dsgvo_privacy: 'DSGVO & Privacy',
-  offline_roi: 'Offline-ROI',
-  qr_practices: 'QR-Practices',
-  attribution: 'Attribution',
-  behind_scenes: 'Behind-Scenes',
+  qr_realtalk: 'QR-Realtalk',
+  print_lebt: 'Print lebt',
+  compliance_lite: 'DSGVO ohne Anwalt',
+  mittelstand: 'Mittelstand-Stories',
+  tracking_tricks: 'Tracking-Tricks',
+  founder_diary: 'Founder-Tagebuch',
 };
 
 const CLUSTER_COLOR: Record<Cluster, string> = {
-  dsgvo_privacy: '#22d3ee',
-  offline_roi: '#f59e0b',
-  qr_practices: '#a855f7',
-  attribution: '#10b981',
-  behind_scenes: '#ec4899',
+  qr_realtalk: '#a855f7',     // violett — playful entertainment
+  print_lebt: '#f59e0b',      // amber — Print/Paper-Feeling
+  compliance_lite: '#22d3ee', // cyan — clean educational
+  mittelstand: '#10b981',     // emerald — community/customer
+  tracking_tricks: '#ec4899', // pink — tactical hidden hacks
+  founder_diary: '#fb7185',   // rose — honest/vulnerable
 };
 
-const ALL_CLUSTERS: Cluster[] = ['dsgvo_privacy', 'offline_roi', 'qr_practices', 'attribution', 'behind_scenes'];
+const ALL_CLUSTERS: Cluster[] = ['qr_realtalk', 'print_lebt', 'compliance_lite', 'mittelstand', 'tracking_tricks', 'founder_diary'];
 
 type Idea = {
   id: string;
@@ -51,7 +53,7 @@ type BatchProgress = {
 };
 
 export function IdeasBacklog() {
-  const [activeCluster, setActiveCluster] = useState<Cluster>('dsgvo_privacy');
+  const [activeCluster, setActiveCluster] = useState<Cluster>('qr_realtalk');
   const [generatingCluster, setGeneratingCluster] = useState<Cluster | null>(null);
   const [expandingId, setExpandingId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
