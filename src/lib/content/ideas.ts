@@ -1922,8 +1922,27 @@ WICHTIG:
 - Keine Quotes um die Werte
 - Nichts vor oder nach dem ---META--- und ---BODY---`;
 
-  const text = await callClaude(apiKey, prompt, { maxTokens: 5000, useSearch: true });
-  return parseMetaBodyBlock(text, idea.title, archetype, mood);
+  // Retry-Loop: Claude liefert manchmal kaputtes JSON oder META/BODY-Marker
+  // fehlen — dann lieber 1× retry als Batch-Failure.
+  let lastErr: unknown = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const text = await callClaude(apiKey, prompt, { maxTokens: 5000, useSearch: true });
+      return parseMetaBodyBlock(text, idea.title, archetype, mood);
+    } catch (e) {
+      lastErr = e;
+      const msg = e instanceof Error ? e.message : 'unknown';
+      const isParseFail = msg.includes('parse failed') || msg.includes('META/BODY markers');
+      const isTransient = msg.includes('rate_limit') || msg.includes('overloaded') || msg.includes('timeout') || msg.includes('Claude API 5') || msg.includes('Claude API 429');
+      if (attempt === 0 && (isParseFail || isTransient)) {
+        // Kurze Pause, dann nochmal versuchen
+        await new Promise((r) => setTimeout(r, 5000));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error('expand failed after retries');
 }
 
 /**

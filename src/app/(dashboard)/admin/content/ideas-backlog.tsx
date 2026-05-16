@@ -113,20 +113,41 @@ export function IdeasBacklog() {
     }
   }
 
-  async function expandOne(ideaId: string, title: string): Promise<{ ok: boolean; error?: string }> {
-    try {
-      const r = await fetch('/api/admin/content/ideas/expand', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ideaId, autoRepurpose: true }),
-        credentials: 'include',
-      });
-      const j = await r.json().catch(() => ({}));
-      if (r.ok && j.blog) return { ok: true };
-      return { ok: false, error: j.error ?? `HTTP ${r.status} bei "${title.slice(0, 30)}"` };
-    } catch (e) {
-      return { ok: false, error: e instanceof Error ? e.message : 'unknown' };
+  async function expandOne(
+    ideaId: string,
+    title: string,
+    maxRetries = 2,
+  ): Promise<{ ok: boolean; error?: string }> {
+    let lastError = '';
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const r = await fetch('/api/admin/content/ideas/expand', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ideaId, autoRepurpose: true }),
+          credentials: 'include',
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.blog) return { ok: true };
+
+        // Retryable errors: 429 (rate-limit), 500 (timeout/parse), 502/503/504
+        const retryable = [429, 500, 502, 503, 504].includes(r.status);
+        lastError = j.error ?? `HTTP ${r.status} bei "${title.slice(0, 30)}"`;
+
+        if (!retryable || attempt === maxRetries) {
+          return { ok: false, error: lastError };
+        }
+        // Exponential backoff: 30s, 60s
+        const waitMs = (attempt + 1) * 30000;
+        console.log(`[expand-retry] "${title.slice(0, 30)}" attempt ${attempt + 1}/${maxRetries + 1} after ${waitMs}ms — last error: ${lastError}`);
+        await new Promise((res) => setTimeout(res, waitMs));
+      } catch (e) {
+        lastError = e instanceof Error ? e.message : 'unknown';
+        if (attempt === maxRetries) return { ok: false, error: lastError };
+        await new Promise((res) => setTimeout(res, 30000));
+      }
     }
+    return { ok: false, error: lastError };
   }
 
   async function expand(ideaId: string) {
@@ -154,7 +175,8 @@ export function IdeasBacklog() {
 
     let done = 0;
     let failed = 0;
-    for (const id of ids) {
+    for (let i = 0; i < ids.length; i++) {
+      const id = ids[i];
       const idea = ideasMap.get(id);
       if (!idea) continue;
       setBatchProgress({ total: ids.length, done, failed, current: idea.title });
@@ -169,6 +191,14 @@ export function IdeasBacklog() {
       setBatchProgress({ total: ids.length, done, failed, current: null });
       queryClient.invalidateQueries({ queryKey: ['content-ideas'] });
       queryClient.invalidateQueries({ queryKey: ['content-drafts'] });
+
+      // Pause zwischen Batch-Items damit Anthropic-Rate-Limit (50k token/min)
+      // sich erholt. Eine Idee verbraucht ~64k tokens (Blog + 3 Repurpose).
+      // Ohne Pause schlägt Idee 2+ oft mit 429-rate-limit fehl.
+      if (i < ids.length - 1) {
+        setBatchProgress({ total: ids.length, done, failed, current: '⏳ Pause für Rate-Limit...' });
+        await new Promise((r) => setTimeout(r, 15000));
+      }
     }
     setBatchProgress(null);
     setSelected(new Set());
