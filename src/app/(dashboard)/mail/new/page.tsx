@@ -7,6 +7,7 @@ import { ArrowLeft, Save, Send, Mail, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MailRichEditor } from '@/components/mail/rich-editor';
 import { toast } from 'sonner';
 
 export default function NewMailPage() {
@@ -146,17 +147,17 @@ export default function NewMailPage() {
               <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="z.B. Update zu deiner Anfrage" />
             </div>
             <div>
-              <Label className="text-[12px]">HTML-Body</Label>
-              <textarea
-                value={bodyHtml}
-                onChange={(e) => setBodyHtml(e.target.value)}
-                rows={14}
-                placeholder={`<p>Hi {{name}},</p>\n<p>kurze Frage...</p>\n<p><a href="https://spurig.com/demo">Demo buchen</a></p>\n<p>Gruß<br>David</p>`}
-                className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 font-mono text-[12.5px] leading-relaxed"
-              />
+              <Label className="text-[12px]">Nachricht</Label>
+              <div className="mt-1">
+                <MailRichEditor
+                  value={bodyHtml}
+                  onChange={setBodyHtml}
+                  placeholder="Hi {{name}}, kurze Frage..."
+                />
+              </div>
               <p className="mt-1.5 text-[11px] text-muted-foreground">
-                Platzhalter: <code className="rounded bg-muted px-1">{'{{name}}'}</code> wird pro Empfänger ersetzt.
-                Alle <code className="rounded bg-muted px-1">&lt;a href&gt;</code>-Links werden automatisch mit Click-Tracking versehen.
+                Platzhalter <code className="rounded bg-muted px-1">{'{{name}}'}</code> wird pro Empfänger ersetzt.
+                Links werden automatisch mit Click-Tracking versehen. Bilder über das Icon hochladen (max 5 MB, PNG/JPG/GIF/WebP).
               </p>
             </div>
           </div>

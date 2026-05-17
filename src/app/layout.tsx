@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { PresenceHeartbeat } from '@/components/shared/presence-heartbeat';
 import { GoogleAdsScript } from '@/components/marketing/google-ads-script';
 import { MetaPixelScript } from '@/components/marketing/meta-pixel-script';
+import { ReferralClickTracker } from '@/components/referral/click-tracker';
 import './globals.css';
 
 const inter = Inter({
@@ -93,6 +94,8 @@ export default function RootLayout({
           {/* Meta-Pixel (fbq). Rendert nichts wenn NEXT_PUBLIC_META_PIXEL_ID nicht gesetzt ist.
               Feuert auto PageView. Lead/Purchase via meta-pixel.ts an signup-verify + settings. */}
           <MetaPixelScript />
+          {/* Referral-Click-Tracker: liest ?ref=XXX → setzt Cookie für 30 Tage */}
+          <ReferralClickTracker />
         </ThemeProvider>
       </body>
     </html>

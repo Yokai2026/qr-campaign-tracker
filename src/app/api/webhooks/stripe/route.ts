@@ -4,6 +4,7 @@ import { getStripe, priceToTierViaProduct, mapStripeStatus } from '@/lib/billing
 import { notifyAdminPayment, notifyAdminCancellation } from '@/lib/email/admin-notify';
 import { notifyLifecycle } from '@/lib/notify/webhook';
 import { trackMetaPurchase } from '@/lib/conversion/meta-capi';
+import { processReferralConversion } from '@/lib/referrals/conversion';
 import type Stripe from 'stripe';
 
 function planFromPriceId(priceId: string | null | undefined): 'monthly' | 'yearly' | 'unknown' {
@@ -134,6 +135,19 @@ export async function POST(request: NextRequest) {
           ],
           url: 'https://spurig.com/admin',
         });
+      }
+
+      // ──────────────────────────────────────────────────────────────────
+      // REFERRAL-CONVERSION: prüfe ob User per Referral kam → Reward Referrer
+      // ──────────────────────────────────────────────────────────────────
+      try {
+        await processReferralConversion({
+          inviteeUserId: userId,
+          inviteeEmail: profile?.email ?? null,
+          supabase,
+        });
+      } catch (e) {
+        console.warn('[stripe-webhook referral] processing failed:', e instanceof Error ? e.message : 'unknown');
       }
       break;
     }

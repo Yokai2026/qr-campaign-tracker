@@ -161,9 +161,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         throw new Error(`Resend ${res.status}: ${errText.slice(0, 200)}`);
       }
 
+      // Resend gibt { id: "..." } zurück — speichern für Webhook-Lookup
+      const sendResult = await res.json().catch(() => ({}));
+      const resendMessageId = (sendResult as { id?: string })?.id ?? null;
+
       await service.from('mail_recipients').update({
         sent_at: new Date().toISOString(),
         status: 'sent',
+        resend_message_id: resendMessageId,
       }).eq('id', r.id);
       sent++;
     } catch (e) {

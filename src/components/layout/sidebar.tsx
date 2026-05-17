@@ -23,6 +23,7 @@ import {
   KeyRound,
   BookOpen,
   Crown,
+  Gift,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -42,6 +43,7 @@ const mainNav = [
 ];
 
 const bottomNav = [
+  { name: 'Empfehlen & gratis Monat', href: '/settings/referrals', icon: Gift },
   { name: 'Einstellungen', href: '/settings', icon: Settings },
 ];
 

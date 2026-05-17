@@ -176,6 +176,47 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: msgErr.message }, { status: 500 });
   }
 
+  // Fallback: wenn keine outbound_messages-Row matched → versuche mail_recipients
+  // (Mail-Tracking-Feature speichert ebenfalls resend_message_id)
+  const outboundMatched = msgs && msgs.length > 0;
+  let mailRecipientMatched = false;
+
+  if (!outboundMatched) {
+    const mailUpdates: Record<string, string | number | null> = {};
+    switch (type) {
+      case 'email.delivered':
+        mailUpdates.delivered_at = ts;
+        mailUpdates.status = 'delivered';
+        break;
+      case 'email.bounced':
+        mailUpdates.status = 'bounced';
+        mailUpdates.bounce_type = data.bounce?.type ?? 'unknown';
+        mailUpdates.bounce_message = (data.bounce?.message ?? 'bounce').slice(0, 500);
+        break;
+      case 'email.complained':
+        mailUpdates.complained_at = ts;
+        mailUpdates.status = 'complained';
+        break;
+      case 'email.failed':
+        mailUpdates.status = 'failed';
+        break;
+      // email.opened / email.clicked: ignore — wir tracken über eigene Pixel/Click-Endpoints
+      default:
+        break;
+    }
+
+    if (Object.keys(mailUpdates).length > 0) {
+      const { data: mailMatched } = await sb
+        .from('mail_recipients')
+        .update(mailUpdates)
+        .eq('resend_message_id', resendMessageId)
+        .select('id, campaign_id');
+      if (mailMatched && mailMatched.length > 0) {
+        mailRecipientMatched = true;
+      }
+    }
+  }
+
   // Lead-State updaten wenn nötig (bounce/complain). Mit .select() um 0-row-
   // Updates zu erkennen — der Original-Code hat das Result ignoriert, weshalb
   // wir Bounces in Production gesehen haben die das outbound_messages-Status
@@ -220,5 +261,11 @@ export async function POST(request: NextRequest) {
     console.warn('[webhooks/resend] diagnostics upsert skipped:', e);
   }
 
-  return NextResponse.json({ ok: true, type, resendMessageId, ...updates });
+  return NextResponse.json({
+    ok: true,
+    type,
+    resendMessageId,
+    matched: outboundMatched ? 'outbound_messages' : mailRecipientMatched ? 'mail_recipients' : 'none',
+    ...updates,
+  });
 }

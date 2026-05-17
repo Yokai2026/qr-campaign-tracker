@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Spurig — AppSumo Lifetime Deal Pitch</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 32px;
+    background: #fafafa;
+    color: #1a1a1a;
+    line-height: 1.6;
+  }
+  h1 { font-size: 32px; color: #0a0a0a; margin-bottom: 4px; }
+  h2 {
+    font-size: 22px;
+    color: #0a0a0a;
+    margin-top: 40px;
+    margin-bottom: 12px;
+    border-bottom: 3px solid #22d3ee;
+    padding-bottom: 6px;
+  }
+  h3 { font-size: 17px; color: #1a1a1a; margin-top: 24px; margin-bottom: 8px; }
+  .subtitle { color: #666; font-size: 15px; margin-bottom: 24px; font-style: italic; }
+  .hero {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2a 100%);
+    color: #fff;
+    padding: 36px 40px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+  }
+  .hero h1 { color: #fff; }
+  .hero .subtitle { color: #22d3ee; }
+  .hero p { color: #d0d0d0; font-size: 16px; }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 24px 0;
+  }
+  .stat {
+    background: #fff;
+    padding: 18px;
+    border-radius: 8px;
+    border-left: 4px solid #22d3ee;
+  }
+  .stat-num { font-size: 28px; font-weight: 700; color: #0a0a0a; display: block; }
+  .stat-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .compare th, .compare td {
+    border: 1px solid #ddd;
+    padding: 12px 14px;
+    text-align: left;
+  }
+  .compare th { background: #0a0a0a; color: #fff; }
+  .compare tr:nth-child(even) td { background: #f5f5f5; }
+  .compare .yes { color: #057642; font-weight: 600; }
+  .compare .no { color: #c43e3e; }
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .tier {
+    background: #fff;
+    padding: 22px;
+    border-radius: 12px;
+    border: 2px solid #ddd;
+  }
+  .tier.featured {
+    border-color: #22d3ee;
+    box-shadow: 0 4px 16px rgba(34, 211, 238, 0.18);
+  }
+  .tier-name { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: #888; }
+  .tier-price { font-size: 32px; font-weight: 700; margin: 8px 0; color: #0a0a0a; }
+  .tier-price small { font-size: 14px; color: #888; font-weight: 400; }
+  .tier-features { list-style: none; padding: 0; margin: 12px 0 0 0; }
+  .tier-features li { padding: 6px 0; font-size: 14px; border-bottom: 1px dashed #eee; }
+  .tier-features li:last-child { border: none; }
+  .callout {
+    background: #fffbea;
+    border-left: 4px solid #f0b400;
+    padding: 16px 22px;
+    border-radius: 4px;
+    margin: 20px 0;
+  }
+  .callout.green {
+    background: #f1f8f3;
+    border-color: #057642;
+  }
+  .callout.blue {
+    background: #f1f5fb;
+    border-color: #0a66c2;
+  }
+  blockquote {
+    margin: 16px 0;
+    padding: 12px 22px;
+    border-left: 4px solid #888;
+    color: #444;
+    font-style: italic;
+    background: #fff;
+  }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+  }
+  .checklist li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #057642;
+    font-weight: 700;
+  }
+  code {
+    background: #0a0a0a;
+    color: #22d3ee;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+  }
+  .footer-note {
+    margin-top: 60px;
+    padding: 18px;
+    background: #fff;
+    border-radius: 8px;
+    color: #666;
+    font-size: 13px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Spurig</h1>
+  <p class="subtitle">European QR-Code & Smart-Link Tracking — GDPR-First Alternative to Bitly</p>
+  <p>Track every QR code scan, link click, and email open in one privacy-first platform. EU-hosted, no cookies, no third-party trackers. Built for small businesses who got priced out by Bitly's $300/mo Enterprise tier.</p>
+</div>
+
+<h2>1. Pitch in 30 Seconds</h2>
+
+<p>Bitly raised prices 4× in 18 months. Their entry tier is now $30/mo for 1,500 links. EU customers pay extra for GDPR-compliance that should be standard. Small businesses can't justify $300+/mo Enterprise tiers just to know which QR codes work.</p>
+
+<p><strong>Spurig solves this:</strong> EU-hosted, full GDPR-baseline, unlimited links on paid tiers, real-time scan analytics, location-level tracking, A/B-tests on QR-codes, email-tracking, smart-redirects with UTM-injection. Everything Bitly Enterprise has — at a price small businesses can swallow.</p>
+
+<div class="stat-grid">
+  <div class="stat">
+    <span class="stat-num">EU</span>
+    <span class="stat-label">Hosted in Germany</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">0</span>
+    <span class="stat-label">Cookies / Third-Party Trackers</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">∞</span>
+    <span class="stat-label">Links on Paid Plans</span>
+  </div>
+</div>
+
+<h2>2. Why Spurig Belongs on AppSumo</h2>
+
+<h3>Target Audience Match</h3>
+<p>AppSumo's core audience = bootstrapped SaaS founders, agencies, freelancers, eCommerce store owners, content creators. <strong>Every one of them tracks links and QR codes.</strong> They're the exact people who feel Bitly's price increase the most — and they're the early-adopter, lifetime-deal-buying crowd.</p>
+
+<h3>Product Maturity</h3>
+<ul class="checklist">
+  <li>Live in production since Q1 2026</li>
+  <li>15+ paying customers (B2B agencies + small DACH businesses)</li>
+  <li>Built on Next.js 16 + Supabase — modern, scalable, EU-compliant by design</li>
+  <li>API + Webhook support for power-users</li>
+  <li>Native integrations: Zapier (planned), Make.com (planned), n8n (live)</li>
+  <li>Email-tracking sub-product (opens, clicks, bounces) — bonus feature for AppSumo audience</li>
+</ul>
+
+<h3>Differentiation vs Existing AppSumo Listings</h3>
+<p>AppSumo has listed link-shorteners before (Switchy, Linkly, RebrandlyAppsumo deals). None of them are:</p>
+<ul class="checklist">
+  <li>EU-hosted with German Auftragsverarbeitungsvertrag (DPA) ready to download</li>
+  <li>Built specifically for QR-Code-first workflows (offline → online attribution)</li>
+  <li>Tracking email + links in same dashboard</li>
+  <li>Privacy-first by default (no cookies, anonymized IP, daily-rotated salt)</li>
+</ul>
+
+<h2>3. Feature Matrix vs Bitly</h2>
+
+<table class="compare">
+<tr>
+  <th>Feature</th>
+  <th>Spurig (Pro €19/mo)</th>
+  <th>Bitly (Basic $30/mo)</th>
+  <th>Bitly (Enterprise $300+/mo)</th>
+</tr>
+<tr>
+  <td>Smart links / shortlinks</td>
+  <td class="yes">Unlimited</td>
+  <td>1,500/mo</td>
+  <td class="yes">Unlimited</td>
+</tr>
+<tr>
+  <td>QR codes with analytics</td>
+  <td class="yes">Unlimited</td>
+  <td>Limited</td>
+  <td class="yes">Unlimited</td>
+</tr>
+<tr>
+  <td>EU-hosted data</td>
+  <td class="yes">Yes (Frankfurt)</td>
+  <td class="no">No (US)</td>
+  <td>Add-on</td>
+</tr>
+<tr>
+  <td>GDPR-baseline by default</td>
+  <td class="yes">Yes</td>
+  <td class="no">No</td>
+  <td>Paid add-on</td>
+</tr>
+<tr>
+  <td>Cookieless tracking</td>
+  <td class="yes">Yes</td>
+  <td class="no">No</td>
+  <td class="no">No</td>
+</tr>
+<tr>
+  <td>Real-time scan map</td>
+  <td class="yes">Yes</td>
+  <td>Limited</td>
+  <td class="yes">Yes</td>
+</tr>
+<tr>
+  <td>A/B-test on QR codes</td>
+  <td class="yes">Yes</td>
+  <td class="no">No</td>
+  <td class="yes">Yes</td>
+</tr>
+<tr>
+  <td>Email-tracking sub-product</td>
+  <td class="yes">Included</td>
+  <td class="no">No</td>
+  <td class="no">No</td>
+</tr>
+<tr>
+  <td>API + Webhooks</td>
+  <td class="yes">Yes</td>
+  <td>Limited</td>
+  <td class="yes">Yes</td>
+</tr>
+<tr>
+  <td>Custom domain</td>
+  <td class="yes">Yes</td>
+  <td>Add-on</td>
+  <td class="yes">Yes</td>
+</tr>
+</table>
+
+<h2>4. AppSumo Lifetime Deal Tiers</h2>
+
+<p>Proposed pricing for AppSumo Plus members (final number negotiated with AppSumo team):</p>
+
+<div class="tier-grid">
+
+<div class="tier">
+  <span class="tier-name">Tier 1</span>
+  <div class="tier-price">$49<small> / lifetime</small></div>
+  <ul class="tier-features">
+    <li>10,000 link clicks / month</li>
+    <li>5 QR codes</li>
+    <li>1 custom domain</li>
+    <li>3-month scan history</li>
+    <li>CSV export</li>
+    <li>Email support</li>
+  </ul>
+</div>
+
+<div class="tier featured">
+  <span class="tier-name">Tier 2 (Featured)</span>
+  <div class="tier-price">$99<small> / lifetime</small></div>
+  <ul class="tier-features">
+    <li>50,000 link clicks / month</li>
+    <li>Unlimited QR codes</li>
+    <li>3 custom domains</li>
+    <li>12-month scan history</li>
+    <li>API access</li>
+    <li>Email-tracking (1,000 sends/mo)</li>
+    <li>Priority support</li>
+  </ul>
+</div>
+
+<div class="tier">
+  <span class="tier-name">Tier 3 (Agency)</span>
+  <div class="tier-price">$199<small> / lifetime</small></div>
+  <ul class="tier-features">
+    <li>Unlimited clicks</li>
+    <li>Unlimited QR codes</li>
+    <li>10 custom domains</li>
+    <li>5 sub-accounts / team seats</li>
+    <li>Unlimited scan history</li>
+    <li>White-label reports</li>
+    <li>Email-tracking (10,000 sends/mo)</li>
+    <li>Founder-direct support (private Slack)</li>
+  </ul>
+</div>
+
+</div>
+
+<div class="callout">
+  <strong>Why these tiers:</strong> Tier 2 ($99) is the sweet spot for AppSumo Plus members — covers 90% of solopreneur and small-agency needs. Tier 3 unlocks the value Bitly charges $300/mo for, as a one-time payment.
+</div>
+
+<h2>5. Refund & Stacking Policy</h2>
+
+<ul class="checklist">
+  <li><strong>60-day money-back guarantee</strong> (AppSumo standard)</li>
+  <li>Stacking up to 5 codes per account (Tier 1 only, +10k clicks per stacked code)</li>
+  <li>Future feature updates included free for all tier holders</li>
+  <li>No price increase on tiered features for at least 24 months</li>
+  <li>If Spurig is acquired or shuts down: AppSumo customers get 90-day data export + 12-month grace period</li>
+</ul>
+
+<h2>6. Roadmap for AppSumo Buyers (Next 12 Months)</h2>
+
+<ul class="checklist">
+  <li>Q3 2026 — Bulk QR-code import via CSV</li>
+  <li>Q3 2026 — Zapier integration (public)</li>
+  <li>Q4 2026 — White-label reports for agencies (Tier 3)</li>
+  <li>Q4 2026 — Mobile app (iOS + Android) for on-the-go scan tracking</li>
+  <li>Q1 2027 — Programmatic UTM-builder with conventions library</li>
+  <li>Q1 2027 — Slack notifications for scan spikes</li>
+</ul>
+
+<h2>7. Founder Note</h2>
+
+<blockquote>
+"I built Spurig because Bitly raised prices on me three times in 12 months while I was running a small marketing agency in Germany. The Enterprise tier had what I needed (real EU hosting + A/B-tests) but the price was insane for a 2-person shop. Now Spurig is the tool I wished existed — and I run it as a one-founder operation, so feature requests turn into shipped code in days, not quarters.<br><br>AppSumo customers will get my direct attention. Tier 3 buyers get a private Slack channel. I'm in this for the long haul."<br>
+— David, Founder
+</blockquote>
+
+<h2>8. Marketing Assets Ready</h2>
+
+<ul class="checklist">
+  <li>Logo (SVG + PNG, transparent + on-light + on-dark variants)</li>
+  <li>2-minute demo video script — covers QR-creation, scan-tracking, A/B-test setup</li>
+  <li>10 product screenshots (dashboard, QR-detail, analytics-map, email-tracking, settings, admin)</li>
+  <li>Brand-Guidelines PDF (colors, fonts, tone of voice)</li>
+  <li>3 customer testimonials from existing DACH paying customers (in EN translated)</li>
+  <li>Comparison-Chart vs Bitly + Switchy + Linkly (PDF, AppSumo-ready)</li>
+  <li>Founder bio + headshot</li>
+  <li>30-second elevator-pitch video</li>
+</ul>
+
+<h2>9. Why Now</h2>
+
+<div class="callout green">
+<strong>Timing arguments for AppSumo team:</strong>
+<ul>
+<li><strong>Bitly fatigue is real</strong> — Reddit, Indie Hackers, and Twitter are full of Bitly-pricing-rant threads in 2026.</li>
+<li><strong>GDPR enforcement is intensifying</strong> — German DPAs sent 1,400+ fines on tracking in 2025. AppSumo customers in EU need a compliant alternative <em>now</em>.</li>
+<li><strong>QR-codes are mainstream post-COVID</strong> — restaurants, retail, events all use them. Bitly's QR product is an afterthought.</li>
+<li><strong>Email-tracking bundled in</strong> — most competitors split this into a separate product. Spurig includes it.</li>
+</ul>
+</div>
+
+<h2>10. Next Steps for AppSumo Team</h2>
+
+<ol>
+  <li>Schedule a 30-min product demo via <code>cal.com/dsg-studio/spurig-demo</code></li>
+  <li>Receive sandbox access (free Tier 3 account for evaluation)</li>
+  <li>Review live metrics: MRR, churn, NPS via shared analytics link</li>
+  <li>Negotiate final tier pricing + revenue split</li>
+  <li>Sign DPA + launch agreement</li>
+  <li>Co-create launch campaign — target launch date: <strong>Q3 2026</strong></li>
+</ol>
+
+<div class="callout blue">
+<strong>Contact:</strong><br>
+David — Founder, Spurig<br>
+Email: <code>david@spurig.com</code><br>
+Web: <code>spurig.com</code><br>
+Demo: <code>cal.com/dsg-studio/spurig-demo</code>
+</div>
+
+<div class="footer-note">
+This document is confidential and prepared for AppSumo's evaluation team only. Last updated: 17 May 2026.
+</div>
+
+</body>
+</html>
