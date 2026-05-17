@@ -29,7 +29,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const [{ data: recipients }, { data: links }] = await Promise.all([
     service
       .from('mail_recipients')
-      .select('id, email, name, status, sent_at, first_open_at, last_open_at, open_count, human_open_count, click_count, first_click_at')
+      .select('id, email, name, status, sent_at, first_open_at, last_open_at, open_count, human_open_count, click_count, first_click_at, last_user_agent')
       .eq('campaign_id', id)
       .order('email', { ascending: true }),
     service

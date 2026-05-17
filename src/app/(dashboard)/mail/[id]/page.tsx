@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Mail, Send, Eye, MousePointerClick, CheckCircle2, Circle, Loader2, ExternalLink, RotateCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
@@ -33,6 +33,7 @@ type Recipient = {
   human_open_count: number;
   click_count: number;
   first_click_at: string | null;
+  last_user_agent?: string | null;
 };
 
 type LinkRow = {
@@ -50,14 +51,15 @@ type Detail = {
 export default function MailDetailPage(props: { params: Promise<{ id: string }> }) {
   const { id } = use(props.params);
 
-  const { data, isLoading } = useQuery<Detail>({
+  const { data, isLoading, isFetching, dataUpdatedAt } = useQuery<Detail>({
     queryKey: ['mail-campaign', id],
     queryFn: async () => {
       const r = await fetch(`/api/mail/campaigns/${id}`);
       if (!r.ok) throw new Error('fetch failed');
       return r.json();
     },
-    refetchInterval: 15_000,
+    refetchInterval: 5_000, // alle 5 Sekunden — schneller Live-Update für Mail-Tracking
+    refetchOnWindowFocus: true,
   });
 
   if (isLoading || !data) {
@@ -94,6 +96,7 @@ export default function MailDetailPage(props: { params: Promise<{ id: string }> 
           <div className="flex items-center gap-2">
             <Mail className="h-5 w-5 text-brand" />
             <h1 className="text-2xl font-semibold tracking-tight line-clamp-1">{campaign.subject}</h1>
+            <LiveIndicator isFetching={isFetching} dataUpdatedAt={dataUpdatedAt} />
           </div>
           <p className="mt-1 text-[13px] text-muted-foreground">
             {campaign.sent_at
@@ -109,6 +112,22 @@ export default function MailDetailPage(props: { params: Promise<{ id: string }> 
           />
         )}
       </div>
+
+      {/* Gmail-Tracking-Hinweis wenn ≥1 Empfänger Gmail-Proxy-Pattern hat */}
+      {recipients.some((r) => isGmailRecipient(r)) && (
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-2.5 text-[12.5px]">
+          <span className="text-amber-500">⚠️</span>
+          <div className="flex-1">
+            <strong>Gmail-Empfänger: Opens nicht zuverlässig trackbar.</strong>{' '}
+            <span className="text-muted-foreground">
+              Gmail cached alle Bilder beim Empfang serverseitig — der Tracking-Pixel wird vom Google-Proxy geladen,
+              bevor der User die Mail überhaupt öffnet. Echte Opens vom User werden danach aus Google-Cache geladen
+              und erreichen unseren Server nicht.{' '}
+              <strong>Verlässliche Engagement-Metrik: Klick-Rate.</strong> Wenn ein Empfänger klickt → er hat gelesen.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -229,8 +248,13 @@ function RecipientRow({ recipient }: { recipient: Recipient }) {
       </div>
       <div className="shrink-0 text-right text-[11px] text-muted-foreground tabular-nums">
         {recipient.human_open_count > 0 && <span>{recipient.human_open_count}× geöffnet</span>}
-        {recipient.human_open_count === 0 && recipient.open_count > 0 && (
-          <span className="text-muted-foreground/60" title="Vom Mail-Provider (Gmail/Apple/Yahoo) automatisch beim Empfang geladen, nicht vom User geöffnet">
+        {recipient.human_open_count === 0 && recipient.open_count > 0 && isGmailRecipient(recipient) && (
+          <span className="text-amber-500/70" title="Gmail cached alle Bilder beim Empfang — Opens nicht trackbar. Klick-Rate ist verlässlicher Indikator.">
+            Gmail (Open n.&nbsp;trackbar)
+          </span>
+        )}
+        {recipient.human_open_count === 0 && recipient.open_count > 0 && !isGmailRecipient(recipient) && (
+          <span className="text-muted-foreground/60" title="Vom Mail-Provider beim Empfang automatisch geladen, nicht vom User geöffnet">
             {recipient.open_count}× Proxy-Preload
           </span>
         )}
@@ -286,4 +310,30 @@ function ResendButton({ campaignId, nonOpenersCount }: { campaignId: string; non
       An {nonOpenersCount} Non-Openers erneut senden
     </Button>
   );
+}
+
+function LiveIndicator({ isFetching, dataUpdatedAt }: { isFetching: boolean; dataUpdatedAt: number }) {
+  const [, forceTick] = useState(0);
+  useEffect(() => {
+    const i = setInterval(() => forceTick((n) => n + 1), 1000);
+    return () => clearInterval(i);
+  }, []);
+  const secondsAgo = Math.max(0, Math.floor((Date.now() - dataUpdatedAt) / 1000));
+  const label = secondsAgo < 3 ? 'jetzt' : `vor ${secondsAgo}s`;
+
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10.5px] font-medium text-emerald-500"
+      title={`Auto-Refresh alle 5 Sekunden · zuletzt: ${label}`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full bg-emerald-500 ${isFetching ? 'animate-pulse' : ''}`} />
+      Live · {label}
+    </span>
+  );
+}
+
+// Gmail-Recipient-Detection: irgendeine Open hat Gmail-Proxy-Pattern im UA
+function isGmailRecipient(r: Recipient): boolean {
+  const ua = r.last_user_agent ?? '';
+  return /GoogleImageProxy|ggpht\.com|Chrome\/42\.0\.2311/i.test(ua);
 }
