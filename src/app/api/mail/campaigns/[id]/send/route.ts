@@ -109,8 +109,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   for (const r of createdRecipients) {
     try {
-      // HTML rewrite
-      const { html: trackedHtml, links } = prepareTrackedHtml(campaign.body_html, r.pixel_token);
+      // HTML rewrite (mit Footer + Unsubscribe-Link)
+      const { html: trackedHtml, links } = prepareTrackedHtml(campaign.body_html, r.pixel_token, {
+        fromName: campaign.from_name ?? undefined,
+        includeFooter: true,
+      });
 
       // Link-Tokens sammeln (pro Campaign unique deduplizieren auf original_url)
       for (const l of links) {

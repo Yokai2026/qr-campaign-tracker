@@ -21,26 +21,27 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://spurig.com';
 /**
  * Ersetzt alle href-Werte im HTML durch Tracking-Redirects.
  * Sammelt original_url + generated click_token pro Link.
+ * Pixel-Token wird als ?r= an die Click-URL gehängt → so wissen wir
+ * welcher Recipient geklickt hat (nicht nur welcher Link).
  */
-export function rewriteLinks(html: string): RewrittenBody {
+export function rewriteLinks(html: string, pixelToken?: string): RewrittenBody {
   const links: Array<{ original_url: string; click_token: string }> = [];
 
-  // Match <a href="..."> oder <a href='...'>
-  // Lassen mailto:, tel:, javascript:, # in Ruhe.
   const rewritten = html.replace(/<a\s+([^>]*?)href=(["'])([^"']+)\2([^>]*?)>/gi, (match, before, quote, href, after) => {
     if (
       href.startsWith('mailto:') ||
       href.startsWith('tel:') ||
       href.startsWith('#') ||
       href.startsWith('javascript:') ||
-      href.startsWith('{{') // template placeholder (e.g. {{unsubscribe_url}})
+      href.startsWith('{{')
     ) {
       return match;
     }
 
     const click_token = generateToken();
     links.push({ original_url: href, click_token });
-    const trackingUrl = `${BASE_URL}/api/mail/click/${click_token}`;
+    const queryStr = pixelToken ? `?r=${encodeURIComponent(pixelToken)}` : '';
+    const trackingUrl = `${BASE_URL}/api/mail/click/${click_token}${queryStr}`;
     return `<a ${before}href=${quote}${trackingUrl}${quote}${after}>`;
   });
 
@@ -64,12 +65,39 @@ export function appendTrackingPixel(html: string, pixelToken: string): string {
 }
 
 /**
- * Vollständiger Rewrite-Pass: Links umschreiben + Pixel anhängen.
+ * Hängt einen schmalen DSGVO-Footer mit Unsubscribe-Link ans Body-Ende.
+ * Pixel-Token wird verwendet, um den Unsubscribe-Link recipient-spezifisch zu machen.
+ */
+export function appendFooter(html: string, pixelToken: string, fromName?: string): string {
+  const unsubUrl = `${BASE_URL}/api/mail/unsubscribe/${pixelToken}`;
+  const footer = `
+<!-- spurig-mail-footer -->
+<div style="margin-top:32px;padding-top:16px;border-top:1px solid #e5e5e5;font-family:Arial,sans-serif;font-size:11px;color:#888;line-height:1.5">
+  Diese Mail wurde${fromName ? ` von ${fromName}` : ''} versandt und nutzt Click-/Open-Tracking via Spurig (DSGVO-konform, EU-gehostet).
+  Wenn du keine weiteren Mails von uns wünschst, kannst du dich hier abmelden:
+  <a href="${unsubUrl}" style="color:#888;text-decoration:underline">Abmelden</a>.
+</div>
+`;
+  if (/<\/body>/i.test(html)) {
+    return html.replace(/<\/body>/i, `${footer}</body>`);
+  }
+  return html + footer;
+}
+
+/**
+ * Vollständiger Rewrite-Pass: Links umschreiben + Footer + Pixel anhängen.
  * Returns final HTML + sammelte Link-Tokens (für DB-Insert).
  */
-export function prepareTrackedHtml(rawHtml: string, pixelToken: string): RewrittenBody {
-  const { html: linkedHtml, links } = rewriteLinks(rawHtml);
-  const finalHtml = appendTrackingPixel(linkedHtml, pixelToken);
+export function prepareTrackedHtml(
+  rawHtml: string,
+  pixelToken: string,
+  opts: { fromName?: string; includeFooter?: boolean } = {},
+): RewrittenBody {
+  const { html: linkedHtml, links } = rewriteLinks(rawHtml, pixelToken);
+  const withFooter = opts.includeFooter !== false
+    ? appendFooter(linkedHtml, pixelToken, opts.fromName)
+    : linkedHtml;
+  const finalHtml = appendTrackingPixel(withFooter, pixelToken);
   return { html: finalHtml, links };
 }
 
