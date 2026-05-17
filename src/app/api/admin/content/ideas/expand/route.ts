@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   const service = await createServiceClient();
   const { data: idea, error: ideaErr } = await service
     .from('content_ideas')
-    .select('id, cluster, title, outline, angle, target_keywords, hook_pattern, status, expanded_blog_id')
+    .select('id, cluster, title, outline, angle, target_keywords, hook_pattern, emotion, target_audience, cta_suggestion, ai_reference, tracking_reference, tonality, blog_format, status, expanded_blog_id')
     .eq('id', body.ideaId)
     .maybeSingle();
   if (ideaErr) return NextResponse.json({ error: ideaErr.message }, { status: 500 });
@@ -88,7 +88,16 @@ export async function POST(request: NextRequest) {
 
     let expanded;
     try {
-      const hookPattern = (idea as { hook_pattern?: string | null }).hook_pattern;
+      const meta = idea as {
+        hook_pattern?: string | null;
+        emotion?: string | null;
+        target_audience?: string | null;
+        cta_suggestion?: string | null;
+        ai_reference?: string | null;
+        tracking_reference?: string | null;
+        tonality?: string | null;
+        blog_format?: string | null;
+      };
       expanded = await expandIdeaToBlog({
         title: idea.title,
         outline: idea.outline ?? '',
@@ -98,7 +107,14 @@ export async function POST(request: NextRequest) {
         recentArchetypes: recentArchetypes.slice(0, 3),
         recentMoods: recentMoods.slice(0, 3),
         recentOpeners,
-        hookPattern: hookPattern as HookPattern | undefined,
+        hookPattern: meta.hook_pattern as HookPattern | undefined,
+        emotion: meta.emotion,
+        targetAudience: meta.target_audience,
+        ctaSuggestion: meta.cta_suggestion,
+        aiReference: meta.ai_reference,
+        trackingReference: meta.tracking_reference,
+        tonality: meta.tonality,
+        blogFormat: meta.blog_format,
       });
     } catch (e) {
       return NextResponse.json({ error: e instanceof Error ? e.message : 'expand-failed' }, { status: 500 });

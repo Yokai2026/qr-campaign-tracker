@@ -110,6 +110,14 @@ export type GeneratedIdea = {
   profession?: string;
   /** Hook-Pattern fürs Quoten-System pro Batch. */
   hook_pattern?: HookPattern;
+  /** NEU 2026 (Modern Builder Branding): Reicher Metadata-Layer für gezielteren Draft-Expand. */
+  emotion?: string;             // joy/anger/curiosity/frustration/aha/schadenfreude/fomo/nostalgia
+  target_audience?: string;     // konkrete Persona z.B. "KMU-CFO 50-200 Mitarbeiter"
+  cta_suggestion?: string;      // konkreter CTA-Vorschlag (z.B. "Teste Spurig 14 Tage gratis")
+  ai_reference?: string;        // chatgpt|claude|gemini|n8n|none|multiple
+  tracking_reference?: string;  // qr|link|email|kurzlink|campaign|none|multiple
+  tonality?: string;            // lehrreich|locker|provokant|story|aha|humor|unpopular_opinion
+  blog_format?: string;         // story|guide|case|comparison|tutorial|opinion|experiment|behind_scenes|breakdown
 };
 
 export type HookPattern =
@@ -843,9 +851,12 @@ ANTI-WIEDERHOLUNG (zusätzlich):
   - Wenn Pillar "Founder-Tagebuch" (founder_diary): variiere — MRR-Reveal / Pricing-Wechsel /
     Customer-Support-Peinlichkeit / gescheitertes Feature / Vercel-Bill / Cousin-versteht-
     nicht / Sales-Call-Fail / Burnout / Konkurrenz-Beobachtung / Cold-Mail-Reply
-  - Wenn Pillar "KI & Automatisierung" (ai_marketing): variiere — ChatGPT/Claude/DeepL/
-    Midjourney/Sora-Workflow / KI-Agent-Setup / n8n + Make.com / Prompt-Engineering /
-    KI-Hype-Realität / KI-spart-tatsächlich-Zeit / KI-Fails / Tracking-Daten in KI-Analyse
+  - Wenn Pillar "KI & Automatisierung" (ai_marketing): variiere — ChatGPT-Workflows /
+    Claude Code für Marketing-Tasks / Gemini für Datenanalyse / n8n-Agent-Setups /
+    LangChain-Pipelines / RAG-Systeme / Prompt-Engineering-Best-Practices / KI-Agent-
+    Architecture / KI-Hype-Realität / KI-spart-tatsächlich-Zeit / KI-Fails /
+    Tracking-Daten in KI-Analyse / DeepL für Localization / Midjourney/Sora für Marketing-
+    Visuals. FOKUS: n8n als Self-Hosting-EU-AI-Agent-Plattform (NICHT Make.com).
   - Wenn Pillar "E-Mail & Kurzlinks" (email_shortlinks): variiere — Open-Rate-Reality /
     Subject-Line-A/B / Gmail-Proxy / Apple-MPP / Cold-Email-Compliance / Newsletter-
     Klick-Forensik / Kurzlink-Vanity-URL / Bounce-Management / DOI / Drip-Sequences
@@ -1067,18 +1078,41 @@ KEIN Vorwort. KEIN "Ich starte mit...". KEINE Research-Notes.
 KEINE Markdown-Code-Fences (kein \`\`\`json).
 KEIN Erklärungstext nach dem JSON.
 
-Format (GENAU SO — alle 6 Felder PFLICHT):
+Format (GENAU SO — ALLE 13 Felder PFLICHT):
 [
-  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "...", "profession": "tierarzt", "hook_pattern": "money_regret"},
-  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "...", "profession": "friseur", "hook_pattern": "discovery_insider"}
+  {
+    "title": "...",
+    "angle": "...",
+    "outline": "...",
+    "target_keywords": "...",
+    "profession": "tierarzt",
+    "hook_pattern": "money_regret",
+    "emotion": "frustration",
+    "target_audience": "KMU-Inhaber 5-50 Mitarbeiter",
+    "cta_suggestion": "Audit dein Marketing-Tool-Stack mit Spurig",
+    "ai_reference": "chatgpt",
+    "tracking_reference": "qr",
+    "tonality": "lehrreich",
+    "blog_format": "case"
+  },
+  { ... weitere 9 Ideen ... }
 ]
 
-Erlaubte hook_pattern-Werte: money_regret, discovery_insider, aha_moment, humor, vulnerability, transformation, curiosity_gap, other
+ERLAUBTE WERTE pro Feld:
+  hook_pattern: money_regret | discovery_insider | aha_moment | humor | vulnerability | transformation | curiosity_gap | other
+  emotion: joy | anger | curiosity | frustration | aha | schadenfreude | fomo | nostalgia | pride | confusion
+  ai_reference: chatgpt | claude | gemini | n8n | none | multiple (verwende "multiple" wenn 2+ Tools im Blog vorkommen sollen)
+  tracking_reference: qr | link | email | kurzlink | campaign | none | multiple
+  tonality: lehrreich | locker | provokant | story | aha | humor | unpopular_opinion
+  blog_format: story | guide | case | comparison | tutorial | opinion | experiment | behind_scenes | breakdown
+
+target_audience + cta_suggestion sind freier Text — konkret, kein Generikum.
+"Marketing-Manager" ist zu vag. "Marketing-Manager KMU 50-200 MA mit Print+Digital-Budget" ist gut.
 
 Dein erster ausgegebener Charakter MUSS "[" sein.
 Dein letzter ausgegebener Charakter MUSS "]" sein.
 
-Jetzt liefere die ${count} besten Ideen — mit korrekt gefüllten profession + hook_pattern Tags + erfüllter Quota.`;
+Jetzt liefere die ${count} besten Ideen — mit ALLEN 13 Feldern gefüllt + erfüllter Hook-Quota + Berufs-Diversity.`;
 
   // 8000 max_tokens gibt Buffer für 10-15 Ideen mit knappem Outline.
   // Bei tighten outline-cap (350 chars) ist eine Idee ca. 200-300 output-tokens.
@@ -1361,6 +1395,14 @@ export async function expandIdeaToBlog(idea: {
   forceMood?: DavidMood;
   /** Hook-Pattern aus Ideen-Generator. Wenn gesetzt → Opener-Typ wird im Bias-Block forciert. */
   hookPattern?: HookPattern;
+  /** Reicher Metadata-Layer (Phase 7) — falls aus DB geladen, forciert Tone/CTA/Format etc. */
+  emotion?: string | null;
+  targetAudience?: string | null;
+  ctaSuggestion?: string | null;
+  aiReference?: string | null;
+  trackingReference?: string | null;
+  tonality?: string | null;
+  blogFormat?: string | null;
 }): Promise<ExpandedBlog> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
@@ -1517,6 +1559,40 @@ Beispiele:
   "Vorher: 23 € pro Lead. Nachher: 4,80 €. Eine Änderung im Tracking-Setup."
   "Aus -1.200 € pro Monat wurden +8.400 €. Was wir entdeckt haben war beschämend einfach."
 
+──── Typ P: AI-Builder-Reveal (NEU 2026 — Branding-Pflicht) ────
+"ChatGPT/Claude/Gemini/n8n hat gerade etwas gemacht, das..." — konkretes
+Ergebnis aus dem AI-Maschinenraum. Macht David sofort als AI-Insider sichtbar.
+Beispiele:
+  "ChatGPT hat heute Morgen 14 Newsletter-Varianten geschrieben. Eine davon hat 4x mehr Klicks bekommen als alle anderen zusammen."
+  "Claude Code hat mir gezeigt, dass mein Tracking-Setup einen 3.400€-Bug hatte. In 12 Minuten gefunden, was Stripe-Support in 3 Tagen nicht gesehen hat."
+  "Gemini ist besser als ChatGPT bei einer einzigen Sache — und es ist nicht das was du denkst."
+  "Mit n8n habe ich plötzlich 27 Stunden pro Woche frei. Hier ist welcher Workflow das gemacht hat."
+
+──── Typ Q: AI-Experiment-Opener ────
+"Ich habe getestet was passiert wenn..." — empirischer Approach,
+nicht Theorie.
+Beispiele:
+  "Ich habe ChatGPT gefragt, was passieren würde wenn ich 1.247 alte Tracking-Links durch KI sortieren lasse. Die Antwort hat mich gestört."
+  "Ich habe 4 Wochen lang Claude Code vs ChatGPT bei der gleichen Aufgabe verglichen. Das Ergebnis war nicht was die LinkedIn-Gurus sagen."
+
+──── Typ R: Workflow-Breakdown ────
+Konkreter AI-Workflow als Eröffnung — Step-by-Step ohne Vorgeplänkel.
+Beispiele:
+  "n8n → ChatGPT → Spurig-API → Slack. Vier Schritte, 47 € Monatskosten, ersetzt einen 15h-Praktikanten-Job."
+  "RAG-System mit eigenen Daten. Claude als Reasoning-Engine. n8n als Orchestrator. So sieht moderne Marketing-Automation aus."
+
+──── Typ S: KI-Aha-Moment (Update mit Tool-Namen) ────
+Konkreter Aha-Trick mit explizitem Tool. Sofort umsetzbar.
+Beispiele:
+  "Diese eine Claude-Code-Funktion spart mir 3h pro Marketing-Report: 'analyze_csv_with_context'."
+  "Ein Gemini-Prompt mit System-Instructions hat meine Lead-Qualifizierung um 67% verbessert. Hier ist der genaue Text."
+
+──── Typ T: Unpopular Opinion (AI-bezogen) ────
+Klare Gegen-Mainstream-Position, mit konkretem Grund.
+Beispiele:
+  "Prompt-Engineering ist eine sterbende Skill. Was wirklich zählt, lernt niemand auf LinkedIn."
+  "KI-Agenten sind 2026 nicht das, was 90% der LinkedIn-Posts versprechen. Hier ist der wirkliche Stand."
+
 VERMEIDE als Default-Opener (HART-VERBOT — auto-reject):
   🚫 JEDE Form von Wochentag / Uhrzeit / Datum in den ersten 2 Sätzen
      ("Es war Dienstag", "Mittwoch 14:30", "Vor 3 Wochen Donnerstag")
@@ -1543,6 +1619,11 @@ PFLICHT-CHECK nach Zeile 1+2: Steht in den ersten 2 Sätzen mindestens EINS davo
   □ Eine konkrete Kostenfalle in Euro (Typ M)
   □ Ein konkreter KI-Aha-Moment ohne Hype (Typ N)
   □ Konkrete Vorher/Nachher-Zahlen (Typ O)
+  □ AI-Builder-Reveal mit konkretem Tool ChatGPT/Claude/Gemini/n8n (Typ P)
+  □ AI-Experiment-Opener "Ich habe getestet was passiert wenn..." (Typ Q)
+  □ Workflow-Breakdown mit konkreten Tools + Kosten (Typ R)
+  □ KI-Aha-Moment mit explizitem Tool + Praxisbezug (Typ S)
+  □ Unpopular Opinion über AI-Mainstream-Diskurs (Typ T)
 
 ZUSÄTZLICH-CHECK: Steht in den ersten 2 Sätzen IRGENDETWAS davon?
   □ Wochentag (Montag/Dienstag/...) → NEU SCHREIBEN
@@ -1605,6 +1686,18 @@ ${idea.hookPattern === 'humor' ? '  → ÖFFNE MIT ABSURDER SZENE (lustige Beoba
 ${idea.hookPattern === 'vulnerability' ? '  → ÖFFNE MIT EHRLICHEM FAIL-REVEAL. "Ich hab X verbockt — hier ist warum." Selbst-konkret.' : ''}
 ${idea.hookPattern === 'transformation' ? '  → ÖFFNE MIT VORHER-NACHHER. Konkrete Zahlen vorher + nachher in den ersten 2 Sätzen.' : ''}
 ${idea.hookPattern === 'curiosity_gap' ? '  → ÖFFNE MIT CURIOSITY-GAP. Info bewusst zurückhalten, Klick = einzige Auflösung.' : ''}
+` : ''}
+${(idea.emotion || idea.targetAudience || idea.aiReference || idea.trackingReference || idea.tonality || idea.blogFormat) ? `
+══════════════════════════════════════════════════════════════════════
+PHASE-7-METADATA — gezielte Draft-Anweisungen (überschreibt Default-Logik)
+══════════════════════════════════════════════════════════════════════
+${idea.emotion ? `🎭 EMOTION: "${idea.emotion}" — diese Emotion MUSS durch den ganzen Blog ziehen (nicht nur den Opener).` : ''}
+${idea.targetAudience ? `🎯 ZIELGRUPPE: "${idea.targetAudience}" — schreibe FÜR diese Person, nicht für alle. Konkrete Pain-Points dieser Persona.` : ''}
+${idea.tonality ? `🗣️ TONALITÄT: "${idea.tonality}" — Stilrichtung. Wenn "provokant" → starke Aussagen. Wenn "story" → narrativ. Wenn "unpopular_opinion" → klare Gegenposition zum Mainstream.` : ''}
+${idea.blogFormat ? `📐 FORMAT: "${idea.blogFormat}" — Struktur des Blogs. Wenn "experiment" → "Ich hab X getestet, hier sind die Daten". Wenn "comparison" → A vs B mit klarer Empfehlung. Wenn "behind_scenes" → Insider-Einblick.` : ''}
+${idea.aiReference && idea.aiReference !== 'none' ? `🤖 AI-BEZUG: ${idea.aiReference} muss konkret vorkommen — mit echtem Workflow-Beispiel, nicht nur Erwähnung. "${idea.aiReference === 'multiple' ? 'mehrere KI-Tools (z.B. ChatGPT + Claude + n8n)' : idea.aiReference}" als Anker im Text.` : ''}
+${idea.trackingReference && idea.trackingReference !== 'none' ? `📊 TRACKING-BEZUG: ${idea.trackingReference} (Spurig-Feature) wird natürlich erwähnt — als Werkzeug-im-Werkzeugkasten, nicht plump beworben.` : ''}
+${idea.ctaSuggestion ? `🔗 CTA: am Schluss organisch einbauen — "${idea.ctaSuggestion}". KEIN "Probier kostenlos jetzt!" sondern eingewoben.` : ''}
 ` : ''}
 `;
 

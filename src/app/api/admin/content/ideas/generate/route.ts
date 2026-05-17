@@ -335,6 +335,13 @@ export async function POST(request: NextRequest) {
     target_keywords: i.target_keywords ?? null,
     profession: i.profession?.trim().toLowerCase().slice(0, 40) ?? null,
     hook_pattern: i.hook_pattern ?? null,
+    emotion: i.emotion?.trim().toLowerCase().slice(0, 40) ?? null,
+    target_audience: i.target_audience?.trim().slice(0, 200) ?? null,
+    cta_suggestion: i.cta_suggestion?.trim().slice(0, 300) ?? null,
+    ai_reference: i.ai_reference?.trim().toLowerCase().slice(0, 40) ?? null,
+    tracking_reference: i.tracking_reference?.trim().toLowerCase().slice(0, 40) ?? null,
+    tonality: i.tonality?.trim().toLowerCase().slice(0, 40) ?? null,
+    blog_format: i.blog_format?.trim().toLowerCase().slice(0, 40) ?? null,
     status: 'backlog' as const,
   }));
 

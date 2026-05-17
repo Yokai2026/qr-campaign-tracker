@@ -80,7 +80,7 @@ export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
   founder_diary:
     'IM SCOPE: David-Erste-Person-Build-in-Public. PFLICHT: Ich-Form. Konkrete Mini-Szene aus David-Solopreneur-Alltag. Pricing-Wechsel, Features die niemand wollte, MRR-Updates mit frischen Zahlen, Vercel-Bill-Schmerz, Customer-Support-Peinlichkeiten, Cousin-fragt-was-machst-du, Burnout-Mikro-Momente, Sales-Call-Fails, Stack-Entscheidungen, KI-Workflow-Experimente. TOOL-BEZUG: organisch aus David-Sicht ("Ich hab das gerade in Spurig eingebaut"). NICHT IM SCOPE: allgemeine Marketing-Tipps, QR-Code-Design, Customer-Stories.',
   ai_marketing:
-    'IM SCOPE: KI im Marketing-Alltag — was wirklich Zeit spart vs Hype. ChatGPT/Claude/DeepL/Midjourney/Sora für Marketer. KI-Agenten die Aufgaben übernehmen (Newsletter-Variants, Bild-Crops, Social-Posts, Reports). n8n + Make.com Automation für KMU. Prompt-Engineering-Tipps für Marketing-Kontext. KI-Aha-Momente vs KI-Fails ("Ich dachte ChatGPT spart mir Zeit — bis ich gemerkt habe..."). Welche KI-Tools 2026 echtes Geld sparen. KI + Tracking = Closed-Loop (Spurig-Daten in KI-Analyse). TOOL-BEZUG NATÜRLICH: Spurig-API + Webhooks integrieren in n8n-Flows. NICHT IM SCOPE: reine Tech-Tutorials ohne Marketing-Bezug, AI-Coding-Themen.',
+    'IM SCOPE: KI im Marketing-Alltag — was wirklich Zeit spart vs Hype. **Kern-Tools 2026**: ChatGPT (Conversational/Multi-Modal), Claude Code (komplexe Tasks/Code/Analysen), Gemini (Datenanalyse/Web-Recherche), n8n (Self-Hosted AI-Agent-Plattform mit nativen Agent-Nodes, LangChain, RAG, Memory). Auch: DeepL, Midjourney, Sora für Localization + Visuals. KI-Agenten die Aufgaben übernehmen (Newsletter-Variants, Bild-Crops, Social-Posts, Reports). Prompt-Engineering-Best-Practices für Marketing-Kontext. KI-Aha-Momente vs KI-Fails ("Ich dachte ChatGPT spart mir Zeit — bis ich gemerkt habe..."). Welche KI-Tools 2026 echtes Geld sparen. KI + Tracking = Closed-Loop (Spurig-Daten in KI-Analyse). TOOL-BEZUG NATÜRLICH: Spurig-API + Webhooks integrieren in n8n-Flows. WICHTIG: n8n bevorzugen (self-host, EU-souverän, AI-first), Make.com nur sekundär oder bewusst kontrastieren (Make = visueller Einstieg, n8n = professional/scalable). NICHT IM SCOPE: reine Tech-Tutorials ohne Marketing-Bezug, AI-Coding-Themen.',
   email_shortlinks:
     'IM SCOPE: E-Mail-Marketing + Kurzlinks als Daten-Punkt. Newsletter-Klick-Tracking, Open-Rate-Reality (Gmail-Proxy-Problem, Apple-MPP), Subject-Line-A/B-Tests, Personalisierung, Cold-Email-Compliance, Kurzlink-Design (spurig.com/x vs bitly), Vanity-URLs, QR + Link + Mail als 3-Kanal-Setup, Drip-Sequences ohne 1.000€/Monat-Mautic, Bounce-Management, DOI-Reality. TOOL-BEZUG NATÜRLICH: Spurig-E-Mail-Tracking inkl. Klick-Forensik, Spurig-Kurzlinks mit eigener Domain. "Ein Kurzlink ist nicht nur kürzer, sondern messbarer." NICHT IM SCOPE: reine Email-Design-Tipps, Mail-Provider-Vergleiche ohne Tracking-Bezug.',
   creator_design:
@@ -127,10 +127,12 @@ export const CLUSTER_NICHE_INDUSTRIES: Record<ContentCluster, string[]> = {
     'DACH-SaaS', 'No-VC-Founder',
   ],
   ai_marketing: [
-    'Marketing-Manager mit ChatGPT-Workflow', 'Solo-Marketer der n8n nutzt',
-    'Agentur die KI-Agenten einsetzt', 'Newsletter-Schreiberin mit Claude',
-    'KMU-Inhaber der Reports von KI generieren lässt', 'Performance-Marketer',
-    'Content-Creator mit Sora/Midjourney', 'B2B-SaaS-Founder mit KI-Stack',
+    'Marketing-Manager mit ChatGPT-Workflow', 'Solopreneur mit n8n-Self-Host-Setup',
+    'Agentur die KI-Agenten einsetzt', 'Newsletter-Schreiberin mit Claude Code',
+    'KMU-Inhaber der Reports von Gemini generieren lässt', 'Performance-Marketer',
+    'Content-Creator mit Sora/Midjourney', 'B2B-SaaS-Founder mit n8n-AI-Agent-Stack',
+    'Builder der ChatGPT + Claude Code + Gemini parallel nutzt',
+    'AI-Workflow-Designer (LangChain/RAG/Memory)', 'Indie-Hacker mit DIY-Automatisierung',
   ],
   email_shortlinks: [
     'Newsletter-Betreiber 1k-50k Abos', 'Cold-Outreach-Solopreneur',
