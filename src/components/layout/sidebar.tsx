@@ -11,6 +11,7 @@ import {
   MapPin,
   QrCode,
   Link2,
+  Mail,
   BarChart3,
   Settings,
   LogOut,
@@ -194,6 +195,22 @@ export function Sidebar() {
         {mainNav.map((item) => (
           <NavItem key={item.href} item={item} />
         ))}
+        {isAdmin && (
+          <Link
+            href="/mail"
+            onClick={() => setMobileOpen(false)}
+            className={cn(
+              'group flex items-center gap-2.5 rounded-[6px] px-2 py-[7px] text-[13px] transition-colors duration-100',
+              pathname === '/mail' || pathname.startsWith('/mail/')
+                ? 'bg-white/[0.07] text-white font-medium border-l-2 border-brand pl-[6px]'
+                : 'text-white/60 hover:bg-white/[0.05] hover:text-white/90',
+            )}
+          >
+            <Mail className={cn('h-[15px] w-[15px] shrink-0', pathname.startsWith('/mail') ? 'text-brand' : 'text-white/45 group-hover:text-white/70')} />
+            <span>Mail-Tracking</span>
+            <span className="ml-auto rounded-full bg-amber-500/20 px-1.5 py-px text-[9px] font-medium text-amber-300">BETA</span>
+          </Link>
+        )}
         {isAdmin && (
           <>
             <div className="my-2 border-t border-white/[0.06]" />
