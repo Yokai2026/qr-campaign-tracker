@@ -1,18 +1,28 @@
 /**
- * Content-Pillars für Spurig — REDESIGN 2026.
+ * Content-Pillars für Spurig — REDESIGN 2026 (V2 mit 10 Pillars).
  *
- * 6 Pillars die für Social-Media-Virality + B2B-SaaS-Authority gleichermassen
- * funktionieren. Jedes Pillar deckt eine andere "Mood" ab:
+ * Spurig = Multi-Channel-Tracking-Tool: QR-Codes + Links + Kurzlinks + E-Mail-
+ * Tracking + Kampagnen. Die Pillars decken die volle Bandbreite ab — von
+ * Marketing-Alltag bis KI-Hype, von Designer-Themen bis B2B-Business-Hacks.
  *
- *   qr_realtalk     — Entertainment + Aha-Moment ("Alltagsbeobachtung")
- *   print_lebt      — Contrarian + Data ("gegen den Digital-Hype")
- *   compliance_lite — Educational + Schadenfreude ("DSGVO ohne Anwaltsdeutsch")
- *   mittelstand     — Community + Customer-Spotlight ("echte DACH-SMB-Stories")
- *   tracking_tricks — Tactical + Hidden-Hack ("Methoden, die niemand kennt")
- *   founder_diary   — Vulnerability + Build-in-Public ("Solopreneur-Realität")
+ * 6 ursprüngliche Pillars (Authority + Storytelling):
+ *   qr_realtalk        - Alltagsbeobachtungen rund um QR-Codes
+ *   print_lebt         - Offline-Marketing-ROI (DOOH, Plakat, Direktmail)
+ *   compliance_lite    - DSGVO + EU-Datenschutz ohne Juristendeutsch
+ *   mittelstand        - Customer-Spotlights aus DACH-Mittelstand
+ *   tracking_tricks    - Hidden Tracking-Methoden für Praktiker
+ *   founder_diary      - David-First-Person-Build-in-Public
  *
- * Ziel: Leser:innen sollen sich in den Blog VERLIEBEN — nicht nur lesen.
- * Mischung aus Entertainment + Education + Authenticity.
+ * 4 neue Pillars (Reichweite + Vielfalt):
+ *   ai_marketing       - KI im Marketing, KI-Agenten, Automatisierung
+ *   email_shortlinks   - E-Mail-Tracking + Kurzlinks + Newsletter
+ *   creator_design     - Designer + Creator + Visual-Marketing
+ *   everyday_marketing - Marketing-Alltag, Business-Hacks, Vorher/Nachher,
+ *                        "Was viele falsch machen", "So sparst du Zeit/Geld"
+ *
+ * Tonalität durchgehend: locker, direkt, ehrlich, leicht humorvoll, marketing-
+ * erfahren, neugierig auf KI. NICHT botmäßig. NICHT werblich. Tool wird
+ * organisch eingewoben, nicht plump beworben.
  */
 
 export type ContentCluster =
@@ -21,7 +31,11 @@ export type ContentCluster =
   | 'compliance_lite'
   | 'mittelstand'
   | 'tracking_tricks'
-  | 'founder_diary';
+  | 'founder_diary'
+  | 'ai_marketing'
+  | 'email_shortlinks'
+  | 'creator_design'
+  | 'everyday_marketing';
 
 export const CLUSTERS: ContentCluster[] = [
   'qr_realtalk',
@@ -30,6 +44,10 @@ export const CLUSTERS: ContentCluster[] = [
   'mittelstand',
   'tracking_tricks',
   'founder_diary',
+  'ai_marketing',
+  'email_shortlinks',
+  'creator_design',
+  'everyday_marketing',
 ];
 
 export const CLUSTER_LABEL: Record<ContentCluster, string> = {
@@ -39,26 +57,38 @@ export const CLUSTER_LABEL: Record<ContentCluster, string> = {
   mittelstand: 'Mittelstand-Stories',
   tracking_tricks: 'Tracking-Tricks',
   founder_diary: 'Founder-Tagebuch',
+  ai_marketing: 'KI & Automatisierung',
+  email_shortlinks: 'E-Mail & Kurzlinks',
+  creator_design: 'Designer & Creator',
+  everyday_marketing: 'Marketing-Alltag',
 };
 
 export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
   qr_realtalk:
-    'IM SCOPE: QR-Code-Stories aus dem DACH-Alltag — Bratwurst, Hochzeitseinladung, Apotheke, Bestattungsinstitut, Hostel-WLAN, Pizza, Friedhof, Tankstelle. Eye-Tracking-Studien zu QR-Größe und Position, Scan-Verhalten verschiedener Smartphones, Print-Material-Wahrheiten (Glanzpapier vs Matt, Regen, Sonnenlicht), QR-Design-Anti-Patterns, Psychologie des Scannens. NICHT IM SCOPE: Bitly-Pricing, Print-ROI-Statistiken, DSGVO-Verträge, Founder-Diary-Inhalte — dafür sind andere Pillars zuständig.',
+    'IM SCOPE: QR-Code-Stories aus dem DACH-Alltag — Bratwurst, Hochzeitseinladung, Apotheke, Bestattungsinstitut, Hostel-WLAN, Pizza, Friedhof, Tankstelle. Eye-Tracking-Studien zu QR-Größe und Position, Scan-Verhalten verschiedener Smartphones, Print-Material-Wahrheiten (Glanzpapier vs Matt, Regen, Sonnenlicht), QR-Design-Anti-Patterns, Psychologie des Scannens. TOOL-BEZUG NATÜRLICH: Spurig trackt jeden Scan + Position + Gerät — "ein QR-Code ist nicht nur ein Bild, sondern ein Einstiegspunkt in Daten". NICHT IM SCOPE: Bitly-Pricing, reine Print-ROI-Statistiken, DSGVO-Verträge.',
   print_lebt:
-    'IM SCOPE: Print/Offline-Marketing-ROI mit konkreten DACH-Zahlen. Plakat-Standorte, Flyer-Aktionen, Postkarten, Visitenkarten, Direktmailing, Litfaßsäulen, U-Bahn-Werbung, Bus-Wartehäuschen, Tisch-Aufsteller. Print-vs-Digital-Vergleiche. Studien aus Hamburg/Düsseldorf/Wien. Pro-Print-Argumente UND ehrliche Anti-Print. NICHT IM SCOPE: konkrete QR-Code-Design-Tipps (→ qr_realtalk), DSGVO-Fragen (→ compliance_lite), Tracking-Methoden (→ tracking_tricks).',
+    'IM SCOPE: Print/Offline-Marketing-ROI mit konkreten DACH-Zahlen. Plakate, Flyer, Postkarten, Visitenkarten, Direktmailing, Litfaßsäulen, U-Bahn-Werbung, Bus-Wartehäuschen, Tisch-Aufsteller, Eventstände. Studien aus Hamburg/Düsseldorf/Wien. Pro-Print UND ehrliche Anti-Print-Argumente. TOOL-BEZUG NATÜRLICH: Print + Spurig-QR-/Kurzlink = messbar — "wenn du nicht misst, rätst du". NICHT IM SCOPE: konkrete QR-Code-Design-Tipps (→ qr_realtalk), DSGVO-Fragen (→ compliance_lite).',
   compliance_lite:
-    'IM SCOPE: DSGVO + EU-Datenschutz für Nicht-Juristen. AVV-Verträge, Schrems II 2026, US-Cloud-Tools im Check (Cloudflare, GA4, Hotjar, Calendly, Mailchimp, Slack, Notion). Aktuelle Bußgeld-Cases aus DACH-Aufsichtsbehörden. EU-AI-Act-Fakten. Cookie-Banner-Reality. Datenschutz-Audit-Anekdoten. Schwiegermutter-DSGVO-Email-Comedy. NICHT IM SCOPE: Print-Marketing-ROI (→ print_lebt), QR-Code-Design (→ qr_realtalk), Founder-Mein-Steuerberater-Geschichten (→ founder_diary).',
+    'IM SCOPE: DSGVO + EU-Datenschutz für Nicht-Juristen. AVV-Verträge, Schrems II 2026, US-Cloud-Tools im Check (Cloudflare, GA4, Hotjar, Calendly, Mailchimp, Slack, Notion). Aktuelle Bußgeld-Cases aus DACH-Aufsichtsbehörden. EU-AI-Act-Fakten. Cookie-Banner-Reality. Datenschutz-Audit-Anekdoten. TOOL-BEZUG NATÜRLICH: Spurig = EU-hosted, DSGVO-baseline, kein US-Cloud. NICHT IM SCOPE: Print-Marketing-ROI, QR-Code-Design, Founder-Stories.',
   mittelstand:
-    'IM SCOPE: Customer-Spotlights aus DACH-Mittelstand. KONKRETE Personen + Branche + Stadt: Friseur Leipzig, Schreinerei Bayerischer Wald, Optikerin Wien, Tierarzt Zürich, Apotheker Hannover, Yoga-Studio Köln, Tattoo-Studio Berlin, Foodtruck München, Brauerei Franken, Imkerei Schwarzwald. Wie sie Marketing machen, wo es scheitert, was klappt. JEDE Idee MUSS eine konkrete Branche+Stadt-Kombo enthalten. NICHT IM SCOPE: David-Founder-Stories (→ founder_diary), abstrakte Marketing-Tipps, Bitly/Tool-Comparisons.',
+    'IM SCOPE: Customer-Spotlights aus DACH-Mittelstand. KONKRETE Personen + Branche + Stadt: Friseur Leipzig, Schreinerei Bayerischer Wald, Optikerin Wien, Tierarzt Zürich, Apotheker Hannover, Yoga-Studio Köln, Tattoo-Studio Berlin, Foodtruck München, Brauerei Franken, Imkerei Schwarzwald. Wie sie Marketing machen, wo es scheitert, was klappt. JEDE Idee MUSS eine konkrete Branche+Stadt-Kombo enthalten. TOOL-BEZUG NATÜRLICH: KMU nutzt Spurig für QR-/Link-/Mail-Tracking ohne Bitly-Enterprise-Pricing. NICHT IM SCOPE: David-Founder-Stories.',
   tracking_tricks:
-    'IM SCOPE: Hidden Tracking-Methoden für Praktiker. 1 QR pro Tag statt pro Kampagne, UTM-Schema-Hacks, Multi-Touch-Attribution einfach, Cookie-less Tracking 2026, Server-Side-Pixel-Setup, Offline-Online-Bridge, Heatmap-Tricks, Newsletter-Klick-Forensik, Conversion-Pfad-Detektivarbeit. JEDE Idee = ein konkreter umsetzbarer Trick. NICHT IM SCOPE: persönliche Founder-Geschichten (→ founder_diary), Customer-Spotlights (→ mittelstand), reine DSGVO-Fragen (→ compliance_lite).',
+    'IM SCOPE: Hidden Tracking-Methoden für Praktiker. UTM-Schema-Hacks, Multi-Touch-Attribution einfach, Cookie-less Tracking 2026, Server-Side-Pixel-Setup, Offline-Online-Bridge, Heatmap-Tricks, Newsletter-Klick-Forensik, Conversion-Pfad-Detektivarbeit. Spurig-Features als praktische Anwendung. JEDE Idee = ein konkreter umsetzbarer Trick. TOOL-BEZUG NATÜRLICH: "Tracking macht aus Bauchgefühl bessere Entscheidungen" — Spurig zeigt jeden Scan/Klick/Open ohne Cookie-Banner-Drama. NICHT IM SCOPE: Founder-Stories, Customer-Spotlights.',
   founder_diary:
-    'IM SCOPE: David-Erste-Person-Build-in-Public. PFLICHT: Ich-Form. Konkrete Mini-Szene aus David-Solopreneur-Alltag. Pricing-Wechsel, Features die niemand wollte, MRR-Updates mit frischen Zahlen, Vercel-Bill-Schmerz, Customer-Support-Peinlichkeiten, Cousin-fragt-was-machst-du, Burnout-Mikro-Momente, Sales-Call-Fails, Konkurrenz-Beobachtungen, Stack-Entscheidungen. NICHT IM SCOPE: allgemeine Marketing-Tipps, QR-Code-Design, Print-Statistiken, Customer-Stories (→ mittelstand). Alles ANDERE als persönliche David-Story = falscher Pillar.',
+    'IM SCOPE: David-Erste-Person-Build-in-Public. PFLICHT: Ich-Form. Konkrete Mini-Szene aus David-Solopreneur-Alltag. Pricing-Wechsel, Features die niemand wollte, MRR-Updates mit frischen Zahlen, Vercel-Bill-Schmerz, Customer-Support-Peinlichkeiten, Cousin-fragt-was-machst-du, Burnout-Mikro-Momente, Sales-Call-Fails, Stack-Entscheidungen, KI-Workflow-Experimente. TOOL-BEZUG: organisch aus David-Sicht ("Ich hab das gerade in Spurig eingebaut"). NICHT IM SCOPE: allgemeine Marketing-Tipps, QR-Code-Design, Customer-Stories.',
+  ai_marketing:
+    'IM SCOPE: KI im Marketing-Alltag — was wirklich Zeit spart vs Hype. ChatGPT/Claude/DeepL/Midjourney/Sora für Marketer. KI-Agenten die Aufgaben übernehmen (Newsletter-Variants, Bild-Crops, Social-Posts, Reports). n8n + Make.com Automation für KMU. Prompt-Engineering-Tipps für Marketing-Kontext. KI-Aha-Momente vs KI-Fails ("Ich dachte ChatGPT spart mir Zeit — bis ich gemerkt habe..."). Welche KI-Tools 2026 echtes Geld sparen. KI + Tracking = Closed-Loop (Spurig-Daten in KI-Analyse). TOOL-BEZUG NATÜRLICH: Spurig-API + Webhooks integrieren in n8n-Flows. NICHT IM SCOPE: reine Tech-Tutorials ohne Marketing-Bezug, AI-Coding-Themen.',
+  email_shortlinks:
+    'IM SCOPE: E-Mail-Marketing + Kurzlinks als Daten-Punkt. Newsletter-Klick-Tracking, Open-Rate-Reality (Gmail-Proxy-Problem, Apple-MPP), Subject-Line-A/B-Tests, Personalisierung, Cold-Email-Compliance, Kurzlink-Design (spurig.com/x vs bitly), Vanity-URLs, QR + Link + Mail als 3-Kanal-Setup, Drip-Sequences ohne 1.000€/Monat-Mautic, Bounce-Management, DOI-Reality. TOOL-BEZUG NATÜRLICH: Spurig-E-Mail-Tracking inkl. Klick-Forensik, Spurig-Kurzlinks mit eigener Domain. "Ein Kurzlink ist nicht nur kürzer, sondern messbarer." NICHT IM SCOPE: reine Email-Design-Tipps, Mail-Provider-Vergleiche ohne Tracking-Bezug.',
+  creator_design:
+    'IM SCOPE: Designer + Creator + Visual-Marketing. Wie Designer für Kampagnen-Assets denken — was tatsächlich tracked, was nicht. Branding-Konsistenz auf Print + Digital. Asset-Bau für Multi-Channel-Tests. Figma/Canva/Adobe-Workflow für KMU. Typografie auf Print + QR-Code-Design. Farbpsychologie auf Plakaten. Creator-Economy für DACH (Newsletter-Sponsorships, Affiliate-Tracking). Asset-Performance messen statt raten. TOOL-BEZUG NATÜRLICH: Designer baut visuell perfekten Flyer + Spurig misst was funktioniert. NICHT IM SCOPE: reine Tutorial-Themen wie "Wie nutze ich Figma".',
+  everyday_marketing:
+    'IM SCOPE: Marketing-Alltag, Business-Hacks, "Was viele falsch machen", "So sparst du Zeit/Geld", Vorher/Nachher-Cases, kleine Aha-Tricks, Kostenfallen, Tool-Audit-Geschichten, Setup-Hacks die 80% der KMU nicht kennen. Echte Mehrwert-Beiträge für Unternehmer + Marketer. Wie aus Misserfolg + Tracking ein Plus wurde. Konkrete Aufwand/Nutzen-Vergleiche. TOOL-BEZUG NATÜRLICH: Spurig spart 200€/Monat gegenüber Bitly Enterprise + ist messbar. "Tracking macht aus Bauchgefühl bessere Entscheidungen." NICHT IM SCOPE: Branche-spezifische Customer-Stories (→ mittelstand), reine David-Founder-Erlebnisse (→ founder_diary).',
 };
 
 /**
- * Pro Pillar empfohlene Niche-Industries (für Idea-Generierung).
- * AI rotiert zwischen diesen Branchen → mehr Diversität, weniger Print-Trampelpfad.
+ * Pro Pillar empfohlene Niche-Industries / Persona / Settings (für Idea-
+ * Generierung). AI rotiert zwischen diesen → mehr Diversität.
  */
 export const CLUSTER_NICHE_INDUSTRIES: Record<ContentCluster, string[]> = {
   qr_realtalk: [
@@ -90,5 +120,29 @@ export const CLUSTER_NICHE_INDUSTRIES: Record<ContentCluster, string[]> = {
   founder_diary: [
     'Solo-Founder', 'Indie-Hacker', 'Bootstrapper', 'Build-in-Public',
     'DACH-SaaS', 'No-VC-Founder',
+  ],
+  ai_marketing: [
+    'Marketing-Manager mit ChatGPT-Workflow', 'Solo-Marketer der n8n nutzt',
+    'Agentur die KI-Agenten einsetzt', 'Newsletter-Schreiberin mit Claude',
+    'KMU-Inhaber der Reports von KI generieren lässt', 'Performance-Marketer',
+    'Content-Creator mit Sora/Midjourney', 'B2B-SaaS-Founder mit KI-Stack',
+  ],
+  email_shortlinks: [
+    'Newsletter-Betreiber 1k-50k Abos', 'Cold-Outreach-Solopreneur',
+    'B2B-Sales-Team', 'E-Commerce-Newsletter', 'Affiliate-Marketer mit Vanity-Domain',
+    'Community-Manager mit Drip-Funnels', 'SaaS-Lifecycle-Email-Owner',
+    'Podcast-Host mit Newsletter',
+  ],
+  creator_design: [
+    'Freelance-Designerin', 'In-House-Designer KMU', 'Branding-Agentur',
+    'Print-Designer aus Hamburg', 'Canva-Power-User', 'Figma-Designerin',
+    'Newsletter-Designer', 'UGC-Creator', 'YouTuber DACH 10k-100k Abos',
+    'Indie-Podcaster',
+  ],
+  everyday_marketing: [
+    'Solo-Marketer', 'Marketing-Manager KMU 5-50 Mitarbeiter',
+    'Inhaber Handwerksbetrieb', 'E-Commerce-Owner 10k-500k Umsatz',
+    'Gastronom mit Marketing-Budget', 'Eventbüro', 'Coach mit Online-Programm',
+    'Vertriebs-Leiter', 'Marketing-Praktikant in der Agentur',
   ],
 };

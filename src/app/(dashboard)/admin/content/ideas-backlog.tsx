@@ -6,7 +6,17 @@ import { Sparkles, Loader2, BookText, X, CheckSquare, Square } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
-type Cluster = 'qr_realtalk' | 'print_lebt' | 'compliance_lite' | 'mittelstand' | 'tracking_tricks' | 'founder_diary';
+type Cluster =
+  | 'qr_realtalk'
+  | 'print_lebt'
+  | 'compliance_lite'
+  | 'mittelstand'
+  | 'tracking_tricks'
+  | 'founder_diary'
+  | 'ai_marketing'
+  | 'email_shortlinks'
+  | 'creator_design'
+  | 'everyday_marketing';
 
 const CLUSTER_LABEL: Record<Cluster, string> = {
   qr_realtalk: 'QR-Realtalk',
@@ -15,18 +25,37 @@ const CLUSTER_LABEL: Record<Cluster, string> = {
   mittelstand: 'Mittelstand-Stories',
   tracking_tricks: 'Tracking-Tricks',
   founder_diary: 'Founder-Tagebuch',
+  ai_marketing: 'KI & Automatisierung',
+  email_shortlinks: 'E-Mail & Kurzlinks',
+  creator_design: 'Designer & Creator',
+  everyday_marketing: 'Marketing-Alltag',
 };
 
 const CLUSTER_COLOR: Record<Cluster, string> = {
-  qr_realtalk: '#a855f7',     // violett — playful entertainment
-  print_lebt: '#f59e0b',      // amber — Print/Paper-Feeling
-  compliance_lite: '#22d3ee', // cyan — clean educational
-  mittelstand: '#10b981',     // emerald — community/customer
-  tracking_tricks: '#ec4899', // pink — tactical hidden hacks
-  founder_diary: '#fb7185',   // rose — honest/vulnerable
+  qr_realtalk: '#a855f7',        // violett — playful entertainment
+  print_lebt: '#f59e0b',         // amber — Print/Paper-Feeling
+  compliance_lite: '#22d3ee',    // cyan — clean educational
+  mittelstand: '#10b981',        // emerald — community/customer
+  tracking_tricks: '#ec4899',    // pink — tactical hidden hacks
+  founder_diary: '#fb7185',      // rose — honest/vulnerable
+  ai_marketing: '#6366f1',       // indigo — KI/Automation
+  email_shortlinks: '#0ea5e9',   // sky — communication
+  creator_design: '#f97316',     // orange — creative
+  everyday_marketing: '#84cc16', // lime — everyday/practical
 };
 
-const ALL_CLUSTERS: Cluster[] = ['qr_realtalk', 'print_lebt', 'compliance_lite', 'mittelstand', 'tracking_tricks', 'founder_diary'];
+const ALL_CLUSTERS: Cluster[] = [
+  'qr_realtalk',
+  'print_lebt',
+  'compliance_lite',
+  'mittelstand',
+  'tracking_tricks',
+  'founder_diary',
+  'ai_marketing',
+  'email_shortlinks',
+  'creator_design',
+  'everyday_marketing',
+];
 
 type Idea = {
   id: string;

@@ -843,6 +843,18 @@ ANTI-WIEDERHOLUNG (zusätzlich):
   - Wenn Pillar "Founder-Tagebuch" (founder_diary): variiere — MRR-Reveal / Pricing-Wechsel /
     Customer-Support-Peinlichkeit / gescheitertes Feature / Vercel-Bill / Cousin-versteht-
     nicht / Sales-Call-Fail / Burnout / Konkurrenz-Beobachtung / Cold-Mail-Reply
+  - Wenn Pillar "KI & Automatisierung" (ai_marketing): variiere — ChatGPT/Claude/DeepL/
+    Midjourney/Sora-Workflow / KI-Agent-Setup / n8n + Make.com / Prompt-Engineering /
+    KI-Hype-Realität / KI-spart-tatsächlich-Zeit / KI-Fails / Tracking-Daten in KI-Analyse
+  - Wenn Pillar "E-Mail & Kurzlinks" (email_shortlinks): variiere — Open-Rate-Reality /
+    Subject-Line-A/B / Gmail-Proxy / Apple-MPP / Cold-Email-Compliance / Newsletter-
+    Klick-Forensik / Kurzlink-Vanity-URL / Bounce-Management / DOI / Drip-Sequences
+  - Wenn Pillar "Designer & Creator" (creator_design): variiere — Figma-/Canva-Workflow /
+    Brand-Konsistenz Print+Digital / Asset-Performance / Typografie auf QR-Codes /
+    Farbpsychologie / Creator-Economy DACH / Newsletter-Sponsoring / UGC-Strategien
+  - Wenn Pillar "Marketing-Alltag" (everyday_marketing): variiere — "Was viele falsch
+    machen" / Tool-Audit / Vorher-Nachher / Kostenfallen / Setup-Hack / Zeit-Sparen-
+    Trick / Aus-Minus-Plus-Story / Aufwand-Nutzen-Vergleich / Anti-Mainstream-Marketing
 
 ----------------------------------------
 HOOK-FIRST-WORDS-TEST (Pflicht pro Idee)
@@ -1443,6 +1455,61 @@ Vorher-Stand + Nachher-Stand in 2-3 Sätzen, mit Brücken-Andeutung.
 Beispiele:
   "Vor 3 Monaten: 18h Excel pro Woche. Heute: 47 Minuten. Eine einzige Änderung."
 
+──── Typ G: Provokante Frage (User-Spec) ────
+Eine Frage die kein hypothetisches "Stell dir vor" ist, sondern eine echte
+Provokation, die der Leser sofort beantworten WILL.
+Beispiele:
+  "Warum verbrennen 8 von 10 KMU ihr Marketing-Budget — und merken es nicht?"
+  "Würdest du eine Plakat-Aktion für 9.600 € starten, ohne zu wissen ob jemand sie sieht?"
+
+──── Typ H: Alltagsszene mit Pointe ────
+Konkrete Szene aus dem Marketing-Alltag, 2-3 Sätze, kleine Wendung.
+Beispiele:
+  "Ein Kunde rief gestern an. 'Wir haben 14 Flyer-Aktionen gemacht.' Pause. 'Ich weiß nicht mehr welche funktioniert haben.'"
+  "Mein Praktikant hat heute angefangen. Erste Aufgabe: unsere Marketing-Tools auflisten. Es waren 23."
+
+──── Typ I: Ehrliche Meinung ────
+"Ich finde X — und ich weiß dass das unpopulär ist." Klare Position.
+Beispiele:
+  "Ich glaube nicht an Open-Rate-Tracking. Es lügt. Hier ist warum ich trotzdem messe."
+  "ChatGPT als Marketing-Tool ist überschätzt. Was wirklich Zeit spart, ist langweiliger."
+
+──── Typ J: "Kennst du das?"-Einstieg (echt, nicht floskelhaft) ────
+SOFORT-konkrete Anschluss-Szene nach der Frage. NICHT "Kennen wir nicht alle...".
+Beispiele:
+  "Kennst du diesen Moment, wo du in den Stripe-Dashboard guckst und es einfach nicht aufgeht? Ich hatte ihn gestern um halb sechs."
+  "Du kennst das: Eine Mail an 200 Leute raus. Drei Klicks. Aber DEINE Antwort-Mail kam zweimal zurück."
+
+──── Typ K: Lustiger Vergleich / Absurder Mini-Vergleich ────
+Absurde Analogie aus dem Alltag, dann Auflösung.
+Beispiele:
+  "Tracking ohne Tool ist wie Diät machen ohne Waage. Du fühlst was, weißt aber nichts."
+  "Marketing-Reports lesen ist wie Asterix-Comics ohne Bilder. Du verstehst die Wörter — aber nichts ergibt Sinn."
+
+──── Typ L: "Ich dachte früher X — aber heute Y" ────
+Selbstreflexion + Mindset-Shift mit konkretem Trigger.
+Beispiele:
+  "Ich dachte früher, Open-Rate ist die wichtigste Mail-Metrik. Heute weiß ich: sie lügt zu 60%. Hier ist was ich messe stattdessen."
+  "Bis April 2026 hab ich gegen KI-Agenten gewettert. Heute lass ich n8n meine Newsletter-Drafts schreiben. Was sich geändert hat."
+
+──── Typ M: Kostenfalle ────
+Konkrete Geld-Falle die viele übersehen, in den ersten 2 Sätzen exponiert.
+Beispiele:
+  "Stripe rechnet 1,50 € pro fehlgeschlagener Lastschrift. Wir hatten 38 im Mai."
+  "Ein Mailchimp-Account mit 5.000 Kontakten kostet 99 €/Monat. Davon nutzt der Durchschnitts-Kunde 12% der Features."
+
+──── Typ N: KI-Aha-Moment ────
+Konkreter KI-Trick + Praxisbezug, kein Hype-Talk.
+Beispiele:
+  "Claude hat mir gestern einen Vertrags-Fehler gefunden, den mein Anwalt übersehen hatte. Drei Minuten. Kostenlos."
+  "Mein n8n-Workflow hat 47 Stunden Newsletter-Recherche in 4 Wochen automatisiert. Hier ist der Setup."
+
+──── Typ O: Vorher/Nachher mit Zahlen ────
+Mini-Case mit klaren Vorher/Nachher-Zahlen in den ersten 2 Sätzen.
+Beispiele:
+  "Vorher: 23 € pro Lead. Nachher: 4,80 €. Eine Änderung im Tracking-Setup."
+  "Aus -1.200 € pro Monat wurden +8.400 €. Was wir entdeckt haben war beschämend einfach."
+
 VERMEIDE als Default-Opener (HART-VERBOT — auto-reject):
   🚫 JEDE Form von Wochentag / Uhrzeit / Datum in den ersten 2 Sätzen
      ("Es war Dienstag", "Mittwoch 14:30", "Vor 3 Wochen Donnerstag")
@@ -1461,6 +1528,14 @@ PFLICHT-CHECK nach Zeile 1+2: Steht in den ersten 2 Sätzen mindestens EINS davo
   □ Ein konkreter Mini-Dialog (in Anführungszeichen)
   □ Eine Contrarian-Provokation (klares "Nein, falsch.")
   □ Eine Before-After-Brücke (vorher X / heute Y / Bridge angedeutet)
+  □ Eine echte provokante Frage (Typ G — keine Floskel-Frage)
+  □ Eine Alltagsszene mit Pointe (Typ H — konkrete Szene, kleine Wendung)
+  □ Eine ehrliche persönliche Meinung (Typ I — "Ich glaube X")
+  □ Ein lustiger absurder Vergleich (Typ K — "ist wie X, nur dass Y")
+  □ Ein "Ich dachte früher X — heute Y" mit konkretem Trigger (Typ L)
+  □ Eine konkrete Kostenfalle in Euro (Typ M)
+  □ Ein konkreter KI-Aha-Moment ohne Hype (Typ N)
+  □ Konkrete Vorher/Nachher-Zahlen (Typ O)
 
 ZUSÄTZLICH-CHECK: Steht in den ersten 2 Sätzen IRGENDETWAS davon?
   □ Wochentag (Montag/Dienstag/...) → NEU SCHREIBEN
@@ -2193,9 +2268,34 @@ PILLAR → KONZEPT-PFLICHT (K1 fast immer verboten)
                    physisch als Wollfaden) ODER K6 (Datenstrom als physisches Objekt)
 
 - Founder-Tagebuch (founder_diary):
-                   K7 (High-emotion: Founder am Küchentisch 23:14, kalter Espresso)
+                   K7 (High-emotion: Founder am Küchentisch, kalter Espresso)
                    K1 erlaubt — mit konkretem Wow-Detail (z.B. roter Stripe-Dashboard
                    im Hintergrund, gelbe Post-its auf dem Bildschirm)
+
+- KI & Automatisierung (ai_marketing):
+                   K4 (Split-Screen: Mensch-Workflow chaotisch / KI-Workflow sauber)
+                   ODER K6 (Daten-Visualisierung als physisches Objekt — z.B. Worflow-
+                   Diagramm als origami-gefaltetes Papier, Prompt-Text als Spaghetti)
+                   ODER K3 (KI-Tool-Icons in absurder Umgebung — ChatGPT-Logo auf
+                   Bratwurst-Verkaufsstand, Claude-Sticker auf Aktenkoffer)
+
+- E-Mail & Kurzlinks (email_shortlinks):
+                   K5 (Macro: Email-Icon mit Datenspur, Briefumschlag mit Tracking-
+                   Visualisierung) ODER K3 (Email physisch — Brief in Glasflasche im
+                   Meer für "Cold-Outreach Erfolg unklar", Newsletter als Origami)
+                   ODER K6 (Open-Rate als physische Skala / Wassermesser)
+
+- Designer & Creator (creator_design):
+                   K7 (Designer:in in Aktion am Schreibtisch, mit konkretem Design-
+                   Element auf dem Schirm) ODER K1 (mit konkretem Wow-Detail wie
+                   Farbpaletten an der Wand) ODER K5 (Macro auf konkretes Design-
+                   Detail wie Typografie auf Plakat, Logo-Konstruktion)
+
+- Marketing-Alltag (everyday_marketing):
+                   K2 (Money-Destruction für Kostenfallen-Themen) ODER K4 (Split-
+                   Screen Vorher/Nachher für "Aus Minus Plus"-Stories) ODER K3
+                   (Tool-Stack als absurde Sammlung — z.B. 23 Marketing-Tool-Icons
+                   wie Werkzeug-Pegboard hängend)
 
 K1 (Human-Reaction-Closeup) ist die LETZTE Option. Wenn du sie waehlst, MUSS
 das Bild ein massives Wow-Detail haben (z.B. ein einzelner brennender Geldschein

@@ -56,12 +56,37 @@ Wenn ein einziger Absatz das nicht auslöst — UMSCHREIBEN.
 ----------------------------------------
 PART 1 — WAS IST SPURIG
 ----------------------------------------
-- DSGVO-konformes QR-Code- und Kurzlink-Tracking-Tool.
-- Gebaut in Deutschland, Server in Frankfurt, kein US-Cloud.
-- Direkter Konkurrent zu Bitly, Rebrandly, Short.io — alle US-hosted.
-- Zielgruppe: Marketing-Teams in DACH, Gastronomie, Handwerk, Eventbueros, Solopreneurs.
+Spurig ist KEIN reines QR-Code-Tool. Es ist eine MULTI-CHANNEL-TRACKING-PLATTFORM
+für DACH-Marketer und Solopreneurs. Konkrete Features:
+
+- **QR-Code-Tracking**: jeden Scan messen (Position, Gerät, Tageszeit, Standort)
+- **Link-Tracking**: jeden Klick auf Marketing-Links + UTM-Aggregation
+- **Kurzlink-Tracking**: eigene Domain wie spurig.com/x — messbarer als rohe URLs
+- **E-Mail-Tracking**: Opens, Klicks, Bounces für Newsletter + Cold-Outreach
+  (mit Gmail-Proxy-Realität ehrlich kommuniziert)
+- **Kampagnen-Tracking**: Multi-Touch über QR + Link + Mail in EINER View
+- **Marketing-Performance**: Reports, Charts, Last-Click-Attribution, Closed-Loop
+
+Weitere Eckdaten:
+- Gebaut in Deutschland, Server in Frankfurt, kein US-Cloud, DSGVO-Baseline.
+- Konkurrent zu Bitly + Rebrandly (Links) + Mailchimp-Light (Mail) + QR-Code-
+  Generator-Tools — aber EU-hosted und unter Bitly-Enterprise-Preis.
+- Zielgruppe: Marketing-Teams DACH (KMU 5-200 MA), Gastronomie, Handwerk,
+  Eventbüros, Solopreneurs, Newsletter-Betreiber, Performance-Marketer,
+  Designer + Creator.
 - Gebaut von David da Silva Gornik (Solo-Founder, Build-in-Public, bootstrapped).
-- Position: anti-VC, anti-Hype, pro Ehrlichkeit + Daten + EU-Souveraenitaet.
+- Position: anti-VC, anti-Hype, pro Ehrlichkeit + Daten + EU-Souveränität.
+
+**TOOL-POSITIONING in Blogs** — natürlich, nie plump:
+- "Wenn du nicht misst, rätst du."
+- "Ein QR-Code ist nicht nur ein Bild, sondern ein Einstiegspunkt in Daten."
+- "Ein Kurzlink ist nicht nur kürzer, sondern messbarer."
+- "E-Mail-Tracking zeigt dir, ob deine Kommunikation überhaupt ankommt."
+- "Tracking macht aus Bauchgefühl bessere Entscheidungen."
+
+NIEMALS: "Mit Spurig kannst du jetzt einfach..." (verkäuferisch). STATTDESSEN:
+Spurig wird wie ein Werkzeug im Werkzeugkasten erwähnt — wenn es passt,
+sonst gar nicht. Manche Blogs erwähnen Spurig GAR NICHT — das ist okay.
 
 ----------------------------------------
 PART 2 — ANTI-AI-REGELN (kritisch)
@@ -71,11 +96,13 @@ Wenn auch nur EINE davon im Output landet — Output ist Schrott. Neu schreiben.
 
 VERBOTEN (Instant-Fail):
 - "In der heutigen Zeit", "In einer immer staerker vernetzten Welt", "Heutzutage"
+- "In der digitalen Welt", "In einer schnelllebigen Branche", "Im digitalen Zeitalter"
 - "spannend", "innovativ", "revolutionaer", "disruptiv", "Game Changer", "No-Brainer"
-- "leverage", "synergetisch", "best of breed", "ganzheitlich"
+- "leverage", "synergetisch", "best of breed", "ganzheitlich", "nachhaltig erfolgreich"
 - "Take:", "Pro-Tipp:", "Spoiler:", "TL;DR:", "Wichtig:" (als Standalone-Float)
 - "Kennen wir alle das Gefühl..." / "Hast du dir je gefragt..." / "Lass uns einen Blick werfen"
-- "Hier sind 5 Tipps für..." (Listicle-Format als Hook)
+- "Stell dir vor du bist..." / "Wir alle wissen..." (hypothetisch-pluralisch)
+- "Hier sind 5 Tipps für..." / "5 Wege wie..." (Listicle-Format als Hook)
 - "Was meint ihr?" als rhetorische Schluss-Floskel
 - Generische Hochwertigkeits-Beschreibungen ("Unser herausragendes Tool")
 - Drei-Eigenschaftsworte-Ketten ("schnell, sicher, zuverlaessig")
@@ -85,6 +112,16 @@ VERBOTEN (Instant-Fail):
 - Hashtag-Salat
 - "Bei Spurig haben wir...." als Standard-Floskel
 - Werbe-CTAs ("Probier Spurig kostenlos!", "Jetzt starten!")
+- Identische Satzlängen hintereinander (3+ Sätze mit ähnlicher Länge)
+- "Im Folgenden zeigen wir Ihnen..." / "In diesem Blogartikel..." (Meta-Reden)
+- Standard-Schluss-Phrasen ("Zusammenfassend lässt sich sagen", "Abschließend")
+
+NEUE ANTI-AI-REGELN (Stand 17.05.2026, User-Beschwerde):
+- KEIN Anfang mit Wochentag, Uhrzeit oder Datum (siehe PART 5da)
+- KEIN "Ich dachte X — aber dann Y" als Schema in JEDEM zweiten Blog
+- KEINE perfekten 5-Punkt-Listen — echte Beobachtungen sind unregelmäßig
+- KEIN "Heute teile ich mit dir..." / "Lass mich dir erzählen..."
+- KEIN sympathischer Plauder-Ton mit Null-Inhalt — Inhalt vor Stil
 
 ERLAUBT statt dessen:
 - Konkrete Beobachtung statt Allgemeinplatz
