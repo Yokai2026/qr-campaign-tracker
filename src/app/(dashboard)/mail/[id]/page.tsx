@@ -229,6 +229,11 @@ function RecipientRow({ recipient }: { recipient: Recipient }) {
       </div>
       <div className="shrink-0 text-right text-[11px] text-muted-foreground tabular-nums">
         {recipient.human_open_count > 0 && <span>{recipient.human_open_count}× geöffnet</span>}
+        {recipient.human_open_count === 0 && recipient.open_count > 0 && (
+          <span className="text-muted-foreground/60" title="Vom Mail-Provider (Gmail/Apple/Yahoo) automatisch beim Empfang geladen, nicht vom User geöffnet">
+            {recipient.open_count}× Proxy-Preload
+          </span>
+        )}
         {recipient.click_count > 0 && <span className="ml-2 text-brand">{recipient.click_count} Klick{recipient.click_count > 1 ? 's' : ''}</span>}
       </div>
     </div>

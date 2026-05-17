@@ -28,16 +28,62 @@ const TRANSPARENT_GIF = Buffer.from(
 const APPLE_MPP_UA_PATTERN = /mail\/(\d+)|apple|macintosh.*safari/i;
 const APPLE_PROXY_IP_PREFIXES = ['17.', '23.234.', '23.40.', '23.45.', '23.66.', '23.77.'];
 
+// Gmail Image Proxy (lädt alle Bilder beim Empfang in Google's Cache, OHNE User-Aktion)
+// User-Agent typisch: "...Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)"
+// IP-Ranges: 66.249.x, 66.102.x, 64.233.x, 72.14.x, 74.125.x, 173.194.x, 209.85.x, 216.239.x
+// Gmail-Image-Proxy nutzt teilweise einen alten Chrome/42-Fake-UA OHNE den
+// expliziten "GoogleImageProxy"-String. Spezifische Markers:
+//   Chrome/42.0.2311.13 — outdated Chrome-Version, Gmail-spezifisch
+//   Windows NT 5.1 (XP) — Gmail-Fake-OS in der UA-Verschleierung
+const GMAIL_PROXY_UA_PATTERN = /GoogleImageProxy|ggpht\.com|via\s+google|Chrome\/42\.0\.2311|Windows NT 5\.1.*Chrome\/42/i;
+const GMAIL_PROXY_IP_PREFIXES = [
+  '66.249.', '66.102.', '64.18.', '64.233.', '72.14.', '74.125.',
+  '173.194.', '209.85.', '216.58.', '216.239.',
+];
+
+// Yahoo / AOL Mail Proxy
+const YAHOO_PROXY_UA_PATTERN = /YahooMailProxy|YPC|Yahoo.*Image/i;
+
+// Outlook.com / Office365 Pre-Fetcher (Safe Links / ATP)
+const OUTLOOK_PREFETCH_UA_PATTERN = /Microsoft.*Office|Outlook.*Mobile|MSOffice|OfficeProtect|SafeLinks/i;
+
 // Bekannte Email-Security-Scanner (Bot-Detection)
 const BOT_UA_PATTERN = /microsoft.?outlook|defender|proofpoint|mimecast|barracuda|symantec|trendmicro|sophos|ironport|cisco|fortinet|crawler|bot|spider/i;
+
+// Quasi-immer-Bot: Curl, Wget, Postman, Python-Requests etc.
+const BASIC_BOT_UA = /^(curl|wget|python-requests|libwww|httpclient|java\/|go-http-client)/i;
 
 function isAppleProxy(ua: string, ip: string): boolean {
   if (APPLE_PROXY_IP_PREFIXES.some((p) => ip.startsWith(p))) return true;
   return APPLE_MPP_UA_PATTERN.test(ua) && /privacy|preview/i.test(ua);
 }
 
+function isGmailProxy(ua: string, ip: string): boolean {
+  if (GMAIL_PROXY_UA_PATTERN.test(ua)) return true;
+  if (GMAIL_PROXY_IP_PREFIXES.some((p) => ip.startsWith(p))) return true;
+  return false;
+}
+
+function isYahooProxy(ua: string): boolean {
+  return YAHOO_PROXY_UA_PATTERN.test(ua);
+}
+
+function isOutlookPrefetch(ua: string): boolean {
+  return OUTLOOK_PREFETCH_UA_PATTERN.test(ua);
+}
+
 function isBot(ua: string): boolean {
+  if (!ua || ua.length < 10) return true; // leerer/kurzer UA = wahrscheinlich Bot
+  if (BASIC_BOT_UA.test(ua)) return true;
   return BOT_UA_PATTERN.test(ua);
+}
+
+// Aggregierte Proxy-Detection: alle Email-Proxy-Mechanismen die KEINEN echten User-Open darstellen
+function isAnyMailProxy(ua: string, ip: string): boolean {
+  return isAppleProxy(ua, ip)
+    || isGmailProxy(ua, ip)
+    || isYahooProxy(ua)
+    || isOutlookPrefetch(ua);
 }
 
 function gifResponse() {
@@ -80,28 +126,42 @@ async function logOpen(pixelToken: string, request: NextRequest) {
   const ipHash = hashIp(ipRaw);
 
   const apple = isAppleProxy(ua, ipRaw);
+  const gmailProxy = isGmailProxy(ua, ipRaw);
+  const proxy = isAnyMailProxy(ua, ipRaw);
   const bot = isBot(ua);
 
   const sb = await createServiceClient();
   const { data: recipient } = await sb
     .from('mail_recipients')
-    .select('id, open_count, human_open_count, first_open_at')
+    .select('id, open_count, human_open_count, first_open_at, sent_at')
     .eq('pixel_token', pixelToken)
     .maybeSingle();
 
   if (!recipient) return;
 
-  // Insert detail Event
+  // Zeit-Heuristik: Open innerhalb 60s nach Send = wahrscheinlich Proxy-Preload,
+  // nicht echter User. Gmail/Yahoo/Outlook cachen Bilder beim Empfang sofort.
+  let suspiciousFastOpen = false;
+  if (recipient.sent_at) {
+    const sentAtMs = new Date(recipient.sent_at as string).getTime();
+    const elapsedMs = Date.now() - sentAtMs;
+    if (elapsedMs > 0 && elapsedMs < 60_000) {
+      suspiciousFastOpen = true;
+    }
+  }
+
+  // Insert detail Event (apple-flag bleibt im Schema; gmail/yahoo zählen über is_bot=true)
   await sb.from('mail_opens').insert({
     recipient_id: recipient.id,
     user_agent: ua.slice(0, 500),
     ip_hash: ipHash,
-    is_apple_proxy: apple,
-    is_bot: bot,
+    is_apple_proxy: apple || gmailProxy, // Gmail-Proxy als "proxy" gleich behandeln
+    is_bot: bot || suspiciousFastOpen,
   });
 
   // Aggregat in mail_recipients updaten
-  const isHuman = !apple && !bot;
+  // isHuman strikt: KEIN Proxy + KEIN Bot + KEIN suspicious-fast (<60s nach Send)
+  const isHuman = !proxy && !bot && !suspiciousFastOpen;
   const updates: Record<string, unknown> = {
     last_open_at: new Date().toISOString(),
     open_count: (recipient.open_count ?? 0) + 1,
@@ -109,7 +169,9 @@ async function logOpen(pixelToken: string, request: NextRequest) {
     last_ip_hash: ipHash,
   };
   if (isHuman) updates.human_open_count = (recipient.human_open_count ?? 0) + 1;
-  if (!recipient.first_open_at) updates.first_open_at = new Date().toISOString();
+  // first_open_at nur setzen wenn HUMAN — verhindert dass "Erstes Open"
+  // einen Proxy-Preload anzeigt (User-Bug 17.05.2026)
+  if (isHuman && !recipient.first_open_at) updates.first_open_at = new Date().toISOString();
 
   await sb.from('mail_recipients').update(updates).eq('id', recipient.id);
 
