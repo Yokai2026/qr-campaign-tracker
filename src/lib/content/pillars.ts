@@ -35,7 +35,8 @@ export type ContentCluster =
   | 'ai_marketing'
   | 'email_shortlinks'
   | 'creator_design'
-  | 'everyday_marketing';
+  | 'everyday_marketing'
+  | 'geld_business';
 
 export const CLUSTERS: ContentCluster[] = [
   'qr_realtalk',
@@ -48,6 +49,7 @@ export const CLUSTERS: ContentCluster[] = [
   'email_shortlinks',
   'creator_design',
   'everyday_marketing',
+  'geld_business',
 ];
 
 export const CLUSTER_LABEL: Record<ContentCluster, string> = {
@@ -61,6 +63,7 @@ export const CLUSTER_LABEL: Record<ContentCluster, string> = {
   email_shortlinks: 'E-Mail & Kurzlinks',
   creator_design: 'Designer & Creator',
   everyday_marketing: 'Marketing-Alltag',
+  geld_business: 'Geld & Business',
 };
 
 export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
@@ -83,7 +86,9 @@ export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
   creator_design:
     'IM SCOPE: Designer + Creator + Visual-Marketing. Wie Designer für Kampagnen-Assets denken — was tatsächlich tracked, was nicht. Branding-Konsistenz auf Print + Digital. Asset-Bau für Multi-Channel-Tests. Figma/Canva/Adobe-Workflow für KMU. Typografie auf Print + QR-Code-Design. Farbpsychologie auf Plakaten. Creator-Economy für DACH (Newsletter-Sponsorships, Affiliate-Tracking). Asset-Performance messen statt raten. TOOL-BEZUG NATÜRLICH: Designer baut visuell perfekten Flyer + Spurig misst was funktioniert. NICHT IM SCOPE: reine Tutorial-Themen wie "Wie nutze ich Figma".',
   everyday_marketing:
-    'IM SCOPE: Marketing-Alltag, Business-Hacks, "Was viele falsch machen", "So sparst du Zeit/Geld", Vorher/Nachher-Cases, kleine Aha-Tricks, Kostenfallen, Tool-Audit-Geschichten, Setup-Hacks die 80% der KMU nicht kennen. Echte Mehrwert-Beiträge für Unternehmer + Marketer. Wie aus Misserfolg + Tracking ein Plus wurde. Konkrete Aufwand/Nutzen-Vergleiche. TOOL-BEZUG NATÜRLICH: Spurig spart 200€/Monat gegenüber Bitly Enterprise + ist messbar. "Tracking macht aus Bauchgefühl bessere Entscheidungen." NICHT IM SCOPE: Branche-spezifische Customer-Stories (→ mittelstand), reine David-Founder-Erlebnisse (→ founder_diary).',
+    'IM SCOPE: Marketing-Alltag, Business-Hacks, "Was viele falsch machen", "So sparst du Zeit/Geld", Vorher/Nachher-Cases, kleine Aha-Tricks, Kostenfallen, Tool-Audit-Geschichten, Setup-Hacks die 80% der KMU nicht kennen. Echte Mehrwert-Beiträge für Unternehmer + Marketer. Wie aus Misserfolg + Tracking ein Plus wurde. Konkrete Aufwand/Nutzen-Vergleiche. TOOL-BEZUG NATÜRLICH: Spurig spart 200€/Monat gegenüber Bitly Enterprise + ist messbar. "Tracking macht aus Bauchgefühl bessere Entscheidungen." NICHT IM SCOPE: Branche-spezifische Customer-Stories (→ mittelstand), reine David-Founder-Erlebnisse (→ founder_diary), reine Geld-/Cashflow-Themen (→ geld_business).',
+  geld_business:
+    'IM SCOPE: GELD-THEMEN für KMU + Marketer + Solopreneurs. Sowohl SPAREN als auch VERDIENEN. Konkrete Sub-Topics: (1) Cashflow-Optimierung für KMU — Working-Capital-Management, Debitorenmanagement, Rechnungsstellung-Hacks (PwC-Studie 2026: €75 Mrd Potenzial in DACH-Unternehmen). (2) Marketing-Budget-ROI — Rolling-Forecast statt Jahresbudget, Streuverluste reduzieren, CAC-Reduktion mit Tracking-Daten. (3) SaaS-Stack-Audit — welche Tools wirklich nutzen, Subscription-Audits, Tool-Konsolidierung, Lifetime-Deals vs Subscriptions. (4) Pricing-Strategien — Value-Based vs Cost-Plus, Anchor-Pricing, Pricing-Pivots, Preiserhöhung ohne Churn. (5) Fördermittel & Grants für DACH-KMU 2026 — Digitalisierungs-Förderung, BAFA, KfW, INVEST-Zuschuss, EXIST. (6) Revenue-Growth ohne Wachstum-um-jeden-Preis — Conversion-Optimierung, Upsell, Cross-Sell, Retention-Tricks. (7) KI-driven Cost-Saving — wie KI repetitive Aufgaben automatisiert + reale Stundensätze einspart. (8) Co-Marketing-Hacks — Cross-Promotion, geteilte Kampagnen, Affiliate-Setups, Partner-Newsletter. (9) Steueroptimierung für Selbstständige + KMU — was Steuerberater nicht erzählen, GWG, IAB, Reisekosten. (10) Werte-Diskussion — "Wie viel ist 1 Stunde deiner Zeit wirklich wert?", Stundensatz-Kalkulation für Solo-Founder. TOOL-BEZUG NATÜRLICH: Spurig zeigt was Marketing-Euro wirklich bringen — Tracking als CFO-Argument. "Tracking macht aus Bauchgefühl bessere Entscheidungen." NICHT IM SCOPE: persönliche David-Founder-Geld-Stories (→ founder_diary), Branche-spezifische Cases (→ mittelstand), reine KI-Tool-Reviews ohne Cost-Aspect (→ ai_marketing).',
 };
 
 /**
@@ -144,5 +149,13 @@ export const CLUSTER_NICHE_INDUSTRIES: Record<ContentCluster, string[]> = {
     'Inhaber Handwerksbetrieb', 'E-Commerce-Owner 10k-500k Umsatz',
     'Gastronom mit Marketing-Budget', 'Eventbüro', 'Coach mit Online-Programm',
     'Vertriebs-Leiter', 'Marketing-Praktikant in der Agentur',
+  ],
+  geld_business: [
+    'KMU-CFO 50-200 Mitarbeiter', 'Solopreneur mit 6-stelligem Umsatz',
+    'Marketing-Manager mit Budget-Verantwortung', 'Geschäftsführer Handwerk',
+    'E-Commerce-Owner der SaaS-Stack reduziert', 'Bootstrapped-Founder',
+    'Steuerberater für Selbstständige', 'Vertriebsleiter mit Pricing-Hoheit',
+    'Förder-Beraterin', 'Working-Capital-Optimierer in Mittelstand',
+    'Co-Marketing-Agentur', 'Pricing-Consultant',
   ],
 };

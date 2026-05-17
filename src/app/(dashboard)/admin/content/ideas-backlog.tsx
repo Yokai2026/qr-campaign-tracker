@@ -16,7 +16,8 @@ type Cluster =
   | 'ai_marketing'
   | 'email_shortlinks'
   | 'creator_design'
-  | 'everyday_marketing';
+  | 'everyday_marketing'
+  | 'geld_business';
 
 const CLUSTER_LABEL: Record<Cluster, string> = {
   qr_realtalk: 'QR-Realtalk',
@@ -29,6 +30,7 @@ const CLUSTER_LABEL: Record<Cluster, string> = {
   email_shortlinks: 'E-Mail & Kurzlinks',
   creator_design: 'Designer & Creator',
   everyday_marketing: 'Marketing-Alltag',
+  geld_business: 'Geld & Business',
 };
 
 const CLUSTER_COLOR: Record<Cluster, string> = {
@@ -42,6 +44,7 @@ const CLUSTER_COLOR: Record<Cluster, string> = {
   email_shortlinks: '#0ea5e9',   // sky — communication
   creator_design: '#f97316',     // orange — creative
   everyday_marketing: '#84cc16', // lime — everyday/practical
+  geld_business: '#facc15',      // yellow — money/finance
 };
 
 const ALL_CLUSTERS: Cluster[] = [
@@ -55,6 +58,7 @@ const ALL_CLUSTERS: Cluster[] = [
   'email_shortlinks',
   'creator_design',
   'everyday_marketing',
+  'geld_business',
 ];
 
 type Idea = {

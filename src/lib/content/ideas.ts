@@ -855,6 +855,13 @@ ANTI-WIEDERHOLUNG (zusätzlich):
   - Wenn Pillar "Marketing-Alltag" (everyday_marketing): variiere — "Was viele falsch
     machen" / Tool-Audit / Vorher-Nachher / Kostenfallen / Setup-Hack / Zeit-Sparen-
     Trick / Aus-Minus-Plus-Story / Aufwand-Nutzen-Vergleich / Anti-Mainstream-Marketing
+  - Wenn Pillar "Geld & Business" (geld_business): variiere — Cashflow-Optimierung /
+    Working-Capital-Audit / Marketing-Budget-ROI / SaaS-Stack-Audit / Pricing-Pivot /
+    Anchor-Pricing / Fördermittel BAFA-KfW-INVEST / Steueroptimierung GWG IAB Reisekosten /
+    Stundensatz-Kalkulation / Upsell-Cross-Sell-Retention / KI-Cost-Saving-Hours / Co-
+    Marketing-Affiliate / Streuverlust-Reduktion / Debitorenmanagement / CAC-LTV-Ratio /
+    Lifetime-Deal vs Subscription / Wertbasiertes-vs-Cost-Plus-Pricing. WICHTIG: JEDE
+    Idee MUSS eine konkrete Euro-Zahl enthalten — wenn nicht, → falsche Idee, neu.
 
 ----------------------------------------
 HOOK-FIRST-WORDS-TEST (Pflicht pro Idee)
@@ -2296,6 +2303,14 @@ PILLAR → KONZEPT-PFLICHT (K1 fast immer verboten)
                    Screen Vorher/Nachher für "Aus Minus Plus"-Stories) ODER K3
                    (Tool-Stack als absurde Sammlung — z.B. 23 Marketing-Tool-Icons
                    wie Werkzeug-Pegboard hängend)
+
+- Geld & Business (geld_business):
+                   K2 (Money-Destruction für Kostenfalle / "verbrennen") ODER K6
+                   (Daten als physisches Objekt — Geldscheine als Schraffur, Excel-
+                   Diagramm als origami) ODER K4 (Split-Screen Vorher/Nachher mit
+                   Euro-Werten links/rechts) ODER K3 (SaaS-Subscriptions als
+                   Spielautomaten-Reihe / monatliche Rechnungen als Tapete). PFLICHT:
+                   konkrete Euro-Zahl oder Münzen/Scheine im Bild sichtbar.
 
 K1 (Human-Reaction-Closeup) ist die LETZTE Option. Wenn du sie waehlst, MUSS
 das Bild ein massives Wow-Detail haben (z.B. ein einzelner brennender Geldschein
