@@ -1,20 +1,172 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
-import { generateIdeasForCluster } from '@/lib/content/ideas';
+import {
+  generateIdeasForCluster,
+  type GeneratedIdea,
+  type HookPattern,
+} from '@/lib/content/ideas';
 import { CLUSTERS, type ContentCluster } from '@/lib/content/pillars';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-// 300s ist max auf Vercel Pro. Auf Hobby wird's bei 60s gekappt — dann muss
-// CONTENT_WEB_SEARCH_MAX_USES auf 1 oder 0 (=off) gesetzt werden.
+// 300s ist max auf Vercel Pro. Hard-cap unsere Loop-Zeit auf 270s damit der
+// Final-Insert noch Zeit hat.
 export const maxDuration = 300;
+
+const LOOP_BUDGET_MS = 270_000;
+const MAX_TOP_UP_ROUNDS = 3;
+
+// Pflicht-Quoten pro Batch (in % von count, gerundet)
+const QUOTA_MONEY_REGRET = 0.20;
+const QUOTA_DISCOVERY = 0.20;
+const QUOTA_AHA_MOMENT = 0.10;
+
+const BANNED_TROPES: RegExp[] = [
+  /\b47\s*(plak|standort|euro|mitarbeiter|prozent)/i,
+  /\b500\s*postkarten/i,
+  /\b180\s*flyer/i,
+  /\b(8|11|19)\s*(wochen|tage|monate).*falsch/i,
+  /\bvier anrufe\b/i,
+  /stripe.?dashboard.*\b(47|312)\b/i,
+  /bruder.{0,20}(steuerberater|versteht|fragt)/i,
+  /(bitly|bittly).{0,40}(virginia|ashburn)/i,
+  /sechs jahre.*atlantik/i,
+  /\b67\s*plakat/i,
+  /\b89(\.\d{3}|\.000)?\s*€\s*(jahr|pro jahr)?.*bitly/i,
+];
+
+const STOP_WORDS = new Set([
+  'ist', 'das', 'die', 'der', 'und', 'oder', 'mit', 'für', 'von', 'auf',
+  'nach', 'bei', 'vom', 'zum', 'zur', 'sich', 'sind', 'wie', 'was', 'wer', 'wir', 'ich', 'dein',
+  'mein', 'sein', 'eine', 'einen', 'einem', 'eines', 'aus', 'nicht', 'noch', 'doch', 'immer', 'auch',
+  'wenn', 'weil', 'dann', 'aber', 'sehr', 'hier', 'mehr', 'kein', 'keine',
+]);
+
+const SOFT_DUP_OVERLAP = 3;
+
+const tokenize = (s: string): Set<string> =>
+  new Set(s.toLowerCase().split(/[^a-zäöüß0-9]+/).filter((w) => w.length >= 4 && !STOP_WORDS.has(w)));
+
+type FilterStats = {
+  hardDup: number;
+  softDup: number;
+  bannedTrope: number;
+  professionDup: number;
+};
+
+/**
+ * Filtert eine frisch-generierte Idee-Liste gegen alle Regeln.
+ * Profession-Hard-Cap: max 1 Idee pro Beruf in der KOMBINIERTEN (kept + new) Liste.
+ */
+function filterIdeas(
+  fresh: GeneratedIdea[],
+  existingSet: Set<string>,
+  existingTokenSets: Set<string>[],
+  professionsUsedSet: Set<string>,
+  stats: FilterStats,
+): GeneratedIdea[] {
+  const kept: GeneratedIdea[] = [];
+
+  for (const idea of fresh) {
+    if (!idea.title || !idea.outline) continue;
+
+    const titleLower = idea.title.trim().toLowerCase();
+    if (existingSet.has(titleLower)) {
+      stats.hardDup++;
+      continue;
+    }
+
+    const fullText = `${idea.title} ${idea.outline ?? ''} ${idea.angle ?? ''}`;
+    if (BANNED_TROPES.some((rx) => rx.test(fullText))) {
+      stats.bannedTrope++;
+      continue;
+    }
+
+    const newTokens = tokenize(idea.title);
+    let isSoftDup = false;
+    for (const ex of existingTokenSets) {
+      let overlap = 0;
+      for (const t of newTokens) if (ex.has(t)) overlap++;
+      if (overlap >= SOFT_DUP_OVERLAP) {
+        isSoftDup = true;
+        break;
+      }
+    }
+    if (isSoftDup) {
+      stats.softDup++;
+      continue;
+    }
+
+    // Profession-Hard-Cap: max 1 pro Beruf (außer "none", da max 2 erlaubt)
+    const prof = (idea.profession ?? 'none').trim().toLowerCase();
+    if (prof !== 'none' && professionsUsedSet.has(prof)) {
+      stats.professionDup++;
+      continue;
+    }
+    if (prof === 'none') {
+      // Track "none"-Count separat — max 2 erlaubt
+      const noneCount = Array.from(professionsUsedSet).filter((p) => p === 'none-1' || p === 'none-2').length;
+      if (noneCount >= 2) {
+        stats.professionDup++;
+        continue;
+      }
+      professionsUsedSet.add(`none-${noneCount + 1}`);
+    } else {
+      professionsUsedSet.add(prof);
+    }
+
+    kept.push(idea);
+    // Auch im Token-Set tracken damit nachfolgende Ideen im SELBEN Batch
+    // nicht zu nah aneinander liegen
+    existingSet.add(titleLower);
+    existingTokenSets.push(newTokens);
+  }
+
+  return kept;
+}
+
+function countHookPatterns(ideas: GeneratedIdea[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const i of ideas) {
+    const p = (i.hook_pattern ?? 'other').toLowerCase();
+    counts[p] = (counts[p] ?? 0) + 1;
+  }
+  return counts;
+}
+
+/**
+ * Welche Hook-Patterns fehlen noch, um die Quoten für `targetCount` Ideen zu erfüllen?
+ */
+function identifyMissingPatterns(kept: GeneratedIdea[], targetCount: number): HookPattern[] {
+  const counts = countHookPatterns(kept);
+  const need: HookPattern[] = [];
+
+  const minMoney = Math.ceil(targetCount * QUOTA_MONEY_REGRET);
+  const minDiscovery = Math.ceil(targetCount * QUOTA_DISCOVERY);
+  const minAha = Math.ceil(targetCount * QUOTA_AHA_MOMENT);
+
+  const moneyHave = counts['money_regret'] ?? 0;
+  const discoveryHave = counts['discovery_insider'] ?? 0;
+  const ahaHave = counts['aha_moment'] ?? 0;
+
+  for (let i = moneyHave; i < minMoney; i++) need.push('money_regret');
+  for (let i = discoveryHave; i < minDiscovery; i++) need.push('discovery_insider');
+  for (let i = ahaHave; i < minAha; i++) need.push('aha_moment');
+
+  return need;
+}
 
 /**
  * POST /api/admin/content/ideas/generate
- * Body: { cluster: ContentCluster, count?: number (default 15) }
+ * Body: { cluster: ContentCluster, count?: number (default 10) }
  *
- * Generiert N Ideen fuer den Pillar via Claude und insertet sie in content_ideas
- * mit status='backlog'. Duplikate (gleicher Titel + Cluster) werden geskippt.
+ * Top-Up-Loop:
+ *   1. Generate `count` ideas
+ *   2. Filter (hard-dup, soft-dup, banned-trope, profession-cap)
+ *   3. Wenn kept < count ODER Pattern-Quota nicht erfüllt → Top-Up-Call mit
+ *      avoidProfessions + requireHookPatterns
+ *   4. Max MAX_TOP_UP_ROUNDS Runden ODER LOOP_BUDGET_MS Zeitbudget
+ *   5. Insert was kept ist
  */
 export async function POST(request: NextRequest) {
   const sb = await createClient();
@@ -31,15 +183,10 @@ export async function POST(request: NextRequest) {
   if (!CLUSTERS.includes(cluster)) {
     return NextResponse.json({ error: 'invalid cluster' }, { status: 400 });
   }
-  // Cap auf 10 — bei 15 dauert die Generation ~65s und reisst das Vercel-Hobby
-  // 60s-Limit. Mit 10 ist die Generation bei ~35-45s sicher unter Limit.
-  // Auf Pro kann ueber CONTENT_IDEAS_MAX_COUNT auf bis zu 20 hochgezogen werden.
+
   const hardCap = Number(process.env.CONTENT_IDEAS_MAX_COUNT ?? '10');
   const count = Math.max(5, Math.min(hardCap, body.count ?? 10));
 
-  // Existing titles — JETZT cross-cluster + ALLE Statuses (inkl. deleted +
-  // expanded + skipped + posted-Blogs). So vermeidet die AI Themen die schon
-  // gepostet, geskippt oder geloescht wurden, nicht nur den aktiven Backlog.
   const service = await createServiceClient();
   const [{ data: existingIdeas }, { data: postedBlogs }] = await Promise.all([
     service
@@ -53,7 +200,7 @@ export async function POST(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(100),
   ]);
-  // Reihenfolge: erst gleicher Cluster (relevanter), dann andere
+
   const sameClusterTitles = (existingIdeas ?? [])
     .filter((r) => r.cluster === cluster)
     .map((r) => r.title);
@@ -61,89 +208,96 @@ export async function POST(request: NextRequest) {
     .filter((r) => r.cluster !== cluster)
     .map((r) => r.title);
   const publishedBlogTitles = (postedBlogs ?? []).map((r) => r.title);
-  // Reihenfolge: gepostete Blogs (TOP-priority weil schon raus) > Cluster-Ideen > andere
   const existingTitles = [...publishedBlogTitles, ...sameClusterTitles, ...otherClusterTitles];
-  const existingSet = new Set(existingTitles.map((t) => t.trim().toLowerCase()));
 
-  let ideas;
-  const generateStart = Date.now();
-  try {
-    ideas = await generateIdeasForCluster(cluster, count, existingTitles);
-    console.log(`[ideas-generate] cluster=${cluster} count=${ideas.length} existing=${existingTitles.length} took=${Date.now() - generateStart}ms`);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : 'unknown';
-    const stack = e instanceof Error ? e.stack : '';
-    console.error(`[ideas-generate FAIL] cluster=${cluster} took=${Date.now() - generateStart}ms err=${msg}`);
-    if (stack) console.error(stack.slice(0, 1000));
-    return NextResponse.json({ error: msg }, { status: 500 });
+  // Mutables für den Loop
+  const existingSet = new Set(existingTitles.map((t) => t.trim().toLowerCase()));
+  const existingTokenSets = existingTitles.map(tokenize);
+  const professionsUsedSet = new Set<string>();
+  const stats: FilterStats = { hardDup: 0, softDup: 0, bannedTrope: 0, professionDup: 0 };
+  const kept: GeneratedIdea[] = [];
+
+  const loopStart = Date.now();
+  let round = 0;
+  const rounds: Array<{ requested: number; got: number; kept: number; tookMs: number }> = [];
+
+  while (round < MAX_TOP_UP_ROUNDS) {
+    if (Date.now() - loopStart > LOOP_BUDGET_MS) {
+      console.log(`[ideas-generate] budget exhausted after round ${round}, kept=${kept.length}/${count}`);
+      break;
+    }
+
+    const stillNeeded = count - kept.length;
+    const missingPatterns = identifyMissingPatterns(kept, count);
+    const quotaOk = missingPatterns.length === 0;
+
+    if (stillNeeded <= 0 && quotaOk) break;
+
+    // Diese Runde Anfrage-Größe: was fehlt + Buffer (2 extra fürs Filtering)
+    const reqCount = Math.min(10, Math.max(stillNeeded > 0 ? stillNeeded + 2 : 3, missingPatterns.length));
+
+    const isTopUp = round > 0;
+    const extra = isTopUp ? {
+      avoidProfessions: Array.from(professionsUsedSet).filter((p) => !p.startsWith('none-')),
+      requireHookPatterns: missingPatterns,
+      avoidTitles: kept.map((k) => k.title),
+    } : {};
+
+    const roundStart = Date.now();
+    let fresh: GeneratedIdea[];
+    try {
+      fresh = await generateIdeasForCluster(cluster, reqCount, existingTitles, extra);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'unknown';
+      console.error(`[ideas-generate round=${round} FAIL] ${msg}`);
+      if (round === 0) {
+        return NextResponse.json({ error: msg }, { status: 500 });
+      }
+      // In Top-Up-Runden: failure ignorieren, mit was wir haben weitermachen
+      break;
+    }
+    const tookMs = Date.now() - roundStart;
+
+    const newlyKept = filterIdeas(fresh, existingSet, existingTokenSets, professionsUsedSet, stats);
+    kept.push(...newlyKept);
+
+    rounds.push({ requested: reqCount, got: fresh.length, kept: newlyKept.length, tookMs });
+    console.log(`[ideas-generate round=${round}] req=${reqCount} got=${fresh.length} kept=${newlyKept.length} total=${kept.length}/${count} took=${tookMs}ms`);
+
+    if (newlyKept.length === 0 && round > 0) {
+      // Wenn Top-Up gar nichts brachte → abbrechen statt endlos versuchen
+      console.log(`[ideas-generate round=${round}] zero kept, stopping top-up`);
+      break;
+    }
+
+    round++;
   }
 
-  if (!ideas.length) return NextResponse.json({ generated: 0, ideas: [] });
+  // Trim auf exakt count falls über-geliefert
+  const finalKept = kept.slice(0, count);
 
-  // Soft-Dup-Filter: 4-Wort-Overlap mit existierendem Titel = Wiederholung.
-  // Faengt Faelle wie "Postkarten/Anrufe/Niemand/misst" vs "Postkarten/Anrufe/
-  // Niemand/weiss" trotz unterschiedlicher Wort-Kombo.
-  const stopWords = new Set(['ist', 'das', 'die', 'der', 'und', 'oder', 'mit', 'für', 'von', 'auf',
-    'nach', 'bei', 'vom', 'zum', 'zur', 'sich', 'sind', 'wie', 'was', 'wer', 'wir', 'ich', 'dein',
-    'mein', 'sein', 'eine', 'einen', 'einem', 'eines', 'aus', 'nicht', 'noch', 'doch', 'immer', 'auch',
-    'wenn', 'weil', 'dann', 'aber', 'sehr', 'hier', 'mehr', 'kein', 'keine']);
-  const tokenize = (s: string) => new Set(
-    s.toLowerCase().split(/[^a-zäöüß0-9]+/).filter((w) => w.length >= 4 && !stopWords.has(w)),
-  );
-  const existingTokenSets = existingTitles.map(tokenize);
-  const SOFT_DUP_OVERLAP = 3; // 3+ gemeinsame Schlagwoerter = Duplikat (vorher 4 — zu lax)
+  const rows = finalKept.map((i) => ({
+    cluster,
+    title: i.title.slice(0, 200),
+    outline: i.outline ?? null,
+    angle: i.angle ?? null,
+    target_keywords: i.target_keywords ?? null,
+    profession: i.profession?.trim().toLowerCase().slice(0, 40) ?? null,
+    hook_pattern: i.hook_pattern ?? null,
+    status: 'backlog' as const,
+  }));
 
-  // Hart-verboten: konkrete Tropes die immer wieder auftauchen weil sie in den
-  // Prompt-Examples stehen. Verhindern dass die AI sie als Templates kopiert.
-  const BANNED_TROPES: RegExp[] = [
-    /\b47\s*(plak|standort|euro|mitarbeiter|prozent)/i,    // "47 Plakate", "47 Euro", "47 Standorte"
-    /\b500\s*postkarten/i,                                  // "500 Postkarten"
-    /\b180\s*flyer/i,                                       // "180 Flyer" (neuer Sticky-Trope nach Example)
-    /\b(8|11|19)\s*(wochen|tage|monate).*falsch/i,         // "8/11/19 Wochen am falschen X"
-    /\bvier anrufe\b/i,                                     // "Vier Anrufe" (begleitet "180 Flyer")
-    /stripe.?dashboard.*\b(47|312)\b/i,                     // "Stripe-Dashboard 47/312 Euro"
-    /bruder.{0,20}(steuerberater|versteht|fragt)/i,         // "Bruder versteht/fragt"
-    /(bitly|bittly).{0,40}(virginia|ashburn)/i,             // "Bitly in Virginia"
-    /sechs jahre.*atlantik/i,                               // "Sechs Jahre Daten Atlantik"
-    /\b67\s*plakat/i,                                       // "67 Plakatstandorte" (auch sticky geworden)
-    /\b89(\.\d{3}|\.000)?\s*€\s*(jahr|pro jahr)?.*bitly/i, // "89.000€ für Bitly"
-  ];
-
-  let softDupCount = 0;
-  let bannedTropeCount = 0;
-  const rows = ideas
-    .filter((i) => {
-      const newTitleLower = i.title.trim().toLowerCase();
-      if (existingSet.has(newTitleLower)) return false;
-      // Banned-trope check auf Titel + Outline + Angle kombiniert
-      const fullText = `${i.title} ${i.outline ?? ''} ${i.angle ?? ''}`;
-      if (BANNED_TROPES.some((rx) => rx.test(fullText))) {
-        bannedTropeCount++;
-        return false;
-      }
-      const newTokens = tokenize(i.title);
-      for (const ex of existingTokenSets) {
-        let overlap = 0;
-        for (const t of newTokens) if (ex.has(t)) overlap++;
-        if (overlap >= SOFT_DUP_OVERLAP) {
-          softDupCount++;
-          return false;
-        }
-      }
-      return true;
-    })
-    .map((i) => ({
-      cluster,
-      title: i.title.slice(0, 200),
-      outline: i.outline ?? null,
-      angle: i.angle ?? null,
-      target_keywords: i.target_keywords ?? null,
-      status: 'backlog' as const,
-    }));
-  console.log(`[ideas-generate dedupe] hard-dups=${ideas.length - rows.length - softDupCount - bannedTropeCount} soft-dups=${softDupCount} banned-tropes=${bannedTropeCount} kept=${rows.length}`);
+  const hookCounts = countHookPatterns(finalKept);
+  console.log(`[ideas-generate FINAL] kept=${finalKept.length}/${count} rounds=${rounds.length} stats=${JSON.stringify(stats)} hooks=${JSON.stringify(hookCounts)}`);
 
   if (rows.length === 0) {
-    return NextResponse.json({ generated: 0, duplicates: ideas.length });
+    return NextResponse.json({
+      generated: 0,
+      requested: count,
+      duplicates: stats.hardDup + stats.softDup,
+      stats,
+      rounds,
+    });
   }
 
   const { data: inserted, error } = await service
@@ -154,7 +308,10 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     generated: inserted?.length ?? 0,
-    duplicates: ideas.length - (inserted?.length ?? 0),
+    requested: count,
+    rounds: rounds.length,
+    hookCounts,
+    stats,
     ideas: inserted,
   });
 }

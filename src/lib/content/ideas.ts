@@ -106,7 +106,21 @@ export type GeneratedIdea = {
   outline: string;
   angle: string;
   target_keywords?: string;
+  /** Tag für Berufs-Diversity-Filter. Lowercase, ein Wort. "none" wenn nicht branchen-spezifisch. */
+  profession?: string;
+  /** Hook-Pattern fürs Quoten-System pro Batch. */
+  hook_pattern?: HookPattern;
 };
+
+export type HookPattern =
+  | 'money_regret'        // "So verlor ich Zeit + Geld" / "das hätte nicht passieren sollen"
+  | 'discovery_insider'   // "keiner kannte X, jetzt weiß es jeder" / Insider-Reveal
+  | 'aha_moment'          // konkreter Mehrwert-Tipp / Aha-Trick
+  | 'humor'               // echter Lacher / absurde Szene
+  | 'vulnerability'       // ehrlicher Fail-Reveal
+  | 'transformation'      // Vorher/Nachher-Outcome
+  | 'curiosity_gap'       // bewusste Info-Zurückhaltung
+  | 'other';
 
 export type ExpandedBlog = {
   slug: string;
@@ -217,24 +231,58 @@ export function pickArchetypeAndMood(opts: {
 // Ideas-Generator
 // ---------------------------------------------------------------------------
 
+export type GenerateExtraRequirements = {
+  /** Berufe die in diesem Top-Up-Call NICHT mehr verwendet werden dürfen (schon im Batch belegt). */
+  avoidProfessions?: string[];
+  /** Hook-Patterns die im Batch noch fehlen und mit Priorität generiert werden müssen. */
+  requireHookPatterns?: HookPattern[];
+  /** Titel die im Batch schon belegt sind — zusätzlich zu existingTitles. */
+  avoidTitles?: string[];
+};
+
 export async function generateIdeasForCluster(
   cluster: ContentCluster,
   count = 15,
   existingTitles: string[] = [],
+  extra: GenerateExtraRequirements = {},
 ): Promise<GeneratedIdea[]> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
-  const existingSection = existingTitles.length > 0 ? `
+  const allAvoidTitles = [...existingTitles, ...(extra.avoidTitles ?? [])];
+
+  // TOP-UP-REQUIREMENTS-Block: nur bei Top-Up-Calls aktiv. Wird ganz oben
+  // im Prompt angeheftet, damit Claude diese Constraints als härteste behandelt.
+  const topUpSection = (extra.avoidProfessions?.length || extra.requireHookPatterns?.length) ? `
+══════════════════════════════════════════════════════════════════════
+TOP-UP-REQUIREMENTS — HÖCHSTE PRIORITÄT (überschreibt alles andere)
+══════════════════════════════════════════════════════════════════════
+Dies ist ein TOP-UP-CALL — der vorherige Batch hatte Lücken die JETZT
+geschlossen werden müssen. Du DARFST diese Regeln nicht ignorieren:
+
+${extra.avoidProfessions?.length ? `🚫 VERBOTENE BERUFE (bereits im Batch belegt — NICHT mehr verwenden):
+   ${extra.avoidProfessions.join(', ')}
+   → JEDE Idee MUSS einen ANDEREN profession-Tag haben.
+   → Wenn deine geplante Idee einen dieser Berufe verwendet → verwirf, anderen Beruf wählen.
+` : ''}
+${extra.requireHookPatterns?.length ? `⚠️ FEHLENDE HOOK-PATTERNS (MUSS in diesem Top-Up vorkommen):
+   ${extra.requireHookPatterns.join(', ')}
+   → MINDESTENS ${Math.min(count, extra.requireHookPatterns.length)} der ${count} Ideen MÜSSEN aus dieser Liste sein.
+   → Bevorzuge Hook-Patterns aus dieser Liste. Erst danach andere.
+   → Schau dir die Hook-Pattern-Definitionen weiter unten an für die genauen Vorlagen.
+` : ''}
+` : '';
+
+  const existingSection = allAvoidTitles.length > 0 ? `
 ══════════════════════════════════════════════════════════════════════
 KRITISCH — ANTI-WIEDERHOLUNGS-CONTEXT (HOCHSTE PRIORITAT)
 ══════════════════════════════════════════════════════════════════════
-Diese ${existingTitles.length} Titel/Themen existieren BEREITS im Backlog.
+Diese ${allAvoidTitles.length} Titel/Themen existieren BEREITS (im Backlog oder im aktuellen Batch).
 JEDE Idee die du jetzt generierst muss SUBSTANTIELL anders sein —
 nicht nur andere Worte, sondern ein KOMPLETT anderer Angle.
 
 EXISTIERENDE TITEL (NICHT in dieser Form, nicht mit aehnlichem Sub-Thema):
-${existingTitles.slice(0, 40).map((t, i) => `  ${i + 1}. ${t}`).join('\n')}
+${allAvoidTitles.slice(0, 40).map((t, i) => `  ${i + 1}. ${t}`).join('\n')}
 
 ANTI-WIEDERHOLUNGS-CHECK pro neuer Idee:
   [ ] Hat dieses Sub-Thema schon einer der existierenden Titel?
@@ -280,7 +328,7 @@ Behörden). Mach Ideen TOPICAL ("Die [Bußgeld-Fall XYZ] zeigt:...").
 ` : '';
 
   const prompt = `${SPURIG_VOICE}
-
+${topUpSection}
 ========================================
 DEINE AUFGABE — IDEEN-GENERIERUNG FUER PILLAR "${CLUSTER_LABEL[cluster]}"
 ========================================
@@ -831,25 +879,107 @@ VARIATIONS-PFLICHT (zusätzlich zum Category-Wheel)
 - Mind. 2 Ideen mit Humor / Selbstironie (C3 oder C7-Vibe)
 - Mind. 3 Ideen mit "Did-you-know"-Reveal-Charakter (C2/C5/C10)
 
-==========================================
+══════════════════════════════════════════════════════════════════════
+HOOK-PATTERN-QUOTA (PFLICHT pro Batch von ${count} Ideen — wird CODE-SEITIG geprüft)
+══════════════════════════════════════════════════════════════════════
+Jede Idee MUSS einem der folgenden hook_pattern-Tags zugeordnet werden.
+Die Verteilung im Batch MUSS folgende Mindest-Quoten erfüllen:
+
+  • money_regret       — mindestens 20% der Ideen (bei 10 = 2 Ideen)
+  • discovery_insider  — mindestens 20% der Ideen (bei 10 = 2 Ideen)
+  • aha_moment         — mindestens 10% der Ideen (bei 10 = 1 Idee)
+  • Rest beliebig: humor / vulnerability / transformation / curiosity_gap / other
+
+PATTERN-DEFINITIONEN + ECHTE BEISPIELE die du als VORLAGE nehmen sollst:
+
+──────────── money_regret ────────────
+"So verlor ich Zeit + Geld" / "Das hätte nicht passieren sollen" / "Ich hab X bezahlt für Y das ich nie genutzt hab"
+Hook: konkrete Summe + verlorene Zeit + Selbsterkenntnis am Schluss.
+Titel-Beispiele (NICHT 1:1 kopieren, Variationen):
+  - "Zwei Jahre lang das falsche Tool bezahlt. 4.800€. Niemand hat's gemerkt."
+  - "18 Monate ein Feature, das niemand benutzt. Asche."
+  - "Drei Jahre für eine Software die ich seit Monat 2 nicht mehr nutze."
+  - "Ich zahle seit 2023 für etwas das es seit 2024 gratis gibt. Klassisch."
+Verboten in money_regret: generische "verschwendetes Budget"-Floskeln. MUSS konkret sein.
+
+──────────── discovery_insider ────────────
+"Keiner kannte X. Jetzt weiß es jeder." / "Stille Branchen-Insider-Wahrheit" / "Was Agenturen nicht sagen"
+Hook: Reveal von einem Fakt/Trick/Mechanismus den die Allgemeinheit nicht kennt.
+Titel-Beispiele:
+  - "Was kein Print-Berater dir sagt: 73% der Plakat-Standorte tracken sich selbst."
+  - "Der Trick mit dem QR-Code den jeder Foodtruck-Inhaber kennt. Außer dir."
+  - "Stille Branchen-Regel: Floristen haben 4x mehr Wiederholungs-Kunden als ihre Conversion-Rate zeigt."
+  - "Tierärzte rechnen anders ab seit 2025. Niemand hat's bemerkt."
+Verboten in discovery_insider: "Geheimnis von..."-Buzzwords. MUSS konkrete Praxis sein.
+
+──────────── aha_moment ────────────
+Konkreter Mehrwert-Tipp / Trick / Optimierung mit unmittelbar nutzbarem Outcome.
+Hook: praktischer Tipp den der Leser sofort anwenden kann.
+Titel-Beispiele:
+  - "Ein UTM-Parameter, der dir 3 Stunden Excel pro Woche spart."
+  - "Den QR-Code 2mm größer drucken. 31% mehr Scans."
+  - "Wie ein Optiker seine Newsletter-Öffnungsrate verdoppelt hat — eine Zeile im Subject."
+Verboten in aha_moment: Listicle-Sprache ("7 Tipps..."). MUSS EIN konkreter Trick sein.
+
+──────────── humor ────────────
+Echter Lacher. Absurde Szene + Pointe. DACH-Kontext.
+Titel-Beispiele:
+  - "Mein Onkel fragt: 'Sind das die mit dem Bargeld?' (Es geht um QR-Codes)"
+  - "Ein Foodtruck in Köln. 14 QR-Codes. Einer führt zur Konkurrenz."
+
+──────────── vulnerability ────────────
+Ehrlicher Fail-Reveal von dir selbst. Macht dich menschlich.
+Titel-Beispiele:
+  - "Mein erster Sales-Pitch endete damit dass der Kunde MIR Tipps gab."
+  - "Ich hab 11 Wochen am falschen Feature gebaut. Hier ist warum."
+
+──────────── transformation ────────────
+Vorher/Nachher-Outcome mit konkreten Zahlen.
+Titel-Beispiele:
+  - "Von 23 Anfragen/Monat auf 184. Eine Veränderung im Print-Layout."
+
+──────────── curiosity_gap ────────────
+Bewusste Info-Zurückhaltung — Klick = einzige Auflösung.
+Titel-Beispiele:
+  - "Ein Anwalt sagte mir gestern einen Satz. Geht mir nicht aus dem Kopf."
+
+══════════════════════════════════════════════════════════════════════
+PROFESSION-DIVERSITY-PFLICHT (CODE-SEITIG enforced — max 1 pro Beruf!)
+══════════════════════════════════════════════════════════════════════
+Jede Idee mit Branchen-Bezug MUSS einen profession-Tag tragen (lowercase, ein Wort).
+Pro Batch von ${count} Ideen darf JEDER Beruf NUR EINMAL vorkommen.
+
+Erlaubte profession-Tags (wähle):
+  tierarzt, friseur, optiker, yoga, floristin, foodtruck, brauerei, schreiner,
+  apotheke, anwalt, steuerberater, fahrschule, tattoo, schneider, hostel,
+  coworking, physio, sanitaeter, hundeschule, imker, hochzeitsplaner,
+  immobilien, kfz, baecker, fitness, eis, restaurant, cafe, putzfirma,
+  hausmeister, none
+
+"none" nur wenn die Idee komplett branchen-unspezifisch ist (z.B. reine Founder-Tagebuch-Reflexion).
+Verteilung: max 2 Ideen mit profession="none" pro Batch. Rest MUSS echte Branche haben.
+
+══════════════════════════════════════════════════════════════════════
 OUTPUT-FORMAT (STRIKT EINHALTEN — sonst Parser-Crash)
-==========================================
+══════════════════════════════════════════════════════════════════════
 
 ANTWORTE AUSSCHLIESSLICH MIT JSON.
 KEIN Vorwort. KEIN "Ich starte mit...". KEINE Research-Notes.
 KEINE Markdown-Code-Fences (kein \`\`\`json).
 KEIN Erklärungstext nach dem JSON.
 
-Format (genau so):
+Format (GENAU SO — alle 6 Felder PFLICHT):
 [
-  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "..."},
-  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "..."}
+  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "...", "profession": "tierarzt", "hook_pattern": "money_regret"},
+  {"title": "...", "angle": "...", "outline": "...", "target_keywords": "...", "profession": "friseur", "hook_pattern": "discovery_insider"}
 ]
+
+Erlaubte hook_pattern-Werte: money_regret, discovery_insider, aha_moment, humor, vulnerability, transformation, curiosity_gap, other
 
 Dein erster ausgegebener Charakter MUSS "[" sein.
 Dein letzter ausgegebener Charakter MUSS "]" sein.
 
-Jetzt liefere die ${count} besten Ideen.`;
+Jetzt liefere die ${count} besten Ideen — mit korrekt gefüllten profession + hook_pattern Tags + erfüllter Quota.`;
 
   // 8000 max_tokens gibt Buffer für 10-15 Ideen mit knappem Outline.
   // Bei tighten outline-cap (350 chars) ist eine Idee ca. 200-300 output-tokens.
@@ -959,6 +1089,8 @@ export async function expandIdeaToBlog(idea: {
   recentOpeners?: string[];
   forceArchetype?: BlogArchetype;
   forceMood?: DavidMood;
+  /** Hook-Pattern aus Ideen-Generator. Wenn gesetzt → Opener-Typ wird im Bias-Block forciert. */
+  hookPattern?: HookPattern;
 }): Promise<ExpandedBlog> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
@@ -1010,6 +1142,59 @@ ANTI-WIEDERHOLUNGS-CHECK:
 - Wenn die obigen einen Pattern teilen → wähle ein KOMPLETT anderes
 ` : '';
 
+  // Bias-Block: gilt IMMER (nicht nur bei recentOpeners). Pusht aktiv die starken
+  // Curiosity-Gap-Opener (Money-Regret / Discovery / Aha-Moment) als Default
+  // statt "Es war Dienstag um 14:30"-Timestamp-Defaults.
+  const openerBiasSection = `
+══════════════════════════════════════════════════════════════════════
+KILLER-OPENER-BIAS — Welche Anfänge IMMER funktionieren (Pflicht-Bevorzugung)
+══════════════════════════════════════════════════════════════════════
+Die ersten 2 Sätze deines Blogs entscheiden ob jemand weiterliest oder weg-swiped.
+
+BEVORZUGE diese Opener-Typen (haben Research-belegte Hänge-Rate >70%):
+
+──── Typ A: Money-Regret-Opener ────
+Konkrete Geldsumme + Reue + Zeitspanne in den ERSTEN 2 SÄTZEN.
+Beispiele:
+  "4.800 Euro. Zwei Jahre. Für ein Tool das ich seit Monat 2 nicht mehr benutzt habe."
+  "So verlor ich 11 Monate und einen mittleren vierstelligen Betrag — heute weiß ich genau wo's schiefging."
+  "Das hätte nicht passieren sollen. Aber 23 Monate lang habe ich für ein Feature bezahlt, das niemand in meiner Firma kannte."
+
+──── Typ B: Discovery-Insider-Opener ────
+"Keiner kannte X — jetzt weiß es jeder" / Branchen-Insider-Reveal.
+Beispiele:
+  "Bis vor 3 Monaten hat das keiner gewusst. Jetzt steht es in jeder Branchen-Mail. Hier ist was passiert ist."
+  "Was kein Print-Berater dir erzählt: 73% der Plakat-Standorte tracken sich selbst — ohne dass du es weißt."
+  "Eine stille Branchen-Regel die niemand offiziell ausspricht: [...]"
+
+──── Typ C: Aha-Trick-Opener ────
+Konkreter Mehrwert-Trick + sofortige Anwendbarkeit.
+Beispiele:
+  "Ein einziger UTM-Parameter spart mir 3 Stunden Excel pro Woche. So sieht er aus:"
+  "Mach den QR-Code 2mm größer. Klingt lächerlich — bringt 31% mehr Scans."
+
+VERMEIDE als Default-Opener:
+  ✗ "Es war Dienstag 14:30 in Düsseldorf" — Timestamp-Opener NUR bei Archetype F
+  ✗ "Lass uns mal ehrlich sein" — Floskel, kein Inhalt
+  ✗ "In der heutigen schnelllebigen Zeit" — KI-typische Plattitüde
+  ✗ "Stell dir vor du bist..." — Hypothetische Einstiege wirken schwach
+  ✗ "Wir alle kennen das Problem" — Generisch-pluralisch
+
+PFLICHT-CHECK nach Zeile 1+2: Steht in den ersten 2 Sätzen mindestens EINS davon?
+  □ Eine konkrete Zahl (Geld / Zeit / Menge)
+  □ Eine konkrete Person mit Rolle (Anwalt, Tierarzt, Praktikant)
+  □ Ein konkretes Geheimnis-Reveal ("Was X dir nicht sagt:")
+  □ Ein konkreter Mini-Dialog (in Anführungszeichen)
+
+Wenn NULL davon → Opener neu schreiben.
+
+ÜBERSCHNEIDUNG mit dem hook_pattern der Idee:
+- Wenn der hook_pattern der Idee = money_regret → öffne mit Typ A (Pflicht)
+- Wenn der hook_pattern der Idee = discovery_insider → öffne mit Typ B (Pflicht)
+- Wenn der hook_pattern der Idee = aha_moment → öffne mit Typ C (Pflicht)
+- Andernfalls: wähle frei, aber NICHT Timestamp-Default.
+`;
+
   const archetypeAssignment = `
 ====================================================================
 ARCHETYPE-ZUWEISUNG für DIESEN Blog (KRITISCH — überschreibt generische Regeln)
@@ -1041,6 +1226,21 @@ Die folgende HOOK-PFLICHT-CHECKLISTE und das KILLER-OPENER-DOGMA gelten NUR
 für Archetype A, B, D, G (viszerale Archetypes). Für deinen Archetype ${archetype}
 gilt sie ${['A', 'B', 'D', 'G'].includes(archetype) ? 'AUCH' : 'NICHT — verwende den Opening-Stil aus der Archetype-DNA oben'}.
 ${recentOpenersSection}
+${openerBiasSection}
+${idea.hookPattern ? `
+══════════════════════════════════════════════════════════════════════
+FORCIERTER OPENER-TYP für diesen Blog (überschreibt alles andere)
+══════════════════════════════════════════════════════════════════════
+Diese Idee wurde mit hook_pattern = "${idea.hookPattern}" generiert.
+Das bedeutet:
+${idea.hookPattern === 'money_regret' ? '  → ÖFFNE MIT TYP A (Money-Regret). Konkrete Summe + Zeitspanne + Reue in den ersten 2 Sätzen. KEIN Timestamp-Opener.' : ''}
+${idea.hookPattern === 'discovery_insider' ? '  → ÖFFNE MIT TYP B (Discovery-Insider). "Keiner kannte X..." / "Was Y dir nicht sagt..." in den ersten 2 Sätzen.' : ''}
+${idea.hookPattern === 'aha_moment' ? '  → ÖFFNE MIT TYP C (Aha-Trick). Konkreter Trick + sofortige Anwendbarkeit in den ersten 2 Sätzen.' : ''}
+${idea.hookPattern === 'humor' ? '  → ÖFFNE MIT ABSURDER SZENE (lustige Beobachtung + Pointe). Lacher in den ersten 3 Sätzen Pflicht.' : ''}
+${idea.hookPattern === 'vulnerability' ? '  → ÖFFNE MIT EHRLICHEM FAIL-REVEAL. "Ich hab X verbockt — hier ist warum." Selbst-konkret.' : ''}
+${idea.hookPattern === 'transformation' ? '  → ÖFFNE MIT VORHER-NACHHER. Konkrete Zahlen vorher + nachher in den ersten 2 Sätzen.' : ''}
+${idea.hookPattern === 'curiosity_gap' ? '  → ÖFFNE MIT CURIOSITY-GAP. Info bewusst zurückhalten, Klick = einzige Auflösung.' : ''}
+` : ''}
 `;
 
   const prompt = `${SPURIG_VOICE}
