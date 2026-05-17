@@ -1221,8 +1221,63 @@ Wenn irgendwas davon fehlt — Text ist zu generisch. Spezifik einbauen.
 ==========================================
 IMAGE-PROMPT — VIRAL THUMBNAIL (KEIN STOCKFOTO)
 ==========================================
-Generiere einen ENGLISCHEN Image-Prompt (80-130 Worte) für ChatGPT/DALL-E 3/
+Generiere einen ENGLISCHEN Image-Prompt (180-260 Worte) für ChatGPT/DALL-E 3/
 Midjourney/Gemini Imagen.
+
+═══════════════════════════════════════════
+PFLICHT-SCHRITT 0 — DETAIL-EXTRACTION AUS DEM BLOG (KRITISCH)
+═══════════════════════════════════════════
+Bevor du einen Image-Prompt schreibst, lies dein eigenes Blog-Body. Identifiziere:
+
+  (1) Die ONE HERO-NUMBER aus deinem Blog (z.B. "23 Euro", "1.247 Anrufe",
+      "67 Plakatstandorte"). Diese MUSS visuell auftauchen oder im Overlay sein.
+  (2) Den ONE HERO-ORT aus deinem Blog (z.B. "Bestattungsinstitut Lübeck",
+      "Friseur Leipzig", "Tattoo-Studio Friedrichshain"). Setting MUSS dieser Ort sein.
+  (3) Die ONE HERO-PERSON-ROLLE aus deinem Blog (z.B. "Bestattungsunternehmer",
+      "Sanitärbetrieb-Inhaber", "Optikerin"). Wenn Person im Bild, dann DIESE.
+  (4) Das ONE HERO-OBJEKT aus deinem Blog (z.B. "ein Holzschild mit QR-Code",
+      "47 Postkarten auf einem Marmor-Tresen", "ein leerer Restaurant-Tisch
+      mit QR-Aufsteller").
+  (5) Die ONE HERO-EMOTION aus deinem Blog (Schock / Trauer / Erleichterung /
+      Empörung / Verwunderung).
+
+Beispiel-Extraktion vom Blog "Bestattungsinstitut Lübeck misst Trauer-Anrufe":
+  Hero-Number: 18 Jahre / 14 Trauer-Anrufe nach Plakat
+  Hero-Ort: Bestattungsinstitut, kleine Backsteinfassade, Lübeck Altstadt
+  Hero-Person-Rolle: Bestattungsunternehmer mit Brille, älter
+  Hero-Objekt: kleines Holzschild mit QR-Code an der Tür
+  Hero-Emotion: stille Verwunderung über die Daten
+
+DIESE 5 ELEMENTE MUESSEN im Image-Prompt explizit auftauchen. Wenn dein Image-
+Prompt austauschbar wäre mit einem aus einem ANDEREN Blog → falsch, neu schreiben.
+
+═══════════════════════════════════════════
+PFLICHT-SCHRITT 0b — MR-BEAST-THUMBNAIL-PRINZIPIEN (Research 2026)
+═══════════════════════════════════════════
+Top-Performer-Thumbnails auf LinkedIn 2026 folgen diesen 6 MrBeast-Regeln:
+
+  R1) EIN klares Hauptmotiv. NICHT 5 gleichgewichtige Objekte.
+      Wenn dein Image-Prompt mehr als 3 "primary focal points" hat → reduzieren.
+
+  R2) Maximal 2-3 dominante Farben. Eine Hero-Farbe + komplementäre Farbe.
+      Empfohlen: warm-orange auf cool-cyan, hot-pink auf deep-navy,
+      hazard-yellow auf charcoal-black, electric-red auf mint-green.
+      KEINE "Regenbogen-Palette" (Output wirkt dann amateurhaft).
+
+  R3) Eine Zahl ODER Stake sichtbar (im Overlay oder als Objekt).
+      Beispiel: brennende 50-Euro-Scheine, Stripe-Counter zeigt eine Zahl,
+      ein Stempel mit "18 JAHRE" als Detail.
+
+  R4) Extreme Sättigung + Kontrast. Bei 200x113 px Mobile-Größe muss alles
+      ablesbar sein. "muted" und "subtle" sind verboten.
+
+  R5) Wenn Person im Bild: EINE klar erkennbare Emotion auf dem Gesicht.
+      Nicht "ruhig", nicht "denkend", sondern: Schock / Trauer / Lachen /
+      Empörung / Verwunderung. Authentisch, nicht karikiert.
+
+  R6) EIN setting-defining Element im Hintergrund. Nicht generisches Office.
+      Sondern: Lübeck-Backsteinfassade, Bratwurst-Plakat blurred,
+      Friseursalon-Spiegel-Reihe, Eis-Theke mit Pastell-Eis.
 
 ═══════════════════════════════════════════
 KRITISCHES VERBOT — NIE GENERIEREN:
