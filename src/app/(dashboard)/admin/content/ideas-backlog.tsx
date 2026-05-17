@@ -116,15 +116,17 @@ export function IdeasBacklog() {
   async function expandOne(
     ideaId: string,
     title: string,
-    maxRetries = 2,
+    opts: { autoRepurpose?: boolean; maxRetries?: number } = {},
   ): Promise<{ ok: boolean; error?: string }> {
+    const autoRepurpose = opts.autoRepurpose ?? true;
+    const maxRetries = opts.maxRetries ?? 2;
     let lastError = '';
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         const r = await fetch('/api/admin/content/ideas/expand', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ideaId, autoRepurpose: true }),
+          body: JSON.stringify({ ideaId, autoRepurpose }),
           credentials: 'include',
         });
         const j = await r.json().catch(() => ({}));
@@ -132,14 +134,17 @@ export function IdeasBacklog() {
 
         // Retryable errors: 429 (rate-limit), 500 (timeout/parse), 502/503/504
         const retryable = [429, 500, 502, 503, 504].includes(r.status);
-        lastError = j.error ?? `HTTP ${r.status} bei "${title.slice(0, 30)}"`;
+        const isRateLimit = r.status === 429 || /rate.?limit|too many/i.test(j.error ?? '');
+        lastError = isRateLimit
+          ? `Anthropic-Rate-Limit. $40 Credits aufladen → Tier-2 Upgrade ODER 1h warten. (${title.slice(0, 30)})`
+          : (j.error ?? `HTTP ${r.status} bei "${title.slice(0, 30)}"`);
 
         if (!retryable || attempt === maxRetries) {
           return { ok: false, error: lastError };
         }
-        // Exponential backoff: 30s, 60s
-        const waitMs = (attempt + 1) * 30000;
-        console.log(`[expand-retry] "${title.slice(0, 30)}" attempt ${attempt + 1}/${maxRetries + 1} after ${waitMs}ms — last error: ${lastError}`);
+        // Rate-Limit braucht laengere Pause; sonstige Errors: 30s, 60s
+        const waitMs = isRateLimit ? 90000 : (attempt + 1) * 30000;
+        console.log(`[expand-retry] "${title.slice(0, 30)}" attempt ${attempt + 1}/${maxRetries + 1} after ${waitMs}ms — ${lastError}`);
         await new Promise((res) => setTimeout(res, waitMs));
       } catch (e) {
         lastError = e instanceof Error ? e.message : 'unknown';
@@ -153,7 +158,8 @@ export function IdeasBacklog() {
   async function expand(ideaId: string) {
     const ideaTitle = (data?.ideas ?? []).find((i) => i.id === ideaId)?.title ?? '?';
     setExpandingId(ideaId);
-    const result = await expandOne(ideaId, ideaTitle);
+    // Single-Klick: auto-repurpose AN (User klickt 1 Idee, will alles fertig)
+    const result = await expandOne(ideaId, ideaTitle, { autoRepurpose: true });
     if (result.ok) {
       toast.success(`Blog "${ideaTitle.slice(0, 50)}" geschrieben + Channel-Drafts`);
       queryClient.invalidateQueries({ queryKey: ['content-ideas'] });
@@ -173,6 +179,17 @@ export function IdeasBacklog() {
     const ideasMap = new Map((data?.ideas ?? []).map((i) => [i.id, i]));
     setBatchProgress({ total: ids.length, done: 0, failed: 0, current: null });
 
+    // Batch-Modus: KEIN auto-repurpose (spart 3x Claude-Calls pro Blog).
+    // Channel-Drafts kann der User danach pro Blog einzeln triggern.
+    // Adaptive Pause basierend auf Batch-Groesse:
+    //   2-3 Ideen → 15s zwischen Items
+    //   4-5 Ideen → 30s
+    //   6+ Ideen → 60s (vermeidet Rate-Limit-Cascade)
+    const pauseMs = ids.length >= 6 ? 60000 : ids.length >= 4 ? 30000 : 15000;
+    if (ids.length >= 3) {
+      toast.info(`Batch-Modus: ${ids.length} Blogs, ohne Auto-Channel-Drafts (spart Tokens). Pause ${pauseMs / 1000}s zwischen Items. Channel-Drafts triggerst du danach pro Blog einzeln.`);
+    }
+
     let done = 0;
     let failed = 0;
     for (let i = 0; i < ids.length; i++) {
@@ -180,24 +197,21 @@ export function IdeasBacklog() {
       const idea = ideasMap.get(id);
       if (!idea) continue;
       setBatchProgress({ total: ids.length, done, failed, current: idea.title });
-      const result = await expandOne(id, idea.title);
+      const result = await expandOne(id, idea.title, { autoRepurpose: false });
       if (result.ok) {
         done++;
         toast.success(`✓ "${idea.title.slice(0, 40)}…"`);
       } else {
         failed++;
-        toast.error(`✗ "${idea.title.slice(0, 40)}…" — ${result.error?.slice(0, 80)}`);
+        toast.error(`✗ "${idea.title.slice(0, 40)}…" — ${result.error?.slice(0, 120)}`);
       }
       setBatchProgress({ total: ids.length, done, failed, current: null });
       queryClient.invalidateQueries({ queryKey: ['content-ideas'] });
       queryClient.invalidateQueries({ queryKey: ['content-drafts'] });
 
-      // Pause zwischen Batch-Items damit Anthropic-Rate-Limit (50k token/min)
-      // sich erholt. Eine Idee verbraucht ~64k tokens (Blog + 3 Repurpose).
-      // Ohne Pause schlägt Idee 2+ oft mit 429-rate-limit fehl.
       if (i < ids.length - 1) {
-        setBatchProgress({ total: ids.length, done, failed, current: '⏳ Pause für Rate-Limit...' });
-        await new Promise((r) => setTimeout(r, 15000));
+        setBatchProgress({ total: ids.length, done, failed, current: `⏳ Pause ${pauseMs / 1000}s für Rate-Limit...` });
+        await new Promise((r) => setTimeout(r, pauseMs));
       }
     }
     setBatchProgress(null);
