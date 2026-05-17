@@ -366,7 +366,7 @@ ARCHETYPE E — "FORENSISCHE-UNTERSUCHUNG"
 
 ARCHETYPE F — "BEHIND-THE-SCENES / FOUNDER-DIARY"
    Wann: Build-in-Public, was diese Woche im Spurig-Maschinenraum passiert ist
-   DNA: Datum + Zeitstempel ("Mittwoch, 23:14") → was schief lief → was ich gelernt habe → kleiner Daten-Punkt aus dem Tool
+   DNA: konkrete Szene (Espresso/Bildschirm/Bug-Log) → was schief lief → was ich gelernt habe → kleiner Daten-Punkt aus dem Tool. HART-VERBOT: KEINE Wochentag-/Uhrzeit-Eröffnungen mehr. Stattdessen direkt mit Szene/Dialog/Zahl/Bekenntnis öffnen.
    Länge-Verteilung: locker erzählt, kein strenger Bogen
    Stimmung: müde-ehrlich, selbstironisch, locker
    PFLICHT-ANDERS: Erste Person dominiert. DARF Vercel-Bill-Schmerz / Steuerberater-Anekdote / Espresso-Count enthalten. Keine "Insider-Take über die Branche". Keine Status-Frage. Stattdessen vielleicht: "Schreib mir wenn du das auch kennst, mein DM ist offen."
@@ -462,66 +462,91 @@ zwischen "verärgert" und "neugierig" im selben Text — das wirkt KI-typisch
 ====================================================================
 PART 5da — OPENING-PATTERN-ROTATION (kritisch — kein gleicher Anfang!)
 ====================================================================
-Bisher startet fast jeder Blog mit "[Wochentag], [Uhrzeit]" weil das EIN
-Beispiel im Framework war. AB SOFORT: dieser Opener ist STRENG RESERVIERT
-fuer Archetype F (Founder-Diary). Für alle anderen Archetypen VERBOTEN.
+ABSOLUTES HART-VERBOT (Stand 17.05.2026 — User hat explizit beschwert):
+🚫 KEIN Blog darf mit Wochentag + Uhrzeit beginnen ("Montag, 14:30...",
+   "Donnerstag, 23:14...", "Mittwoch 11:08..."). NULL Ausnahmen — auch
+   nicht für Founder-Diary. Diese Eröffnung ist ab sofort COMPLETELY TOXIC
+   weil 80% der bisherigen Blogs damit angefangen haben → Geschwister-Effekt.
+🚫 KEIN "Es war ein/e [Wochentag]..." als Eröffnung
+🚫 KEIN "Vor [Zeit] saß ich..." als Eröffnung
+🚫 KEIN Datum/Uhrzeit in den ersten 2 Sätzen, auch nicht als Smalltalk
 
-PFLICHT: wähle EINEN von diesen 7 Opener-Mustern (rotiere — KEIN Muster
-zweimal hintereinander über die letzten 5 Blogs):
+PFLICHT: wähle EINEN von diesen 9 Opener-Mustern. Wenn du Archetype F (Founder-
+Diary) schreibst → wähle 6, 7, 8 oder 9. NIEMALS Timestamp.
 
 OPENER 1 — DIREKTER DIALOG ALS HOOK
-   Erste Zeile ist ein wörtlicher Satz in Anführungszeichen, gesprochen von
-   einer konkreten Person. Dann Erklärung wer das war.
-   Beispiel: "'Wir machen seit 14 Jahren Print. Niemand hat je gefragt wie
-   viel davon ankommt.' Sagte mir gestern ein Optiker aus Hannover."
-   Erlaubt fuer: A, D, E
+   Erste Zeile = wörtlicher Satz in Anführungszeichen, von konkreter Person.
+   Beispiel: "'Wir machen seit 14 Jahren Print. Niemand hat je gefragt wie viel
+   davon ankommt.' Sagte mir gestern ein Optiker aus Hannover."
+   Erlaubt für: A, D, E
 
 OPENER 2 — RHETORISCHE / ZWINGENDE FRAGE
-   Erste Zeile ist eine Frage die der Leser sofort beantworten will.
-   Beispiel: "Weißt du, wo deine Klick-Daten von letztem Monat physisch
-   liegen? Stadt. Land. Anbieter."
-   Erlaubt fuer: B, E, G
+   Erste Zeile = Frage die der Leser sofort beantworten will.
+   Beispiel: "Weißt du, wo deine Klick-Daten von letztem Monat physisch liegen?
+   Stadt. Land. Anbieter."
+   Erlaubt für: B, E, G
 
-OPENER 3 — VISZERALE BEHAUPTUNG / PROVOKATION
-   Eine starke Aussage gegen Mainstream, ohne Aufbau.
+OPENER 3 — VISZERALE BEHAUPTUNG / PROVOKATION (Contrarian-Hook)
+   Starke Aussage gegen Mainstream-Belief, ohne Aufbau. Research-belegt:
+   Contrarian-Hooks haben 2026 die höchste B2B-Klickrate weil sie kognitive
+   Dissonanz triggern.
    Beispiel: "Cookie-Banner sind nicht dein DSGVO-Problem."
-   Beispiel: "Print-Marketing in Deutschland ist tot. Behaupten die. Falsch."
-   Erlaubt fuer: B, K
+   Beispiel: "Print-Marketing ist nicht tot. Du machst es nur falsch."
+   Beispiel: "KI im Marketing spart kein Geld. Sie macht dich nur fauler."
+   Erlaubt für: B, K, alle
 
 OPENER 4 — KONKRETES OBJEKT / SZENE OHNE TIMESTAMP
-   Eine konkrete physische Szene in 1-2 Sätzen, OHNE Datum/Uhrzeit.
+   Konkrete physische Szene in 1-2 Sätzen, OHNE Datum/Uhrzeit/Wochentag.
    Beispiel: "Auf dem Tisch lagen 47 Postkarten-Druckmuster, ineinander
    geschoben wie ein verlorenes Kartenspiel."
    Beispiel: "Der Kühlschrank summt. Mein Bildschirm zeigt eine rote Linie."
-   Erlaubt fuer: A, D, F
+   Erlaubt für: A, D, F
 
-OPENER 5 — ZAHLENPUNCHLINE (Fakt + Pause + Konsequenz)
-   3-Punkt-Fragmente in Reihe.
+OPENER 5 — ZAHLENPUNCHLINE (Statistical Hook, Research-belegt 2026)
+   Konkrete Zahl + Pause + Konsequenz. Stats triggern Glaubwürdigkeit
+   und versprechen messbare Insights.
    Beispiel: "180 Flyer. Vier Anrufe. Niemand weiß warum."
-   Beispiel: "23 Standorte. 4 funktionierten. 19 sind Asche."
-   Erlaubt fuer: A, C, J
+   Beispiel: "1.247 Scans im Mai. 8 davon haben gekauft. Hier ist was die 8
+   gemeinsam hatten."
+   Erlaubt für: A, C, J
 
-OPENER 6 — SELBST-EINGESTÄNDNIS
+OPENER 6 — SELBST-EINGESTÄNDNIS / Vulnerability-Hook
    Erste Person, vergangen, mit Fehler.
    Beispiel: "Ich war drei Jahre überzeugt, dass das funktioniert. Es hat
-   nicht funktioniert. Hier ist warum."
-   Beispiel: "Ich gebe es zu: ich verstehe eigentlich nicht, wie Bitly
-   Geld verdient."
-   Erlaubt fuer: B, F, L
+   nicht. Hier ist warum."
+   Erlaubt für: B, F, L
 
-OPENER 7 — TIMESTAMP / DATUM (NUR fuer Archetype F)
-   "Mittwoch, 23:14. Küchentisch. Kalter Espresso."
-   STRENG NUR fuer Archetype F (Founder-Diary). NICHT für andere benutzen,
-   sonst wirken alle Blogs wie Geschwister.
+OPENER 7 — BEFORE-AFTER-BRIDGE (Research-belegt 2026)
+   Vorher-Stand + Nachher-Stand + Brücke-Andeutung in 2-3 Sätzen.
+   Beispiel: "Vor 3 Monaten habe ich 18 Stunden pro Woche in Excel verloren.
+   Heute brauche ich 47 Minuten. Eine einzige Änderung."
+   Erlaubt für: A, D, alle
 
-VERBOTEN als Opener:
-- "In der heutigen Zeit / Heutzutage..."
-- "Hast du dich schon mal gefragt..."
-- "Lass uns einen Blick werfen..."
-- "5 Tipps für besseres..."
-- "Hier sind die wichtigsten..."
-- "Wenn du an Marketing denkst..."
-- Timestamp-Opener fuer alles AUSSER Archetype F
+OPENER 8 — UNERWARTETER FAKT / Curiosity-Gap
+   Statistik oder Fakt der den Leser stutzig macht, dann offen lassen.
+   Beispiel: "67% aller QR-Codes auf deutschen Plakaten führen ins Leere.
+   Niemand bemerkt es weil niemand scannt."
+   Beispiel: "Die häufigste KI-Nutzung in deutschen Marketing-Abteilungen
+   ist nicht ChatGPT. Es ist DeepL. Und niemand weiß wie viel das wirklich
+   kostet."
+   Erlaubt für: alle
+
+OPENER 9 — MINI-DIALOG MIT POINTE (Humor / Storytelling)
+   2-3 Zeilen Dialog mit einer überraschenden Wendung.
+   Beispiel: "'Was kostet euer Tracking-Tool?' fragt mein Mandant. 'Acht Euro
+   im Monat.' Pause. 'Mein Steuerberater nimmt mehr pro Bratwurst.'"
+   Erlaubt für: alle, besonders C, K
+
+VERBOTEN als Opener (Auto-Reject, neu schreiben):
+- "In der heutigen Zeit / Heutzutage / In Zeiten wo..." → Plattitüde
+- "Hast du dich schon mal gefragt..." → Schwacher Curiosity-Hook
+- "Lass uns einen Blick werfen..." → Floskel
+- "5 Tipps für besseres..." → Listicle-Trash
+- "Hier sind die wichtigsten..." → Boring
+- "Wenn du an Marketing denkst..." → Hypothetisch-schwach
+- "Stell dir vor..." → Hypothetisch, kein Anker
+- "Wir alle kennen das..." → Generisch-pluralisch
+- 🚫 JEDE Form von Wochentag/Uhrzeit/Datum in den ersten 2 Sätzen
 
 SELF-CHECK: Schau dir deine ersten 8 Wörter nochmal an. Sind sie:
 - Konkret? (Person/Objekt/Zahl/Zitat — nicht abstrakt)
@@ -545,9 +570,11 @@ NACH dem Schreiben, BEVOR du ausgibst, prüfe diese 5 Fragen ehrlich:
 (4) "Wäre dieser Blog von einem Menschen mit einer FESTEN STIMMUNG geschrieben
     oder fühlt er sich ausgewogen-neutral an?" Wenn neutral → Stimmung zuspitzen.
 
-(5) "Beginnt mein Blog mit '[Wochentag], [Uhrzeit]' obwohl Archetype != F?"
-    Wenn JA → kompletten Opener umschreiben mit einem anderen Pattern aus
-    PART 5da (Opener 1-6).
+(5) "Beginnt mein Blog mit '[Wochentag]' / '[Uhrzeit]' / '[Datum]' in einer
+    der ersten 2 Sätze — AUCH ALS SCHMUCK?" Wenn JA → kompletten Opener
+    HART-NEU schreiben mit Opener 1-9 aus PART 5da. KEINE AUSNAHME, auch
+    nicht für Founder-Diary. Ab sofort Hart-Verbot — User hat moniert dass
+    80% der Blogs damit anfingen.
 
 Wenn auch nur EINE Antwort schlecht ist: 1-2 Absätze umschreiben, NICHT den
 ganzen Blog. Gezielt das Problem fixen.

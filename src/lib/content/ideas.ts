@@ -193,7 +193,7 @@ export function archetypeSpecificInstructions(archetype: BlogArchetype): string 
     case 'E':
       return `Journalist-Modus, KEIN Drama. Sachlich-beharrlich. Erste Zeile = eine Frage ("Wo liegen Bitlys Daten wirklich?"). Dann der Recherche-Pfad: "Ich rief X an. Sie sagte Y. Also las ich Z." Konkrete Funde mit Datum + Quelle + Zitat. Wenig "ich-Drama", viel "ich-fand-heraus". Schluss: nüchternes Resümee. KEIN viszerales Vokabular. KEINE Status-Frage am Ende.`;
     case 'F':
-      return `Behind-the-Scenes / Founder-Diary. Beginne mit Datum + Zeitstempel ("Mittwoch, 23:14. Küchentisch. Vierter Espresso."). Was diese Woche im Spurig-Maschinenraum passiert ist — was schief lief, was ich gelernt habe. Vercel-Bill-Schmerz / Steuerberater-Anekdote / Espresso-Count sind erlaubt und passend. KEIN Insider-Take über die Branche. KEINE Status-Frage. Stattdessen: "Schreib mir wenn du das auch kennst, mein DM ist offen." Müde-ehrliche Atmosphäre.`;
+      return `Behind-the-Scenes / Founder-Diary. HART-VERBOT: KEIN Wochentag/Uhrzeit/Datum-Opener mehr (User hat moniert dass 80% so anfingen — toxisch geworden). Beginne stattdessen mit konkreter Szene (Bug-Log auf Bildschirm / Fehler-Modal / verfehlte Deadline) ODER direktem Bekenntnis ("Heute hat mich Stripe geschockt. -47%."). Was diese Woche im Spurig-Maschinenraum passiert ist — was schief lief, was ich gelernt habe. Vercel-Bill-Schmerz / Steuerberater-Anekdote / Espresso-Count sind erlaubt und passend. KEIN Insider-Take über die Branche. KEINE Status-Frage. Stattdessen: "Schreib mir wenn du das auch kennst, mein DM ist offen." Müde-ehrliche Atmosphäre.`;
     case 'G':
       return `Fairer Vergleich. Erste Zeile = eine Frage ("Bitly oder Spurig? Ich versuche es fair."). Dann FÜR/GEGEN-Analyse für beide Seiten. PFLICHT: erwähne ehrlich wo das ANDERE Tool BESSER ist (das macht dich glaubwürdig). Erst dann wo Spurig besser ist. Schluss: ein "es kommt drauf an"-Fazit, kein Sales-Push. KEIN viszerales Vokabular. KEIN "Geld verbrennt"-Hook.`;
   }
@@ -880,6 +880,86 @@ VARIATIONS-PFLICHT (zusätzlich zum Category-Wheel)
 - Mind. 3 Ideen mit "Did-you-know"-Reveal-Charakter (C2/C5/C10)
 
 ══════════════════════════════════════════════════════════════════════
+TOPIC-DIVERSITY-PFLICHT (Research 2026 — wichtigste Topics für SaaS-Audience)
+══════════════════════════════════════════════════════════════════════
+User-Beschwerde: "Themen sind zu eng / zu wenig vielfältig". Research zeigt
+für 2026 dass folgende Topic-Buckets die höchste B2B-Engagement-Rate haben.
+**JE 10 IDEEN MUSS folgende Topic-Verteilung enthalten:**
+
+  📊 mind. 2 KI/AI-Topics — "Wie ich ChatGPT für X nutze", "KI-Hype vs Realität",
+     "Welches Tool spart wirklich Zeit", "DeepL vs Google vs Claude für Texte",
+     "Wann KI Geld verbrennt statt spart"
+  💰 mind. 2 Money-Saving / Gewinn-Topics — "Wie ich 1.200€/Mo SaaS-Stack auf
+     180€ reduziert hab", "5 Tools die kostenlose Alternativen haben", "Wie viel
+     dein Marketing-Stack wirklich kostet (Audit-Anleitung)"
+  💡 mind. 2 Educational / Aha-Trick-Topics — konkreter Mehrwert-Tipp den der
+     Leser SOFORT umsetzen kann, mit Mini-Anleitung
+  📖 mind. 2 Storytelling-Topics — echte Mini-Story (Kunde / Anekdote /
+     Erlebnis) mit Pointe. KEIN Hypothetisches.
+  😄 mind. 1 Humor-Topic — absurde Beobachtung + Pointe, echter Lacher
+  📈 Rest beliebig
+
+Erweiterte Sub-Topic-Pools je Pillar (rotiere — keine 2 ähnliche pro Batch):
+
+QR-Realtalk:
+  • Eye-Tracking-Studien — wie groß muss QR sein
+  • QR-Codes auf Pflegeprodukten / im Senioren-Marketing
+  • QR-Codes auf Bratwurst / Bier / Lebensmitteln (verwittert?)
+  • Hochzeits-QR-Codes — wer scannt wirklich
+  • QR im Schaufenster vs auf der Tür — welche Position klickt
+  • QR-Code als Easter-Egg in Print
+  • Multi-QR-Bingo: 5 QR-Codes nebeneinander, wer gewinnt
+
+Print lebt:
+  • Plakatwerbung-ROI 2026 mit aktuellen Zahlen
+  • Direktmailing-Rückkehr (besonders bei Senioren-Markt)
+  • DOOH (Digital-Out-of-Home) vs klassische Plakate
+  • Flyer-Conversion-Hacks (Papier, Format, Hand-Anweisungen)
+  • Print + QR + UTM = full-loop tracking
+  • Visitenkarten mit Tracking
+  • Magazin-Anzeigen vs Print-Beilagen
+
+DSGVO ohne Anwalt:
+  • Aktuelle Bußgeld-Fälle DACH 2026
+  • Schrems II + Trump 2.0 = was ändert sich 2026
+  • Auftragsverarbeitungsverträge ohne Anwalt erstellen
+  • Cookie-Banner-Ausnahmen (was darf ohne Consent)
+  • Pixel + DSGVO — was Facebook/Meta erlaubt + verbietet
+  • Microsoft Clarity + EU = ja oder nein
+  • DPO-Pflicht — wann brauchst du wirklich einen
+
+Mittelstand-Stories:
+  • Branche-spezifische QR-Use-Cases (rotiere durch 30+ Berufe)
+  • Lokale Sichtbarkeit ohne Google-My-Business-Spam
+  • Wie 1-Personen-Unternehmen Marketing tracken
+  • Family-Business + digitale Transformation
+  • Branchen-Verbände vs Tools — wer hilft wirklich
+
+Tracking-Tricks:
+  • UTM-Convention-Library (best practice)
+  • Last-Click vs Multi-Touch — was passt zu KMU
+  • Cookieless-Tracking nach 2026
+  • Server-Side-Tracking ohne GTM-Server
+  • Conversion-API direkt von eigenem Server
+  • A/B-Testing für Solopreneure (ohne Tool-Stack)
+  • KI-Tools zum Tracking-Reporting (siehe TOPIC-BUCKET KI)
+
+Founder-Tagebuch:
+  • Build-in-Public-Meilenstein (mit konkreten Zahlen)
+  • Pricing-Pivot-Story
+  • Cancel-Story (Customer-Interview-Insight)
+  • Tool-Audit-Schmerz (siehe TOPIC-BUCKET Money-Saving)
+  • Wie ich Stripe-Webhook + Deutsches Steuersystem überlebt habe
+  • Mein KI-Workflow für Content-Erstellung (siehe TOPIC-BUCKET KI)
+  • Trial-Conversion-A/B-Test-Ergebnis
+  • Was Indie-Hacker-Communities übersehen
+
+JEDE Idee MUSS mindestens 1 Topic-Bucket konkret ansprechen.
+Wenn der Pillar Founder-Tagebuch ist und das Topic "KI" → erlaubt + erwünscht.
+Wenn der Pillar QR-Realtalk ist und das Topic "Money-Saving" → erlaubt wenn
+nahe QR-Bezug (z.B. "QR-Tracking statt $300 Bitly-Enterprise").
+
+══════════════════════════════════════════════════════════════════════
 HOOK-PATTERN-QUOTA (PFLICHT pro Batch von ${count} Ideen — wird CODE-SEITIG geprüft)
 ══════════════════════════════════════════════════════════════════════
 Jede Idee MUSS einem der folgenden hook_pattern-Tags zugeordnet werden.
@@ -1344,20 +1424,50 @@ Beispiele:
   "Ein einziger UTM-Parameter spart mir 3 Stunden Excel pro Woche. So sieht er aus:"
   "Mach den QR-Code 2mm größer. Klingt lächerlich — bringt 31% mehr Scans."
 
-VERMEIDE als Default-Opener:
-  ✗ "Es war Dienstag 14:30 in Düsseldorf" — Timestamp-Opener NUR bei Archetype F
+──── Typ D: Contrarian-Provokations-Opener (Research-belegt 2026) ────
+Direktes Anti-Mainstream-Statement. Triggert kognitive Dissonanz → Leser
+muss verstehen warum. Höchste B2B-Klickrate 2026.
+Beispiele:
+  "KI im Marketing spart kein Geld. Sie macht dich nur fauler."
+  "Cookie-Banner sind nicht dein DSGVO-Problem. Sie sind die Ablenkung."
+  "Bitly ist nicht zu teuer. Du nutzt es nur falsch."
+
+──── Typ E: Statistical Lead (Research-belegt 2026) ────
+Erste 2 Sätze = konkrete Zahl + Implikation. Stats = Credibility-Boost.
+Beispiele:
+  "67% aller QR-Codes auf deutschen Plakaten führen ins Leere. Niemand bemerkt es."
+  "1.247 Marketing-Tools, 12 davon nutzt deine Abteilung wirklich. Ich hab nachgezählt."
+
+──── Typ F: Before-After-Bridge ────
+Vorher-Stand + Nachher-Stand in 2-3 Sätzen, mit Brücken-Andeutung.
+Beispiele:
+  "Vor 3 Monaten: 18h Excel pro Woche. Heute: 47 Minuten. Eine einzige Änderung."
+
+VERMEIDE als Default-Opener (HART-VERBOT — auto-reject):
+  🚫 JEDE Form von Wochentag / Uhrzeit / Datum in den ersten 2 Sätzen
+     ("Es war Dienstag", "Mittwoch 14:30", "Vor 3 Wochen Donnerstag")
+     → Auch nicht für Founder-Diary. User hat moniert, 80% so begonnen.
   ✗ "Lass uns mal ehrlich sein" — Floskel, kein Inhalt
   ✗ "In der heutigen schnelllebigen Zeit" — KI-typische Plattitüde
   ✗ "Stell dir vor du bist..." — Hypothetische Einstiege wirken schwach
   ✗ "Wir alle kennen das Problem" — Generisch-pluralisch
+  ✗ "5 Tipps für besseres..." — Listicle-Trash
+  ✗ "Hast du dich schon mal gefragt..." — Schwacher Curiosity-Hook
 
 PFLICHT-CHECK nach Zeile 1+2: Steht in den ersten 2 Sätzen mindestens EINS davon?
-  □ Eine konkrete Zahl (Geld / Zeit / Menge)
-  □ Eine konkrete Person mit Rolle (Anwalt, Tierarzt, Praktikant)
+  □ Eine konkrete Zahl (Geld / Zeit / Menge / Prozent)
+  □ Eine konkrete Person mit Rolle (Anwalt, Tierarzt, Praktikant, KMU-Inhaber)
   □ Ein konkretes Geheimnis-Reveal ("Was X dir nicht sagt:")
   □ Ein konkreter Mini-Dialog (in Anführungszeichen)
+  □ Eine Contrarian-Provokation (klares "Nein, falsch.")
+  □ Eine Before-After-Brücke (vorher X / heute Y / Bridge angedeutet)
 
-Wenn NULL davon → Opener neu schreiben.
+ZUSÄTZLICH-CHECK: Steht in den ersten 2 Sätzen IRGENDETWAS davon?
+  □ Wochentag (Montag/Dienstag/...) → NEU SCHREIBEN
+  □ Uhrzeit (14:30, 23:14) → NEU SCHREIBEN
+  □ "Vor X Wochen/Monaten" als Zeit-Anker → NEU SCHREIBEN
+
+Wenn NULL Pflicht-Element ODER EIN Wochentag-Element → Opener neu schreiben.
 
 ÜBERSCHNEIDUNG mit dem hook_pattern der Idee:
 - Wenn der hook_pattern der Idee = money_regret → öffne mit Typ A (Pflicht)
@@ -1383,9 +1493,11 @@ VERHALTENS-REGELN:
    - Mindestens 1 Satz über 30 Wörter (eine Beweisführung oder Beschreibung)
    - Mindestens 2 Fragmente (kein Verb, oder nur 1 Wort: "Asche.", "Sechs Jahre.")
    - Absatz-Längen ABSICHTLICH ungleich: 1-Zeiler und 5-7-Satz-Absätze mischen
-4. OPENER-PFLICHT (PART 5da): wähle einen der 7 Opener-Muster (1-7).
-   Opener 7 (Timestamp "Mittwoch, 23:14") ist STRENG RESERVIERT fuer Archetype F.
-   Dein Archetype: ${archetype} → ${archetype === 'F' ? 'Opener 7 erlaubt (Timestamp)' : 'NICHT Opener 7, wähle aus Opener 1-6'}.
+4. OPENER-PFLICHT (PART 5da): wähle einen der 9 Opener-Muster (1-9). HART-VERBOT
+   (NULL Ausnahmen, auch nicht für Archetype F): KEIN Wochentag / KEIN Uhrzeit /
+   KEIN Datum in den ersten 2 Sätzen. Auch nicht als Smalltalk-Schmuck. Wer
+   damit startet → komplett neuen Opener wählen aus Opener 1-9.
+   Dein Archetype: ${archetype}.
 5. Anti-Template-Check (PART 5e) am Schluss: würde ein Leser den Blog
    verwechseln können mit "irgendeinem anderen Spurig-Blog"? Wenn ja → die
    Stimmung zuspitzen, den Archetype klarer zeigen.
