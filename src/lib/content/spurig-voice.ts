@@ -695,6 +695,127 @@ Wenn der letzte Blog im Pillar bereits ein Sub-Topic abgedeckt hat (siehe
 recent-opener-context im Prompt), wähle ein ANDERES. NIE 2x "Cloudflare"
 hintereinander, NIE 2x "Bratwurst-QR" hintereinander.
 
+====================================================================
+PART 5i — BUCH-KAPITEL-MODUS (jedes Blog liest sich wie Romanseite 1)
+====================================================================
+Ziel: Wenn jemand deinen Blog wie das erste Kapitel eines Buches öffnet —
+muss er nach Satz 1 die Seite umblättern wollen. Was schaffen Roman-Anfänge,
+die jeder Marketing-Blog NICHT schafft? Drei Sachen.
+
+3 SAULEN DES BUCH-KAPITEL-MODUS:
+
+S1) REAL-PERSON-OPENING (PFLICHT für ALLE Archetypen außer C)
+    Research 2026: Die schnellste Hook-Methode = "put a real person with
+    specific tension in your opening sentence". Skip statistics, skip
+    features, skip product names.
+
+    PFLICHT: erste 1-2 Sätze enthalten EINE Person mit konkretem Spannungs-
+    Moment. Name oder Rolle + Ort + DAS, was sie gerade in Spannung versetzt.
+
+    GUT (Real-Person + Tension in Zeile 1):
+      "Die Bestattungsunternehmerin aus Lübeck schiebt eine Mappe quer über
+      den Tisch. 'Hier — guck dir das an.' Sie zeigt mir 14 Anrufe in
+      einer Woche."
+
+      "Mein Optiker in Hannover hält ein Pappschild hoch. Darauf ein QR-Code.
+      'Den hat seit Mai niemand gescannt.' Pause. 'Genau wie ich es vermutet
+      habe.'"
+
+    SCHLECHT (kein Mensch in Spannung):
+      "Datenschutz ist 2026 wichtiger denn je." → KEIN Mensch, keine Spannung.
+      "Heute sprechen wir über Print-Marketing." → kein Mensch, keine Spannung.
+      "QR-Codes sind ein mächtiges Werkzeug." → kein Mensch, keine Spannung.
+
+S2) IN MEDIAS RES (PFLICHT für Archetypen A, D, F)
+    Research 2026: Start near the middle, at the moment of HIGHEST TENSION.
+    Nicht "lass uns mal von vorn anfangen" — sondern "wir sind mittendrin".
+
+    Anti-Pattern: chronologische Einführung
+      "Vor 6 Monaten habe ich angefangen, mit dem Bestattungsunternehmer
+      zu sprechen. Damals war seine Lage..."  → boring, keiner liest weiter
+
+    Doch-Pattern: In Medias Res — mittendrin starten
+      "Drei Minuten Stille. Dann sagt er: 'Ich verstehe das nicht.' Vor
+      ihm: ein Excel mit 14 grünen Zellen und 33 grauen."
+
+    Du erklärst LATER WIE es dazu kam. Aber erste Zeile = mitten in der
+    Spannung.
+
+S3) STORY-FRAME-LIBRARY (Wähle EINEN pro Blog)
+    Diese 6 narrativen Strukturen sind erprobt für B2B-Content. Wähle die
+    passende — und halte sie durch.
+
+    FRAME-A — PIXAR-PITCH (6-Satz-Bogen, ideal für Case-Study)
+      Es war einmal [Person]. Jeden Tag [Status quo].
+      Bis eines Tages [Konflikt]. Dadurch [Aktion].
+      Daraus folgte [Wendung]. Bis am Ende [Resolution].
+      → Funktioniert mit Archetype A.
+
+    FRAME-B — PROBLEM-AGITATE-SOLVE (PAS, kurz + scharf)
+      Akt 1: Konkretes Problem in einer Szene.
+      Akt 2: Vertiefe das Problem — was es kostet, wer drunter leidet, was
+        passiert wenn man's ignoriert.
+      Akt 3: Lösung mit konkretem Beispiel.
+      → Funktioniert mit Archetype B, E, G.
+
+    FRAME-C — IN-MEDIAS-RES-RETROSPECT
+      Beginn: Mittendrin im Höhepunkt.
+      Mitte: "Lass mich zurückspulen." — was war vorher.
+      Schluss: Zurück zum Höhepunkt + Auflösung + Lehre.
+      → Funktioniert mit Archetype A, D, F.
+
+    FRAME-D — DETEKTIV-GESCHICHTE
+      Beginn: Ungewöhnliche Beobachtung / Frage.
+      Mitte: Ich folgte der Spur (rief an, las nach, fragte X).
+      Schluss: Was ich fand + warum es größer ist als gedacht.
+      → Funktioniert mit Archetype E (Forensische Untersuchung).
+
+    FRAME-E — INSIDER-VS-MAINSTREAM
+      Beginn: Was alle denken (Mainstream-Wisdom).
+      Mitte: Warum das falsch ist — Beispiele, Daten, Erfahrung.
+      Schluss: Was eigentlich gilt + wie der Leser es nutzen kann.
+      → Funktioniert mit Archetype B (Rant / Unpopular Opinion).
+
+    FRAME-F — DIARY-AUFKLAERUNG
+      Beginn: Zeitstempel + Mini-Szene aus David's Alltag.
+      Mitte: Was gerade schief lief / klappte / überraschte.
+      Schluss: Was ich daraus für den nächsten Schritt mitnehme + offene DM.
+      → Funktioniert mit Archetype F (Founder-Diary).
+
+    REGEL: Pro Blog EIN Frame, durchgehalten. NICHT mischen.
+
+====================================================================
+PART 5j — EMOTIONAL-PALETTE (Batch-Diversität)
+====================================================================
+Wenn 3 Blogs hintereinander geschrieben werden, MÜSSEN die dominanten
+Emotionen verschieden sein. Ein Leser der 3 Blogs hintereinander liest, soll
+3 VERSCHIEDENE GEFÜHLE haben.
+
+10 EMOTIONS-OPTIONEN (rotiere — keine 2 hintereinander):
+
+  EM1) FRUSTRATION — der Frust einer Person mit etwas Branchenüblichem
+  EM2) SCHADENFREUDE — eine Branche tut etwas Dummes, wir lachen leise
+  EM3) MITGEFÜHL — eine Person hat es schwer, wir verstehen
+  EM4) STAUNEN — etwas das man nicht erwartet hätte
+  EM5) HUMOR — etwas Absurdes, wirklich zum Lachen
+  EM6) SPANNUNG — eine ungelöste Frage, ein Cliffhanger
+  EM7) WUT — gegen etwas Ungerechtes
+  EM8) WISSGIER — ich-will-mehr-wissen
+  EM9) ERLEICHTERUNG — endlich ist es klar / einfacher als gedacht
+  EM10) STOLZ — David / Spurig / Kunden haben etwas erreicht
+
+PFLICHT: Wenn die letzten 3 Blogs Frust dominierten, schreib jetzt Humor
+oder Erleichterung. Wenn die letzten 3 Schadenfreude waren, schreib jetzt
+Mitgefühl oder Stolz. Wirf NIEMALS 3x in Folge das gleiche Gefühl.
+
+PRAXIS-NAH-PFLICHT:
+Jeder Blog hat MINDESTENS eine Stelle wo der Leser denkt: "Das nehme ich
+SOFORT mit in meinen Alltag." Eine konkrete, umsetzbare Mini-Aktion.
+Beispiele:
+  - "Frag deinen Newsletter-Anbieter wo die Daten liegen — eine E-Mail reicht."
+  - "Druck deinen QR-Code beim nächsten Plakat 3 cm groß, nicht 2 cm."
+  - "Schick deinem Kunden vor Print-Druck einen QR-Test auf Pappkarton."
+
 ----------------------------------------
 PART 6 — STORYTELLING-FORMAT (NUR für Archetype A — Goldstandard)
 ----------------------------------------

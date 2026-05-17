@@ -65,16 +65,22 @@ export async function POST(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(5);
     const recentArchetypes: BlogArchetype[] = [];
+    const recentMoods: number[] = [];
     const recentOpeners: string[] = [];
     for (const b of recentBlogs ?? []) {
-      const tag = (b.tags as string[] | null)?.find((t) => t.startsWith('archetype:'));
-      const code = tag?.slice('archetype:'.length) as BlogArchetype | undefined;
+      const tags = (b.tags as string[] | null) ?? [];
+      const archTag = tags.find((t) => t.startsWith('archetype:'));
+      const code = archTag?.slice('archetype:'.length) as BlogArchetype | undefined;
       if (code && ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(code)) {
         recentArchetypes.push(code);
       }
+      const moodTag = tags.find((t) => t.startsWith('mood:'));
+      const moodNum = moodTag ? parseInt(moodTag.slice('mood:'.length), 10) : NaN;
+      if (Number.isFinite(moodNum) && moodNum >= 1 && moodNum <= 6) {
+        recentMoods.push(moodNum);
+      }
       // Erste 1-2 Sätze als Opener-Signature extrahieren
       const body = (b.body_md as string | null) ?? '';
-      // Strip H2-Headlines am Anfang, dann ersten ~120 chars nehmen
       const cleaned = body.replace(/^(##\s+.*?\n+)+/m, '').trim();
       const opener = cleaned.slice(0, 140).replace(/\s+/g, ' ').trim();
       if (opener.length > 20) recentOpeners.push(opener);
@@ -89,6 +95,7 @@ export async function POST(request: NextRequest) {
         target_keywords: idea.target_keywords,
         cluster: idea.cluster as ContentCluster,
         recentArchetypes: recentArchetypes.slice(0, 3),
+        recentMoods: recentMoods.slice(0, 3),
         recentOpeners,
       });
     } catch (e) {

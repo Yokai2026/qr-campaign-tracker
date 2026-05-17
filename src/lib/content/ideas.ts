@@ -955,6 +955,7 @@ export async function expandIdeaToBlog(idea: {
   target_keywords?: string | null;
   cluster: ContentCluster;
   recentArchetypes?: BlogArchetype[];
+  recentMoods?: number[];
   recentOpeners?: string[];
   forceArchetype?: BlogArchetype;
   forceMood?: DavidMood;
@@ -962,13 +963,24 @@ export async function expandIdeaToBlog(idea: {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
-  const { archetype, mood } = pickArchetypeAndMood({
+  const { archetype, mood: rawMood } = pickArchetypeAndMood({
     title: idea.title,
     cluster: idea.cluster,
     recentArchetypes: idea.recentArchetypes,
     forceArchetype: idea.forceArchetype,
     forceMood: idea.forceMood,
   });
+  // Mood-Rotation: wenn die gewählte mood in den letzten 3 schon verwendet wurde,
+  // wähle die nächste verfügbare aus dem Default-Pool für diesen Archetype.
+  const recentMoodSet = new Set(idea.recentMoods ?? []);
+  let mood = rawMood;
+  if (!idea.forceMood && recentMoodSet.has(rawMood)) {
+    const allMoods: DavidMood[] = [1, 2, 3, 4, 5, 6];
+    const available = allMoods.filter((m) => !recentMoodSet.has(m));
+    if (available.length > 0) {
+      mood = available[hashString(idea.title + 'mood-rotate') % available.length];
+    }
+  }
 
   const blogResearchSection = WEB_SEARCH_ENABLED ? `
 ----------------------------------------
@@ -2061,10 +2073,12 @@ function parseMetaBodyBlock(
     .filter(Boolean)
     .slice(0, 6);
 
-  // Archetype als Tag mit-speichern, damit die Route später recentArchetypes
-  // aus content_blogs.tags fetchen kann ohne Schema-Migration.
+  // Archetype + Mood als Tags mit-speichern, damit die Route bei naechster
+  // Generation die letzten 3 Werte fetchen kann (Rotation, kein Schema-Change).
   const archetypeTag = `archetype:${archetype}`;
+  const moodTag = `mood:${mood}`;
   if (!tags.includes(archetypeTag)) tags.push(archetypeTag);
+  if (!tags.includes(moodTag)) tags.push(moodTag);
 
   return {
     slug: slugify(meta.slug),
