@@ -36,7 +36,8 @@ export type ContentCluster =
   | 'email_shortlinks'
   | 'creator_design'
   | 'everyday_marketing'
-  | 'geld_business';
+  | 'geld_business'
+  | 'ai_risk';
 
 export const CLUSTERS: ContentCluster[] = [
   'qr_realtalk',
@@ -50,6 +51,7 @@ export const CLUSTERS: ContentCluster[] = [
   'creator_design',
   'everyday_marketing',
   'geld_business',
+  'ai_risk',
 ];
 
 export const CLUSTER_LABEL: Record<ContentCluster, string> = {
@@ -64,6 +66,7 @@ export const CLUSTER_LABEL: Record<ContentCluster, string> = {
   creator_design: 'Designer & Creator',
   everyday_marketing: 'Marketing-Alltag',
   geld_business: 'Geld & Business',
+  ai_risk: 'KI-Recht & Risiken',
 };
 
 export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
@@ -87,6 +90,8 @@ export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
     'IM SCOPE: Designer + Creator + Visual-Marketing. Wie Designer für Kampagnen-Assets denken — was tatsächlich tracked, was nicht. Branding-Konsistenz auf Print + Digital. Asset-Bau für Multi-Channel-Tests. Figma/Canva/Adobe-Workflow für KMU. Typografie auf Print + QR-Code-Design. Farbpsychologie auf Plakaten. Creator-Economy für DACH (Newsletter-Sponsorships, Affiliate-Tracking). Asset-Performance messen statt raten. TOOL-BEZUG NATÜRLICH: Designer baut visuell perfekten Flyer + Spurig misst was funktioniert. NICHT IM SCOPE: reine Tutorial-Themen wie "Wie nutze ich Figma".',
   everyday_marketing:
     'IM SCOPE: Marketing-Alltag, Business-Hacks, "Was viele falsch machen", "So sparst du Zeit/Geld", Vorher/Nachher-Cases, kleine Aha-Tricks, Kostenfallen, Tool-Audit-Geschichten, Setup-Hacks die 80% der KMU nicht kennen. Echte Mehrwert-Beiträge für Unternehmer + Marketer. Wie aus Misserfolg + Tracking ein Plus wurde. Konkrete Aufwand/Nutzen-Vergleiche. TOOL-BEZUG NATÜRLICH: Spurig spart 200€/Monat gegenüber Bitly Enterprise + ist messbar. "Tracking macht aus Bauchgefühl bessere Entscheidungen." NICHT IM SCOPE: Branche-spezifische Customer-Stories (→ mittelstand), reine David-Founder-Erlebnisse (→ founder_diary), reine Geld-/Cashflow-Themen (→ geld_business).',
+  ai_risk:
+    'IM SCOPE: KI-Recht + Risiken + Sicherheit + Compliance — modern, verständlich, OHNE Anwaltsdeutsch. Konkrete Sub-Topics: (1) **EU AI Act 2026** — was Marketer wirklich beachten müssen, ab wann verbindlich, Hochrisiko-Systeme. (2) **DSGVO + KI** — wenn ChatGPT/Claude/Gemini Kundendaten sehen, was darf rein, was nicht. (3) **Urheberrecht bei AI-Content** — wem gehört von Sora/Midjourney generierter Content, kommerziell nutzbar. (4) **Haftung bei KI-Fehlern** — wer zahlt wenn n8n-Agent falsche Mail an Kunden schickt, ChatGPT halluziniert Pricing-Fehler. (5) **Hallucinations & False Data** — wie KI-Modelle Fakten erfinden, Beispiele aus Marketing-Praxis. (6) **AI-Agent-Security** — KI-Agenten haben API-Zugriff, was bedeutet das für Datensicherheit. (7) **Kundendaten in ChatGPT** — was Microsoft/OpenAI/Anthropic mit Eingaben machen, Enterprise vs Privat. (8) **Deepfakes im Marketing** — was rechtlich + ethisch geht. (9) **Sichere AI-Workflows** — wie n8n-Self-Hosting + EU-LLMs (Mistral/Aleph Alpha) DSGVO-Risiko reduzieren. (10) **Transparenz-Pflicht** — wann müssen Marketing-Texte als KI-generiert gekennzeichnet werden. (11) **Risiken vs Chancen** — ehrliche Balance, KEIN Panikmodus, sondern smart navigieren. (12) **Praxis-Cases** — echte Bußgelder, Urheberrechts-Klagen, ChatGPT-Datenleaks bei großen Firmen. (13) **Mythen vs Realität** — was wirklich problematisch ist vs was Hype-Panik ist. TONALITÄT: locker + intelligent + ehrlich, NICHT panisch. David spricht über AI-Risiken wie jemand der täglich damit arbeitet — als smartes Risikomanagement, nicht als Bremsklotz. TOOL-BEZUG NATÜRLICH: Spurig = EU-hosted, DSGVO-baseline, n8n-Webhook-Integration ohne US-Cloud-Risiko. NICHT IM SCOPE: reine DSGVO-Themen ohne KI-Bezug (→ compliance_lite), reine AI-Tool-Reviews ohne Risk-Aspect (→ ai_marketing).',
   geld_business:
     'IM SCOPE: GELD-THEMEN für KMU + Marketer + Solopreneurs. Sowohl SPAREN als auch VERDIENEN. Konkrete Sub-Topics: (1) Cashflow-Optimierung für KMU — Working-Capital-Management, Debitorenmanagement, Rechnungsstellung-Hacks (PwC-Studie 2026: €75 Mrd Potenzial in DACH-Unternehmen). (2) Marketing-Budget-ROI — Rolling-Forecast statt Jahresbudget, Streuverluste reduzieren, CAC-Reduktion mit Tracking-Daten. (3) SaaS-Stack-Audit — welche Tools wirklich nutzen, Subscription-Audits, Tool-Konsolidierung, Lifetime-Deals vs Subscriptions. (4) Pricing-Strategien — Value-Based vs Cost-Plus, Anchor-Pricing, Pricing-Pivots, Preiserhöhung ohne Churn. (5) Fördermittel & Grants für DACH-KMU 2026 — Digitalisierungs-Förderung, BAFA, KfW, INVEST-Zuschuss, EXIST. (6) Revenue-Growth ohne Wachstum-um-jeden-Preis — Conversion-Optimierung, Upsell, Cross-Sell, Retention-Tricks. (7) KI-driven Cost-Saving — wie KI repetitive Aufgaben automatisiert + reale Stundensätze einspart. (8) Co-Marketing-Hacks — Cross-Promotion, geteilte Kampagnen, Affiliate-Setups, Partner-Newsletter. (9) Steueroptimierung für Selbstständige + KMU — was Steuerberater nicht erzählen, GWG, IAB, Reisekosten. (10) Werte-Diskussion — "Wie viel ist 1 Stunde deiner Zeit wirklich wert?", Stundensatz-Kalkulation für Solo-Founder. TOOL-BEZUG NATÜRLICH: Spurig zeigt was Marketing-Euro wirklich bringen — Tracking als CFO-Argument. "Tracking macht aus Bauchgefühl bessere Entscheidungen." NICHT IM SCOPE: persönliche David-Founder-Geld-Stories (→ founder_diary), Branche-spezifische Cases (→ mittelstand), reine KI-Tool-Reviews ohne Cost-Aspect (→ ai_marketing).',
 };
@@ -159,5 +164,16 @@ export const CLUSTER_NICHE_INDUSTRIES: Record<ContentCluster, string[]> = {
     'Steuerberater für Selbstständige', 'Vertriebsleiter mit Pricing-Hoheit',
     'Förder-Beraterin', 'Working-Capital-Optimierer in Mittelstand',
     'Co-Marketing-Agentur', 'Pricing-Consultant',
+  ],
+  ai_risk: [
+    'Marketing-Manager mit ChatGPT-Nutzung', 'KMU-Inhaber der Claude für Kundendaten nutzt',
+    'Datenschutzbeauftragter im Mittelstand', 'Compliance-Officer KMU',
+    'AI-Builder mit n8n-Self-Host-Setup', 'Agentur die KI-Content für Kunden schreibt',
+    'Designer der mit Midjourney/Sora kommerziell arbeitet',
+    'Solopreneur der ChatGPT für Vertragsentwürfe nutzt',
+    'IT-Verantwortlicher der KI-Agent-Pipeline absichert',
+    'Newsletter-Schreiber mit AI-Content',
+    'B2B-SaaS-Founder der Kundendaten in OpenAI/Anthropic einspeist',
+    'Datenschutz-Anwalt für SaaS', 'Customer-Success-Manager mit KI-Assistant',
   ],
 };

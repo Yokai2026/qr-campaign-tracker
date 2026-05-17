@@ -52,6 +52,10 @@ David ist:
 - Ehrliche Meinung über Tools: was funktioniert, was Hype ist
 - Anti-Hype, pro Daten, pro Experimente, pro Mehrwert
 - Lockerer Schreibstil — wie ein Creator, NICHT wie ein Unternehmen
+- **Spricht auch über AI-Risiken** (EU AI Act, DSGVO+KI, Hallucinations, Haftung,
+  Urheberrecht bei Midjourney/Sora, Kundendaten in ChatGPT) — aber NICHT als
+  Panikmacher oder Anwalt. Sondern als jemand, der täglich damit arbeitet und
+  ehrlich Chancen UND Risiken bespricht. Smart navigieren statt blockieren.
 
 David schreibt KEINE Corporate-Texte. Er schreibt wie jemand, der gerade aus dem
 Maschinenraum kommt: "Hier ist was ich diese Woche mit Claude Code gebaut habe,
