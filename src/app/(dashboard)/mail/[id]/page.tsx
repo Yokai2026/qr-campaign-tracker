@@ -3,7 +3,11 @@
 import { use } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Mail, Send, Eye, MousePointerClick, CheckCircle2, Circle, Loader2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Mail, Send, Eye, MousePointerClick, CheckCircle2, Circle, Loader2, ExternalLink, RotateCw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 type Campaign = {
   id: string;
@@ -98,6 +102,12 @@ export default function MailDetailPage(props: { params: Promise<{ id: string }> 
             {' · '}{campaign.status}
           </p>
         </div>
+        {campaign.status === 'sent' && (
+          <ResendButton
+            campaignId={campaign.id}
+            nonOpenersCount={recipients.filter((r) => r.human_open_count === 0 && r.status === 'sent').length}
+          />
+        )}
       </div>
 
       {/* Stats Cards */}
@@ -233,5 +243,42 @@ function CheckIcon({ active, brand, title }: { active: boolean; brand?: boolean;
     />
   ) : (
     <Circle className="h-3.5 w-3.5 text-white/15" aria-label={title} />
+  );
+}
+
+function ResendButton({ campaignId, nonOpenersCount }: { campaignId: string; nonOpenersCount: number }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+
+  if (nonOpenersCount === 0) return null;
+
+  async function resend() {
+    if (!confirm(`Original-Mail erneut an ${nonOpenersCount} Empfänger senden, die noch nicht geöffnet haben?`)) return;
+    setBusy(true);
+    const loadingId = toast.loading(`Sende an ${nonOpenersCount} Non-Openers...`);
+    try {
+      const r = await fetch(`/api/mail/campaigns/${campaignId}/resend-non-openers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const j = await r.json();
+      toast.dismiss(loadingId);
+      if (!r.ok) throw new Error(j.error ?? 'Resend fehlgeschlagen');
+      toast.success(`${j.sent} von ${j.total} versandt`);
+      router.push(`/mail/${j.new_campaign_id}`);
+    } catch (e) {
+      toast.dismiss(loadingId);
+      toast.error(e instanceof Error ? e.message : 'Fehler');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Button variant="outline" onClick={resend} disabled={busy}>
+      {busy ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <RotateCw className="mr-1.5 h-3.5 w-3.5" />}
+      An {nonOpenersCount} Non-Openers erneut senden
+    </Button>
   );
 }
