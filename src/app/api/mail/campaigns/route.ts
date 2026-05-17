@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
     from_email?: string;
     from_name?: string;
     reply_to?: string;
+    attachments?: Array<{ path: string; filename: string; size: number; content_type: string }>;
   };
   try { body = await request.json(); } catch { return NextResponse.json({ error: 'invalid-json' }, { status: 400 }); }
 
@@ -57,6 +58,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `body_html required (max ${MAX_BODY_SIZE} chars)` }, { status: 400 });
   }
 
+  // Attachments-Validation: max 10, je ein valides Objekt mit path
+  const attachments = Array.isArray(body.attachments)
+    ? body.attachments
+        .filter((a) => a && typeof a.path === 'string' && a.path.length > 0)
+        .slice(0, 10)
+        .map((a) => ({
+          path: String(a.path).slice(0, 500),
+          filename: String(a.filename ?? 'datei').slice(0, 200),
+          size: Number(a.size ?? 0),
+          content_type: String(a.content_type ?? 'application/octet-stream').slice(0, 100),
+        }))
+    : [];
+
   const service = await createServiceClient();
   const { data, error } = await service
     .from('mail_campaigns')
@@ -68,6 +82,7 @@ export async function POST(request: NextRequest) {
       from_email: body.from_email ?? 'david@spurig.com',
       from_name: body.from_name ?? 'David',
       reply_to: body.reply_to ?? null,
+      attachments,
       status: 'draft',
     })
     .select('id, subject, status, created_at')

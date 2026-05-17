@@ -67,7 +67,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Campaign laden + auth-check
   const { data: campaign } = await service
     .from('mail_campaigns')
-    .select('id, user_id, subject, body_html, from_email, from_name, reply_to, status')
+    .select('id, user_id, subject, body_html, from_email, from_name, reply_to, status, attachments')
     .eq('id', id)
     .eq('user_id', user.id)
     .maybeSingle();
@@ -99,6 +99,34 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (rErr || !createdRecipients) {
     await service.from('mail_campaigns').update({ status: 'failed' }).eq('id', id);
     return NextResponse.json({ error: rErr?.message ?? 'recipient insert failed' }, { status: 500 });
+  }
+
+  // 1b) Attachments aus Storage holen + base64 encoden (einmal pro Send, nicht pro Recipient)
+  type CampaignAttachment = { path: string; filename: string; size: number; content_type: string };
+  const campaignAttachments: CampaignAttachment[] = Array.isArray(campaign.attachments)
+    ? (campaign.attachments as CampaignAttachment[])
+    : [];
+  const resendAttachments: Array<{ filename: string; content: string; content_type?: string }> = [];
+  if (campaignAttachments.length > 0) {
+    for (const att of campaignAttachments) {
+      try {
+        const { data: file, error: dlErr } = await service.storage
+          .from('mail-attachments')
+          .download(att.path);
+        if (dlErr || !file) {
+          console.error(`[mail-send] attachment download failed: ${att.path}`, dlErr);
+          continue;
+        }
+        const buf = Buffer.from(await file.arrayBuffer());
+        resendAttachments.push({
+          filename: att.filename,
+          content: buf.toString('base64'),
+          content_type: att.content_type,
+        });
+      } catch (e) {
+        console.error(`[mail-send] attachment error ${att.path}:`, e);
+      }
+    }
   }
 
   // 2) Pro Recipient: HTML rewriten + Mail senden
@@ -143,6 +171,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         html: personalizedHtml,
         text: personalizedText,
         ...(campaign.reply_to ? { reply_to: campaign.reply_to } : {}),
+        ...(resendAttachments.length > 0 ? { attachments: resendAttachments } : {}),
         // Resend's eigenes Tracking DEAKTIVIEREN — wir tracken selbst
         tracking: { click: { enabled: false }, open: { enabled: false } },
       };

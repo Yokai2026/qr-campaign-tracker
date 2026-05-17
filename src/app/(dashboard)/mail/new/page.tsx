@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MailRichEditor } from '@/components/mail/rich-editor';
+import { AttachmentsUploader, type MailAttachment } from '@/components/mail/attachments-uploader';
 import { toast } from 'sonner';
 
 export default function NewMailPage() {
@@ -18,6 +19,7 @@ export default function NewMailPage() {
   const [fromEmail, setFromEmail] = useState('david@spurig.com');
   const [replyTo, setReplyTo] = useState('');
   const [recipientsText, setRecipientsText] = useState('');
+  const [attachments, setAttachments] = useState<MailAttachment[]>([]);
   const [saving, setSaving] = useState(false);
   const [sending, setSending] = useState(false);
 
@@ -51,6 +53,7 @@ export default function NewMailPage() {
           from_email: fromEmail,
           from_name: fromName,
           reply_to: replyTo || undefined,
+          attachments,
         }),
       });
       const j = await r.json();
@@ -161,6 +164,17 @@ export default function NewMailPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Anhänge */}
+        <div className="rounded-xl border border-border bg-card p-5">
+          <h2 className="mb-3 text-[13px] font-medium uppercase tracking-wide text-muted-foreground">
+            Anhänge {attachments.length > 0 && <span className="ml-2 text-brand">({attachments.length})</span>}
+          </h2>
+          <AttachmentsUploader value={attachments} onChange={setAttachments} />
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            Flyer, PDFs, Word-Dokumente, Bilder etc. werden an jede Mail angehängt. Pro Empfänger max 25 MB total (Resend-Limit).
+          </p>
         </div>
 
         {/* Empfänger */}
