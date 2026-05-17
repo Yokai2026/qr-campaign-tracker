@@ -989,6 +989,177 @@ Jetzt liefere die ${count} besten Ideen — mit korrekt gefüllten profession + 
   return ideas.filter((i) => i.title && i.outline).slice(0, count);
 }
 
+// ---------------------------------------------------------------------------
+// Quality-Validator-Pass (Stufe 5)
+// ---------------------------------------------------------------------------
+
+export type IdeaQualityScore = {
+  index: number;
+  total: number;             // gewichtete Gesamt-Score (0-50)
+  concrete: number;           // 0-10 Konkretheit
+  hookStrength: number;       // 0-10 Erste 5 Wörter packen?
+  moneyDiscoveryVibe: number; // 0-10 Money-Regret / Discovery-Vibes spürbar?
+  nicheDiversity: number;     // 0-10 Frische Branche / kein Trampelpfad?
+  antiCliche: number;         // 0-10 Frei von KI-Plattitüden?
+  verdict: 'pass' | 'borderline' | 'reject';
+  reason: string;
+};
+
+const DEFAULT_VALIDATE_THRESHOLD = 32; // 32/50 = 64% — relativ streng
+
+/**
+ * Bewertet eine Liste generierter Ideen via 2. Claude-Call.
+ * Gibt für jede Idee 5 Scores (1-10) + verdict zurück.
+ *
+ * Kostet ca. 2000-4000 Output-Tokens für 10 Ideen.
+ */
+export async function validateIdeasQuality(
+  ideas: GeneratedIdea[],
+): Promise<IdeaQualityScore[]> {
+  if (ideas.length === 0) return [];
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
+
+  const ideasJson = ideas.map((i, idx) => ({
+    index: idx,
+    title: i.title,
+    outline: i.outline?.slice(0, 350) ?? '',
+    angle: i.angle ?? '',
+    hook_pattern: i.hook_pattern ?? 'unknown',
+  }));
+
+  const prompt = `Du bist ein erfahrener Chefredakteur (Spiegel/Wired-Niveau).
+Du bewertest ${ideas.length} Content-Ideen knallhart nach 5 Dimensionen.
+
+BEWERTUNG (jede 0-10, total 0-50):
+
+1. **Konkretheit (concrete, 0-10)**
+   - 10 = konkrete Zahl, konkreter Beruf, konkrete Stadt/Setting
+   - 5  = ein konkretes Element + 2 generische
+   - 0  = nur Buzzwords, keine konkreten Details
+
+2. **Hook-Strength (hookStrength, 0-10)**
+   - 10 = die ersten 5 Wörter des Titels packen schon allein
+   - 5  = Titel ok, aber Hänge-Effekt erst ab Wort 8
+   - 0  = "Die wichtigsten Tipps für..." / "Wie du..."-Floskel-Start
+
+3. **Money/Discovery-Vibe (moneyDiscoveryVibe, 0-10)**
+   - 10 = klar spürbarer Money-Regret ODER Discovery-Insider ODER Aha-Trick
+   - 5  = vorhanden aber schwach
+   - 0  = generisches Marketing-Topic ohne emotionalen Hebel
+
+4. **Niche-Diversity (nicheDiversity, 0-10)**
+   - 10 = frische Branche (Imker, Schreiner, Hostel-Rezeption, Tatortreiniger)
+   - 5  = bekannte aber ok (Friseur, Tierarzt, Anwalt)
+   - 0  = Trampelpfad (Restaurant, Bitly, Plakatwerbung) ODER Bruder/Steuerberater/Cousin-Trope
+
+5. **Anti-Cliché (antiCliche, 0-10)**
+   - 10 = frei von KI-Plattitüden, eigene Stimme
+   - 5  = ein Cliché ("Das Problem mit...")
+   - 0  = mehrere Plattitüden ("In der heutigen schnelllebigen Zeit", "Wir alle kennen...", "Stell dir vor du bist...")
+
+VERDICT:
+- pass       = total >= 35
+- borderline = total 25-34
+- reject     = total < 25
+
+OUTPUT (NUR JSON, kein Vorwort, kein Code-Fence):
+[
+  {"index": 0, "concrete": 8, "hookStrength": 7, "moneyDiscoveryVibe": 9, "nicheDiversity": 6, "antiCliche": 8, "verdict": "pass", "reason": "Konkrete Summe + frischer Beruf"},
+  ...
+]
+
+Bewerte STRENG. Wenn 6+ Ideen unter "pass" landen — gut. Wir wollen Qualität, nicht alle durchwinken.
+
+IDEEN:
+${JSON.stringify(ideasJson, null, 2)}
+
+Antworte JETZT mit dem JSON-Array.`;
+
+  const text = await callClaude(apiKey, prompt, { maxTokens: 4000, useSearch: false });
+
+  let parsed: Array<{
+    index: number;
+    concrete?: number;
+    hookStrength?: number;
+    moneyDiscoveryVibe?: number;
+    nicheDiversity?: number;
+    antiCliche?: number;
+    verdict?: 'pass' | 'borderline' | 'reject';
+    reason?: string;
+  }>;
+  try {
+    const cleaned = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+    parsed = JSON.parse(cleaned);
+    if (!Array.isArray(parsed)) throw new Error('not array');
+  } catch (e) {
+    // Salvage: try parseIdeasJson approach
+    const salvaged = salvageTruncatedArray(text.trim());
+    if (salvaged) {
+      try {
+        parsed = JSON.parse(salvaged);
+      } catch {
+        throw new Error(`validator JSON parse failed: ${(e as Error).message}`);
+      }
+    } else {
+      throw new Error(`validator JSON parse failed: ${(e as Error).message}`);
+    }
+  }
+
+  return parsed.map((p, fallbackIdx) => {
+    const concrete = Math.max(0, Math.min(10, p.concrete ?? 5));
+    const hookStrength = Math.max(0, Math.min(10, p.hookStrength ?? 5));
+    const moneyDiscoveryVibe = Math.max(0, Math.min(10, p.moneyDiscoveryVibe ?? 5));
+    const nicheDiversity = Math.max(0, Math.min(10, p.nicheDiversity ?? 5));
+    const antiCliche = Math.max(0, Math.min(10, p.antiCliche ?? 5));
+    const total = concrete + hookStrength + moneyDiscoveryVibe + nicheDiversity + antiCliche;
+    const verdict = p.verdict ?? (total >= 35 ? 'pass' : total >= 25 ? 'borderline' : 'reject');
+    return {
+      index: typeof p.index === 'number' ? p.index : fallbackIdx,
+      total,
+      concrete,
+      hookStrength,
+      moneyDiscoveryVibe,
+      nicheDiversity,
+      antiCliche,
+      verdict,
+      reason: (p.reason ?? '').slice(0, 200),
+    };
+  });
+}
+
+/**
+ * Filtert Ideen nach Quality-Score. Default-Threshold = 32/50.
+ * Returns: { passing, rejected, scores }
+ */
+export function filterByQuality(
+  ideas: GeneratedIdea[],
+  scores: IdeaQualityScore[],
+  threshold = DEFAULT_VALIDATE_THRESHOLD,
+): { passing: GeneratedIdea[]; rejected: GeneratedIdea[]; scoreByIdx: Map<number, IdeaQualityScore> } {
+  const scoreByIdx = new Map<number, IdeaQualityScore>();
+  for (const s of scores) scoreByIdx.set(s.index, s);
+
+  const passing: GeneratedIdea[] = [];
+  const rejected: GeneratedIdea[] = [];
+  ideas.forEach((idea, idx) => {
+    const score = scoreByIdx.get(idx);
+    if (!score) {
+      // Kein Score = pass (Validator hat's übersehen, lieber durchlassen)
+      passing.push(idea);
+      return;
+    }
+    if (score.verdict === 'reject' || score.total < threshold) {
+      rejected.push(idea);
+    } else {
+      passing.push(idea);
+    }
+  });
+
+  return { passing, rejected, scoreByIdx };
+}
+
 /**
  * Robust-Parser: erst clean parse versuchen, dann Code-Fences/Pre-Text strippen,
  * dann Salvage-Mode (truncierte JSON-Arrays).

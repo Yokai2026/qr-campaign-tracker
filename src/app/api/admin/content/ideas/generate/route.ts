@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import {
   generateIdeasForCluster,
+  validateIdeasQuality,
+  filterByQuality,
   type GeneratedIdea,
   type HookPattern,
+  type IdeaQualityScore,
 } from '@/lib/content/ideas';
 import { CLUSTERS, type ContentCluster } from '@/lib/content/pillars';
 
@@ -274,7 +277,55 @@ export async function POST(request: NextRequest) {
   }
 
   // Trim auf exakt count falls über-geliefert
-  const finalKept = kept.slice(0, count);
+  let finalKept = kept.slice(0, count);
+
+  // ──────────────────────────────────────────────────────────────────
+  // OPTIONAL: Quality-Validator-Pass (Stufe 5)
+  // Aktivierung via ?validate=1 Query-Param ODER env CONTENT_IDEAS_VALIDATE=1
+  // ──────────────────────────────────────────────────────────────────
+  const url = new URL(request.url);
+  const validateRequested = url.searchParams.get('validate') === '1'
+    || process.env.CONTENT_IDEAS_VALIDATE === '1';
+
+  let validationSummary: {
+    enabled: boolean;
+    threshold?: number;
+    passing?: number;
+    rejected?: number;
+    scores?: Array<Omit<IdeaQualityScore, 'index'> & { title: string }>;
+    rejectedTitles?: string[];
+    error?: string;
+  } = { enabled: validateRequested };
+
+  if (validateRequested && finalKept.length > 0 && Date.now() - loopStart < LOOP_BUDGET_MS) {
+    try {
+      const valStart = Date.now();
+      const scores = await validateIdeasQuality(finalKept);
+      const threshold = Number(process.env.CONTENT_IDEAS_VALIDATE_THRESHOLD ?? '32');
+      const { passing, rejected, scoreByIdx } = filterByQuality(finalKept, scores, threshold);
+
+      console.log(`[ideas-generate VALIDATE] passing=${passing.length} rejected=${rejected.length} threshold=${threshold} took=${Date.now() - valStart}ms`);
+
+      validationSummary = {
+        enabled: true,
+        threshold,
+        passing: passing.length,
+        rejected: rejected.length,
+        scores: scores.map((s) => {
+          const idea = finalKept[s.index];
+          return { ...s, title: idea?.title?.slice(0, 80) ?? '<unknown>' };
+        }).map(({ index: _, ...rest }) => rest),
+        rejectedTitles: rejected.map((r) => r.title.slice(0, 80)),
+      };
+
+      finalKept = passing;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'validator-failed';
+      console.error(`[ideas-generate VALIDATE FAIL] ${msg}`);
+      validationSummary = { enabled: true, error: msg };
+      // Bei Validator-Fail: nicht abbrechen, mit unvalidierten Ideen weitermachen
+    }
+  }
 
   const rows = finalKept.map((i) => ({
     cluster,
@@ -288,7 +339,7 @@ export async function POST(request: NextRequest) {
   }));
 
   const hookCounts = countHookPatterns(finalKept);
-  console.log(`[ideas-generate FINAL] kept=${finalKept.length}/${count} rounds=${rounds.length} stats=${JSON.stringify(stats)} hooks=${JSON.stringify(hookCounts)}`);
+  console.log(`[ideas-generate FINAL] kept=${finalKept.length}/${count} rounds=${rounds.length} stats=${JSON.stringify(stats)} hooks=${JSON.stringify(hookCounts)} validated=${validationSummary.enabled}`);
 
   if (rows.length === 0) {
     return NextResponse.json({
@@ -297,6 +348,7 @@ export async function POST(request: NextRequest) {
       duplicates: stats.hardDup + stats.softDup,
       stats,
       rounds,
+      validation: validationSummary,
     });
   }
 
@@ -312,6 +364,7 @@ export async function POST(request: NextRequest) {
     rounds: rounds.length,
     hookCounts,
     stats,
+    validation: validationSummary,
     ideas: inserted,
   });
 }
