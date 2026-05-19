@@ -52,9 +52,12 @@ export default function SignupPage() {
       return;
     }
 
-    // Pre-Check: Username bereits vergeben? (case-insensitive via RPC)
+    // Pre-Check: Username bereits vergeben? (case-insensitive via RPC).
+    // lookup_email mitgeben — damit der RPC unsen User durchlaesst, wenn er
+    // einen unbestaetigten Vor-Signup mit gleichen Daten retry'd (Mig 054).
     const { data: taken, error: checkError } = await supabase.rpc('username_exists', {
       lookup_username: username,
+      lookup_email: email,
     });
     if (checkError) {
       setError('Benutzername konnte nicht geprüft werden. Bitte versuche es erneut.');
@@ -92,7 +95,7 @@ export default function SignupPage() {
       } else if (msg.includes('database') || msg.includes('duplicate') || msg.includes('unique')) {
         setError('Dieser Benutzername ist bereits vergeben. Bitte wähle einen anderen.');
       } else if (msg.includes('already registered') || msg.includes('already exists') || code === 'user_already_exists') {
-        setError('Diese E-Mail-Adresse ist bereits registriert. Bitte melde dich an oder nutze eine andere.');
+        setError('Diese E-Mail-Adresse ist bereits registriert. Falls du dich vorher angemeldet hast: Bestätigungsmail prüfen (auch Spam-Ordner) oder über „Anmelden" einloggen und ggf. Passwort zurücksetzen.');
       } else if (msg.includes('password') && (msg.includes('weak') || msg.includes('short') || msg.includes('strength'))) {
         setError('Passwort zu schwach. Bitte wähle mindestens 10 Zeichen mit Buchstaben und Zahlen.');
       } else if (msg.includes('invalid') && msg.includes('email')) {
