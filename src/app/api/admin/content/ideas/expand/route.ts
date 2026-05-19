@@ -163,7 +163,8 @@ export async function POST(request: NextRequest) {
     const blogContent = await readBlogPost(blog.slug);
     if (blogContent) {
       const channels = ['linkedin', 'twitter', 'reddit'] as const;
-      for (const ch of channels) {
+      for (let i = 0; i < channels.length; i++) {
+        const ch = channels[i];
         try {
           const text = await generateDraft(ch, blogContent);
           await service.from('content_drafts').upsert(
@@ -173,6 +174,13 @@ export async function POST(request: NextRequest) {
           repurposed.push({ channel: ch, ok: true });
         } catch (e) {
           repurposed.push({ channel: ch, ok: false, error: e instanceof Error ? e.message : 'unknown' });
+        }
+
+        // Bei Anthropic-Ueberlast laenger pausieren, sonst nur kurz Luft holen.
+        if (i < channels.length - 1) {
+          const last = repurposed[repurposed.length - 1];
+          const hitOverload = !last.ok && /529|429|ueberlastet|Rate-Limit/i.test(last.error ?? '');
+          await new Promise((r) => setTimeout(r, hitOverload ? 15_000 : 1_500));
         }
       }
     }

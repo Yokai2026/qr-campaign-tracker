@@ -126,40 +126,94 @@ export async function generateDraft(
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set');
 
   const prompt = buildPrompt(channel, blog);
-
-  const res = await fetch(ANTHROPIC_API, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: CLAUDE_MODEL,
-      max_tokens: 1500,
-      messages: [{ role: 'user', content: prompt }],
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Claude API ${res.status}: ${err.slice(0, 200)}`);
-  }
-
-  const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
-  let text = data.content?.find((c) => c.type === 'text')?.text?.trim();
+  const text = await callClaudeWithRetry(apiKey, prompt, channel);
 
   // UTM-Anreicherung: jeder spurig.com-Link im Draft bekommt utm_source = channel etc.
   // -> bei Signup wird attribution_source = 'linkedin' / 'twitter' / 'reddit'.
-  if (text) {
-    text = addUtmToAllLinks(text, {
-      source: channel,
-      medium: 'social',
-      campaign: blog.slug,
+  return addUtmToAllLinks(text, {
+    source: channel,
+    medium: 'social',
+    campaign: blog.slug,
+  });
+}
+
+/**
+ * Claude-Call mit Exponential-Backoff fuer transient Errors.
+ *
+ * Retry-Auslöser:
+ *   - 529 overloaded_error   → Anthropic-API ueberlastet (haeufig in Lastspitzen)
+ *   - 429 rate_limit         → wir feuern zu schnell
+ *   - 500 / 502 / 503 / 504  → transient Server-Fehler
+ *
+ * Backoff: 2s → 5s → 10s mit Jitter. Bei 429 mit retry-after-Header: dessen Wert.
+ * Nach 3 Versuchen friendly Error-Message fuer die UI (auf 529 spezifisch).
+ */
+async function callClaudeWithRetry(
+  apiKey: string,
+  prompt: string,
+  channel: ContentChannel,
+  maxAttempts = 3,
+): Promise<string> {
+  let lastStatus = 0;
+  let lastBody = '';
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const res = await fetch(ANTHROPIC_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: 1500,
+        messages: [{ role: 'user', content: prompt }],
+      }),
     });
+
+    if (res.ok) {
+      const data = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+      const text = data.content?.find((c) => c.type === 'text')?.text?.trim();
+      if (!text) throw new Error(`Claude lieferte leere Antwort (${channel})`);
+      return text;
+    }
+
+    lastStatus = res.status;
+    lastBody = await res.text();
+
+    const isTransient = res.status === 529 || res.status === 429
+      || res.status === 500 || res.status === 502 || res.status === 503 || res.status === 504;
+
+    if (!isTransient || attempt === maxAttempts) break;
+
+    // Anthropic kann retry-after sekunden-genau zurueckgeben (besonders bei 429).
+    const retryAfter = Number(res.headers.get('retry-after'));
+    const backoffMs = Number.isFinite(retryAfter) && retryAfter > 0
+      ? Math.min(retryAfter * 1000, 30_000)
+      : [2_000, 5_000, 10_000][attempt - 1] ?? 10_000;
+    const jitter = Math.floor(Math.random() * 750);
+
+    console.warn(
+      `[generateDraft:${channel}] Claude ${res.status} (attempt ${attempt}/${maxAttempts}) — `
+      + `retry in ${(backoffMs + jitter) / 1000}s`,
+    );
+    await new Promise((r) => setTimeout(r, backoffMs + jitter));
   }
-  if (!text) throw new Error('Empty response from Claude');
-  return text;
+
+  if (lastStatus === 529) {
+    throw new Error(
+      `Claude API ueberlastet (529 overloaded). Anthropic-Server haben kurzfristig keine Kapazitaet. `
+      + `In 1-2 Minuten nochmal versuchen — dann meist ok.`,
+    );
+  }
+  if (lastStatus === 429) {
+    throw new Error(
+      `Claude API Rate-Limit (429). Zu viele Drafts in kurzer Zeit. `
+      + `5-10 Minuten warten ODER $40 Credits aufladen fuer Tier-2.`,
+    );
+  }
+  throw new Error(`Claude API ${lastStatus}: ${lastBody.slice(0, 200)}`);
 }
 
 function buildPrompt(channel: ContentChannel, blog: BlogContent): string {

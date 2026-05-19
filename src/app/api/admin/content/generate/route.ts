@@ -4,7 +4,9 @@ import { readBlogPost, generateDraft, type ContentChannel } from '@/lib/content/
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+// Worst-Case: 3 Channels × bis zu 17s Anthropic-Retry-Backoff (2+5+10s)
+// + zwei 15s-Cooldowns nach Overload-Treffern = ~80s. Daher 120s Reserve.
+export const maxDuration = 120;
 
 const CHANNELS: ContentChannel[] = ['linkedin', 'twitter', 'reddit'];
 
@@ -54,7 +56,8 @@ export async function POST(request: NextRequest) {
   const service = await createServiceClient();
   const results: Array<{ channel: ContentChannel; ok: boolean; error?: string }> = [];
 
-  for (const channel of channels) {
+  for (let i = 0; i < channels.length; i++) {
+    const channel = channels[i];
     try {
       const text = await generateDraft(channel, blog);
       const { error } = await service
@@ -69,11 +72,9 @@ export async function POST(request: NextRequest) {
           },
           { onConflict: 'blog_slug,channel' },
         );
-      if (error) {
-        results.push({ channel, ok: false, error: error.message });
-      } else {
-        results.push({ channel, ok: true });
-      }
+      results.push(
+        error ? { channel, ok: false, error: error.message } : { channel, ok: true },
+      );
     } catch (e) {
       results.push({
         channel,
@@ -81,6 +82,15 @@ export async function POST(request: NextRequest) {
         error: e instanceof Error ? e.message : 'unknown',
       });
     }
+
+    // Wenn der eben fertige Channel gegen Anthropic-Ueberlast gelaufen ist
+    // (529/429), fuer den naechsten Channel laenger Luft holen — sonst rauschen
+    // alle drei in dieselbe Welle. Bei Erfolg: kleines Cooldown reicht.
+    const last = results[results.length - 1];
+    const next = channels[i + 1];
+    if (!next) break;
+    const hitOverload = !last.ok && /529|429|ueberlastet|Rate-Limit/i.test(last.error ?? '');
+    await new Promise((r) => setTimeout(r, hitOverload ? 15_000 : 1_500));
   }
 
   return NextResponse.json({ slug, results });
