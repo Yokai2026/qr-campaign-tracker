@@ -1829,19 +1829,22 @@ VIBE:
 - Wirkt wie gesprochen, nicht wie geschrieben
 - Frust + Beobachtung + Faktum mischen
 
-REFERENZ (aus David's Post):
-"Mein Kunde zahlte 50.000 Euro monatlich für 47 Plakat-Standorte. Dann fragte
-ich: 'Welche drei funktionieren am besten?' Antwort: 'Keine Ahnung.' Das war
-der Moment, wo mir klar wurde — Print-Marketing läuft in Deutschland komplett
-blind."
+REFERENZ-STRUKTUR (Vier-Satz-Bogen — Inhalt MUSS variieren):
+- Satz 1 = konkrete Zahl + Person (z.B. Budget + Anzahl + Branche)
+- Satz 2 = direkte Frage in Anführungszeichen (vom Autor oder Kunden)
+- Satz 3 = überraschende Antwort, idealerweise direkt zitiert
+- Satz 4 = Insight als Beobachtung — NICHT mit "Das war der Moment..."!
+            Statt dessen aus Variety-Bank B (siehe PART 0 in SPURIG_VOICE):
+            direkte Konsequenz, verzögerte Erkenntnis, Frage zurück an Leser,
+            Sub-Insight, externe Stimme, ODER überhaupt KEIN expliziter Pivot —
+            die Beobachtung sprechen lassen.
 
-Beachte:
-- Satz 1 = konkrete Zahl + Person (50k € + 47 Plakate + Kunde)
-- Satz 2 = direkte Frage in Anführungszeichen
-- Satz 3 = direkte Antwort ("Keine Ahnung.")
-- Satz 4 = Insight-Pivot ("Das war der Moment, wo mir klar wurde...")
+WICHTIG: Inhalt der Sätze 1-4 muss ZUM IDEA-TITEL passen. NIEMALS Plakat-Story
+copy-paste. KEINE konkreten Zahlen / Beispiele aus dieser Referenz übernehmen
+(50.000 Euro, 47 Plakate, "Keine Ahnung" sind PHRASEN-DAVIDS-Geschichten,
+nicht Templates). Eigene plausible Zahlen + eigene Branche + eigener Kontext.
 
-Genau dieser Vier-Satz-Bogen — mach das in DEINEM Blog gleich.
+Genau dieser Vier-Satz-RHYTHMUS — aber neue Story, neue Zahlen, neuer Pivot-Stil.
 
 VERBOTEN (Instant-Fail):
 - "In diesem Artikel zeige ich dir..."
@@ -1897,15 +1900,26 @@ STRUKTUR
 RETENTION-PFLICHT (PART 8 anwenden)
 ----------------------------------------
 
-Pro 200 Worte mindestens EIN Retention-Hebel:
-  - Cliffhanger ("Drei Minuten Stille. Dann:")
-  - Offene Frage ("Was sie als nächstes sagte, war neu für mich.")
-  - Mini-Pattern-Interrupt ("Ich dachte das Gegenteil. Bis...")
-  - 1-Wort-Satz ("Stille.")
-  - Konkrete Andeutung ("Eine einzige Frage hat alles geändert.")
+Pro 200 Worte mindestens EIN Retention-Hebel — aber WECHSLE die Hebel-Sorte
+(siehe SPURIG_VOICE PART 0 / Variety-Bank A). NIE zweimal hintereinander
+derselbe Hebel-Stil.
+
+Erlaubte Hebel-Sorten (rotieren):
+  - Sensorischer Cliffhanger aus Variety-Bank A (NIE "Stille." / "X Minuten Stille")
+  - Offene Frage ("Was sie als nächstes sagte, war anders als ich dachte.")
+  - Mini-Pattern-Interrupt ("Ich dachte das Gegenteil. Bis…")
+  - 1-Wort-Satz mit konkretem Wort (z.B. "Schweigen." / "Falsch." / "Vorbei." —
+    NIEMALS "Stille.")
+  - Konkrete Andeutung ("Eine einzige Frage hat den Etat um 30% verschoben.")
+  - Direkte Lese-Frage ("Wie würdest du das interpretieren?")
+
+VERBOTEN als Retention-Hebel (siehe PART 0):
+  ❌ "Drei Minuten Stille. Dann:"
+  ❌ "Stille." als 1-Wort-Satz
+  ❌ "Das war der Moment…"
 
 Wenn ein Absatz auch ohne den nächsten verstanden werden kann — er ist zu rund.
-Umschreiben mit Cliffhanger am Ende.
+Umschreiben mit Cliffhanger am Ende. ABER variiere die Cliffhanger-Sorte.
 
 ----------------------------------------
 SPEZIFITAETS-CHECKLISTE (vor finalem Output)

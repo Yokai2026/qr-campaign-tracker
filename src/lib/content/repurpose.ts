@@ -259,13 +259,17 @@ LINKEDIN-FORMAT (strikt)
 ----------------------------------------
 
 ZEILE 1 (STOP-SCROLL-HOOK, max 100 Zeichen):
-Nutze einen der Hook-Patterns aus PART 7:
-  A. Echter Dialog: "Eine Marketing-Chefin gestern: 'Wir nutzen das seit 6 Jahren...'"
+Nutze einen der Hook-Patterns aus PART 7 — ABER siehe SPURIG_VOICE PART 0
+(Anti-Monotonie): keine wiederholten Signature-Phrasen, keine Klischee-Timestamps.
+  A. Echter Dialog: "Eine Marketing-Chefin gestern: 'Wir nutzen das seit 6 Jahren…'"
   B. Persoenlicher Fail: "Ich hab 8 Wochen das falsche Feature gebaut."
   C. Konkrete Zahl + Pattern-Break: "47 Marketing-Mitarbeiter. Keiner stellte die Frage."
   D. Verlustangst + Specificity: "Sechs Jahre Daten. Server in Ashburn, Virginia. Kein AV-Vertrag."
   E. Provokante Behauptung: "Cookie-Banner sind nicht das DSGVO-Problem."
-  F. Hyper-spezifische Mini-Story: "Donnerstag 14:30. Büro in Düsseldorf. Drei Minuten Stille."
+  F. Hyper-spezifische Mini-Story: variiere Setting + Geräusch + Person.
+     NIEMALS "Donnerstag 14:30. Drei Minuten Stille." — das ist Davids Signature
+     und längst totgeritten. Stattdessen: andere Mikro-Szenen, andere Sinnesebene,
+     andere Tageszeit. Variety-Bank A nutzen.
 
 ZEILE 2: LEER (LinkedIn-Cut-Off-Trick — der Hook hängt allein, der "weiter lesen"-Klick faellt)
 
@@ -276,8 +280,10 @@ BLOCK 2-4 (Story-Aufbau, je 2-4 Zeilen, mit Leerzeile dazwischen):
     jeder Touchpoint vermessen.")
 
   Block B — Konflikt: die Wendung, die Überraschung, mit Mini-Cliffhanger.
-    (z.B. "Ich hab eine einzige Frage gestellt. Drei Minuten Tippen. Stille.
-    Dann: 'Ashburn, Virginia.'")
+    Variiere den Cliffhanger-Stil (Variety-Bank A — Geräusch, Geste, Blick,
+    direktes Eingestaendnis). NIEMALS "Drei Minuten Stille" — schon erschöpft.
+    Beispiel: "Ich hab eine einzige Frage gestellt. Sie tippte. Loeschte.
+    Tippte wieder. Dann: 'Ashburn, Virginia.'"
 
   Block C — Insight + Selbstkritik / Kontroverse: was die Geschichte für ALLE
     bedeutet. Eine starke These oder Selbst-Eingestaendnis.
@@ -304,7 +310,8 @@ Optional 0-2 Hashtags am Ende (wenn wirklich passend, default 0).
 ----------------------------------------
 RETENTION-CHECKS (PART 8)
 ----------------------------------------
-- Mind. 1 Cliffhanger ("Drei Minuten Stille. Dann:")
+- Mind. 1 Cliffhanger (variiere Stil — sensorisch, Geste, Wort — siehe Variety-Bank A;
+  NICHT "Drei Minuten Stille" / NICHT "Stille." als 1-Wort-Satz)
 - Mind. 1 direkter Satz in Anführungszeichen
 - Mind. 2 sehr kurze Sätze (3-6 Worte) als Pattern-Interrupt
 - Mind. 1 konkrete Zahl/Ort/Person/Marke
