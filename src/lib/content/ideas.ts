@@ -143,6 +143,54 @@ export type ExpandedBlog = {
 };
 
 // ---------------------------------------------------------------------------
+// Anti-Klischee-Validator
+// ---------------------------------------------------------------------------
+// Diese Phrasen waren Davids Signature-Klischees, die jeden Blog gleich
+// klingen ließen. SPURIG_VOICE PART 0 verbietet sie auf Prompt-Ebene. Dieser
+// Validator hängt am Output: wird eine Phrase doch noch geliefert, triggern
+// wir 1× Retry mit explizitem Feedback. Bleibt sie auch dann → programmatisch
+// strippen (Fallback statt Blog-Fail).
+
+const BANNED_PHRASE_PATTERNS: Array<{ name: string; regex: RegExp }> = [
+  { name: 'X Minuten/Sekunden Stille',            regex: /\bdrei\s+(?:minuten|sekunden)\s+stille\b/gi },
+  { name: '"X Sekunden Stille" generic',          regex: /\b(?:zwei|drei|vier|fünf|sechs|sieben|acht|neun|zehn|\d+)\s+(?:minuten|sekunden)\s+stille\b/gi },
+  { name: '"Das war der Moment, wo mir klar..."', regex: /\bdas war der moment,?\s+wo mir klar wurde\b/gi },
+  { name: 'Standalone "Stille."',                 regex: /(^|\n)\s*Stille\.\s*(\n|$)/g },
+  { name: '"Ich realisierte:" als Pivot',         regex: /^\s*Ich realisierte:/gim },
+];
+
+export function findBannedPhrases(body: string): string[] {
+  const hits: string[] = [];
+  for (const { name, regex } of BANNED_PHRASE_PATTERNS) {
+    if (regex.test(body)) hits.push(name);
+    regex.lastIndex = 0; // wichtig wegen /g flag
+  }
+  return hits;
+}
+
+/**
+ * Letzte-Rettung-Strippen wenn Retry trotzdem Klischees liefert. Wir bauen
+ * keine Magie — wir entfernen die Phrase, der Rest des Satzes bleibt
+ * verständlich.
+ */
+export function stripBannedPhrases(body: string): string {
+  let out = body;
+  // "Drei Minuten Stille. Dann sagte sie:" → "Dann sagte sie:"
+  out = out.replace(/\b(?:drei|zwei|vier|fünf|\d+)\s+(?:Minuten|Sekunden)\s+Stille\.\s+Dann\b/gi, 'Dann');
+  // "Drei Minuten Stille." als ganzer Satz → komplett raus
+  out = out.replace(/\b(?:drei|zwei|vier|fünf|\d+)\s+(?:Minuten|Sekunden)\s+Stille\.\s*/gi, '');
+  // "Das war der Moment, wo mir klar wurde — XYZ." → "XYZ." (Pivot-Klausel raus)
+  out = out.replace(/Das war der Moment,?\s+wo mir klar wurde[,\s—–-]+/gi, '');
+  // Standalone "Stille." Zeile entfernen
+  out = out.replace(/(^|\n)\s*Stille\.\s*(\n|$)/g, '$1$2');
+  // "Ich realisierte:" am Zeilenanfang → einfach entfernen, der Inhalt danach bleibt
+  out = out.replace(/^\s*Ich realisierte:\s*/gim, '');
+  // Doppelte Leerzeilen aufräumen die durch das Strippen entstehen
+  out = out.replace(/\n{3,}/g, '\n\n').trim();
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Archetype + Stimmung-Rotation (verhindert dass alle Blogs gleich klingen)
 // ---------------------------------------------------------------------------
 
@@ -2759,21 +2807,61 @@ WICHTIG:
 - Keine Quotes um die Werte
 - Nichts vor oder nach dem ---META--- und ---BODY---`;
 
-  // Retry-Loop: Claude liefert manchmal kaputtes JSON oder META/BODY-Marker
-  // fehlen — dann lieber 1× retry als Batch-Failure.
+  // Retry-Loop: Claude liefert manchmal kaputtes JSON, META/BODY-Marker fehlen,
+  // ODER der Output enthält trotz Prompt-Anweisung noch Klischees aus PART 0.
+  // In allen Fällen: 1× retry mit angepasstem Prompt, sonst graceful Fallback.
   let lastErr: unknown = null;
+  let promptForAttempt = prompt;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const text = await callClaude(apiKey, prompt, { maxTokens: 5000, useSearch: true });
-      return parseMetaBodyBlock(text, idea.title, archetype, mood);
+      const text = await callClaude(apiKey, promptForAttempt, { maxTokens: 5000, useSearch: true });
+      const parsed = parseMetaBodyBlock(text, idea.title, archetype, mood);
+
+      // Anti-Klischee-Check: verbotene Signature-Phrasen?
+      const cliches = findBannedPhrases(parsed.body_md);
+      if (cliches.length === 0) return parsed;
+
+      if (attempt === 0) {
+        // Retry mit explizitem Feedback an die KI
+        console.warn(
+          `[expand] cliché detected on attempt 1 (${cliches.join(', ')}) — retrying with feedback`,
+        );
+        promptForAttempt = `${prompt}
+
+══════════════════════════════════════════════════════════════════════
+KLISCHEE-ALERT — RETRY (PFLICHT)
+══════════════════════════════════════════════════════════════════════
+Dein vorheriger Output enthielt folgende verbotene Signature-Phrasen:
+${cliches.map((c) => `  ❌ ${c}`).join('\n')}
+
+Diese stehen explizit in SPURIG_VOICE PART 0 als Instant-Fail. Schreibe
+den Blog KOMPLETT NEU und ersetze diese Phrasen durch:
+  - Cliffhanger: Variety-Bank A (Geräusch / Geste / Blick / Wort / Tippen)
+  - Insight-Pivot: Variety-Bank B (direkte Konsequenz / verzögert / Frage
+    zurück / Sub-Insight / externe Stimme — oder GAR KEIN Pivot-Satz)
+
+Wenn dir nichts einfällt, schreib einen Blog GANZ OHNE Cliffhanger und
+Pivot-Satz. Beobachtung allein reicht.
+══════════════════════════════════════════════════════════════════════`;
+        throw new Error(`cliche-detected: ${cliches.join(', ')}`);
+      }
+
+      // Attempt 2 hat IMMER NOCH Klischees → programmatisch strippen.
+      // Lieber leicht ausgehöhlter Blog als Batch-Fail.
+      console.warn(
+        `[expand] cliché survived retry (${cliches.join(', ')}) — stripping programmatically`,
+      );
+      return { ...parsed, body_md: stripBannedPhrases(parsed.body_md) };
     } catch (e) {
       lastErr = e;
       const msg = e instanceof Error ? e.message : 'unknown';
       const isParseFail = msg.includes('parse failed') || msg.includes('META/BODY markers');
       const isTransient = msg.includes('rate_limit') || msg.includes('overloaded') || msg.includes('timeout') || msg.includes('Claude API 5') || msg.includes('Claude API 429');
-      if (attempt === 0 && (isParseFail || isTransient)) {
-        // Kurze Pause, dann nochmal versuchen
-        await new Promise((r) => setTimeout(r, 5000));
+      const isCliche = msg.startsWith('cliche-detected:');
+      if (attempt === 0 && (isParseFail || isTransient || isCliche)) {
+        // Kurze Pause, dann retry. Bei Cliché-Detect: kein Sleep nötig (kein Rate-Limit),
+        // aber 1s gibt Anthropic Atempause.
+        await new Promise((r) => setTimeout(r, isCliche ? 1000 : 5000));
         continue;
       }
       throw e;
