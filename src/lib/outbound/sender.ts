@@ -41,6 +41,11 @@ export type SendBatchResult = {
   skipped: number;
   errors: Array<{ leadId: string; error: string }>;
   sentEmails: Array<{ email: string; subject: string; lead: string }>;
+  /** Dedupe-Telemetrie — wie viele Leads wurden durch den Anti-Spam-Filter
+   *  auf do_not_contact gesetzt, damit der gleiche Empfaenger nicht 2x
+   *  angeschrieben wird. */
+  dedupedAlreadyContacted: number;
+  dedupedBatchDuplicate: number;
 };
 
 export async function sendOutboundBatch(
@@ -72,12 +77,16 @@ export async function sendOutboundBatch(
       sent: 0,
       failed: 0,
       skipped: 0,
+      dedupedAlreadyContacted: 0,
+      dedupedBatchDuplicate: 0,
       errors: [],
       sentEmails: [],
     };
   }
 
-  // Kandidaten holen: Leads mit Email, status=new, nicht im don_not_contact
+  // Kandidaten holen: Leads mit Email, status=new, nicht im don_not_contact.
+  // Mehr als 'remaining' fetchen — wir filtern gleich Duplikate weg und brauchen
+  // einen Puffer, sonst bleibt das Tagesbudget durch Dedupe-Drops unausgeschoepft.
   let q = sb
     .from('outbound_leads')
     .select('*')
@@ -85,12 +94,98 @@ export async function sendOutboundBatch(
     .eq('status', 'new')
     .not('email', 'is', null)
     .order('rating_count', { ascending: false, nullsFirst: false })  // bevorzuge Unternehmen mit mehr Reviews (= aktiv)
-    .limit(remaining);
+    .limit(remaining * 4);
 
   if (options.segment) q = q.eq('segment', options.segment);
 
-  const { data: candidates, error } = await q;
+  const { data: rawCandidates, error } = await q;
   if (error) throw new Error('Fetch candidates failed: ' + error.message);
+
+  // ANTI-SPAM-DEDUPE — verhindert dass die selbe Email-Adresse mehrfach
+  // kontaktiert wird. Quellen fuer Duplikate:
+  //  (a) Franchise-Standorte teilen eine zentrale Kontaktadresse
+  //      (z.B. mehrere PRIME-TIME-Gyms → join@primetime-fitness.de)
+  //  (b) Scrape-Duplikate (gleicher Betrieb 2x in outbound_leads)
+  //
+  // Zweistufiger Filter:
+  //  1. Global: jede Email die schon EINMAL in outbound_messages auftaucht
+  //     (egal welcher Lead) wird komplett uebersprungen + Lead -> do_not_contact.
+  //  2. Innerhalb Batch: pro Email-Adresse nur den staerksten Lead behalten
+  //     (sortiert nach rating_count desc), Rest -> do_not_contact.
+  const candidatePool = (rawCandidates ?? []) as OutboundLead[];
+  const candidateEmails = Array.from(
+    new Set(
+      candidatePool
+        .map((c) => c.email?.trim().toLowerCase())
+        .filter((e): e is string => Boolean(e)),
+    ),
+  );
+
+  // (1) Welche dieser Emails wurden je angeschrieben? Join ueber lead_id auf
+  //     outbound_messages — wir wollen status IN (pending, sent, ...) zaehlen,
+  //     'failed' ist OK weil dort nichts wirklich rausging.
+  const alreadyContactedEmails = new Set<string>();
+  if (candidateEmails.length > 0) {
+    const { data: contactedRows } = await sb
+      .from('outbound_messages')
+      .select('lead_id, outbound_leads!inner(email)')
+      .neq('status', 'failed');
+    for (const row of (contactedRows ?? []) as Array<{
+      outbound_leads: { email: string | null } | { email: string | null }[] | null;
+    }>) {
+      const rel = row.outbound_leads;
+      const email = Array.isArray(rel) ? rel[0]?.email : rel?.email;
+      if (email) alreadyContactedEmails.add(email.trim().toLowerCase());
+    }
+  }
+
+  // (2) Pro Email den ersten Lead behalten (Pool ist nach rating_count desc
+  //     sortiert → das ist automatisch der "staerkste"). Den Rest markieren wir
+  //     gleich als do_not_contact, damit sie nicht in kuenftigen Batches wieder
+  //     auftauchen.
+  const seenEmails = new Set<string>();
+  const candidates: OutboundLead[] = [];
+  const skippedAlreadyContacted: string[] = [];  // lead.ids
+  const skippedBatchDuplicate: string[] = [];   // lead.ids
+
+  for (const lead of candidatePool) {
+    const email = lead.email?.trim().toLowerCase();
+    if (!email) continue;
+
+    if (alreadyContactedEmails.has(email)) {
+      skippedAlreadyContacted.push(lead.id);
+      continue;
+    }
+    if (seenEmails.has(email)) {
+      skippedBatchDuplicate.push(lead.id);
+      continue;
+    }
+    seenEmails.add(email);
+    candidates.push(lead);
+    if (candidates.length >= remaining) break;
+  }
+
+  // Duplikate als do_not_contact markieren — best-effort, blockiert den Send-
+  // Pfad nicht wenn das Update fehlschlaegt. Reason wird in notes festgehalten
+  // damit die Provenance nicht verloren geht.
+  if (!dryRun && skippedAlreadyContacted.length > 0) {
+    await sb
+      .from('outbound_leads')
+      .update({
+        status: 'do_not_contact',
+        notes: 'auto: email bereits kontaktiert (anderer Lead-Datensatz)',
+      })
+      .in('id', skippedAlreadyContacted);
+  }
+  if (!dryRun && skippedBatchDuplicate.length > 0) {
+    await sb
+      .from('outbound_leads')
+      .update({
+        status: 'do_not_contact',
+        notes: 'auto: dupliziert (gleiche Email wie staerkerer Lead im Batch)',
+      })
+      .in('id', skippedBatchDuplicate);
+  }
 
   const result: SendBatchResult = {
     attempted: 0,
@@ -99,6 +194,8 @@ export async function sendOutboundBatch(
     skipped: 0,
     errors: [],
     sentEmails: [],
+    dedupedAlreadyContacted: skippedAlreadyContacted.length,
+    dedupedBatchDuplicate: skippedBatchDuplicate.length,
   };
 
   for (let i = 0; i < (candidates?.length ?? 0); i++) {

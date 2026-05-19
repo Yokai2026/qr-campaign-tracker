@@ -34,10 +34,6 @@
       "schedule": "0 7 * * *"
     },
     {
-      "path": "/api/cron/outbound-send",
-      "schedule": "30 9 * * *"
-    },
-    {
       "path": "/api/cron/outbound-report",
       "schedule": "0 18 * * *"
     }
