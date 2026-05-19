@@ -39,7 +39,8 @@ export type ContentCluster =
   | 'geld_business'
   | 'ai_risk'
   | 'marketing_systems'
-  | 'digital_marketing';
+  | 'digital_marketing'
+  | 'ki_geld_effizienz';
 
 export const CLUSTERS: ContentCluster[] = [
   'qr_realtalk',
@@ -56,6 +57,7 @@ export const CLUSTERS: ContentCluster[] = [
   'ai_risk',
   'marketing_systems',
   'digital_marketing',
+  'ki_geld_effizienz',
 ];
 
 export const CLUSTER_LABEL: Record<ContentCluster, string> = {
@@ -73,6 +75,7 @@ export const CLUSTER_LABEL: Record<ContentCluster, string> = {
   ai_risk: 'KI-Recht & Risiken',
   marketing_systems: 'Online & Offline Marketing',
   digital_marketing: 'Digitales Marketing',
+  ki_geld_effizienz: 'KI, Geld & Effizienz',
 };
 
 export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
@@ -104,6 +107,8 @@ export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
     'IM SCOPE: STRATEGISCHER POSITIONIERUNGS-CLUSTER. David versteht Online + Offline Marketing zusammen — Flyer, Plakate, Visitenkarten, QR-Codes, Schaufenster, Gutscheine, Events, Messen ↔ Websites, Landingpages, Newsletter, Kurzlinks, Tracking, CRM, Funnels, KI-Automation. KERNKOMPETENZ: die komplette Strecke sehen — Plakat → QR → Landingpage → Angebot → Eintrag → Mail → Termin → Tracking-Auswertung. Sub-Topics: (1) Print-Marketing messbar machen (Flyer + QR + Landingpage als geschlossener Loop). (2) Offline-Touchpoints → Online-Funnel (Schaufenster, Visitenkarte, Eventstand, Gutschein als Funnel-Einstieg). (3) QR-Codes, Kurzlinks, Landingpages als Einheit denken. (4) Wie lokale Unternehmen Offline-Kontakte digital weiterführen (Newsletter, Buchung, WhatsApp, Retargeting). (5) Multi-Touch-Customer-Journey für KMU ohne Enterprise-Stack. (6) KI-Automation für einfache Marketing-Aufgaben (Newsletter-Varianten, Asset-Quality-Check, Report-Zusammenfassungen) — aber Klarheit vor Automation. (7) Vertrauen offline → Abschluss online. (8) Klare Angebote, klare Fragen, klare Next-Steps. (9) Mini-Tests statt großer Launches. (10) Werbebudget sinnvoller einsetzen mit Tracking-Daten. (11) Marketing als wiederholbares System, nicht als einzelner Post. (12) blog_format="online-offline-bridge" für Ideen die explizit die Offline↔Online-Brücke zeigen. TONALITÄT: realistisch, sympathisch, leicht provokant, bodenständig, professionell — NIE Guru, NIE salesy, KEINE Reich-werden-Versprechen. CTAs subtil: "Marketing-Check anfragen", "Idee gemeinsam prüfen", "Kampagne analysieren lassen", "Mini-Audit starten", "System gemeinsam aufbauen", "Tracking-Setup besprechen". TOOL-BEZUG NATÜRLICH: Spurig als das Mess-Backbone für solche Systeme — verbindet Offline-Print mit Online-Conversion. POSITIONIERUNG: zeigt dass David Marketing als kompletten Kundenweg versteht — von der ersten physischen Wahrnehmung bis zur digitalen Buchung. NICHT IM SCOPE: reine Tool-Reviews (→ ai_marketing), reine Branchen-Cases (→ mittelstand), persönliche Founder-Erlebnisse ohne System-Lehre (→ founder_diary).',
   digital_marketing:
     'IM SCOPE: REIN DIGITALER POSITIONIERUNGS-CLUSTER (Komplementaer zu marketing_systems). David als Marketing-Praktiker der digitale Systeme baut — NICHT als Social-Media-Poster, NICHT als reiner Ads-Typ, NICHT als KI-Prompt-Verkäufer. Konkrete Sub-Topics: (1) Website / Landingpage / Buchungsseite als Conversion-System. (2) Newsletter-Aufbau, Subject-Lines, Timing, Segmentierung. (3) Social Media als Top-of-Funnel — Einstieg, kein Ziel. (4) SEO fuer lokale Unternehmen (Google Business Profile, Schema-Markup, NAP-Konsistenz). (5) Google Ads / Meta Ads-Grundlogik ohne Performance-Marketing-Buzzwords. (6) Lead-Magneten die wirklich konvertieren (klares Versprechen, nicht "spannende Tipps"). (7) Retargeting-Setup ohne Geld-in-den-Wind. (8) KI-Automation fuer Follow-ups (n8n + Mail-Trigger + Lead-Scoring). (9) CRM-Grundlagen — Notion vs Spreadsheet vs echtes CRM. (10) Tracking ohne Datenchaos (max 5 Conversion-Events). (11) Conversion-Optimierung als Klarheit, nicht Button-Farbe. (12) Angebotsklarheit + Pricing-Display + Vertrauenssignale. (13) Online-Reputation als Funnel-Hebel (Bewertungen, Q&A, Branchenverzeichnisse). (14) WhatsApp Business als Erst-Kontakt-Kanal. (15) Content der verkauft ohne plump zu verkaufen. UNTERSCHIED zu marketing_systems: hier KEINE Offline-Touchpoints (Print/Flyer/Plakat/QR/Event), sondern rein digitale Kanaele. UNTERSCHIED zu ai_marketing: hier breiter — KI ist EIN Hebel, nicht der Fokus. UNTERSCHIED zu tracking_tricks: hier strategische Marketing-Sicht, nicht reiner Tracking-Hack. TONALITÄT: sympathisch, realistisch, praxisnah, leicht provokant, verstaendlich, professionell — NIE Agentur-Sprech, NIE Growth-Hacker-Buzzwords. CTAs subtil: "Website-Check anfragen", "Landingpage prüfen lassen", "Newsletter-Strecke planen", "Tracking-Setup besprechen", "Kundenweg prüfen lassen", "Strategiegespräch anfragen". TOOL-BEZUG NATÜRLICH: Spurig misst was Online-Marketing wirklich bringt — Kurzlink-Tracking, Klick-Forensik in Newsletters, UTM-saubere Kampagnen. POSITIONIERUNG: David versteht digitale Systeme als Ganzes — Website + Newsletter + KI + Tracking + Reputation, sinnvoll verbunden. Leser-Wirkung: "Der versteht digitales Marketing wirklich" — nicht plump verkauft.',
+  ki_geld_effizienz:
+    'IM SCOPE: KI als WIRTSCHAFTLICHER HEBEL — Komplementaer zu ai_marketing und geld_business. Kernbotschaft: "KI verdient kein Geld von allein. Aber sie kann Systeme bauen, die Zeit sparen, Kosten senken und bessere Entscheidungen ermöglichen." Konkrete Sub-Topics: (1) KI zur Kostensenkung (Tool-Audit, SaaS-Konsolidierung, Stundeneinsparung). (2) KI zur Umsatzsteigerung (Follow-up-Automation, Angebots-Drafts, Lead-Recherche). (3) KI im Kundenservice (Erstantworten + menschliche Eskalation, nicht reiner Chatbot). (4) KI fuer interne Prozesse (Mail-Triage, Report-Automation, FAQ-Bots). (5) KI fuer Angebotserstellung (Template + Personalisierung = 80%-Erstentwurf). (6) KI fuer Lead-Follow-up (respektvolle Personalisierung, nicht Spam-Sequenzen). (7) KI fuer Newsletter (Subject-Varianten, Repurposing, A/B). (8) KI fuer Reporting (Daten → Zusammenfassung → Entscheidung). (9) KI fuer Content-Wiederverwertung (1 Blog → 5 Kanaele). (10) KI fuer Termin-Vorbereitung (Briefing-Automation vor Sales-Call). (11) KI fuer CRM-Pflege (Anreicherung, Stale-Lead-Detection). (12) Tool-Audit + Prozess-Audit (was kostet uns mehr als es loest). (13) Automationspotenzial entdecken (Wochenlog → Top-3-Zeitkiller). (14) KI-Projekt-Failures (warum die meisten KI-Initiativen nach 3 Monaten sterben). (15) KI-ROI realistisch berechnen (Total Cost of Ownership: Setup + Wartung + Lernkurve + Fehlerkosten). (16) Fehler-Kosten durch schlechte KI (Halluzinationen, falsche Pricing-Aussagen, falsche Mails). (17) Menschliche Freigaben in KI-Workflows (was nie ohne Mensch). (18) DSGVO + KI-Kostenrisiken (Bussgelder durch unbedachte Datenflüsse). (19) Was man NICHT automatisieren sollte (Reklamationen, Krisen, emotional). (20) KI fuer Solopreneure, kleine Teams, Mittelstand, Agenturen. UNTERSCHIED zu ai_marketing: hier Wirtschaft + Effizienz im Vordergrund, KI-Marketing ist EIN Teil. UNTERSCHIED zu geld_business: hier KI als Hebel im Zentrum, nicht allgemeine Cashflow-/Pricing-Themen. UNTERSCHIED zu ai_risk: hier wirtschaftliche Risikobetrachtung (Fehlerkosten, ROI), nicht reine Compliance. TONALITÄT: seriös, praxisnah, sympathisch, klar, wirtschaftlich, leicht provokant, realistisch — NIE Hype, NIE "schnell-reich-mit-KI", NIE Guru-Sprech. CTAs subtil: "KI-Prozess-Check anfragen", "Automationspotenzial prüfen", "Tool-Audit starten", "Follow-up-System besprechen", "Reporting automatisieren", "KI-Einstieg planen", "KI-Projekt prüfen", "Zeitfresser finden". TOOL-BEZUG NATÜRLICH: Spurig misst was die KI-Setups bringen — Tracking macht KI-ROI sichtbar. POSITIONIERUNG: Marketing-Praktiker + KI-Systemdenker + Umsetzer mit Blick auf Kosten, Nutzen und echte Ergebnisse. Leser-Wirkung: "Der versteht KI nicht als Spielerei, sondern als Werkzeug fuers Geschaeft."',
 };
 
 /**
@@ -211,5 +216,21 @@ export const CLUSTER_NICHE_INDUSTRIES: Record<ContentCluster, string[]> = {
     'KMU-Inhaber der eine Webseite hat aber keine Anfragen bekommt',
     'Performance-Marketer der von Ads-Tools zu Funnel-Denken wechselt',
     'Newsletter-Betreiber 100-2000 Abos im Aufbau',
+  ],
+  ki_geld_effizienz: [
+    'KMU-Inhaber 20-100 MA mit manueller Mail-Triage-Plage',
+    'Solopreneur der zwischen 5 Rollen pendelt',
+    'Agentur-Owner mit Junior-Burnout-Risiko',
+    'B2B-Sales-Team mit zu langem Lead-Follow-up',
+    'CFO der KI-Tools-Kosten begruenden muss',
+    'Coach mit wiederkehrenden FAQ-Anfragen',
+    'Praxis-Inhaber mit Termin-Vorbereitungs-Aufwand',
+    'Marketing-Manager mit 4-Stunden-Wochenreport-Last',
+    'Geschaeftsfuehrer mit SaaS-Stack ueber 4.000 EUR/Jahr',
+    'Operations-Leiter im Mittelstand mit Auto-Pilot-Wunsch',
+    'Solo-Founder mit Content-Repurposing-Stau',
+    'IT-Verantwortliche fuer KMU-KI-Stack-Auswahl',
+    'Customer-Service-Leiter mit Erst-Antwort-Zeit-Problem',
+    'Indie-Hacker der seinen ROI fuer Tools nachweisen muss',
   ],
 };

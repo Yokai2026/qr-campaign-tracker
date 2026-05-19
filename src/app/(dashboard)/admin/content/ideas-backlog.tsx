@@ -20,7 +20,8 @@ type Cluster =
   | 'geld_business'
   | 'ai_risk'
   | 'marketing_systems'
-  | 'digital_marketing';
+  | 'digital_marketing'
+  | 'ki_geld_effizienz';
 
 const CLUSTER_LABEL: Record<Cluster, string> = {
   qr_realtalk: 'QR-Realtalk',
@@ -37,6 +38,7 @@ const CLUSTER_LABEL: Record<Cluster, string> = {
   ai_risk: 'KI-Recht & Risiken',
   marketing_systems: 'Online & Offline Marketing',
   digital_marketing: 'Digitales Marketing',
+  ki_geld_effizienz: 'KI, Geld & Effizienz',
 };
 
 const CLUSTER_COLOR: Record<Cluster, string> = {
@@ -54,11 +56,13 @@ const CLUSTER_COLOR: Record<Cluster, string> = {
   ai_risk: '#dc2626',            // red — Risk/Compliance/Caution
   marketing_systems: '#c2410c',  // burnt orange — warmes Gold, Positionierungs-Cluster Online↔Offline
   digital_marketing: '#2563eb',  // kräftiges Blau — Positionierungs-Cluster Digital
+  ki_geld_effizienz: '#16a34a',  // kräftiges Grün — Positionierungs-Cluster KI-Wirtschaftlichkeit
 };
 
 const ALL_CLUSTERS: Cluster[] = [
   'marketing_systems',
   'digital_marketing',
+  'ki_geld_effizienz',
   'qr_realtalk',
   'print_lebt',
   'compliance_lite',
@@ -369,7 +373,7 @@ export function IdeasBacklog() {
           <p className="mt-0.5 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">
             Blog-Ideen für{' '}
             <span className="text-foreground/80">Marketing mit System</span>
-            : digitale Kanäle, Website, Newsletter, KI, Tracking und Offline-Touchpoints so verbinden, dass aus Aufmerksamkeit echte Anfragen werden.
+            : Print, Website, Newsletter, KI, Tracking und Effizienz zusammendenken — damit aus Aufmerksamkeit echte Anfragen und bessere Entscheidungen werden.
           </p>
         </div>
       </div>
