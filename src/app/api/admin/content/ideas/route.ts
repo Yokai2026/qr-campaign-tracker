@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   const service = await createServiceClient();
   let q = service
     .from('content_ideas')
-    .select('id, cluster, title, outline, angle, target_keywords, status, expanded_blog_id, created_at, updated_at')
+    .select('id, cluster, title, outline, angle, target_keywords, status, expanded_blog_id, created_at, updated_at, secondary_clusters')
     .order('created_at', { ascending: false })
     .limit(500);
   if (cluster && CLUSTERS.includes(cluster as ContentCluster)) q = q.eq('cluster', cluster);

@@ -18,7 +18,8 @@ type Cluster =
   | 'creator_design'
   | 'everyday_marketing'
   | 'geld_business'
-  | 'ai_risk';
+  | 'ai_risk'
+  | 'marketing_systems';
 
 const CLUSTER_LABEL: Record<Cluster, string> = {
   qr_realtalk: 'QR-Realtalk',
@@ -33,6 +34,7 @@ const CLUSTER_LABEL: Record<Cluster, string> = {
   everyday_marketing: 'Marketing-Alltag',
   geld_business: 'Geld & Business',
   ai_risk: 'KI-Recht & Risiken',
+  marketing_systems: 'Online & Offline Marketing',
 };
 
 const CLUSTER_COLOR: Record<Cluster, string> = {
@@ -48,9 +50,11 @@ const CLUSTER_COLOR: Record<Cluster, string> = {
   everyday_marketing: '#84cc16', // lime — everyday/practical
   geld_business: '#facc15',      // yellow — money/finance
   ai_risk: '#dc2626',            // red — Risk/Compliance/Caution
+  marketing_systems: '#c2410c',  // burnt orange — warmes Gold, Positionierungs-Cluster
 };
 
 const ALL_CLUSTERS: Cluster[] = [
+  'marketing_systems',
   'qr_realtalk',
   'print_lebt',
   'compliance_lite',
@@ -75,6 +79,7 @@ type Idea = {
   status: 'backlog' | 'expanded' | 'skipped';
   expanded_blog_id: string | null;
   created_at: string;
+  secondary_clusters: Cluster[] | null;
 };
 
 type Response = {
@@ -357,8 +362,10 @@ export function IdeasBacklog() {
       <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Ideen-Backlog</h2>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">
-            Ideen ankreuzen → „Blogs für Auswahl schreiben". Funktioniert clusterübergreifend.
+          <p className="mt-0.5 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">
+            Blog-Ideen für{' '}
+            <span className="text-foreground/80">Marketing mit System</span>
+            : Print, QR, Website, Newsletter, KI und Tracking zusammendenken — damit aus Aufmerksamkeit echte Anfragen werden.
           </p>
         </div>
       </div>
@@ -546,6 +553,22 @@ function IdeaCard({
       </button>
 
       <h3 className="mb-1 pr-7 text-[13.5px] font-semibold leading-snug">{idea.title}</h3>
+      {idea.secondary_clusters && idea.secondary_clusters.length > 0 && (
+        <div className="mb-1.5 flex flex-wrap gap-1">
+          {idea.secondary_clusters
+            .filter((c): c is Cluster => c in CLUSTER_LABEL)
+            .map((c) => (
+              <span
+                key={c}
+                className="inline-flex items-center gap-1 rounded-full bg-muted/40 px-1.5 py-0.5 text-[9.5px] font-medium text-muted-foreground"
+                title={`Sekundärer Cluster: ${CLUSTER_LABEL[c]}`}
+              >
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: CLUSTER_COLOR[c] }} />
+                {CLUSTER_LABEL[c]}
+              </span>
+            ))}
+        </div>
+      )}
       {idea.angle && (
         <p className="mb-1 text-[11.5px] italic text-muted-foreground">
           Hook: {idea.angle}

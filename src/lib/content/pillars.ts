@@ -37,7 +37,8 @@ export type ContentCluster =
   | 'creator_design'
   | 'everyday_marketing'
   | 'geld_business'
-  | 'ai_risk';
+  | 'ai_risk'
+  | 'marketing_systems';
 
 export const CLUSTERS: ContentCluster[] = [
   'qr_realtalk',
@@ -52,6 +53,7 @@ export const CLUSTERS: ContentCluster[] = [
   'everyday_marketing',
   'geld_business',
   'ai_risk',
+  'marketing_systems',
 ];
 
 export const CLUSTER_LABEL: Record<ContentCluster, string> = {
@@ -67,6 +69,7 @@ export const CLUSTER_LABEL: Record<ContentCluster, string> = {
   everyday_marketing: 'Marketing-Alltag',
   geld_business: 'Geld & Business',
   ai_risk: 'KI-Recht & Risiken',
+  marketing_systems: 'Online & Offline Marketing',
 };
 
 export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
@@ -94,6 +97,8 @@ export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
     'IM SCOPE: KI-Recht + Risiken + Sicherheit + Compliance — modern, verständlich, OHNE Anwaltsdeutsch. Konkrete Sub-Topics: (1) **EU AI Act 2026** — was Marketer wirklich beachten müssen, ab wann verbindlich, Hochrisiko-Systeme. (2) **DSGVO + KI** — wenn ChatGPT/Claude/Gemini Kundendaten sehen, was darf rein, was nicht. (3) **Urheberrecht bei AI-Content** — wem gehört von Sora/Midjourney generierter Content, kommerziell nutzbar. (4) **Haftung bei KI-Fehlern** — wer zahlt wenn n8n-Agent falsche Mail an Kunden schickt, ChatGPT halluziniert Pricing-Fehler. (5) **Hallucinations & False Data** — wie KI-Modelle Fakten erfinden, Beispiele aus Marketing-Praxis. (6) **AI-Agent-Security** — KI-Agenten haben API-Zugriff, was bedeutet das für Datensicherheit. (7) **Kundendaten in ChatGPT** — was Microsoft/OpenAI/Anthropic mit Eingaben machen, Enterprise vs Privat. (8) **Deepfakes im Marketing** — was rechtlich + ethisch geht. (9) **Sichere AI-Workflows** — wie n8n-Self-Hosting + EU-LLMs (Mistral/Aleph Alpha) DSGVO-Risiko reduzieren. (10) **Transparenz-Pflicht** — wann müssen Marketing-Texte als KI-generiert gekennzeichnet werden. (11) **Risiken vs Chancen** — ehrliche Balance, KEIN Panikmodus, sondern smart navigieren. (12) **Praxis-Cases** — echte Bußgelder, Urheberrechts-Klagen, ChatGPT-Datenleaks bei großen Firmen. (13) **Mythen vs Realität** — was wirklich problematisch ist vs was Hype-Panik ist. TONALITÄT: locker + intelligent + ehrlich, NICHT panisch. David spricht über AI-Risiken wie jemand der täglich damit arbeitet — als smartes Risikomanagement, nicht als Bremsklotz. TOOL-BEZUG NATÜRLICH: Spurig = EU-hosted, DSGVO-baseline, n8n-Webhook-Integration ohne US-Cloud-Risiko. NICHT IM SCOPE: reine DSGVO-Themen ohne KI-Bezug (→ compliance_lite), reine AI-Tool-Reviews ohne Risk-Aspect (→ ai_marketing).',
   geld_business:
     'IM SCOPE: GELD-THEMEN für KMU + Marketer + Solopreneurs. Sowohl SPAREN als auch VERDIENEN. Konkrete Sub-Topics: (1) Cashflow-Optimierung für KMU — Working-Capital-Management, Debitorenmanagement, Rechnungsstellung-Hacks (PwC-Studie 2026: €75 Mrd Potenzial in DACH-Unternehmen). (2) Marketing-Budget-ROI — Rolling-Forecast statt Jahresbudget, Streuverluste reduzieren, CAC-Reduktion mit Tracking-Daten. (3) SaaS-Stack-Audit — welche Tools wirklich nutzen, Subscription-Audits, Tool-Konsolidierung, Lifetime-Deals vs Subscriptions. (4) Pricing-Strategien — Value-Based vs Cost-Plus, Anchor-Pricing, Pricing-Pivots, Preiserhöhung ohne Churn. (5) Fördermittel & Grants für DACH-KMU 2026 — Digitalisierungs-Förderung, BAFA, KfW, INVEST-Zuschuss, EXIST. (6) Revenue-Growth ohne Wachstum-um-jeden-Preis — Conversion-Optimierung, Upsell, Cross-Sell, Retention-Tricks. (7) KI-driven Cost-Saving — wie KI repetitive Aufgaben automatisiert + reale Stundensätze einspart. (8) Co-Marketing-Hacks — Cross-Promotion, geteilte Kampagnen, Affiliate-Setups, Partner-Newsletter. (9) Steueroptimierung für Selbstständige + KMU — was Steuerberater nicht erzählen, GWG, IAB, Reisekosten. (10) Werte-Diskussion — "Wie viel ist 1 Stunde deiner Zeit wirklich wert?", Stundensatz-Kalkulation für Solo-Founder. TOOL-BEZUG NATÜRLICH: Spurig zeigt was Marketing-Euro wirklich bringen — Tracking als CFO-Argument. "Tracking macht aus Bauchgefühl bessere Entscheidungen." NICHT IM SCOPE: persönliche David-Founder-Geld-Stories (→ founder_diary), Branche-spezifische Cases (→ mittelstand), reine KI-Tool-Reviews ohne Cost-Aspect (→ ai_marketing).',
+  marketing_systems:
+    'IM SCOPE: STRATEGISCHER POSITIONIERUNGS-CLUSTER. David versteht Online + Offline Marketing zusammen — Flyer, Plakate, Visitenkarten, QR-Codes, Schaufenster, Gutscheine, Events, Messen ↔ Websites, Landingpages, Newsletter, Kurzlinks, Tracking, CRM, Funnels, KI-Automation. KERNKOMPETENZ: die komplette Strecke sehen — Plakat → QR → Landingpage → Angebot → Eintrag → Mail → Termin → Tracking-Auswertung. Sub-Topics: (1) Print-Marketing messbar machen (Flyer + QR + Landingpage als geschlossener Loop). (2) Offline-Touchpoints → Online-Funnel (Schaufenster, Visitenkarte, Eventstand, Gutschein als Funnel-Einstieg). (3) QR-Codes, Kurzlinks, Landingpages als Einheit denken. (4) Wie lokale Unternehmen Offline-Kontakte digital weiterführen (Newsletter, Buchung, WhatsApp, Retargeting). (5) Multi-Touch-Customer-Journey für KMU ohne Enterprise-Stack. (6) KI-Automation für einfache Marketing-Aufgaben (Newsletter-Varianten, Asset-Quality-Check, Report-Zusammenfassungen) — aber Klarheit vor Automation. (7) Vertrauen offline → Abschluss online. (8) Klare Angebote, klare Fragen, klare Next-Steps. (9) Mini-Tests statt großer Launches. (10) Werbebudget sinnvoller einsetzen mit Tracking-Daten. (11) Marketing als wiederholbares System, nicht als einzelner Post. (12) blog_format="online-offline-bridge" für Ideen die explizit die Offline↔Online-Brücke zeigen. TONALITÄT: realistisch, sympathisch, leicht provokant, bodenständig, professionell — NIE Guru, NIE salesy, KEINE Reich-werden-Versprechen. CTAs subtil: "Marketing-Check anfragen", "Idee gemeinsam prüfen", "Kampagne analysieren lassen", "Mini-Audit starten", "System gemeinsam aufbauen", "Tracking-Setup besprechen". TOOL-BEZUG NATÜRLICH: Spurig als das Mess-Backbone für solche Systeme — verbindet Offline-Print mit Online-Conversion. POSITIONIERUNG: zeigt dass David Marketing als kompletten Kundenweg versteht — von der ersten physischen Wahrnehmung bis zur digitalen Buchung. NICHT IM SCOPE: reine Tool-Reviews (→ ai_marketing), reine Branchen-Cases (→ mittelstand), persönliche Founder-Erlebnisse ohne System-Lehre (→ founder_diary).',
 };
 
 /**
@@ -175,5 +180,15 @@ export const CLUSTER_NICHE_INDUSTRIES: Record<ContentCluster, string[]> = {
     'Newsletter-Schreiber mit AI-Content',
     'B2B-SaaS-Founder der Kundendaten in OpenAI/Anthropic einspeist',
     'Datenschutz-Anwalt für SaaS', 'Customer-Success-Manager mit KI-Assistant',
+  ],
+  marketing_systems: [
+    'Inhaber lokales Geschäft (Friseur, Blumenladen, Studio, Eisdiele)',
+    'Solopreneur mit Beratungsgeschäft', 'B2B-Service-Anbieter Köln-Hamburg-Wien',
+    'Marketing-Manager KMU 5-50 Mitarbeiter', 'Startup-Founder mit Pre-Seed-Budget',
+    'Handwerksbetrieb mit Print-Mailing-Erfahrung', 'Coaching-Praxis mit Newsletter',
+    'Agentur-Owner der KI-Workflows integriert', 'Geschäftsführer Mittelstand mit Marketing-Frust',
+    'Vertriebsleiter mit Tracking-Lücke', 'Eventbüro / Foodtruck / Pop-Up-Anbieter',
+    'Newsletter-Betreiber 500-5000 Abos', 'Indie-Founder ohne VC-Druck',
+    'Designer der Kampagnen-Assets messbar machen will',
   ],
 };
