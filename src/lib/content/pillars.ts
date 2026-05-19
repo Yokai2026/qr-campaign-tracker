@@ -38,7 +38,8 @@ export type ContentCluster =
   | 'everyday_marketing'
   | 'geld_business'
   | 'ai_risk'
-  | 'marketing_systems';
+  | 'marketing_systems'
+  | 'digital_marketing';
 
 export const CLUSTERS: ContentCluster[] = [
   'qr_realtalk',
@@ -54,6 +55,7 @@ export const CLUSTERS: ContentCluster[] = [
   'geld_business',
   'ai_risk',
   'marketing_systems',
+  'digital_marketing',
 ];
 
 export const CLUSTER_LABEL: Record<ContentCluster, string> = {
@@ -70,6 +72,7 @@ export const CLUSTER_LABEL: Record<ContentCluster, string> = {
   geld_business: 'Geld & Business',
   ai_risk: 'KI-Recht & Risiken',
   marketing_systems: 'Online & Offline Marketing',
+  digital_marketing: 'Digitales Marketing',
 };
 
 export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
@@ -99,6 +102,8 @@ export const CLUSTER_DESCRIPTION: Record<ContentCluster, string> = {
     'IM SCOPE: GELD-THEMEN für KMU + Marketer + Solopreneurs. Sowohl SPAREN als auch VERDIENEN. Konkrete Sub-Topics: (1) Cashflow-Optimierung für KMU — Working-Capital-Management, Debitorenmanagement, Rechnungsstellung-Hacks (PwC-Studie 2026: €75 Mrd Potenzial in DACH-Unternehmen). (2) Marketing-Budget-ROI — Rolling-Forecast statt Jahresbudget, Streuverluste reduzieren, CAC-Reduktion mit Tracking-Daten. (3) SaaS-Stack-Audit — welche Tools wirklich nutzen, Subscription-Audits, Tool-Konsolidierung, Lifetime-Deals vs Subscriptions. (4) Pricing-Strategien — Value-Based vs Cost-Plus, Anchor-Pricing, Pricing-Pivots, Preiserhöhung ohne Churn. (5) Fördermittel & Grants für DACH-KMU 2026 — Digitalisierungs-Förderung, BAFA, KfW, INVEST-Zuschuss, EXIST. (6) Revenue-Growth ohne Wachstum-um-jeden-Preis — Conversion-Optimierung, Upsell, Cross-Sell, Retention-Tricks. (7) KI-driven Cost-Saving — wie KI repetitive Aufgaben automatisiert + reale Stundensätze einspart. (8) Co-Marketing-Hacks — Cross-Promotion, geteilte Kampagnen, Affiliate-Setups, Partner-Newsletter. (9) Steueroptimierung für Selbstständige + KMU — was Steuerberater nicht erzählen, GWG, IAB, Reisekosten. (10) Werte-Diskussion — "Wie viel ist 1 Stunde deiner Zeit wirklich wert?", Stundensatz-Kalkulation für Solo-Founder. TOOL-BEZUG NATÜRLICH: Spurig zeigt was Marketing-Euro wirklich bringen — Tracking als CFO-Argument. "Tracking macht aus Bauchgefühl bessere Entscheidungen." NICHT IM SCOPE: persönliche David-Founder-Geld-Stories (→ founder_diary), Branche-spezifische Cases (→ mittelstand), reine KI-Tool-Reviews ohne Cost-Aspect (→ ai_marketing).',
   marketing_systems:
     'IM SCOPE: STRATEGISCHER POSITIONIERUNGS-CLUSTER. David versteht Online + Offline Marketing zusammen — Flyer, Plakate, Visitenkarten, QR-Codes, Schaufenster, Gutscheine, Events, Messen ↔ Websites, Landingpages, Newsletter, Kurzlinks, Tracking, CRM, Funnels, KI-Automation. KERNKOMPETENZ: die komplette Strecke sehen — Plakat → QR → Landingpage → Angebot → Eintrag → Mail → Termin → Tracking-Auswertung. Sub-Topics: (1) Print-Marketing messbar machen (Flyer + QR + Landingpage als geschlossener Loop). (2) Offline-Touchpoints → Online-Funnel (Schaufenster, Visitenkarte, Eventstand, Gutschein als Funnel-Einstieg). (3) QR-Codes, Kurzlinks, Landingpages als Einheit denken. (4) Wie lokale Unternehmen Offline-Kontakte digital weiterführen (Newsletter, Buchung, WhatsApp, Retargeting). (5) Multi-Touch-Customer-Journey für KMU ohne Enterprise-Stack. (6) KI-Automation für einfache Marketing-Aufgaben (Newsletter-Varianten, Asset-Quality-Check, Report-Zusammenfassungen) — aber Klarheit vor Automation. (7) Vertrauen offline → Abschluss online. (8) Klare Angebote, klare Fragen, klare Next-Steps. (9) Mini-Tests statt großer Launches. (10) Werbebudget sinnvoller einsetzen mit Tracking-Daten. (11) Marketing als wiederholbares System, nicht als einzelner Post. (12) blog_format="online-offline-bridge" für Ideen die explizit die Offline↔Online-Brücke zeigen. TONALITÄT: realistisch, sympathisch, leicht provokant, bodenständig, professionell — NIE Guru, NIE salesy, KEINE Reich-werden-Versprechen. CTAs subtil: "Marketing-Check anfragen", "Idee gemeinsam prüfen", "Kampagne analysieren lassen", "Mini-Audit starten", "System gemeinsam aufbauen", "Tracking-Setup besprechen". TOOL-BEZUG NATÜRLICH: Spurig als das Mess-Backbone für solche Systeme — verbindet Offline-Print mit Online-Conversion. POSITIONIERUNG: zeigt dass David Marketing als kompletten Kundenweg versteht — von der ersten physischen Wahrnehmung bis zur digitalen Buchung. NICHT IM SCOPE: reine Tool-Reviews (→ ai_marketing), reine Branchen-Cases (→ mittelstand), persönliche Founder-Erlebnisse ohne System-Lehre (→ founder_diary).',
+  digital_marketing:
+    'IM SCOPE: REIN DIGITALER POSITIONIERUNGS-CLUSTER (Komplementaer zu marketing_systems). David als Marketing-Praktiker der digitale Systeme baut — NICHT als Social-Media-Poster, NICHT als reiner Ads-Typ, NICHT als KI-Prompt-Verkäufer. Konkrete Sub-Topics: (1) Website / Landingpage / Buchungsseite als Conversion-System. (2) Newsletter-Aufbau, Subject-Lines, Timing, Segmentierung. (3) Social Media als Top-of-Funnel — Einstieg, kein Ziel. (4) SEO fuer lokale Unternehmen (Google Business Profile, Schema-Markup, NAP-Konsistenz). (5) Google Ads / Meta Ads-Grundlogik ohne Performance-Marketing-Buzzwords. (6) Lead-Magneten die wirklich konvertieren (klares Versprechen, nicht "spannende Tipps"). (7) Retargeting-Setup ohne Geld-in-den-Wind. (8) KI-Automation fuer Follow-ups (n8n + Mail-Trigger + Lead-Scoring). (9) CRM-Grundlagen — Notion vs Spreadsheet vs echtes CRM. (10) Tracking ohne Datenchaos (max 5 Conversion-Events). (11) Conversion-Optimierung als Klarheit, nicht Button-Farbe. (12) Angebotsklarheit + Pricing-Display + Vertrauenssignale. (13) Online-Reputation als Funnel-Hebel (Bewertungen, Q&A, Branchenverzeichnisse). (14) WhatsApp Business als Erst-Kontakt-Kanal. (15) Content der verkauft ohne plump zu verkaufen. UNTERSCHIED zu marketing_systems: hier KEINE Offline-Touchpoints (Print/Flyer/Plakat/QR/Event), sondern rein digitale Kanaele. UNTERSCHIED zu ai_marketing: hier breiter — KI ist EIN Hebel, nicht der Fokus. UNTERSCHIED zu tracking_tricks: hier strategische Marketing-Sicht, nicht reiner Tracking-Hack. TONALITÄT: sympathisch, realistisch, praxisnah, leicht provokant, verstaendlich, professionell — NIE Agentur-Sprech, NIE Growth-Hacker-Buzzwords. CTAs subtil: "Website-Check anfragen", "Landingpage prüfen lassen", "Newsletter-Strecke planen", "Tracking-Setup besprechen", "Kundenweg prüfen lassen", "Strategiegespräch anfragen". TOOL-BEZUG NATÜRLICH: Spurig misst was Online-Marketing wirklich bringt — Kurzlink-Tracking, Klick-Forensik in Newsletters, UTM-saubere Kampagnen. POSITIONIERUNG: David versteht digitale Systeme als Ganzes — Website + Newsletter + KI + Tracking + Reputation, sinnvoll verbunden. Leser-Wirkung: "Der versteht digitales Marketing wirklich" — nicht plump verkauft.',
 };
 
 /**
@@ -190,5 +195,21 @@ export const CLUSTER_NICHE_INDUSTRIES: Record<ContentCluster, string[]> = {
     'Vertriebsleiter mit Tracking-Lücke', 'Eventbüro / Foodtruck / Pop-Up-Anbieter',
     'Newsletter-Betreiber 500-5000 Abos', 'Indie-Founder ohne VC-Druck',
     'Designer der Kampagnen-Assets messbar machen will',
+  ],
+  digital_marketing: [
+    'B2B-Solopreneur mit Webseite + Newsletter',
+    'Coach mit Buchungsseite (Cal.com / Calendly)',
+    'SaaS-Founder mit unklarem Conversion-Funnel',
+    'Lokaler Dienstleister der Google Business Profile vernachlaessigt',
+    'Marketing-Verantwortliche im Mittelstand 20-100 MA',
+    'Solo-Marketer der von Tool-Stack ueberfordert ist',
+    'Berater der online unklar wirkt obwohl offline gut etabliert',
+    'E-Commerce-Owner mit Ad-Budget aber ohne Retargeting',
+    'Indie-Hacker mit Lead-Magnet der nicht konvertiert',
+    'Agentur-Owner der eigenes Marketing vernachlaessigt',
+    'Startup-Founder zwischen Produkt-Building und Marketing',
+    'KMU-Inhaber der eine Webseite hat aber keine Anfragen bekommt',
+    'Performance-Marketer der von Ads-Tools zu Funnel-Denken wechselt',
+    'Newsletter-Betreiber 100-2000 Abos im Aufbau',
   ],
 };
