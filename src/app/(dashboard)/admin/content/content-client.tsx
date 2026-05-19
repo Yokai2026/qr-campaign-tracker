@@ -11,6 +11,9 @@ import {
   Sparkles,
   Loader2,
   ExternalLink,
+  CheckSquare,
+  Square,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -40,6 +43,7 @@ type Article = {
   publishedAt: string;
   tags: string[];
   source?: 'file' | 'db';
+  cluster?: string;
   image_prompt?: string | null;
   image_url?: string | null;
   image_alt?: string | null;
@@ -70,6 +74,8 @@ const CHANNEL_PUBLISH_URLS: Record<Channel, string> = {
 
 export function ContentClient() {
   const [generatingSlug, setGeneratingSlug] = useState<string | null>(null);
+  const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery<Response>({
@@ -131,6 +137,64 @@ export function ContentClient() {
     else toast.error('Update fehlgeschlagen');
   }
 
+  function toggleSelect(slug: string) {
+    setSelectedSlugs((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  }
+
+  function clearSelection() {
+    setSelectedSlugs(new Set());
+  }
+
+  function selectAllDb() {
+    const dbSlugs = (data?.articles ?? [])
+      .filter((a) => a.source === 'db')
+      .map((a) => a.slug);
+    setSelectedSlugs(new Set(dbSlugs));
+  }
+
+  async function deleteSelected() {
+    const slugs = Array.from(selectedSlugs);
+    if (slugs.length === 0) return;
+    if (!confirm(`${slugs.length} Blog${slugs.length > 1 ? 's' : ''} WIRKLICH löschen? Drafts werden mitgelöscht, verknüpfte Ideen kehren in den Backlog zurück. Geht nicht rückgängig.`)) return;
+    setDeleting(true);
+    try {
+      const r = await fetch('/api/admin/content', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slugs }),
+      });
+      const j = (await r.json().catch(() => ({}))) as {
+        deleted?: string[];
+        errors?: Array<{ slug: string; error: string }>;
+        error?: string;
+      };
+      if (!r.ok) {
+        toast.error(`Löschen fehlgeschlagen: ${j.error ?? `HTTP ${r.status}`}`);
+        return;
+      }
+      const okCount = j.deleted?.length ?? 0;
+      const errCount = j.errors?.length ?? 0;
+      if (okCount > 0) {
+        toast.success(`${okCount} Blog${okCount > 1 ? 's' : ''} gelöscht${errCount > 0 ? `, ${errCount} übersprungen` : ''}`);
+      }
+      if (errCount > 0) {
+        j.errors?.forEach((e) => toast.warning(`${e.slug}: ${e.error}`, { duration: 6000 }));
+      }
+      clearSelection();
+      queryClient.invalidateQueries({ queryKey: ['content-drafts'] });
+      queryClient.invalidateQueries({ queryKey: ['content-ideas'] });
+    } catch (e) {
+      toast.error(`Netzwerk-Fehler: ${e instanceof Error ? e.message : 'unknown'}`);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   const articles = data?.articles ?? [];
   const draftsBySlug = (data?.drafts ?? []).reduce<Record<string, Draft[]>>((acc, d) => {
     (acc[d.blog_slug] ??= []).push(d);
@@ -152,7 +216,38 @@ export function ContentClient() {
 
       <IdeasBacklog />
 
-      <h2 className="mb-3 text-base font-semibold tracking-tight">Blog-Posts mit Drafts</h2>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-base font-semibold tracking-tight">Blog-Posts mit Drafts</h2>
+        {articles.some((a) => a.source === 'db') && (
+          <Button size="sm" variant="ghost" onClick={selectAllDb} disabled={deleting}>
+            <CheckSquare className="mr-1.5 h-3.5 w-3.5" />
+            Alle DB-Blogs auswählen
+          </Button>
+        )}
+      </div>
+
+      {/* Bulk-Bar — nur sichtbar wenn Selection vorhanden */}
+      {selectedSlugs.size > 0 && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+          <div className="text-[13px] font-medium">
+            <span className="text-destructive">{selectedSlugs.size}</span> Blog{selectedSlugs.size > 1 ? 's' : ''} ausgewählt
+            <span className="ml-2 text-muted-foreground">· Drafts werden mitgelöscht, verknüpfte Ideen kehren zurück in den Backlog</span>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="ghost" onClick={clearSelection} disabled={deleting}>
+              Auswahl aufheben
+            </Button>
+            <Button size="sm" variant="destructive" onClick={deleteSelected} disabled={deleting}>
+              {deleting ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              {selectedSlugs.size} löschen
+            </Button>
+          </div>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
@@ -167,25 +262,58 @@ export function ContentClient() {
           {articles.map((article) => {
             const drafts = draftsBySlug[article.slug] ?? [];
             const hasAny = drafts.length > 0;
+            const isDb = article.source === 'db';
+            const isSelected = selectedSlugs.has(article.slug);
             return (
-              <div key={article.slug} className="rounded-xl border border-border bg-card p-5">
+              <div
+                key={article.slug}
+                className={`rounded-xl border bg-card p-5 transition-colors ${
+                  isSelected
+                    ? 'border-destructive/50 bg-destructive/[0.03]'
+                    : 'border-border'
+                }`}
+              >
                 <div className="mb-4 flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <Link
-                      href={`/blog/${article.slug}`}
-                      target="_blank"
-                      className="text-base font-semibold hover:underline"
-                    >
-                      {article.title}
-                    </Link>
-                    <p className="mt-1 line-clamp-2 text-[13px] text-muted-foreground">{article.description}</p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {article.tags.map((tag) => (
-                        <span key={tag} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                          {tag}
-                        </span>
-                      ))}
-                      <span className="text-[10px] text-muted-foreground">· {article.publishedAt}</span>
+                  <div className="flex min-w-0 items-start gap-3">
+                    {isDb ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleSelect(article.slug)}
+                        className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-foreground"
+                        aria-label={isSelected ? 'Auswahl entfernen' : 'Blog auswählen'}
+                        title={isSelected ? 'Auswahl entfernen' : 'Blog für Löschen markieren'}
+                      >
+                        {isSelected ? (
+                          <CheckSquare className="h-4 w-4 text-destructive" />
+                        ) : (
+                          <Square className="h-4 w-4" />
+                        )}
+                      </button>
+                    ) : (
+                      <span
+                        className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground/40"
+                        title="File-based Blog (in src/app/blog/articles.ts) — nicht über UI löschbar"
+                      >
+                        <Square className="h-4 w-4" />
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <Link
+                        href={`/blog/${article.slug}`}
+                        target="_blank"
+                        className="text-base font-semibold hover:underline"
+                      >
+                        {article.title}
+                      </Link>
+                      <p className="mt-1 line-clamp-2 text-[13px] text-muted-foreground">{article.description}</p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {article.tags.map((tag) => (
+                          <span key={tag} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                            {tag}
+                          </span>
+                        ))}
+                        <span className="text-[10px] text-muted-foreground">· {article.publishedAt}</span>
+                      </div>
                     </div>
                   </div>
                   <Button
